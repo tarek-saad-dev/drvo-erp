@@ -50,3 +50,7 @@ Forty founder answers captured and reconciled in [Tenancy Discovery](../01-produ
 ## Tenancy follow-up (2026-10-28)
 
 Approved: Manager always sees profits and service costs in authorized scope; currency/language/timezone only at Business level. Module Dependencies unresolved pending design discussion. [Tenancy Architecture](../02-architecture/TENANCY-ARCHITECTURE.md).
+
+## Identity & Access discovery — 2026-10-28
+
+Twelve founder responses recorded. Platform-global usernames and username/password login, tenant self-registration, explicit Business Membership, one Role per Branch, email OTP recovery and mandatory employee first-login change approved. Explicit Deny and temporary permissions remain unresolved; session revocation must be enforced server-side. [Identity & Access](../02-architecture/IDENTITY-ACCESS.md).

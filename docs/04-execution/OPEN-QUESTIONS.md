@@ -230,3 +230,8 @@ Drafts created: [POS Data Model](../03-modules/POS-DATA-MODEL-V1.md), [Accountin
 - Permission to reopen monthly/yearly periods approved; control and actor policy still TBD; posted entries remain immutable, corrected via linked reversing journal.
 - Sensitive-only Audit Log policy approved, while immutable financial source/provenance must still be retained.
 - See [Accounting Core](../03-modules/ACCOUNTING-CORE-SPEC.md), [Chart of Accounts](../03-modules/CHART-OF-ACCOUNTS.md).
+
+
+## Treasury discovery — 2026-10-29
+
+Confirmed one treasury per Branch; bank accounts at Business and Branch levels; approved and logged Manager-authorized transfers; expenses paid via bank or cash, with Manager approval for large expenses; bank reconciliation deferred; outside-sale cash movements logged; Manager balance visibility under independent permission. Open: large-expense amount thresholds, cross-Business transfers, account-level permissions and transfer reconciliation. [Treasury Core](../03-modules/TREASURY-CORE-SPEC.md).

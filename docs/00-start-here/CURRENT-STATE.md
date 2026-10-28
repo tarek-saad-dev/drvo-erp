@@ -1,26 +1,31 @@
 # Current state
 
-**As of:** 2026-10-27  
-**Overall phase:** Planning / documentation  
-**Code implementation:** NOT STARTED  
-**Production DB:** NOT CREATED / NOT VERIFIED  
-**Staging:** NOT CREATED / NOT VERIFIED  
-**Deployment:** NOT PERFORMED / NOT VERIFIED
+**As of:** 2026-10-28  
+**Phase:** Founder Discovery / Documentation (Phase 0)  
+**Implementation:** NOT STARTED  
+**Production database, staging and deployment:** NOT VERIFIED / NOT DONE
 
-## Confirmed
+## Confirmed product direction
 
-- Independent GitHub repository: `tarek-saad-dev/drvo-erp`, default branch `main`.
-- A documentation-first workflow and source-of-truth policy.
-- Strategic modular monolith direction, multi-tenancy and industry extensions.
+- Complete modular ERP as vision; staged releases.
+- Medium-sized multi-branch target customers.
+- Egypt and Gulf countries intended from first commercial launch, with country details pending.
+- First vertical: barber salons; **second: medical clinics**.
+- **Cut Salon** first real-world pilot.
+- **Responsive Web / PWA** as initial mobile channel.
+- **Core + Extension architecture required for each module**; technical contracts not yet finalized.
+- Modular Monolith, multi-tenant architecture, standalone repository and docs source of truth.
 
-## Next action
+## Next steps
 
-Confirm repository visibility is **Private** (currently Public at baseline); review documentation, resolve foundational open questions, then scaffold application and migrations.
+1. Complete detailed MVP discovery for the barber salon pilot.
+2. Resolve cross-market launch/compliance and medical clinic scope.
+3. Specify extension contracts and tenant model before scaffolding.
+4. Decide technology stack, environments and data strategy.
+5. Define measurable acceptance criteria.
 
-## Blocking/open items
+See [Open questions](../04-execution/OPEN-QUESTIONS.md) and [Roadmap](../04-execution/ROADMAP.md).
 
-See [Open questions](../04-execution/OPEN-QUESTIONS.md).
+## Verification
 
-## Verification rule
-
-Only change a feature to **implemented** on code evidence, **tested** on test results and **production verified** on successful deployment plus functional checks. Capture links to commits/PRs and test logs.
+An accepted decision is not implementation; no feature is considered tested or deployed without evidence.

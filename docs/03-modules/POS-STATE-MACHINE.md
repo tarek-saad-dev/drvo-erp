@@ -59,3 +59,7 @@ Allow only cash sale when a valid preexisting locally cached shift entitlement e
 ## Deferred design
 
 Posting and reversal journal accounts, offline shift-close mechanics, accounting period adjustments, taxes/currencies, discount policies, payment-provider integration and approved detailed API schemas.
+
+## Offline scope change requested (2026-10-28)
+
+Founder now requests offline services and products **with all payment methods**. This supersedes the cash-only **product wish**, but must NOT be interpreted as provider-confirmed electronic payments without connectivity. The existing cash-only offline implementation assumptions in this draft are superseded for product discovery; exact tender eligibility is open. See [Offline discovery](OFFLINE-POS-DISCOVERY-ROUND-1.md) and [Offline sync design](OFFLINE-SYNC-SPEC.md).

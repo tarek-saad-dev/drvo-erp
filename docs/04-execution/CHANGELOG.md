@@ -181,3 +181,8 @@ Added draft POS logical data model, Accounting Events and module integration bou
 - Documented 11 approved founder decisions; deferred cross-Business inventory transfer question.
 - Added compact Inventory Core and Purchasing Core design specs with direct purchase, Recipe-based material consumption, stocktake and low-stock alerts.
 - Reviewed POS offline negative stock and Accounting valuation implications; no code deployed.
+
+
+## 2026-10-29 — Cross-module architecture review
+
+Added ARCHITECTURE-READINESS-REVIEW.md: reconciled historical rule conflicts, listed seven design gates, proposed implementation sequencing, and scoped financial/tenant data integrity checks. Documentation only.

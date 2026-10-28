@@ -172,3 +172,11 @@ Approved: global username uniqueness, username/password login, self-registration
 - OQ-080: Salon opener upsell commission **10% for Mohamed**, while Youssef executes skin care and owns its target. Commission calculation base, stacking and refunds unsettled; prior 70/30 arbitrary revenue split not adopted.
 
 [POS Discovery Round 4](../03-modules/POS-DISCOVERY-ROUND-4.md).
+
+## POS state / shift specification — 2026-10-28
+
+**Resolved founder decisions:** opener commission 10% on post-discount pre-tax service value, one opener, opener ≠ executor, automatically reverse on refund; cash surplus to variance then verified reclassification; approved settlements corrected via new linked entry preserving original.
+
+**Still open:** rounding and partial refund commission reversal, employee commission plan interaction, financial-day closure finality, shift close with offline pending sales, signed custody chain, staff shortage liability approval, event/API/DB contracts, credit/refund ledger exact accounts and discount policy.
+
+Design drafts: [POS State Machine](../03-modules/POS-STATE-MACHINE.md) and [Shift Lifecycle](../03-modules/SHIFT-LIFECYCLE.md). Their proposed state names and implementation choices are **not approved** merely by documenting them.

@@ -21,6 +21,23 @@
 | OQ-018 | Clinic clinical data scope, privacy, compliance and safe release criteria | High |
 | OQ-019 | Cut Salon pilot date, scope, transition and operational rollback | High |
 
+## MVP Round 2 unresolved scope / delivery
+
+| ID | Open decision | Priority |
+|---|---|---|
+| OQ-020 | One-month target feasibility: team, resources, delivery scope, acceptance gates | Critical |
+| OQ-021 | Distinguish limited pilot, replacement parity, and first external commercial sale | Critical |
+| OQ-022 | Offline POS writes, sync conflicts, payment processing, stock and journal posting | Critical |
+| OQ-023 | Parallel operation: per-entity system of record and duplicate prevention | Critical |
+| OQ-024 | Full general ledger design/requirements vs operational cash summaries | Critical |
+| OQ-025 | Full existing HR parity checklist and dependencies | High |
+| OQ-026 | Subscription payment provider(s), invoicing and operational billing | High |
+| OQ-027 | Receipt printing postponed: pilot process and replacement acceptance | High |
+| OQ-028 | Pilot date/branch, data migration strategy, booking concurrency test | Critical |
+| OQ-029 | Arabic-first vs Gulf-market localization and compliance at simultaneous launch | High |
+
+See [MVP Discovery Round 2](../01-product/MVP-DISCOVERY-ROUND-2.md).
+
 ## Resolved from founder follow-ups (2026-10-28)
 
 - Former OQ-010 second industry: **medical clinics**, after barber salons.

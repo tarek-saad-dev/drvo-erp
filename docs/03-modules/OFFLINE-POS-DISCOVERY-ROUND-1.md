@@ -27,3 +27,12 @@
 Previously confirmed: cash-only offline, open-shift guard, immutable paid invoices, hard credit-limit enforcement, global dedupe, no duplicate receipts, source sale date and late accounting adjustment. Scope change must preserve these protections or explicitly revise via new decision. See [POS State Machine](POS-STATE-MACHINE.md).
 
 No implementation has occurred.
+
+## Follow-up answers — 2026-10-28
+
+1. Electronic payments offline — **unanswered; leave open**.
+2. Unsynced sales at shift close — **approved: provisional close then final reconciliation**.
+3. Cash physical count — **approved: include all actually received cash, including offline unsynced sales**.
+4. Failed offline sync — **approved: automatic retries, then Manager-visible errors**.
+
+These decisions supersede the undecided entries for shift close, cash count and sync failure above. Remaining electronic tender behavior is not settled.

@@ -90,3 +90,11 @@
 - Consolidated reports show provenance and do not violate Business boundaries.
 
 [Tenancy blueprint](../02-architecture/TENANCY-ARCHITECTURE.md) · [Open questions](../04-execution/OPEN-QUESTIONS.md).
+
+## Final follow-up answers (2026-10-28)
+
+1. Module Dependencies: discuss design first — **Open**.
+2. Profit/cost visibility: Managers always see these within their authorized scope — **Approved**.
+3. Currency/language/timezone: Business-level only, no Branch overrides — **Approved**.
+
+These answers supersede any conflicting proposals in this document; original survey answers are preserved as history.

@@ -86,3 +86,7 @@ Six founder clarifications approved: opener commission 10% of post-discount pre-
 ## Offline shift reconciliation follow-up — 2026-10-28
 
 Founder approved provisional close for shifts with unsynced sales, cash counting including actually received offline amounts, and automatic retry followed by Manager-visible errors. Offline electronic payment confirmation remains open. Design specification updated; no code implemented.
+
+## Offline/closing design checkpoint — 2026-10-28
+
+Founder approved provisional financial-day close with later final reconciliation; when a device is lost before sync, log incident and reconcile physical cash manually. Provider-dependent offline payments remain undecided pending discussion by method. Draft [Offline API Contracts](../03-modules/OFFLINE-API-CONTRACTS.md) and [Logical Data Model](../03-modules/OFFLINE-DATABASE-DESIGN.md) exist but remain proposed, not implementation. No deployed backend/database.

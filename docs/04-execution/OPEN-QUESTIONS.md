@@ -210,3 +210,9 @@ See [Offline Sync](../03-modules/OFFLINE-SYNC-SPEC.md) and [Shift Closing](../03
 **Open:** criteria for formally resolving a lost-device exception; late period tax/journal adjustments; specific card/terminal/wallet/transfer/gateway tender states; offline credit risk; cached login expiry; exact API schemas/database platform; cash handover and cross-device visibility; pending-payment handling on final close.
 
 New design drafts: [Offline API Contracts](../03-modules/OFFLINE-API-CONTRACTS.md), [Offline Database Design](../03-modules/OFFLINE-DATABASE-DESIGN.md).
+
+## Founder decision — 2026-10-29: payment selection availability
+
+All payment methods configured for a Business must remain visible and selectable in POS both online and offline. Do not gate or hide a method merely because connectivity is lost. Founder explicitly skipped per-payment-method discovery for now.
+
+Selecting a method is NOT equivalent to receiving or verifying funds. Cash may be recorded locally as received; provider-dependent payments must retain an unverified/pending reconciliation status until reliable confirmation or evidence exists. Never manufacture provider authorization, and never post pending electronic payment as settled cash. Payment selection UI availability is APPROVED; exact provider confirmation and settlement semantics are technical design work, not additional UI selection questions.

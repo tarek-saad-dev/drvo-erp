@@ -193,3 +193,12 @@ Design drafts: [POS State Machine](../03-modules/POS-STATE-MACHINE.md) and [Shif
 - OQ-088: Offline credit limit enforcement cannot be assumed safe across independent devices; online reservation or offline credit disabled pending decision.
 
 [Offline founder responses](../03-modules/OFFLINE-POS-DISCOVERY-ROUND-1.md) · [Sync Spec](../03-modules/OFFLINE-SYNC-SPEC.md) · [Shift Closing](../03-modules/SHIFT-CLOSING-WORKFLOW.md).
+
+## Offline POS follow-up decisions — 2026-10-28
+
+- OQ-085 **partially resolved**: founder approved provisional *shift* close with pending sales and final reconciliation; all received offline cash included in count. Detailed day closing policy remains undecided.
+- OQ-086 **partially resolved**: automatic retries then Manager error display approved; idempotency required to avoid duplicate financial events, exact retry escalation unresolved.
+- OQ-081/OQ-082 **OPEN**: electronic tenders without provider confirmation. No assumption of offline card/gateway settlement.
+- Remaining: scope of offline credit, queue-loss recovery, session TTL/revocation, terminal evidence, final exception resolution, finality of business-day close.
+
+See [Offline Sync](../03-modules/OFFLINE-SYNC-SPEC.md) and [Shift Closing](../03-modules/SHIFT-CLOSING-WORKFLOW.md).

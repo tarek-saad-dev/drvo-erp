@@ -1,5 +1,14 @@
 # Project changelog
 
+## 2026-10-28 — POS discovery round 2
+
+- Captured 15 payment, refund, credit, tips and staff attribution answers.
+- Approved separate tips, configurable payment methods, mixed-tender debt, refund controls and automated target/commission reversal outcome.
+- Deferred attribution scenario, percentage rule, closed-day behavior and payroll posting details.
+- No software implementation claimed.
+
+
+
 ## 2026-10-28 — POS Core discovery round 1
 
 - Recorded 12 founder decisions covering invoices, staff attribution, drafts, split tender, credit, corrections and shifts.

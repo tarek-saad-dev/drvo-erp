@@ -1,5 +1,14 @@
 # Project changelog
 
+## 2026-10-28 — MVP release strategy decisions
+
+- Captured eight founder clarifications: founder + Cursor; flexible one-month goal; one comprehensive commercial V1.
+- Cash-only offline sales with later synchronization; DRVO booking authority; all Cut Salon branches for validation.
+- Full accounting required in V1; manual subscription collection precedes electronic gateway.
+- Recorded outstanding architectural and rollout safety requirements. No code or deployment claimed.
+
+
+
 ## 2026-10-28 — MVP discovery round 2
 
 - Captured all 20 founder responses as requested scope, without promising one-month feasibility.

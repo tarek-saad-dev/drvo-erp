@@ -54,3 +54,7 @@ Approved: Manager always sees profits and service costs in authorized scope; cur
 ## Identity & Access discovery — 2026-10-28
 
 Twelve founder responses recorded. Platform-global usernames and username/password login, tenant self-registration, explicit Business Membership, one Role per Branch, email OTP recovery and mandatory employee first-login change approved. Explicit Deny and temporary permissions remain unresolved; session revocation must be enforced server-side. [Identity & Access](../02-architecture/IDENTITY-ACCESS.md).
+
+## RBAC matrix discovery — 2026-10-28
+
+Founder approved scoped Owner full access, customizable Manager role, restricted manager delegation, dedicated paid-invoice void, refund thresholds, Role discount limits, self-shift vs manager shift access, closed-day reopen permission. Ten questions remain undecided. New user ID / QR-linked discount concept requires clarification and security design. [RBAC Matrix](../02-architecture/RBAC-MATRIX.md). No implementation.

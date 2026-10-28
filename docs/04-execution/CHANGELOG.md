@@ -1,5 +1,14 @@
 # Project changelog
 
+## 2026-10-28 — POS discovery round 4
+
+- Recorded seven cash/day/shift responses, including last cash custodian responsibility and separate approval for deductions.
+- Captured explicit salon upsell scenario: Mohamed 10% opener commission; Youssef sole executor and target owner.
+- Flagged cash surplus sales classification and editing approved journal adjustments for accounting/audit design.
+- Day closing and offline fiscal reconciliation remain open; no code implemented.
+
+
+
 ## 2026-10-28 — POS discovery round 3
 
 - Captured 12 founder responses on shared treasury, cashier shifts, cash differences, post-payment attribution corrections, offline sales and employee tips.

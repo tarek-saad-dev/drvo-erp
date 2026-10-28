@@ -186,3 +186,10 @@ Added draft POS logical data model, Accounting Events and module integration bou
 ## 2026-10-29 — Cross-module architecture review
 
 Added ARCHITECTURE-READINESS-REVIEW.md: reconciled historical rule conflicts, listed seven design gates, proposed implementation sequencing, and scoped financial/tenant data integrity checks. Documentation only.
+
+
+## 2026-10-29 — Technology architecture
+
+- Recorded founder SQL Server selection and recommended Next.js + NestJS/TypeScript modular-monolith stack.
+- Created Technology Architecture baseline and phased V1 plan, with tenancy, offline, financial safety and prerequisite decision gates.
+- No source code, migrations, infrastructure changes or production deployment.

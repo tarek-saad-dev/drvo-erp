@@ -82,3 +82,7 @@ Confirmed: business-configurable multiple shifts; offline sale retains occurred 
 ## POS design draft checkpoint — 2026-10-28
 
 Six founder clarifications approved: opener commission 10% of post-discount pre-tax service price; one opener distinct from executor; refund reversals; cash surplus classified as variance pending verified sales evidence; Manager corrections preserve original approved settlement via linked new entry. Initial POS state machine and shift lifecycle **draft specifications** now exist; API/database implementation and outstanding business-day/offline decisions still open. [POS State Machine](../03-modules/POS-STATE-MACHINE.md) · [Shift Lifecycle](../03-modules/SHIFT-LIFECYCLE.md).
+
+## Offline shift reconciliation follow-up — 2026-10-28
+
+Founder approved provisional close for shifts with unsynced sales, cash counting including actually received offline amounts, and automatic retry followed by Manager-visible errors. Offline electronic payment confirmation remains open. Design specification updated; no code implemented.

@@ -250,3 +250,8 @@ Founder approved Branch-scoped inventory and inter-Branch transfers, automatic s
 ## Architecture readiness review — 2026-10-29
 
 Review identified seven production-critical design gates: offline credit, electronic tender posting, inventory costing with negative quantities, late postings and closed periods, module dependencies, employee/service commission rule precedence, and DB/runtime stack. All configured payment methods remain selectable online/offline. Review is a proposal and not an approval to deploy. [Architecture Readiness Review](ARCHITECTURE-READINESS-REVIEW.md).
+
+
+## Technology Architecture — 2026-10-29
+
+Founder selected **SQL Server**. Proposed Next.js frontend, dedicated NestJS modular-monolith API, TypeScript workers and per-device offline local queue; this application stack is an engineering recommendation, not an explicit founder-approved framework choice. Critical gates: offline credit, external tender verification/settlement, negative-stock valuation, late closed-period posting, module dependencies, opener commission rate precedence, SQL Server hosting/version, ORM driver, device storage/security and tax rules. **Do not start coding until blocker decisions recorded.** [Technology Architecture](../02-architecture/TECHNOLOGY-ARCHITECTURE.md) · [V1 Plan](V1-IMPLEMENTATION-PLAN.md).

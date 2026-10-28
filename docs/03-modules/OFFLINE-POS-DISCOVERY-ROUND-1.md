@@ -36,3 +36,9 @@ No implementation has occurred.
 4. Failed offline sync — **approved: automatic retries, then Manager-visible errors**.
 
 These decisions supersede the undecided entries for shift close, cash count and sync failure above. Remaining electronic tender behavior is not settled.
+
+## Founder decision — 2026-10-29: payment selection availability
+
+All payment methods configured for a Business must remain visible and selectable in POS both online and offline. Do not gate or hide a method merely because connectivity is lost. Founder explicitly skipped per-payment-method discovery for now.
+
+Selecting a method is NOT equivalent to receiving or verifying funds. Cash may be recorded locally as received; provider-dependent payments must retain an unverified/pending reconciliation status until reliable confirmation or evidence exists. Never manufacture provider authorization, and never post pending electronic payment as settled cash. Payment selection UI availability is APPROVED; exact provider confirmation and settlement semantics are technical design work, not additional UI selection questions.

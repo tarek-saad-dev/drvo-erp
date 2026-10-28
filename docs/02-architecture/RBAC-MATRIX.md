@@ -42,3 +42,11 @@
 Complete full permission matrix, example-driven Allow/Deny decision, QR discount purpose and model, approved workflows and accounting controls.
 
 [Identity](IDENTITY-ACCESS.md) · [Tenancy](TENANCY-ARCHITECTURE.md) · [Open Questions](../04-execution/OPEN-QUESTIONS.md).
+
+## Founder follow-up — Permission evaluation and QR (2026-10-28)
+
+**Accepted:** Allow-only + Default Deny. Access requires an explicit applicable Allow grant; otherwise deny. No explicit Deny rules in approved V1 policy. Always enforce tenant/business/branch scope server-side, and do not treat approvals as implicit privileges.
+
+**QR clarification:** founder says QR use is **different** from previously described options; purpose still needs founder explanation. Founder approves *owner of the QR card only, with additional verification* for use, but verification mechanism is open. Do not assume QR authorizes customer discounts or is a payment/identity credential.
+
+**Discount Engine:** percentage, precedence with Role limits, recipient, rules and redemption mechanics **not decided**; require dedicated design discussion.

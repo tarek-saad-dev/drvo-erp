@@ -48,3 +48,15 @@ See [MVP Discovery Round 2](../01-product/MVP-DISCOVERY-ROUND-2.md).
 - Cut Salon is first pilot.
 
 [Source answers](../01-product/DISCOVERY-01-FOLLOWUPS.md). Record detailed architecture choices in ADRs before implementation.
+
+## MVP clarification resolutions (2026-10-28)
+
+- OQ-020 partly resolved: team = founder + Cursor; one-month target flexible. Detailed estimate remains open.
+- OQ-021 partly resolved: **one comprehensive commercial V1**, with testing and all-branch validation gates (not separate commercial releases). Exact acceptance criteria open.
+- OQ-022 partly resolved: offline POS cash sales only, sync later. Conflict/idempotency/accounting specifications still open.
+- OQ-023 partly resolved: DRVO authoritative for bookings. Legacy Cashier integration and write lockout still open.
+- OQ-024: **full GL accounting required in V1**; detailed accounting model remains open.
+- OQ-026 partly resolved: subscription collections manual initially; gateway deferred. Entitlements/reconciliation unresolved.
+- OQ-028 partly resolved: all Cut Salon branches included in initial validation; phased activation and rollback remain open.
+
+[Release strategy decision](../01-product/MVP-RELEASE-STRATEGY.md).

@@ -126,3 +126,8 @@ Eleven approved requirements: per-Branch stock with inter-Branch transfers, auto
 ## Architecture readiness checkpoint — 2026-10-29
 
 Cross-module review documented at [Architecture Readiness Review](../04-execution/ARCHITECTURE-READINESS-REVIEW.md). Ready for foundation planning only; production finance/offline schema awaits seven design decisions. No code or deployment.
+
+
+## Technology baseline — 2026-10-29
+
+Founder selected SQL Server. Engineering recommendation: Next.js + NestJS/TypeScript modular monolith, worker, offline device queue, dedicated SQL Server data layer. See [Technology Architecture](../02-architecture/TECHNOLOGY-ARCHITECTURE.md), [V1 Execution Plan](../04-execution/V1-IMPLEMENTATION-PLAN.md). Critical business and hosting/runtime design blockers remain. NO code implementation authorized.

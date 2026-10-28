@@ -121,3 +121,8 @@ Twelve HR decisions documented. Per-employee salary/commission models, custom ta
 ## Inventory/Purchasing founder decisions (2026-10-29)
 
 Eleven approved requirements: per-Branch stock with inter-Branch transfers, automatic Recipe consumption for services, Business-set valuation, negative stock with alert/review, direct purchase/receipt, Business-scoped shared suppliers, supplier returns, full/partial counting, Manager-approved count adjustments, reorder alerts from V1; Batch/Expiry not needed in V1. Transfer between different Businesses remains undecided. [Inventory](../03-modules/INVENTORY-CORE-SPEC.md) and [Purchasing](../03-modules/PURCHASING-CORE-SPEC.md). No code implemented.
+
+
+## Architecture readiness checkpoint — 2026-10-29
+
+Cross-module review documented at [Architecture Readiness Review](../04-execution/ARCHITECTURE-READINESS-REVIEW.md). Ready for foundation planning only; production finance/offline schema awaits seven design decisions. No code or deployment.

@@ -116,3 +116,8 @@ One treasury per Branch, bank accounts Business/Branch, manager-approved recorde
 ## HR & Employee Ledger discovery — 2026-10-29
 
 Twelve HR decisions documented. Per-employee salary/commission models, custom target periods, Branch-separated commissions, variable opening rates, daily accrual and monthly close, advances, auditable corrections and scoped payroll approval. Fixed 10% opening rate now an example, not universal rule; base remains after discount before tax. No HR implementation. [HR Commission](../03-modules/HR-COMMISSION-ENGINE.md) · [Employee Ledger](../03-modules/EMPLOYEE-LEDGER.md).
+
+
+## Inventory/Purchasing founder decisions (2026-10-29)
+
+Eleven approved requirements: per-Branch stock with inter-Branch transfers, automatic Recipe consumption for services, Business-set valuation, negative stock with alert/review, direct purchase/receipt, Business-scoped shared suppliers, supplier returns, full/partial counting, Manager-approved count adjustments, reorder alerts from V1; Batch/Expiry not needed in V1. Transfer between different Businesses remains undecided. [Inventory](../03-modules/INVENTORY-CORE-SPEC.md) and [Purchasing](../03-modules/PURCHASING-CORE-SPEC.md). No code implemented.

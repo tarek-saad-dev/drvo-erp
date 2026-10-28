@@ -36,3 +36,22 @@ No double counting of cash from synced vs unsynced transactions; inability to fi
 
 ## Unresolved
 Formal founder confirmation: provisional close, inclusion of offline cash counts, final financial-day accounting dates, device lost before sync, cross-device shift reconciliation, cash handover and multi-shift concurrency.
+
+## Approved closing behavior — 2026-10-28
+
+1. When offline transactions remain unsynced, **provisional shift close is allowed**; final settlement follows reconciliation. Cashier must not add new sales to that shift once provisionally closed (proposed enforcement detail).
+2. **Physical cash count includes every cash amount actually received**, including offline sales not yet synchronized. Cash tender received is counted separately from provider-pending electronic tenders.
+3. **Transient offline sync failure retries automatically**, with persistent unresolved problems shown to the Manager.
+4. Electronic payment authorization during outages remains undecided.
+
+### Recommended lifecycle (state identifiers proposed)
+
+`OPEN → COUNT_SUBMITTED → PROVISIONALLY_CLOSED → RECONCILIATION_PENDING → CLOSED_FINAL`. `RECOUNT_REQUIRED` can return to `COUNT_SUBMITTED`; failed sync stays in reconciliation pending until acknowledged or exception resolved with a documented adjustment. Distinguish **cash physically held** from **cash digitally acknowledged by server**. Final closing must aggregate local cash events once and verify all device queues associated with this shift. Shared treasury with independent cashier shifts requires custody evidence; differences are not automatically lawful salary deductions.
+
+### Worked example
+
+Opening float 500; synced cash sales 800; offline unsynced cash sales 300; verified cash withdrawals 100. Expected physical cash = 500 + 800 + 300 − 100 = **1,500**. If actual count 1,480, provisional shortage is 20; Manager reviews it. On later sync, 300 must not be added *again* to physical cash count. If a queued event fails permanently, handle through exception reconciliation rather than silently deleting event.
+
+### Day closing remains separate
+
+Earlier approval to close a financial day with open shifts *with warning* still stands. Provisional shift closure does **not** by itself decide whether business-day closure is provisional or final. Late sale should keep original occurrence date and be documented through posting-period adjustment, pending Accounting policy.

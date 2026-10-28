@@ -57,3 +57,9 @@ Shared tenant-aware database, tenant-scoped auth context, Business and Branch au
 Business transfer between Tenants, partner shares, subscription limits/expiration, full data exports, deletion/retention policy, payment entitlements, multi-country Branch settings and exact account uniqueness model. See [Open Questions](../04-execution/OPEN-QUESTIONS.md).
 
 **No database, migrations or code have been implemented.**
+
+## Founder follow-up decisions — 2026-10-28
+
+- **Profit and cost visibility:** a Manager always has access to profits and service costs **within their authorized management scope**. Cross-Business and cross-Branch reach, Owner access, and fine-grained field permissions require a complete RBAC matrix; this does not grant global Tenant access.
+- **Locale settings:** currency, interface language, and timezone are configured at **Business level only**. No Branch-specific overrides are part of the approved design. Multi-country Businesses must be validated against this constraint during data model design.
+- **Module Dependencies:** **NOT APPROVED**. Founder requested detailed design discussion before choosing dependency enforcement and activation behavior. Do not implement a dependency DAG as an accepted product choice yet.

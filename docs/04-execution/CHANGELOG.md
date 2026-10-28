@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-10-28 — POS Core discovery round 1
+
+- Recorded 12 founder decisions covering invoices, staff attribution, drafts, split tender, credit, corrections and shifts.
+- Tracked ambiguity between one service executor and multiple revenue/commission beneficiaries.
+- Added payment/refund/offline follow-up questions; no code implemented.
+
+
+
 ## 2026-10-28 — Permission and QR follow-up
 
 - Approved Allow-only + Default Deny RBAC evaluation.

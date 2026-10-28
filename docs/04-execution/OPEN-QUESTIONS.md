@@ -216,3 +216,8 @@ New design drafts: [Offline API Contracts](../03-modules/OFFLINE-API-CONTRACTS.m
 All payment methods configured for a Business must remain visible and selectable in POS both online and offline. Do not gate or hide a method merely because connectivity is lost. Founder explicitly skipped per-payment-method discovery for now.
 
 Selecting a method is NOT equivalent to receiving or verifying funds. Cash may be recorded locally as received; provider-dependent payments must retain an unverified/pending reconciliation status until reliable confirmation or evidence exists. Never manufacture provider authorization, and never post pending electronic payment as settled cash. Payment selection UI availability is APPROVED; exact provider confirmation and settlement semantics are technical design work, not additional UI selection questions.
+
+
+## POS technical design follow-up (2026-10-29)
+
+Drafts created: [POS Data Model](../03-modules/POS-DATA-MODEL-V1.md), [Accounting Events](../03-modules/POS-ACCOUNTING-EVENTS.md), [Module Integrations](../03-modules/POS-MODULE-INTEGRATIONS.md). Open decisions: selected SQL engine/ORM, taxes, chart of accounts and posting policy, offline credit, provider confirmation, inventory reservation, rounding, payroll reversal timing and Module Dependencies. No source code/schema deployed.

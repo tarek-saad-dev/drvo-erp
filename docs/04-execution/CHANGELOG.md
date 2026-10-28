@@ -1,5 +1,14 @@
 # Project changelog
 
+## 2026-10-28 — RBAC matrix discovery
+
+- Recorded founder's approved RBAC choices and ten unanswered operations.
+- Captured ID/QR card discount concept; clarified that security and recipient semantics are unresolved.
+- Added open questions for permission evaluation, delegation, discounts and accounting.
+- No RBAC or discount feature implemented.
+
+
+
 ## 2026-10-28 — Identity & Access discovery
 
 - Recorded 12 founder responses, approved global usernames and login model.

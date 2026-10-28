@@ -36,6 +36,13 @@ One comprehensive **commercial V1** after development and internal/all-branch op
 5. **Subscription collection:** manual payments and invoices, administrative verification, plan activation/expiration, audit and entitlements; payment gateway later.
 6. **Acceptance evidence:** measured performance, tenant leakage tests, concurrent bookings, financial reconciliation, offline sync recovery, access controls and end-to-end tests.
 
+## MVP discovery closure clarifications — 2026-10-28
+
+- **Public booking integration:** retain the existing Cut Salon website and connect it to the new DRVO Booking API. The exact migration, fallback and integration contracts are pending.
+- **Offline stock shortage:** accept offline **cash** sales even if the eventual server-side reconciliation finds insufficient inventory across branches; record an explicit stock shortage/exception for review after synchronization. Do not silently discard or duplicate sales. Policy for negative stock, costing, reconciliation and escalation is pending; this is not a promise of immediate authoritative stock balances while offline.
+- **Accounting manual journals:** no decision yet whether to permit manual journal entry alongside automatic posting. Complete a detailed Accounting Module design first. Full GL/journals/ledgers/balances remains a V1 requirement.
+- **Single commercial release:** internal testing throughout development is allowed, but commercial sale/launch happens once after comprehensive V1 acceptance. Internal testing is not a separate public release.
+
 ## Unresolved
 
 See [Open Questions](../04-execution/OPEN-QUESTIONS.md); detailed module specs, feasibility estimate and full release gates are not yet approved.

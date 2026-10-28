@@ -180,3 +180,16 @@ Approved: global username uniqueness, username/password login, self-registration
 **Still open:** rounding and partial refund commission reversal, employee commission plan interaction, financial-day closure finality, shift close with offline pending sales, signed custody chain, staff shortage liability approval, event/API/DB contracts, credit/refund ledger exact accounts and discount policy.
 
 Design drafts: [POS State Machine](../03-modules/POS-STATE-MACHINE.md) and [Shift Lifecycle](../03-modules/SHIFT-LIFECYCLE.md). Their proposed state names and implementation choices are **not approved** merely by documenting them.
+
+## Offline POS discovery — 2026-10-28
+
+- OQ-081: Earlier cash-only Offline POS conflicts with latest all-payment-methods request. Decide supported tender type per offline capabilities, external terminal proof and provider confirmation.
+- OQ-082: Should pending external gateway authorization create a draft, pending sale or posted receivable; prevent false PAID.
+- OQ-083: Offline local login TTL, device trust, revocation during outage and encrypted credential storage.
+- OQ-084: Offline corrected/cancelled sale permissions, immutable cash history, sync ordering.
+- OQ-085: Closing cashier shift and counting physical cash when device queues remain unsynced; day finality.
+- OQ-086: Duplicate sale idempotency, failed synchronization retry/review and manager pending-device dashboard.
+- OQ-087: Lost POS device queue disaster recovery and limits of backup.
+- OQ-088: Offline credit limit enforcement cannot be assumed safe across independent devices; online reservation or offline credit disabled pending decision.
+
+[Offline founder responses](../03-modules/OFFLINE-POS-DISCOVERY-ROUND-1.md) · [Sync Spec](../03-modules/OFFLINE-SYNC-SPEC.md) · [Shift Closing](../03-modules/SHIFT-CLOSING-WORKFLOW.md).

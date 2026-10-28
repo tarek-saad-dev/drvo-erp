@@ -160,3 +160,15 @@ Approved: global username uniqueness, username/password login, self-registration
 - OQ-073: Treasury transfers deferred; Tips credited to Employee Ledger (payout timing/settlement unresolved).
 
 [POS Discovery Round 3](../03-modules/POS-DISCOVERY-ROUND-3.md).
+
+## POS Round 4 follow-ups (2026-10-28)
+
+- OQ-074: Shared branch treasury shortage allocated to last employee receiving cash; need custody handover proof, shared access rules, investigation and deduction approval.
+- OQ-075: Founder wants surplus immediately labeled sales income; unresolved accounting/legal classification as true sales versus cash variance.
+- OQ-076: Day close with open shifts: workflow and provisional/final adjustments unresolved.
+- OQ-077: Business setting for multiple concurrent shifts; overlaps, cash custody and reconciliation.
+- OQ-078: Offline original sale date plus post-close adjustment: financial/tax period policy and distinct posted_at vs occurred_at.
+- OQ-079: Manager edits approved cash adjustment: preserve version/reversal audit and immutable posted journals.
+- OQ-080: Salon opener upsell commission **10% for Mohamed**, while Youssef executes skin care and owns its target. Commission calculation base, stacking and refunds unsettled; prior 70/30 arbitrary revenue split not adopted.
+
+[POS Discovery Round 4](../03-modules/POS-DISCOVERY-ROUND-4.md).

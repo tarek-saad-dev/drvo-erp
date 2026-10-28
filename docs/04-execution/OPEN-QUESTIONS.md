@@ -202,3 +202,11 @@ Design drafts: [POS State Machine](../03-modules/POS-STATE-MACHINE.md) and [Shif
 - Remaining: scope of offline credit, queue-loss recovery, session TTL/revocation, terminal evidence, final exception resolution, finality of business-day close.
 
 See [Offline Sync](../03-modules/OFFLINE-SYNC-SPEC.md) and [Shift Closing](../03-modules/SHIFT-CLOSING-WORKFLOW.md).
+
+## Offline day-close follow-up (2026-10-28)
+
+**Founder-resolved:** Day close with open shifts or pending offline sales is **provisional until final reconciliation**. Lost local POS queue/device handled via incident report + **manual physical cash reconciliation**, without assumed restoration. Payment providers to be evaluated **one payment method at a time** (unresolved).
+
+**Open:** criteria for formally resolving a lost-device exception; late period tax/journal adjustments; specific card/terminal/wallet/transfer/gateway tender states; offline credit risk; cached login expiry; exact API schemas/database platform; cash handover and cross-device visibility; pending-payment handling on final close.
+
+New design drafts: [Offline API Contracts](../03-modules/OFFLINE-API-CONTRACTS.md), [Offline Database Design](../03-modules/OFFLINE-DATABASE-DESIGN.md).

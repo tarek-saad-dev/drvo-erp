@@ -124,3 +124,14 @@ Approved: global username uniqueness, username/password login, self-registration
 - OQ-048 **open**: QR card usage differs from suggested staff-authorizes-discount/personal-discount options; founder explanation required before designing feature.
 - OQ-049 **partially resolved**: QR card for owner only with additional verification; exact authentication, revocation, credential/storage and abuse protection remain open.
 - Discount Engine design and precedence vs Role limits remain **open**.
+
+## POS and salon discovery open items (2026-10-28)
+
+- OQ-053: Service has one executor but manager can split revenue and commission among multiple beneficiaries. Distinguish credited sales, targets, payroll and actual cash ledger; rules and percentages open.
+- OQ-054: Draft invoice lifecycle, lock/resume, booking/stock reservations, offline behavior.
+- OQ-055: Temporary catalog line review plus tax, inventory and accounting mapping.
+- OQ-056: Split payments, credit-limit authorization, settlements, refunds and partial balances.
+- OQ-057: Cash-only Offline POS sales require open shift; local shift availability and reconciliation.
+- OQ-058: Correction documents and adjustment policy for immutable paid invoices.
+
+[POS Discovery Round 1](../03-modules/POS-DISCOVERY-ROUND-1.md).

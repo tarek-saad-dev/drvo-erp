@@ -245,3 +245,8 @@ Founder approved per-employee flexible pay, configurable execution commission/ta
 ## Inventory & Purchasing discovery (2026-10-29)
 
 Founder approved Branch-scoped inventory and inter-Branch transfers, automatic service Recipe consumption, Business-configured valuation, negative stock with alert/review, direct purchase and receipt (no mandatory PO), Business-shared suppliers, supplier returns, full/partial stocktake, Manager-approved adjustments, reorder warnings in V1; Batch/Expiry deferred beyond V1. **Cross-Business transfers remain UNDECIDED**. Outstanding: valuation method choices/cost layers, recipe and return consumption rules, negative-stock costing, purchasing payments and taxes, transfer approvals. [Inventory](../03-modules/INVENTORY-CORE-SPEC.md) · [Purchasing](../03-modules/PURCHASING-CORE-SPEC.md).
+
+
+## Architecture readiness review — 2026-10-29
+
+Review identified seven production-critical design gates: offline credit, electronic tender posting, inventory costing with negative quantities, late postings and closed periods, module dependencies, employee/service commission rule precedence, and DB/runtime stack. All configured payment methods remain selectable online/offline. Review is a proposal and not an approval to deploy. [Architecture Readiness Review](ARCHITECTURE-READINESS-REVIEW.md).

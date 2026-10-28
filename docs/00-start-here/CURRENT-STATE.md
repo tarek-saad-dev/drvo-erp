@@ -46,3 +46,7 @@ Confirmed: existing Cut Salon booking site will call the DRVO API; offline cash 
 ## Tenancy discovery checkpoint — 2026-10-28
 
 Forty founder answers captured and reconciled in [Tenancy Discovery](../01-product/TENANCY-DISCOVERY-ROUND-3.md). [Tenancy Architecture](../02-architecture/TENANCY-ARCHITECTURE.md) records accepted logical boundaries. Technical schema, module dependencies and several lifecycle/access rules remain open. No application code or database implemented.
+
+## Tenancy follow-up (2026-10-28)
+
+Approved: Manager always sees profits and service costs in authorized scope; currency/language/timezone only at Business level. Module Dependencies unresolved pending design discussion. [Tenancy Architecture](../02-architecture/TENANCY-ARCHITECTURE.md).

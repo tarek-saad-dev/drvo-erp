@@ -66,3 +66,6 @@ Founder approves warning-only **permission to close a business day while shifts 
 ## Unresolved
 
 Day finality; closing shifts with pending offline sales; cash custody handovers and multi-shift overlap; accounting accounts; handling of withdrawals/transfers; employee-deduction law/compliance; timezone and late-posting policy.
+
+
+Offline POS 2026-10-28: independent per-device queues, local re-authentication for previously verified staff, and permissioned pre-sync correction confirmed. Founder requested broader tender support; provider-dependent confirmation, shift closing, and late sync remain unresolved. See docs/03-modules/OFFLINE-SYNC-SPEC.md and SHIFT-CLOSING-WORKFLOW.md. These are design drafts, not implemented.

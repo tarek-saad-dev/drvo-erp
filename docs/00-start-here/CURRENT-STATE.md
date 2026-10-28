@@ -78,3 +78,7 @@ Confirmed shared branch treasury with separate cashier shifts, actual cash count
 ## POS Round 4 (2026-10-28)
 
 Confirmed: business-configurable multiple shifts; offline sale retains occurred date with documented adjustment; distinct service opener commission and executor's target (Mohamed opens skin-care service, 10% opener commission; Youssef executes and earns target attribution). Requested shortage association with last cash recipient, separate approval before employee deduction, immediate cash-surplus-as-sales classification and edit of approved adjustment need financial/audit safeguards. Day closing workflow remains open. [Round 4](../03-modules/POS-DISCOVERY-ROUND-4.md). Not implemented.
+
+## POS design draft checkpoint — 2026-10-28
+
+Six founder clarifications approved: opener commission 10% of post-discount pre-tax service price; one opener distinct from executor; refund reversals; cash surplus classified as variance pending verified sales evidence; Manager corrections preserve original approved settlement via linked new entry. Initial POS state machine and shift lifecycle **draft specifications** now exist; API/database implementation and outstanding business-day/offline decisions still open. [POS State Machine](../03-modules/POS-STATE-MACHINE.md) · [Shift Lifecycle](../03-modules/SHIFT-LIFECYCLE.md).

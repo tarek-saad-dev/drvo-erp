@@ -1,5 +1,14 @@
 # Project changelog
 
+## 2026-10-28 — POS state machine / shift lifecycle design drafts
+
+- Confirmed single distinct opener; 10% opening commission on after-discount before-tax service price; automatic refund reversal.
+- Founder accepted cash surplus in variance account until proven sale and append-only manager corrections preserving original settlement.
+- Created proposed POS State Machine and Shift Lifecycle specs, including guards, states, events, tests and unresolved design questions.
+- **Specifications only; no implementation, schema, or deployment.**
+
+
+
 ## 2026-10-28 — POS discovery round 4
 
 - Recorded seven cash/day/shift responses, including last cash custodian responsibility and separate approval for deductions.

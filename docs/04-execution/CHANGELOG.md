@@ -148,3 +148,8 @@ Offline POS 2026-10-28: independent per-device queues, local re-authentication f
 - Electronic payments during outage deferred for per-method discussion.
 - Added proposed offline API contracts and logical database model; technical names/schema are not approved. No code implementation or deployment.
 
+
+
+## 2026-10-29 — POS technical design
+
+Added draft POS logical data model, Accounting Events and module integration boundaries. Documents include tenant-scoped data integrity, invoice/payment/refund separation, idempotent outbox, one executor and optional distinct opener, and offline queue reconciliation. No app or database was implemented.

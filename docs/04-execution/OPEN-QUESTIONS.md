@@ -117,3 +117,10 @@ Approved: global username uniqueness, username/password login, self-registration
 - OQ-052: expenses, accounting entries, salaries, advances, stock transfer, price changes, booking, approvals, protected permissions still unanswered (questions 11–20).
 
 [RBAC Discovery](../02-architecture/RBAC-MATRIX.md).
+
+## QR / permission follow-up (2026-10-28)
+
+- OQ-041 **resolved**: founder approved Allow-only + Default Deny. No explicit Deny in V1.
+- OQ-048 **open**: QR card usage differs from suggested staff-authorizes-discount/personal-discount options; founder explanation required before designing feature.
+- OQ-049 **partially resolved**: QR card for owner only with additional verification; exact authentication, revocation, credential/storage and abuse protection remain open.
+- Discount Engine design and precedence vs Role limits remain **open**.

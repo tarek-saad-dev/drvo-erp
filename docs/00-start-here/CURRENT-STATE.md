@@ -111,3 +111,8 @@ Founder approved editable industry-based Chart of Accounts per Business, indepen
 ## Treasury Core founder decisions — 2026-10-29
 
 One treasury per Branch, bank accounts Business/Branch, manager-approved recorded transfers, cash/bank expenses, permissioned cash movement and Manager balance visibility; bank reconciliation deferred. [Treasury Core](../03-modules/TREASURY-CORE-SPEC.md). No implementation.
+
+
+## HR & Employee Ledger discovery — 2026-10-29
+
+Twelve HR decisions documented. Per-employee salary/commission models, custom target periods, Branch-separated commissions, variable opening rates, daily accrual and monthly close, advances, auditable corrections and scoped payroll approval. Fixed 10% opening rate now an example, not universal rule; base remains after discount before tax. No HR implementation. [HR Commission](../03-modules/HR-COMMISSION-ENGINE.md) · [Employee Ledger](../03-modules/EMPLOYEE-LEDGER.md).

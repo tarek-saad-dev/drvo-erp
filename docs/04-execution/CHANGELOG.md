@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-10-28 — MVP discovery round 2
+
+- Captured all 20 founder responses as requested scope, without promising one-month feasibility.
+- Documented scope/timing, offline, double booking, Cashier coexistence, printing and commercial-readiness risks.
+- Added explicit open questions and linked the roadmap/current state. No code deployed.
+
+
 ## 2026-10-28 — Product discovery follow-up decisions
 
 - Approved **medical clinics as the second vertical**, superseding Retail-second commercial rollout.

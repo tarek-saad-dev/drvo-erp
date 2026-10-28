@@ -221,3 +221,12 @@ Selecting a method is NOT equivalent to receiving or verifying funds. Cash may b
 ## POS technical design follow-up (2026-10-29)
 
 Drafts created: [POS Data Model](../03-modules/POS-DATA-MODEL-V1.md), [Accounting Events](../03-modules/POS-ACCOUNTING-EVENTS.md), [Module Integrations](../03-modules/POS-MODULE-INTEGRATIONS.md). Open decisions: selected SQL engine/ORM, taxes, chart of accounts and posting policy, offline credit, provider confirmation, inventory reservation, rounding, payroll reversal timing and Module Dependencies. No source code/schema deployed.
+
+
+## Accounting Core discovery (2026-10-29)
+
+- Accounting hierarchy nesting depth OPEN; posted GL entries must balance debits/credits as an integrity invariant even though founder did not explicitly decide.
+- Business-configured reports: required minimum list TBD; Tenant consolidation currency conversion TBD.
+- Permission to reopen monthly/yearly periods approved; control and actor policy still TBD; posted entries remain immutable, corrected via linked reversing journal.
+- Sensitive-only Audit Log policy approved, while immutable financial source/provenance must still be retained.
+- See [Accounting Core](../03-modules/ACCOUNTING-CORE-SPEC.md), [Chart of Accounts](../03-modules/CHART-OF-ACCOUNTS.md).

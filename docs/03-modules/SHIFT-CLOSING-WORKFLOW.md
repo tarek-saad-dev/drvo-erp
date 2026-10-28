@@ -55,3 +55,13 @@ Opening float 500; synced cash sales 800; offline unsynced cash sales 300; verif
 ### Day closing remains separate
 
 Earlier approval to close a financial day with open shifts *with warning* still stands. Provisional shift closure does **not** by itself decide whether business-day closure is provisional or final. Late sale should keep original occurrence date and be documented through posting-period adjustment, pending Accounting policy.
+
+## Founder decisions — 2026-10-28 (new)
+
+- **Business/financial day closure with open shifts or unsynced sales is provisional**, followed by final reconciliation. This resolves the earlier day-close finality question and aligns with provisional shift closure.
+- If a POS device is destroyed/lost before its queue syncs, **record a data-loss incident and manually reconcile the physical cash**. No promise of queue recovery or fabricated sale reconstruction. If original events later arrive, reconcile/deduplicate against incident records.
+- **Electronic payments while offline remain unresolved, to be considered by payment method one at a time.** Never call an unverified provider payment settled.
+
+### Implications for closure invariants
+
+Final shift/day closure requires accepted queue events or a documented incident/exception resolution, reviewed cash count and variance, and visibility of pending unconfirmed payments. Finalization cannot silently erase missing data. Cash-count totals must include physical offline cash once. See [API Draft](OFFLINE-API-CONTRACTS.md) and [Data Model](OFFLINE-DATABASE-DESIGN.md).

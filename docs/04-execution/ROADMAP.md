@@ -31,3 +31,7 @@ The earlier **Retail second** assumption is superseded. Retail remains a future 
 ## MVP discovery note — 2026-10-28
 
 Founder requests a comprehensive Cashier-replacement feature set in one month, including full HR/accounting/inventory, offline POS and SaaS billing. This is a **desired scope/timeline**, not an approved or validated delivery forecast. Queue and printing can be deferred, so **limited pilot**, **Cashier replacement** and **external commercial launch** require separate acceptance gates. See [MVP Discovery Round 2](../01-product/MVP-DISCOVERY-ROUND-2.md).
+
+## Release strategy update — 2026-10-28
+
+Founder confirmed **one comprehensive commercial V1**, not separate pilot/replacement/commercial editions. Development, internal QA and Cut Salon all-branch validation are pre-launch quality gates. The previous split into separate release acceptance stages was a proposal, not approved. One-month first-test goal is flexible, with quality prioritized. Scope includes full GL accounting, HR parity, inventory, booking, cash-only offline POS, and SaaS subscriptions with manual collection; external online subscription payments can follow. No timeline is guaranteed. See [release strategy](../01-product/MVP-RELEASE-STRATEGY.md).

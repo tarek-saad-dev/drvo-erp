@@ -35,3 +35,8 @@ Founder requests a comprehensive Cashier-replacement feature set in one month, i
 ## Release strategy update — 2026-10-28
 
 Founder confirmed **one comprehensive commercial V1**, not separate pilot/replacement/commercial editions. Development, internal QA and Cut Salon all-branch validation are pre-launch quality gates. The previous split into separate release acceptance stages was a proposal, not approved. One-month first-test goal is flexible, with quality prioritized. Scope includes full GL accounting, HR parity, inventory, booking, cash-only offline POS, and SaaS subscriptions with manual collection; external online subscription payments can follow. No timeline is guaranteed. See [release strategy](../01-product/MVP-RELEASE-STRATEGY.md).
+
+
+## Final MVP clarification — 2026-10-28
+
+Keep Cut Salon's existing booking website and integrate against the new DRVO API. Cash-only offline sales may result in stock shortages after synchronization; surface these for review. Accounting journal-entry workflow awaits detailed module design. Test internally throughout development, but launch one comprehensive commercial V1 after all release gates. [Decision](../01-product/MVP-RELEASE-STRATEGY.md).

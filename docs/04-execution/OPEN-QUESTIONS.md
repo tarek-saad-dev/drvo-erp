@@ -92,3 +92,17 @@ Founder decisions: [Tenancy Discovery](../01-product/TENANCY-DISCOVERY-ROUND-3.m
 - OQ-032 remains **open**, explicitly awaiting Module Dependencies design discussion and founder approval.
 - OQ-036: founder approved Business-only settings, no Branch overrides. Unresolved risk: Businesses spanning countries/timezones/currencies.
 - OQ-038: Manager access to profit/cost is always granted **inside authorized management scope**. Exact owner exceptions and scope-to-role matrix still require documentation.
+
+## Identity & Access discovery unresolved — 2026-10-28
+
+| ID | Open decision | Priority |
+|---|---|---|
+| OQ-041 | Explicit Deny permission semantics versus default-deny Allow-only system | High |
+| OQ-042 | Manager privilege delegation, role creation scope and escalation prevention | Critical |
+| OQ-043 | Tenant/Business role precedence, inherited scopes and one-Role-per-Branch merging | Critical |
+| OQ-044 | Tenant signup, first Business membership bootstrap, verified recovery email and invitation | Critical |
+| OQ-045 | Session revocation on next protected API request; refresh token/session architecture | Critical |
+| OQ-046 | Email OTP expiration, throttling, recovery and first-login credential enrollment | High |
+| OQ-047 | Temporary permission delegation after role matrix design | Medium |
+
+Approved: global username uniqueness, username/password login, self-registration, manager-account creation, explicit Owner Business membership, one Role/Branch, email OTP reset, mandatory first-login password change, revoke on refresh intent. [Identity & Access](../02-architecture/IDENTITY-ACCESS.md).

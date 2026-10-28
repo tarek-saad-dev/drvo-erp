@@ -69,3 +69,11 @@ Persist encrypted append-only local queue and cash tender evidence on each devic
 ### Remaining discovery items
 
 Payment types and electronic confirmation; offline customer credit/limit; cached login validity, offline authorization revocation gap; recovery if device lost; approval of pending-sale cancellations; precise timeout and escalation; whether financial day closes provisionally or permanently when shifts remain open; settlement of failed non-retryable events.
+
+## Founder day close, incident, payments decisions — 2026-10-28
+
+1. Day closure when shifts open / offline pending: **provisional then final reconciliation** (approved).
+2. Device physically lost/destroyed before offline upload: **record loss incident and manually reconcile cash** (approved); no false claim of automatic recovery.
+3. Electronic payment types: **discuss each method separately; OPEN** (not an authorization to call any offline gateway tender paid).
+
+Draft [Offline API Contracts](OFFLINE-API-CONTRACTS.md) and [Offline Database](OFFLINE-DATABASE-DESIGN.md) articulate candidate endpoints/data constraints; no API/schema approved or implemented.

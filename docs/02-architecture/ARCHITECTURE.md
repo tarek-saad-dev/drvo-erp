@@ -43,3 +43,7 @@ First barber salon edition (pilot: Cut Salon); medical clinic second, with sensi
 Migrations, least privilege, audit, backups, encrypted transport, tested auth and tenant isolation, CI/CD. No production implementation exists yet.
 
 [Decisions](../05-decisions/DECISIONS.md) · [Open questions](../04-execution/OPEN-QUESTIONS.md).
+
+## Founder-approved tenancy requirements (2026-10-28)
+
+Tenant represents owner account, with multiple independently branded/accounted Businesses of possibly different industries. Each Branch belongs to one Business. Business customer directory and core pricing can be shared among Branches, while pricing overrides, stock, treasuries, shifts and scoped employee permissions exist at Branch level. Each Business chooses active modules and extensions; one module may have multiple compatible extensions. Shared database with strong tenant isolation. Tenant-scoped accounts (no account shared across Tenants), with separate per-Branch roles and sensitive audit history. See [Tenancy Architecture](TENANCY-ARCHITECTURE.md). Dependencies and detailed schema are still open.

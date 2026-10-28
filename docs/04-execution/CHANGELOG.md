@@ -132,3 +132,11 @@
 
 
 Offline POS 2026-10-28: independent per-device queues, local re-authentication for previously verified staff, and permissioned pre-sync correction confirmed. Founder requested broader tender support; provider-dependent confirmation, shift closing, and late sync remain unresolved. See docs/03-modules/OFFLINE-SYNC-SPEC.md and SHIFT-CLOSING-WORKFLOW.md. These are design drafts, not implemented.
+
+## 2026-10-28 — Offline shift closure follow-up
+
+- Confirmed provisional shift close and final reconciliation for pending local sales.
+- Confirmed cash count includes all actually received offline cash.
+- Confirmed automatic retries plus Manager-visible sync errors.
+- Offline electronic payment confirmation remains undecided; updated engineering draft, no implementation.
+

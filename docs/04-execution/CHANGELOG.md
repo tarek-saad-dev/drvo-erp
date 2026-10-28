@@ -153,3 +153,10 @@ Offline POS 2026-10-28: independent per-device queues, local re-authentication f
 ## 2026-10-29 — POS technical design
 
 Added draft POS logical data model, Accounting Events and module integration boundaries. Documents include tenant-scoped data integrity, invoice/payment/refund separation, idempotent outbox, one executor and optional distinct opener, and offline queue reconciliation. No app or database was implemented.
+
+
+## 2026-10-29 — Accounting Core discovery round 1
+
+- Created Accounting Core and Chart of Accounts documentation based on 16 founder answers, including unanswered/deferred points.
+- Reconciled immediate posting, permissioned period reopening and limited audit scope against immutable posted journals and necessary provenance.
+- No accounting schema or backend implementation.

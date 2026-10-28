@@ -63,3 +63,7 @@ Business transfer between Tenants, partner shares, subscription limits/expiratio
 - **Profit and cost visibility:** a Manager always has access to profits and service costs **within their authorized management scope**. Cross-Business and cross-Branch reach, Owner access, and fine-grained field permissions require a complete RBAC matrix; this does not grant global Tenant access.
 - **Locale settings:** currency, interface language, and timezone are configured at **Business level only**. No Branch-specific overrides are part of the approved design. Multi-country Businesses must be validated against this constraint during data model design.
 - **Module Dependencies:** **NOT APPROVED**. Founder requested detailed design discussion before choosing dependency enforcement and activation behavior. Do not implement a dependency DAG as an accepted product choice yet.
+
+## Identity follow-up — 2026-10-28
+
+Platform-wide unique username; sign in with username/password without asking for Tenant; tenant resolved from that distinct account. Accounts remain separate across Tenants. Business membership is explicit even for Tenant Owner. One Role per Branch, Manager can create Managers (authorization escalation rules pending), Owner/Manager can create employee accounts. See [Identity & Access](IDENTITY-ACCESS.md). This supersedes the prior suggestion of tenant-qualified usernames.

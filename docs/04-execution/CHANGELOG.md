@@ -1,5 +1,14 @@
 # Project changelog
 
+## 2026-10-28 — POS discovery round 3
+
+- Captured 12 founder responses on shared treasury, cashier shifts, cash differences, post-payment attribution corrections, offline sales and employee tips.
+- Documented shortage-to-cashier and surplus-as-sales requested policy with accounting/workforce compliance concerns; no automatic journal classification or payroll deduction approved.
+- Deferred attribution percentages, offline close and treasury transfer design.
+- No implementation or deployment.
+
+
+
 ## 2026-10-28 — POS discovery round 2
 
 - Captured 15 payment, refund, credit, tips and staff attribution answers.

@@ -1,45 +1,45 @@
 # Architecture baseline
 
-**Status:** Direction accepted; design details pending review.  
-**Companion records:** [ADR register](../05-decisions/DECISIONS.md) | [Open questions](../04-execution/OPEN-QUESTIONS.md).
+**Updated:** 2026-10-28  
+**Status:** Direction accepted; implementation architecture pending technical discovery.
 
-## System structure
+## Design
 
-Single repository; modular monolith application with an API, web UI and optional job worker. Keep module boundaries and contracts explicit.
+Single repository, Modular Monolith. Explicit module boundaries and contracts, with shared platform services and strongly enforced tenant isolation.
 
-### Platform core
+### Platform
 
-Identity, authentication, tenants, businesses, branches, memberships, RBAC, module entitlements, audit/security.
+Authentication, tenants, businesses, branches, scoped memberships, permissions, entitlements and auditing.
 
-### Business modules
+### Module architecture — founder decision
 
-Catalog, customers, POS/sales, payments, POS sessions, inventory, employees/payroll, booking, finance/reporting.
+**Every module must have a Core and Extension architecture, without exception.** The Core defines reusable capability; extensions implement industry or other specialized behavior. This is a strict design requirement, but **it does not yet prescribe one plugin per industry per module, particular package boundaries or mandatory no-op extension artifacts**. Those details require design approval and tests.
 
-### Industry extensions
+Examples:
+- POS core: sale/cart/payment; salon extension: barber/service workflows; medical clinic extension: permitted billing workflows.
+- Booking core: appointments/resource allocation; industry extensions: specialized resource/scheduling policies.
+- Other modules: define core contract and valid extension surfaces in their individual specifications.
 
-Salon, Retail, future Clinic. Share sale/cart/payment primitives; attach distinct policy/workflow integrations, not duplicated POS implementations.
+Avoid duplicating core logic and ad-hoc business-type conditions. Establish dependency direction, registries, extension lifecycle, tenant-specific activation and compatibility before implementation.
 
-## Tenant model
+### Data
 
-Tenant is the subscription and isolation boundary; Business belongs to Tenant; Branch belongs to Business; users get scoped memberships/roles. The canonical authenticated context identifies tenant/business; never trust client-supplied tenant IDs as authorization.
+Initial shared tenant-aware SQL database direction, tenant/business/branch scopes and authorization applied server-side. Enforce relational tenant isolation and test cross-tenant access. Final SQL vendor and database-level RLS decisions are open.
 
-Initial database approach: shared database with tenant-aware rows, composite tenant-scoped constraints where necessary, server-enforced isolation, integration tests for cross-tenant access. Dedicated tenant databases may be considered later but are **not** implemented.
+### Module communication
 
-## Module communication
+Explicit synchronous APIs/contracts; domain events for cross-module reactions; transactions for critical invariants; outbox/idempotent consumers when needed.
 
-- Explicit module APIs for synchronous decisions/queries.
-- Domain events for cross-module reactions.
-- Atomic transactions for critical financial/inventory invariants.
-- Transactional outbox and idempotent consumers where reliable asynchronous delivery is necessary.
+### Mobile and locality
 
-## Data evolution
+First release uses **responsive Web/PWA**. Offline capabilities, printing and synchronization remain open.
 
-Use versioned migrations and environments (dev/staging/prod). Historical Cashier tables are references for mapping, **not** a schema to copy. Design appropriate sale/payment, catalog/inventory, cash and accounting boundaries.
+### Markets and industries
 
-## Safety and engineering
+First barber salon edition (pilot: Cut Salon); medical clinic second, with sensitive data/compliance design before implementation. Both Egypt and Gulf are first-launch intended markets; jurisdiction-specific requirements remain open.
 
-Password hashing, secrets management, least privilege, RBAC, tenant isolation, logs/auditing, backups/restoration, tests and CI/CD.
+### Engineering safety
 
-## Not yet decided
+Migrations, least privilege, audit, backups, encrypted transport, tested auth and tenant isolation, CI/CD. No production implementation exists yet.
 
-Runtime/framework, ORM, SQL engine final selection, tenant isolation implementation, hosting and subscription provider. Record final decisions in ADRs before implementation.
+[Decisions](../05-decisions/DECISIONS.md) · [Open questions](../04-execution/OPEN-QUESTIONS.md).

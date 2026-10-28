@@ -129,3 +129,6 @@
 - Created the DRVO ERP documentation baseline and navigation.
 - Recorded agreed strategic architecture direction and open decisions.
 - Status remains planning.
+
+
+Offline POS 2026-10-28: independent per-device queues, local re-authentication for previously verified staff, and permissioned pre-sync correction confirmed. Founder requested broader tender support; provider-dependent confirmation, shift closing, and late sync remain unresolved. See docs/03-modules/OFFLINE-SYNC-SPEC.md and SHIFT-CLOSING-WORKFLOW.md. These are design drafts, not implemented.

@@ -60,3 +60,11 @@ See [MVP Discovery Round 2](../01-product/MVP-DISCOVERY-ROUND-2.md).
 - OQ-028 partly resolved: all Cut Salon branches included in initial validation; phased activation and rollback remain open.
 
 [Release strategy decision](../01-product/MVP-RELEASE-STRATEGY.md).
+
+
+## Final MVP clarification resolutions — 2026-10-28
+
+- Existing Cut Salon public booking website stays; integrate it with DRVO's new Booking API. Migration, cutover and fallback remain OQ-023.
+- Offline cash sales are accepted despite post-sync stock shortages; create a reviewable stock discrepancy. Negative-stock rules, valuation and reconciliation remain OQ-022.
+- Accounting manual vs automatic journal-entry workflow is **unresolved**, to be decided during detailed Accounting Module discovery (OQ-024). Full accounting remains in commercial V1.
+- Internal tests during development are allowed; **one comprehensive commercial launch** after acceptance, not separate public MVP stages (OQ-021).

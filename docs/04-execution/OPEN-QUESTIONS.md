@@ -240,3 +240,8 @@ Confirmed one treasury per Branch; bank accounts at Business and Branch levels; 
 ## HR and Commission Engine — 2026-10-29
 
 Founder approved per-employee flexible pay, configurable execution commission/target rules, different opening commission by service and user (supersedes universal 10% rate, preserves after-discount pre-tax basis), separate per-Branch targets, daily accrual/monthly close, advance offset, early payouts treated as advances, Business-configured negative balances, auditable historical adjustments and Owner/permissioned Manager payroll approvals. Open: rate precedence, lawful advance deductions, rounding, bonus targets, Branch assignment, payroll post-close refund adjustments. Cash-shortage deduction still requires separate approval. [HR Commission](../03-modules/HR-COMMISSION-ENGINE.md) · [Employee Ledger](../03-modules/EMPLOYEE-LEDGER.md).
+
+
+## Inventory & Purchasing discovery (2026-10-29)
+
+Founder approved Branch-scoped inventory and inter-Branch transfers, automatic service Recipe consumption, Business-configured valuation, negative stock with alert/review, direct purchase and receipt (no mandatory PO), Business-shared suppliers, supplier returns, full/partial stocktake, Manager-approved adjustments, reorder warnings in V1; Batch/Expiry deferred beyond V1. **Cross-Business transfers remain UNDECIDED**. Outstanding: valuation method choices/cost layers, recipe and return consumption rules, negative-stock costing, purchasing payments and taxes, transfer approvals. [Inventory](../03-modules/INVENTORY-CORE-SPEC.md) · [Purchasing](../03-modules/PURCHASING-CORE-SPEC.md).

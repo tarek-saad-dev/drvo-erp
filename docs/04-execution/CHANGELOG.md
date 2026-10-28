@@ -174,3 +174,10 @@ Added draft POS logical data model, Accounting Events and module integration bou
 - Recorded 12 founder decisions; created HR Commission Engine and Employee Ledger logical drafts.
 - Reconciled service/employee-variable opener rate with previously fixed 10% example, advance offsets with separate shortage-deduction approval, and per-branch attribution.
 - Documentation only, no code or database deployed.
+
+
+## 2026-10-29 — Inventory and Purchasing discovery
+
+- Documented 11 approved founder decisions; deferred cross-Business inventory transfer question.
+- Added compact Inventory Core and Purchasing Core design specs with direct purchase, Recipe-based material consumption, stocktake and low-stock alerts.
+- Reviewed POS offline negative stock and Accounting valuation implications; no code deployed.

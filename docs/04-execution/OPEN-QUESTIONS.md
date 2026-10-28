@@ -235,3 +235,8 @@ Drafts created: [POS Data Model](../03-modules/POS-DATA-MODEL-V1.md), [Accountin
 ## Treasury discovery — 2026-10-29
 
 Confirmed one treasury per Branch; bank accounts at Business and Branch levels; approved and logged Manager-authorized transfers; expenses paid via bank or cash, with Manager approval for large expenses; bank reconciliation deferred; outside-sale cash movements logged; Manager balance visibility under independent permission. Open: large-expense amount thresholds, cross-Business transfers, account-level permissions and transfer reconciliation. [Treasury Core](../03-modules/TREASURY-CORE-SPEC.md).
+
+
+## HR and Commission Engine — 2026-10-29
+
+Founder approved per-employee flexible pay, configurable execution commission/target rules, different opening commission by service and user (supersedes universal 10% rate, preserves after-discount pre-tax basis), separate per-Branch targets, daily accrual/monthly close, advance offset, early payouts treated as advances, Business-configured negative balances, auditable historical adjustments and Owner/permissioned Manager payroll approvals. Open: rate precedence, lawful advance deductions, rounding, bonus targets, Branch assignment, payroll post-close refund adjustments. Cash-shortage deduction still requires separate approval. [HR Commission](../03-modules/HR-COMMISSION-ENGINE.md) · [Employee Ledger](../03-modules/EMPLOYEE-LEDGER.md).

@@ -101,3 +101,8 @@ Selecting a method is NOT equivalent to receiving or verifying funds. Cash may b
 ## POS design checkpoint (2026-10-29)
 
 POS logical data model, accounting event contracts and Inventory/HR/Salon integration boundary docs added to docs/03-modules. All configured tender types remain selectable offline; confirmed settlement remains separate. Documents are engineering drafts, not code or approved SQL schema.
+
+
+## Accounting Core discovery (2026-10-29)
+
+Founder approved editable industry-based Chart of Accounts per Business, independent Business books with Tenant consolidated reporting, auto and manual immediately-posted balanced journals, reversal-based correction, branch/department/project cost centers, configurable reporting and fiscal start, monthly/annual closing and permissioned reopening. Account depth and minimum report set open; period comparisons deferred. [Accounting Core](../03-modules/ACCOUNTING-CORE-SPEC.md). Documentation only.

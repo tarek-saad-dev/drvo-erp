@@ -160,3 +160,10 @@ Added draft POS logical data model, Accounting Events and module integration bou
 - Created Accounting Core and Chart of Accounts documentation based on 16 founder answers, including unanswered/deferred points.
 - Reconciled immediate posting, permissioned period reopening and limited audit scope against immutable posted journals and necessary provenance.
 - No accounting schema or backend implementation.
+
+
+## 2026-10-29 — Treasury discovery
+
+- Recorded 8 founder answers and created Treasury Core specification.
+- One branch treasury, separate shifts, manager-approved transfers and large expenses, permissioned balances and movements; bank reconciliation deferred.
+- No treasury backend deployed.

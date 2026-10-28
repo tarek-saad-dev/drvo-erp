@@ -68,3 +68,21 @@ See [MVP Discovery Round 2](../01-product/MVP-DISCOVERY-ROUND-2.md).
 - Offline cash sales are accepted despite post-sync stock shortages; create a reviewable stock discrepancy. Negative-stock rules, valuation and reconciliation remain OQ-022.
 - Accounting manual vs automatic journal-entry workflow is **unresolved**, to be decided during detailed Accounting Module discovery (OQ-024). Full accounting remains in commercial V1.
 - Internal tests during development are allowed; **one comprehensive commercial launch** after acceptance, not separate public MVP stages (OQ-021).
+
+## Tenancy discovery — unresolved details (2026-10-28)
+
+| ID | Unresolved issue | Priority |
+|---|---|---|
+| OQ-030 | Business transfer between Tenants: prohibited or controlled migration? | Medium |
+| OQ-031 | Business partner shares and ownership model | Medium |
+| OQ-032 | Module dependency policy (recommended DAG/explicit required and optional dependencies, awaiting approval) | High |
+| OQ-033 | SaaS branch/user/module limits and expired subscription workflow | High |
+| OQ-034 | Tenant/Business export and portability policy | Medium |
+| OQ-035 | Per-entity deletion, retention, audit and legal rules | High |
+| OQ-036 | Business-level currency/timezone/language vs multi-country Branch needs | High |
+| OQ-037 | Tenant-qualified username uniqueness, identity and recovery | High |
+| OQ-038 | Manager-only finance visibility: Owner/Super Admin exceptions | High |
+| OQ-039 | Cross-Business consolidated financial reports, accounting periods and currency conversion | High |
+| OQ-040 | Branch-to-Branch transfer approval/posting and inter-branch finance rules | High |
+
+Founder decisions: [Tenancy Discovery](../01-product/TENANCY-DISCOVERY-ROUND-3.md). Architecture blueprint: [Tenancy Architecture](../02-architecture/TENANCY-ARCHITECTURE.md).

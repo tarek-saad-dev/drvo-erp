@@ -45,3 +45,14 @@ Shift / Treasury module: branch shared treasury, separate cashier shifts, explic
 Opening commission basis, eligibility, multiple openers, refunds, tax/discount interactions, cash variance classification, custody liability, retroactive journal corrections, day close with open shifts and offline backdated financial entries.
 
 [Round 3](POS-DISCOVERY-ROUND-3.md) · [Open questions](../04-execution/OPEN-QUESTIONS.md).
+
+## Founder final six decisions (2026-10-28)
+
+1. Opening commission: **10% of service price after discount, before tax**.
+2. Opener cannot be the service executor; opening commission is for another employee only.
+3. Maximum **one opener** per service.
+4. Refund automatically reverses opening commission, like executor commission (proportional calculation for partial refunds remains technical design).
+5. Cash surplus posts to **cash variance first**; reclassify as sales only **after verified evidence**. This supersedes the earlier direct-to-sales request.
+6. Manager corrects an approved cash settlement using a **new correction that preserves the original**, superseding direct edits.
+
+[POS State Machine](POS-STATE-MACHINE.md) · [Shift Lifecycle](SHIFT-LIFECYCLE.md).

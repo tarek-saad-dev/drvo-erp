@@ -1,24 +1,33 @@
-# Open questions (not decisions)
+# Open questions — unresolved only
 
-| ID | Question | Priority |
+| ID | Open decision | Priority |
 |---|---|---|
-| OQ-001 | Exact backend/frontend framework and TypeScript architecture? | High |
-| OQ-002 | SQL Server vs other SQL engine, ORM and migration tooling? | High |
-| OQ-003 | Enforced tenant isolation: database RLS and/or application-layer guards? | High |
-| OQ-004 | Business vs tenant ownership of subscriptions and module entitlements? | High |
-| OQ-005 | Deployment environments, hosting and secret management? | High |
-| OQ-006 | Salon POS minimum viable flow and migration constraints from Cashier? | High |
-| OQ-007 | Identity provider and invitation/member workflow? | Medium |
-| OQ-008 | Offline POS, printing hardware and synchronization requirements? | Medium |
-| OQ-009 | Final ERP capability map, vs integrations and first-release scope? | High |
-| OQ-010 | Second industry rollout order: beauty/aesthetic, medical clinics or supermarket? | High |
-| OQ-011 | Launch geography sequencing, localizations and compliance requirements? | High |
-| OQ-012 | Mobile strategy: responsive/PWA vs native apps, and stakeholder portals timing? | High |
-| OQ-013 | Per-module Core + Extension contract rules and exceptions? | High |
-| OQ-014 | Measurable 3-month and 12-month customer impact targets? | Medium |
-| OQ-015 | Expected branches/users/transaction scale for target customer? | High |
-| OQ-016 | Specific must-have Odoo capabilities versus differentiated DRVO additions? | Medium |
+| OQ-001 | Backend/frontend framework and TypeScript structure | High |
+| OQ-002 | SQL engine, ORM/query tooling and migrations | High |
+| OQ-003 | Tenant isolation strategy and cross-tenant integrity guarantees | High |
+| OQ-004 | Ownership of subscriptions and entitlements | High |
+| OQ-005 | Hosting, staging, environments and secrets | High |
+| OQ-006 | Salon MVP and legacy Cashier migration/coexistence/rollback | High |
+| OQ-007 | Identity and invitations | Medium |
+| OQ-008 | Offline PWA POS, device/printing support and sync | High |
+| OQ-009 | Final ERP module capability map vs integrations / MVP cut | High |
+| OQ-011 | Which Gulf countries first, and required regulatory, tax, language and payment support for concurrent Egypt + Gulf launch? | High |
+| OQ-012 | PWA offline capability, stakeholder portal timing and later native-app requirements | High |
+| OQ-013 | Mandatory Core + Extension contracts for **every** module: interface, packaging, lifecycle and dependency rules | High |
+| OQ-014 | Measurable 3-month/12-month customer benefit targets | Medium |
+| OQ-015 | Target branches/users/transaction volume | High |
+| OQ-016 | Must-have Odoo capabilities vs DRVO additions | Medium |
+| OQ-017 | After barber salons then medical clinics, when do beauty/aesthetic and supermarket editions launch? | Medium |
+| OQ-018 | Clinic clinical data scope, privacy, compliance and safe release criteria | High |
+| OQ-019 | Cut Salon pilot date, scope, transition and operational rollback | High |
 
-Follow-up prompts and confirmed product answers: [Section 1 discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md).
+## Resolved from founder follow-ups (2026-10-28)
 
-Record resolutions as ADRs and update architecture/roadmap. Never treat an unanswered question as a committed requirement.
+- Former OQ-010 second industry: **medical clinics**, after barber salons.
+- Comprehensive ERP ambition, delivered in stages.
+- Egypt and Gulf both in initial commercial launch strategy.
+- Responsive Web / PWA for first release.
+- Core + Extension mandatory for every module.
+- Cut Salon is first pilot.
+
+[Source answers](../01-product/DISCOVERY-01-FOLLOWUPS.md). Record detailed architecture choices in ADRs before implementation.

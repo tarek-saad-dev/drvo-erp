@@ -1,5 +1,14 @@
 # Project changelog
 
+## 2026-10-28 — Permission and QR follow-up
+
+- Approved Allow-only + Default Deny RBAC evaluation.
+- QR card must be used only by its owner with additional verification; actual purpose remains unspecified.
+- Discount Engine rules and precedence are not yet approved.
+- No feature implementation claimed.
+
+
+
 ## 2026-10-28 — RBAC matrix discovery
 
 - Recorded founder's approved RBAC choices and ten unanswered operations.

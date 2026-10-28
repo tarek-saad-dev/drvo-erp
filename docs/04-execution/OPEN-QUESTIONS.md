@@ -135,3 +135,16 @@ Approved: global username uniqueness, username/password login, self-registration
 - OQ-058: Correction documents and adjustment policy for immutable paid invoices.
 
 [POS Discovery Round 1](../03-modules/POS-DISCOVERY-ROUND-1.md).
+
+## POS payments / refunds / attribution discovery (2026-10-28)
+
+- OQ-059: Custom payment method settlement, reconciliation and restrictions.
+- OQ-060: Credit limit atomic checks, mixed cash/receivable payments, partial collection and aging.
+- OQ-061: Refund by item or arbitrary amount, to tender/customer credit, preventing over-refunds and refunding unpaid debt.
+- OQ-062: Tips distinct from service revenue: payroll/payable, allocation, refund and reporting.
+- OQ-063: Manager approval for over-limit refunds: authorization workflow and thresholds.
+- OQ-064: Automatically reverse target/commission on refund if earned, posted or paid; correction periods undecided.
+- OQ-065: Service executor vs revenue/commission share mechanics and whether total shares equal 100%; HR to set attribution rules.
+- OQ-066: Financial day reopening deferred to Accounting Module.
+
+[POS Discovery Round 2](../03-modules/POS-DISCOVERY-ROUND-2.md).

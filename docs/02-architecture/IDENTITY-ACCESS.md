@@ -37,3 +37,7 @@
 **Privilege safety:** Manager creation cannot exceed creator's scope or grant unauthorized roles. Require server-side checks.
 
 [Tenancy Blueprint](TENANCY-ARCHITECTURE.md) · [Open questions](../04-execution/OPEN-QUESTIONS.md).
+
+## Permission evaluation decision (2026-10-28)
+
+Founder accepted **Allow-only + Default Deny** for V1. An action without a valid applicable Allow permission is rejected. No explicit Deny rule. All operations still require scoped membership, resource ownership and security checks. The QR card use case remains unspecified and is not authorization on its own.

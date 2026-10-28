@@ -90,3 +90,9 @@ Founder approved provisional close for shifts with unsynced sales, cash counting
 ## Offline/closing design checkpoint — 2026-10-28
 
 Founder approved provisional financial-day close with later final reconciliation; when a device is lost before sync, log incident and reconcile physical cash manually. Provider-dependent offline payments remain undecided pending discussion by method. Draft [Offline API Contracts](../03-modules/OFFLINE-API-CONTRACTS.md) and [Logical Data Model](../03-modules/OFFLINE-DATABASE-DESIGN.md) exist but remain proposed, not implementation. No deployed backend/database.
+
+## Founder decision — 2026-10-29: payment selection availability
+
+All payment methods configured for a Business must remain visible and selectable in POS both online and offline. Do not gate or hide a method merely because connectivity is lost. Founder explicitly skipped per-payment-method discovery for now.
+
+Selecting a method is NOT equivalent to receiving or verifying funds. Cash may be recorded locally as received; provider-dependent payments must retain an unverified/pending reconciliation status until reliable confirmation or evidence exists. Never manufacture provider authorization, and never post pending electronic payment as settled cash. Payment selection UI availability is APPROVED; exact provider confirmation and settlement semantics are technical design work, not additional UI selection questions.

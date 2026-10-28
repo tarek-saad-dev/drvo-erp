@@ -140,3 +140,11 @@ Offline POS 2026-10-28: independent per-device queues, local re-authentication f
 - Confirmed automatic retries plus Manager-visible sync errors.
 - Offline electronic payment confirmation remains undecided; updated engineering draft, no implementation.
 
+
+## 2026-10-28 — Offline day close and API/data draft
+
+- Approved provisional financial-day close and later final reconciliation.
+- Approved device-loss incident with manual cash reconciliation, not guaranteed restoration.
+- Electronic payments during outage deferred for per-method discussion.
+- Added proposed offline API contracts and logical database model; technical names/schema are not approved. No code implementation or deployment.
+

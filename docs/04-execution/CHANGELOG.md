@@ -1,5 +1,16 @@
 # Project changelog
 
+## 2026-10-28 — Tenancy discovery (40 answers)
+
+- Confirmed Tenant > Business > Branch, separate Business brands/accounting and Tenant-wide summaries.
+- Confirmed Branch-specific stock/treasury/shifts, shared intra-Business customers, price overrides and multi-Branch staff.
+- Confirmed Tenant-scoped accounts, hierarchical RBAC, customizable roles and sensitive-action audits.
+- Confirmed Business-level module enablement, multiple extensions, preserved data on deactivation and admin approval for paid modules.
+- Confirmed shared database with isolation, expected scale and deferred questions.
+- Added discovery record and Tenancy Architecture blueprint; no code implemented.
+
+
+
 ## 2026-10-28 — Final MVP discovery clarification
 
 - Retain Cut Salon booking site; connect to DRVO Booking API.

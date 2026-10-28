@@ -167,3 +167,10 @@ Added draft POS logical data model, Accounting Events and module integration bou
 - Recorded 8 founder answers and created Treasury Core specification.
 - One branch treasury, separate shifts, manager-approved transfers and large expenses, permissioned balances and movements; bank reconciliation deferred.
 - No treasury backend deployed.
+
+
+## 2026-10-29 — HR & Commission discovery
+
+- Recorded 12 founder decisions; created HR Commission Engine and Employee Ledger logical drafts.
+- Reconciled service/employee-variable opener rate with previously fixed 10% example, advance offsets with separate shortage-deduction approval, and per-branch attribution.
+- Documentation only, no code or database deployed.

@@ -1,5 +1,14 @@
 # Project changelog
 
+## 2026-10-28 — Final MVP discovery clarification
+
+- Retain Cut Salon booking site; connect to DRVO Booking API.
+- Accept cash-only offline sales with reviewable shortages found after sync.
+- Defer manual journal-entry design decision until Accounting Module discovery.
+- Allow internal development tests before one comprehensive commercial V1 launch.
+- Updated project state, roadmap and open risks; no implementation claimed.
+
+
 ## 2026-10-28 — MVP release strategy decisions
 
 - Captured eight founder clarifications: founder + Cursor; flexible one-month goal; one comprehensive commercial V1.

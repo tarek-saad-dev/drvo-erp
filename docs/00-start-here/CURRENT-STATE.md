@@ -70,3 +70,7 @@ First 12 POS requirements captured: mixed product/service invoice, one service e
 ## POS discovery round 2 — 2026-10-28
 
 Approved: built-in/custom payment methods, cash-plus-receivable splits, hard credit limits, partial debt collections, separate employee tips, line/custom partial refunds, refund to customer credit or payment method, executed-service refunds with reason, Manager over-limit approval, employee-specific commission plans and automatic reversal of target/commission effects. Attribution, payroll reversal period and financial day reopening remain open. [Round 2](../03-modules/POS-DISCOVERY-ROUND-2.md). No code implemented.
+
+## POS Round 3 discovery — 2026-10-28
+
+Confirmed shared branch treasury with separate cashier shifts, actual cash counts and manager-reviewed shortages/surpluses; manager can make audited post-payment service-attribution adjustment; offline cash sales attach to same shift; tips accrue to employee ledger; financial day can close with open shifts (warning). Founder requests cashier liability for shortages and recording surplus as sales; accounting classification, investigation and lawful recovery require design, do not treat unverified surplus as real sales. [POS Round 3](../03-modules/POS-DISCOVERY-ROUND-3.md). No code.

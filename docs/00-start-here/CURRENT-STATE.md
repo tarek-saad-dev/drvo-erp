@@ -96,3 +96,8 @@ Founder approved provisional financial-day close with later final reconciliation
 All payment methods configured for a Business must remain visible and selectable in POS both online and offline. Do not gate or hide a method merely because connectivity is lost. Founder explicitly skipped per-payment-method discovery for now.
 
 Selecting a method is NOT equivalent to receiving or verifying funds. Cash may be recorded locally as received; provider-dependent payments must retain an unverified/pending reconciliation status until reliable confirmation or evidence exists. Never manufacture provider authorization, and never post pending electronic payment as settled cash. Payment selection UI availability is APPROVED; exact provider confirmation and settlement semantics are technical design work, not additional UI selection questions.
+
+
+## POS design checkpoint (2026-10-29)
+
+POS logical data model, accounting event contracts and Inventory/HR/Salon integration boundary docs added to docs/03-modules. All configured tender types remain selectable offline; confirmed settlement remains separate. Documents are engineering drafts, not code or approved SQL schema.

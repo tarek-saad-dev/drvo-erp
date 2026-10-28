@@ -148,3 +148,15 @@ Approved: global username uniqueness, username/password login, self-registration
 - OQ-066: Financial day reopening deferred to Accounting Module.
 
 [POS Discovery Round 2](../03-modules/POS-DISCOVERY-ROUND-2.md).
+
+## POS Round 3 unresolved — 2026-10-28
+
+- OQ-067: Founder to describe one-executor / multiple-attribution-beneficiaries scenario; 100% share rule remains unknown.
+- OQ-068: Shared Branch treasury with separate cashier shifts: cash custody, overlapping shifts, shortage attribution and evidence.
+- OQ-069: Manager post-payment service attribution adjustments vs immutable invoice, HR and accounting.
+- OQ-070: Cash shortfall charged to cashier and surplus described as sales income: investigate, approve, lawful employee recovery, and distinguish cash variance from verified sales/tax revenue.
+- OQ-071: Financial day may close with active shifts; late-shift and offline sync settlement policy.
+- OQ-072: Offline cash sale same shift; closing shift with pending unsynced transactions unresolved.
+- OQ-073: Treasury transfers deferred; Tips credited to Employee Ledger (payout timing/settlement unresolved).
+
+[POS Discovery Round 3](../03-modules/POS-DISCOVERY-ROUND-3.md).

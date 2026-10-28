@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-10-28 — Tenancy final follow-up
+
+- Confirmed manager access to profit/cost within authorized management scope.
+- Confirmed Business-only currency, language, timezone settings; no Branch overrides.
+- Left Module Dependencies undecided for detailed architecture review.
+
+
 ## 2026-10-28 — Tenancy discovery (40 answers)
 
 - Confirmed Tenant > Business > Branch, separate Business brands/accounting and Tenant-wide summaries.

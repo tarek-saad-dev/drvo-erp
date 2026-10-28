@@ -106,3 +106,14 @@ Founder decisions: [Tenancy Discovery](../01-product/TENANCY-DISCOVERY-ROUND-3.m
 | OQ-047 | Temporary permission delegation after role matrix design | Medium |
 
 Approved: global username uniqueness, username/password login, self-registration, manager-account creation, explicit Owner Business membership, one Role/Branch, email OTP reset, mandatory first-login password change, revoke on refresh intent. [Identity & Access](../02-architecture/IDENTITY-ACCESS.md).
+
+## RBAC matrix unresolved (2026-10-28)
+
+- OQ-041: founder requests illustrative comparison before Allow-only vs explicit Deny decision.
+- OQ-048: user QR discount: user is discount issuer, discount recipient or both; what determines final percentage/amount and role cap?
+- OQ-049: QR security: revocable card tokens, second-factor/manager sign-off and audit rules (proposal only).
+- OQ-050: manager may create/edit Roles but not grant equal Manager Role without Owner; define effective privilege ceilings.
+- OQ-051: refund amount tiers, void permissions, closed-day reopening and journal reversal semantics.
+- OQ-052: expenses, accounting entries, salaries, advances, stock transfer, price changes, booking, approvals, protected permissions still unanswered (questions 11–20).
+
+[RBAC Discovery](../02-architecture/RBAC-MATRIX.md).

@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-10-28 — Identity & Access discovery
+
+- Recorded 12 founder responses, approved global usernames and login model.
+- Documented Owner/Manager account creation, explicit Business Membership, one role per Branch and recovery/session policies.
+- Logged unresolved Deny, role hierarchy and privilege escalation controls. No code implemented.
+
+
+
 ## 2026-10-28 — Tenancy final follow-up
 
 - Confirmed manager access to profit/cost within authorized management scope.

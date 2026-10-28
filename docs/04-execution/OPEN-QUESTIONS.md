@@ -86,3 +86,9 @@ See [MVP Discovery Round 2](../01-product/MVP-DISCOVERY-ROUND-2.md).
 | OQ-040 | Branch-to-Branch transfer approval/posting and inter-branch finance rules | High |
 
 Founder decisions: [Tenancy Discovery](../01-product/TENANCY-DISCOVERY-ROUND-3.md). Architecture blueprint: [Tenancy Architecture](../02-architecture/TENANCY-ARCHITECTURE.md).
+
+## Tenancy final follow-up (2026-10-28)
+
+- OQ-032 remains **open**, explicitly awaiting Module Dependencies design discussion and founder approval.
+- OQ-036: founder approved Business-only settings, no Branch overrides. Unresolved risk: Businesses spanning countries/timezones/currencies.
+- OQ-038: Manager access to profit/cost is always granted **inside authorized management scope**. Exact owner exceptions and scope-to-role matrix still require documentation.

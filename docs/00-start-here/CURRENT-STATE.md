@@ -62,3 +62,7 @@ Founder approved scoped Owner full access, customizable Manager role, restricted
 ## Permission and QR discovery (2026-10-28)
 
 Allow-only + Default Deny approved; other resource/scope checks remain mandatory. QR card owner-only with extra verification approved, but intended QR function and Discount Engine behavior remain open. Continue with POS Core + Salon Extension requirements; no code implemented.
+
+## POS discovery (2026-10-28)
+
+First 12 POS requirements captured: mixed product/service invoice, one service executor but potentially multiple attribution recipients, optional customer except credit, immutable paid invoice, draft persistence, split tender, temporary catalog line, credit limit and open shifts. Attribution details and payment/refund specs remain open. [POS Discovery](../03-modules/POS-DISCOVERY-ROUND-1.md). No code implemented.

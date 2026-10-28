@@ -54,3 +54,18 @@ Use transactional durable local DB, forward-only log, integrity checksum, encryp
 
 ## Open decisions
 All payment method availability; offline invoices with pending payment; cached login lifetime; offline credit policy; allowed correction scope; batch ordering; pending shift/day closing; device replacement; approval thresholds; refund processing offline; exact API/DB schema.
+
+## Founder follow-up approvals — 2026-10-28
+
+- **Electronic payments during outage: OPEN.** Do not treat provider-dependent payment as confirmed or captured without verified evidence. Method-specific capabilities remain discovery work; request to support all tenders is not approval to bypass authorization.
+- **Sync failures:** automatically retry transient failures, then expose unresolved errors to the Manager. Approved business behavior; exact backoff, attempt limit and escalation threshold remain technical design choices.
+- **Shift interaction:** unsynced sales may coexist with a *provisionally closed* shift; they must remain attached to original shift and undergo final reconciliation after successful sync.
+- **Cash counting:** count all cash actually received, including cash represented by un-synced local transactions; avoid treating pending card payments as received cash.
+
+### Proposed protocol specifics (implementation draft, not founder decisions)
+
+Persist encrypted append-only local queue and cash tender evidence on each device. Retry with stable device ID, sale ID, event sequence and payload hash; exponential backoff with jitter, halt/quarantine deterministic validation conflicts, manual retry visibility. Server upsert by unique idempotency key and retain ACK permanently until client confirms. Return `accepted/retryable/review_required` per event, not a blanket batch success. Store `occurred_at/synced_at/posted_at` separately. Device snapshot contributes pending cash count/value to provisional close. Final reconciliation compares all outstanding device queues against server acknowledgements, cash counts and adjustments. Never create duplicate invoice, customer debt, commission, inventory or accounting entries on retries.
+
+### Remaining discovery items
+
+Payment types and electronic confirmation; offline customer credit/limit; cached login validity, offline authorization revocation gap; recovery if device lost; approval of pending-sale cancellations; precise timeout and escalation; whether financial day closes provisionally or permanently when shifts remain open; settlement of failed non-retryable events.

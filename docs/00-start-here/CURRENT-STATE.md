@@ -106,3 +106,8 @@ POS logical data model, accounting event contracts and Inventory/HR/Salon integr
 ## Accounting Core discovery (2026-10-29)
 
 Founder approved editable industry-based Chart of Accounts per Business, independent Business books with Tenant consolidated reporting, auto and manual immediately-posted balanced journals, reversal-based correction, branch/department/project cost centers, configurable reporting and fiscal start, monthly/annual closing and permissioned reopening. Account depth and minimum report set open; period comparisons deferred. [Accounting Core](../03-modules/ACCOUNTING-CORE-SPEC.md). Documentation only.
+
+
+## Treasury Core founder decisions — 2026-10-29
+
+One treasury per Branch, bank accounts Business/Branch, manager-approved recorded transfers, cash/bank expenses, permissioned cash movement and Manager balance visibility; bank reconciliation deferred. [Treasury Core](../03-modules/TREASURY-CORE-SPEC.md). No implementation.

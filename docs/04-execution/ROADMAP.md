@@ -27,3 +27,7 @@ The earlier **Retail second** assumption is superseded. Retail remains a future 
 **First mobile channel:** responsive web/PWA. Comprehensive ERP is the product vision, not first-release scope. The mandatory core/extension structure for all modules requires explicit technical contracts.
 
 [Open questions](OPEN-QUESTIONS.md) · [Product vision](../01-product/VISION.md).
+
+## MVP discovery note — 2026-10-28
+
+Founder requests a comprehensive Cashier-replacement feature set in one month, including full HR/accounting/inventory, offline POS and SaaS billing. This is a **desired scope/timeline**, not an approved or validated delivery forecast. Queue and printing can be deferred, so **limited pilot**, **Cashier replacement** and **external commercial launch** require separate acceptance gates. See [MVP Discovery Round 2](../01-product/MVP-DISCOVERY-ROUND-2.md).

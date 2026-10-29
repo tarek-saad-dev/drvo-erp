@@ -224,3 +224,10 @@ Added ARCHITECTURE-READINESS-REVIEW.md: reconciled historical rule conflicts, li
 4. **Late offline sale after month close:** preserve original sale date and post linked adjustment into the current open accounting period, **without a separate additional manual tax review step** by default. This is a workflow preference, not a waiver of mandatory local tax laws, filing obligations, or jurisdiction-specific validations before production.
 
 These four points supersede earlier open recommendations in this document. **Technical sign-off for these business behaviors is approved; overall production/implementation authorization is NOT given. No coding without explicit founder permission.**
+
+
+## 2026-10-29 — Windows POS offline qualification planning
+
+- Founder selected Windows Browser initial POS hardware category.
+- Added 20-case Windows PWA/IndexedDB test plan covering restart, failure recovery, multi-device replay, site-data loss, payments and reconciliation.
+- Linked into infrastructure checklist and Cursor plan; no tests or code executed.

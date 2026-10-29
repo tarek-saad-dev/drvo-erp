@@ -50,3 +50,8 @@ This list is conceptual. Exact graphic style, character names, animation technol
 [Character, Scene and Motion Blueprint](../02-architecture/CHARACTER-ILLUSTRATION-MOTION-BLUEPRINT.md) · [ADR-025](ADR-025-ERP-PROFESSIONALISM-EVERYDAY-SIMPLICITY.md).
 
 **No code, UI asset production, animations, Figma files, migrations or production changes authorized.**
+
+
+## Founder-selected art style — ADR-028 (2026-10-29)
+
+Founder accepted the proposed combined **Soft Editorial 2.5D profession characters + Miniature/Isometric 3D-inspired environment scenes** as the DRVO visual art direction. First concept validation targets the DRVO Barber, a miniature Salon storefront and miniature property/house (real estate) scene plus a nonblocking storyboard for scene.flip. This resolves only the general *style pairing*, not any exact art asset, production character pack, layout, motion timing or renderer. Previous screen layouts remain rejected; graphics are not permission to implement them. [ADR-028](ADR-028-SOFT-2_5D-CHARACTERS-MINIATURE-3D-SCENES.md), [Art Concept Pack](../02-architecture/DRVO-ART-DIRECTION-FIRST-CONCEPT-PACK.md).

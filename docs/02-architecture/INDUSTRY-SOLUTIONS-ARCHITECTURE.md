@@ -1,7 +1,7 @@
 # Industry Solutions Architecture — Shared Platform, Domain Boundaries and Composition
 
 **Date:** 2026-10-29
-**Status:** Founder-approved direction (ADR-017), detailed contracts and module inventory are proposed pending design sign-off.
+**Status:** Founder-approved direction (ADR-017 and ADR-019), detailed contracts and module inventory are proposed pending design sign-off.
 **Scope:** product architecture and rules, NOT code or migrations.
 
 ## 1. Product layers
@@ -10,7 +10,7 @@
 flowchart TB
   P[DRVO Platform Kernel: Tenant, Business, Branch, Identity, RBAC, Entitlements, Audit, Module Registry]
   S[Shared Business Modules: POS & Sales, Booking, Accounting, Treasury, Inventory, Purchasing, HR, CRM, Reporting]
-  D[Industry Domain Modules: Salon Operations, Clinical Records, Education Courses, Real Estate Properties, Manufacturing MRP]
+  D[Conditional Domain Modules: Clinical Records, Courses, Properties, Manufacturing MRP; Salon Execution only if justified]
   E[Industry Extensions: barber/chair, doctor/room, recipes, pricing and commission policies]
   X[Optional Integrations: WhatsApp, AI, payment providers]
   I[Industry Solution Registry and Versioned Templates]
@@ -89,3 +89,8 @@ Use typed sync commands/queries for required validation and same-transaction inv
 Produce a Core vs Extension vs Domain Module boundary matrix *per selected capability*, domain event ownership contract, data sensitivity classification, solution manifest spec, dependency/entitlement UX, industry migration/reuse evaluation, and quantitative cross-industry/tenant isolation tests. Exact packaging and release policy remain unapproved.
 
 **See [ADR-017](../05-decisions/ADR-017-SHARED-CORE-INDUSTRY-SOLUTIONS.md). No code permitted.**
+
+
+## Founder-approved classification boundary — ADR-019 (2026-10-29)
+
+**Option B accepted:** no mandatory one-domain-module-per-industry, and no attempt to encode every specialized domain as a Booking or Sales Extension. Create a new Domain Module only when separate aggregate ownership, state machine, access sensitivity, financial invariants or lifecycle warrant it. Salon may be entirely Shared Modules + bounded Salon Extensions until an independent Service Execution workflow justifies ownership. Clinic sensitive records should be separated from generic appointment/customer records; Manufacturing/MRP is a likely independent domain. These examples are not full technical approvals or release commitments. Follow [Core/Extension/Domain Boundary Matrix](CORE-EXTENSION-DOMAIN-BOUNDARY-MATRIX.md) and [ADR-019](../05-decisions/ADR-019-CONDITIONAL-DOMAIN-MODULE-BOUNDARY.md). All Modules must still have defined Core+Extension architecture (ADR-006).

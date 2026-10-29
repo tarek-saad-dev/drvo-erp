@@ -14,3 +14,8 @@ Modules declare **Required** and **Optional** dependencies, and the platform mus
 
 ## Testing
 Activate, suspend, upgrade, deactivate, cyclic/conflicting graphs, invalid paid entitlement, data retention and cross-Business isolation.
+
+
+## Approved activation UX — ADR-016 (2026-10-29)
+
+When required prerequisites are missing, present selected app and full Required-dependency bundle with any prices and obtain one explicit approval to activate together. This is now a founder-approved addition, not a suggestion. Exact concrete dependency edges, approver roles, billing and suspension semantics remain to design. [ADR-016](ADR-016-BUNDLED-REQUIRED-DEPENDENCIES.md).

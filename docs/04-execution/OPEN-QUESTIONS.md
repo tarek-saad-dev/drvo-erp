@@ -279,3 +279,8 @@ Resolved at product-intent level: offline credit recorded immediately with post-
 4. **Late offline sale after month close:** preserve original sale date and post linked adjustment into the current open accounting period, **without a separate additional manual tax review step** by default. This is a workflow preference, not a waiver of mandatory local tax laws, filing obligations, or jurisdiction-specific validations before production.
 
 These four points supersede earlier open recommendations in this document. **Technical sign-off for these business behaviors is approved; overall production/implementation authorization is NOT given. No coding without explicit founder permission.**
+
+
+## Technical validation remaining — 2026-10-29
+
+Before implementation authorization: inspect SQL Server version/edition/VPS capacity, select data access driver, establish/test off-host backup and restoration, verify actual POS devices and IndexedDB eviction/offline login threat model, settle RPO/RTO and country-specific fiscal integration details. [Infrastructure Checklist](INFRASTRUCTURE-OFFLINE-PRECODE-CHECKLIST.md). No tests have been executed.

@@ -244,3 +244,10 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - Created Module Registry/Dependencies/Contracts engineering specification, explicitly draft.
 - Linked documents in architecture, current state, decision register, Cursor plan and open questions.
 - No application code, SQL migration or deployment executed.
+
+
+## 2026-10-29 — Bundled module dependencies approved
+
+- ADR-016 accepted: preview Required transitive dependency bundle with prices and receive one explicit approval to activate it together.
+- Added detailed proposed BusinessModule lifecycle, platform release vs tenant activation, versioned command/event contracts, outbox, idempotency and test matrix.
+- Synced ADR register, module registry draft, Cursor plan, open questions, current state. No code or DB changes.

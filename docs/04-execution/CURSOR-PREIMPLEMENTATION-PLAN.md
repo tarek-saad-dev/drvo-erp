@@ -53,3 +53,8 @@ Prior B1-B4 questions are now answered at founder product-intent level, but the 
 4. **Late offline sale after month close:** preserve original sale date and post linked adjustment into the current open accounting period, **without a separate additional manual tax review step** by default. This is a workflow preference, not a waiver of mandatory local tax laws, filing obligations, or jurisdiction-specific validations before production.
 
 These four points supersede earlier open recommendations in this document. **Technical sign-off for these business behaviors is approved; overall production/implementation authorization is NOT given. No coding without explicit founder permission.**
+
+
+## Infrastructure/offline pre-code review — 2026-10-29
+
+The environment and offline-security verification checklist is now documented at [INFRASTRUCTURE-OFFLINE-PRECODE-CHECKLIST.md](INFRASTRUCTURE-OFFLINE-PRECODE-CHECKLIST.md). SQL Server on VPS and IndexedDB PWA are architecture decisions, NOT proof of deployable configuration. Verify database edition, available capacity, off-host backup restore, target POS browsers, storage eviction, offline authentication and Tenant isolation before production. **Checklist created only: no server accessed and no code written.**

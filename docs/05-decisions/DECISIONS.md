@@ -38,6 +38,8 @@ Accepted directions are **not implemented features**.
 | ADR-026 | Business-scoped theme palettes, central typography and safe custom font capability | Accepted direction | [ADR-026](ADR-026-BUSINESS-THEMES-AND-CENTRAL-TYPOGRAPHY.md) |
 | ADR-027 | Original profession-specific character scenes and purposeful motion | Accepted direction | [ADR-027](ADR-027-INDUSTRY-CHARACTERS-SCENES-AND-MOTION.md) |
 
+| ADR-028 | Soft 2.5D profession characters + Miniature 3D industry environments | Accepted art direction | [ADR-028](ADR-028-SOFT-2_5D-CHARACTERS-MINIATURE-3D-SCENES.md) |
+
 **Product launch and pilot decisions** are recorded in [Product Discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md) and [Roadmap](../04-execution/ROADMAP.md).
 
 When superseding decisions, preserve the original and cross-link replacements.

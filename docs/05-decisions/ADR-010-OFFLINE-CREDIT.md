@@ -8,3 +8,12 @@ Conflict: earlier POS rules required hard stop on exceeding customer credit limi
 Design proposal, not approved: local record labeled OFFLINE_UNRECONCILED, sync to immutable server sale/debt record where permissible, flag CREDIT_LIMIT_EXCEEDED_REVIEW with amount, reviewer and remediation. Never silently discard actual sale or falsely claim global cap enforced; decide authorization, credit hold, and recovery workflow, including simultaneous multi-device sales.
 
 Acceptance examples: customer limit 1,000; two offline devices each create 800 debt; after sync actual total 1,600 must be visibly flagged and cannot be mistakenly accepted as compliant with limit. Preserve source events, no duplicate AR. 
+
+## Founder technical sign-off decisions — 2026-10-29 (approved)
+
+1. **Offline credit over-limit:** retain all previously registered offline sales; once sync reveals exceeded credit limit, suspend further credit sales for that customer until authorized Manager review. Online strict cap remains. Do not silently erase transactions.
+2. **Unverified customer electronic payment evidence:** open outstanding amount / collection-review case when claim fails verification. Customer screenshot or reference alone is not processor settlement; no fabricated confirmed payment. Identified customer receivable versus anonymous customer collection exception must be distinguished.
+3. **Negative stock without last known cost:** record stock quantity movement, leave inventory cost explicitly PENDING until a reliable cost is determined. Never invent zero cost or fictional COGS; final financial accounting exception workflow remains required.
+4. **Late offline sale after month close:** preserve original sale date and post linked adjustment into the current open accounting period, **without a separate additional manual tax review step** by default. This is a workflow preference, not a waiver of mandatory local tax laws, filing obligations, or jurisdiction-specific validations before production.
+
+These four points supersede earlier open recommendations in this document. **Technical sign-off for these business behaviors is approved; overall production/implementation authorization is NOT given. No coding without explicit founder permission.**

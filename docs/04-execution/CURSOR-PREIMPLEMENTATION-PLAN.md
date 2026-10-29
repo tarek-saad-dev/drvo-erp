@@ -58,3 +58,8 @@ These four points supersede earlier open recommendations in this document. **Tec
 ## Infrastructure/offline pre-code review — 2026-10-29
 
 The environment and offline-security verification checklist is now documented at [INFRASTRUCTURE-OFFLINE-PRECODE-CHECKLIST.md](INFRASTRUCTURE-OFFLINE-PRECODE-CHECKLIST.md). SQL Server on VPS and IndexedDB PWA are architecture decisions, NOT proof of deployable configuration. Verify database edition, available capacity, off-host backup restore, target POS browsers, storage eviction, offline authentication and Tenant isolation before production. **Checklist created only: no server accessed and no code written.**
+
+
+## POS Windows target verification — 2026-10-29
+
+Approved initial device category: **Windows Browser**. [Windows PWA/IndexedDB Offline Test Plan](WINDOWS-POS-OFFLINE-TEST-PLAN.md) lists 20 evidence-driven tests. Chrome/Edge support versions, kiosk/shared Windows profiles, offline auth TTL and SQL Server deployment checks require selection. No coding or tests performed; explicit founder authorization still required.

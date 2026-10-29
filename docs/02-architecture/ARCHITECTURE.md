@@ -1,5 +1,8 @@
 # Architecture baseline
 
+> **FOUNDATIONAL ARCHITECTURE CONSTRAINT (ADR-029):** [Founder Architecture Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) — one scalable ERP product, repeatably expandable to new Industries through Shared Modules / Extensions / conditional Domain Modules / Industry Solutions, designed for micro Businesses and enterprise workloads using **two independent scalability axes** (functional module composition AND validated operational/data capacity). Every major design must pass [Industry & Scale Fitness Gates](UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md). V1 shared SQL Server/Modular Monolith is only a measured starting architecture, not an unlimited capacity promise.
+
+
 **Updated:** 2026-10-28  
 **Status:** Direction accepted; implementation architecture pending technical discovery.
 
@@ -61,3 +64,8 @@ Adopt Shared Platform Kernel + reusable Business Modules + bounded Industry Exte
 The future target is repeatable new-industry development and productization, not automatic readiness for all sectors. Salon/Cut Salon first, Clinic second. V1 still uses **one shared SQL Server database**, not one DB per industry. Later database pools or dedicated Enterprise placement are possible **only when measured and separately designed**; no SLA or scalability guarantee follows from choosing a Modular Monolith. See [Industry Solutions Architecture](INDUSTRY-SOLUTIONS-ARCHITECTURE.md), [Industry Onboarding Playbook](../04-execution/NEW-INDUSTRY-ONBOARDING-PLAYBOOK.md), [SaaS Scale & Control Center](SAAS-SCALE-CATALOG-AND-CONTROL-CENTER.md), [ADR-017](../05-decisions/ADR-017-SHARED-CORE-INDUSTRY-SOLUTIONS.md) and [ADR-018](../05-decisions/ADR-018-INDUSTRY-EXPANSION-AND-SCALE-STRATEGY.md).
 
 **Status:** approved direction only; no code, migration or deployment authorized. Older text elsewhere in this baseline reflecting undecided SQL vendor or offline policy is historical and must be reconciled before implementation against later accepted ADRs.
+
+
+## Primary architectural obligation — founder charter ADR-029 (2026-10-30)
+
+All future platform work is subordinate to three strategic dimensions: (1) national-scale Egyptian ERP ambitions with one maintainable SaaS system, (2) repeatable industry onboarding and specialization with correct Core / Extension / independent Domain boundaries, and (3) micro-to-Enterprise functional choice **plus** independent performance/isolation/operational capacity. **Module count does not determine server scale**. Preserve a future tenant-placement / migration interface before locking large volumes into one shared SQL resource, without prematurely building per-client services/databases. Any design that creates bespoke industry forks, makes every customer buy/install all modules, or prevents future data placement evolution requires a blocker/exception ADR. Full criteria: [Founder Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md), [ADR-029](../05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md), [Fitness Gates](UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md). Architecture intent only; SQL/scale evidence pending; implementation not authorized.

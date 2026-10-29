@@ -1,21 +1,23 @@
 # DRVO ERP — Design Tokens, Component Inventory & Behavior Contract
 
 **Date:** 2026-10-29
-**Status:** Detailed design PROPOSAL; ADR-022 approved pattern/brand independence, NOT these exact numeric tokens/colors.
+**Status:** Visual palette/colors accepted via ADR-024; component measurements, typography, interaction states and full visual screens still DESIGN PROPOSALS. ADR-022/023 identity/navigation directions accepted.
 **Sources:** [UI Kit Blueprint](DRVO-ERP-UI-KIT-BLUEPRINT.md), [App Shell](DRVO-APP-SHELL-UX-SPEC.md).
 
 ## 1. Token governance
 A single independent DRVO design system spans marketing/onboarding, customer ERP Modules, POS, owner mobile and internal admin. Tokens are semantic rather than arbitrary copied color/spacing values. Proposed naming levels: `primitive.*`, `semantic.*`, `component.*`; light default, future dark/high-contrast only after tested. All Modules use shared tokens, never hardcode a new style for each sector. Brand overrides cannot override financial states or readability.
 
-## 2. Proposed visual foundation — candidates, NOT founder sign-off
+## 2. Founder-approved DRVO palette (ADR-024) + proposed non-color dimensions
 | Token | Candidate value | Role |
 |---|---|---|
-| `color.brand.primary` | #126F63 | Original DRVO brand accent candidate (must pass contrast checks) |
-| `color.text.primary` | #192A34 | Main text |
-| `color.text.secondary` | #5D6A74 | Supporting labels |
-| `color.surface.page` | #F6F8FA | App background |
-| `color.surface.panel` | #FFFFFF | Forms, lists, modal body |
-| `color.border.subtle` | #E1E7EC | Section/table dividers |
+| `color.brand.primary` | #74536E | **APPROVED** Primary Plum — brand and selected navigation |
+| `color.brand.deep` | #553E53 | **APPROVED** Deep Plum — strong nav/header emphasis |
+| `color.action.primary` | #1A7B80 | **APPROVED** Action Teal — primary interactive CTAs |
+| `color.text.primary` | #27242B | **APPROVED** Main text |
+| `color.text.secondary` | #77707B | Supporting label candidate shown in visual preview; verify contrast in UI |
+| `color.surface.page` | #F7F6F8 | **APPROVED** Page Canvas |
+| `color.surface.panel` | #FFFFFF | **APPROVED** Surface: Forms, lists, modal body |
+| `color.border.subtle` | #E6E1E8 | Soft border candidate shown in color preview; validate in components |
 | `color.status.success` | #167B53 | Verified success; never alone |
 | `color.status.warning` | #9B6214 | Pending/exception and approval |
 | `color.status.danger` | #B53B46 | Error/destructive |
@@ -30,7 +32,7 @@ A single independent DRVO design system spans marketing/onboarding, customer ERP
 | `layout.topbar.height` | 56 px | Stable top global context |
 | `animation.fast/normal` | 100/180 ms | Meaningful state change only |
 
-These are a **starting set for critique, not brand or accessibility-certified values**; validate per WCAG 2.2 AA, forced colors, 200% zoom and real Arabic/English screen captures before adoption. Never guarantee semantic contrast without checking actual foreground/background combinations.
+**Palette approved by founder in ADR-024:** Plum `#74536E`, Deep Plum `#553E53`, Teal `#1A7B80`, Canvas `#F7F6F8`, Panel `#FFFFFF`, Main Text `#27242B`. Numerical spacing/size/font/animation tokens and full semantic variant ramps remain **DRAFT**. Contrast of selected pairs was preliminarily calculated; the full actual UI remains untested and not accessibility-certified. See [ADR-024](../05-decisions/ADR-024-DRVO-PLUM-TEAL-NEUTRAL-PALETTE.md).
 
 ## 3. Typography, numbers and localization
 - Arabic: select a licensed, legible UI typeface with clear diacritics and tabular numerals; compare Alexandria, IBM Plex Sans Arabic and Cairo as design candidates; commercial embedding rights/license must be verified. Latin: matching high-legibility family such as Inter/IBM Plex Sans; do not distribute unlicensed font files.
@@ -101,7 +103,7 @@ Modules describe page title, icons, nav groups, searchable fields, columns, form
 - Version all tokens and component docs before product modules adopt the Kit.
 
 ## 9. Still open
-Actual brand palette and typeface, visual source format/design tool, light/dark, component sizes after usability, topbar/sidebar options, per-country currency and tax display. Do not treat this draft as a finished or accessible-certified Kit.
+Brand **color palette direction and primary six hex codes are RESOLVED ADR-024**. Still open: typeface, logo/iconography, visual source format/design tool, light/dark, semantic hover/focus/disabled ramps, component sizes after usability, per-app Hybrid mapping and country currency/tax display. Do not treat the color approval as a finished or accessible-certified Kit.
 
 **No code/library/Figma artifacts produced.**
 
@@ -109,3 +111,8 @@ Actual brand palette and typeface, visual source format/design tool, light/dark,
 ## Hybrid Navigation component variants — ADR-023 (2026-10-29)
 
 Founder chose one Shell with per-Module controlled Sidebar, shallow Tabs, or Focused Workspace navigation. The values in Section 2 (56px Topbar, 240/64px Sidebar, 36/44px table rows, 40px controls) remain **unapproved candidate tokens** to test in RTL/LTR with Arabic text and desktop/phone layouts. Add documented `GlobalTopbar`, `BusinessSwitcher`, `BranchSwitcher`, `AppLauncher`, `SidebarNav`, `ModuleTabs`, `WorkspaceHeader`, `Breadcrumbs`, `ViewToolbar` and `RecordActionBar` to the shared kit; avoid new brand/component variant per industry. [ADR-023](../05-decisions/ADR-023-HYBRID-NAVIGATION-BY-MODULE.md), [Detailed hybrid UX](DRVO-HYBRID-NAVIGATION-RTL-APP-LAUNCHER.md), [List/Form detailed UX](DRVO-LIST-FORM-UX-DETAILED.md). No final pixel approval or code.
+
+
+## Color palette approved — ADR-024 (2026-10-29)
+
+The earlier green-first candidate was superseded. Adopt **Plum + Teal + Soft Neutrals** with `#74536E` Primary Plum, `#553E53` Deep Plum, `#1A7B80` Action Teal, `#F7F6F8` Page, `#FFFFFF` Panel, `#27242B` Text. Use Plum in navigation and App identity, Teal for actions, neutrals for transactional content. Use separate text+icon semantic statuses; an action-colored button does not certify a payment/ledger success. Keep the first viewport focused on actionable apps/data instead of a dominant decorative Hero. Full details: [ADR-024](../05-decisions/ADR-024-DRVO-PLUM-TEAL-NEUTRAL-PALETTE.md). No component library code has been built.

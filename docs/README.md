@@ -49,3 +49,12 @@
 
 - [SaaS Pricing Strategy Discovery](01-product/SAAS-PRICING-STRATEGY-DISCOVERY.md) — candidate commercial models, no DRVO prices approved.
 - [DRVO ERP UI Kit Blueprint](02-architecture/DRVO-ERP-UI-KIT-BLUEPRINT.md) — Odoo-inspired component/view/template system, not an implemented kit.
+
+
+## Accepted DRVO UX direction and detailed design reviews — 2026-10-29
+
+- [ADR-022 — Odoo-familiar ERP UX, original DRVO identity](05-decisions/ADR-022-ODOO-FAMILIARITY-ORIGINAL-DRVO-UI.md) — founder-approved direction.
+- [ERP App Shell UX Specification](02-architecture/DRVO-APP-SHELL-UX-SPEC.md) — **draft** navigation/role/responsive rules.
+- [Design Tokens & Components](02-architecture/DRVO-DESIGN-TOKENS-AND-COMPONENTS.md) — **draft** colors, dimensions, controls and states; not approved brand colors.
+- [Reusable ERP Views & Screen Patterns](02-architecture/DRVO-VIEW-AND-SCREEN-PATTERNS.md) — **draft** List/Form/Kanban/Calendar/Graph/Pivot/POS designs.
+- [Hybrid Pricing Model Analysis](01-product/HYBRID-PRICING-MODEL-ANALYSIS.md) — **commercial study only**, no approved prices.

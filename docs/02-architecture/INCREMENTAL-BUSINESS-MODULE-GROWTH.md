@@ -1,5 +1,8 @@
 # DRVO ERP — Incremental Business Modules and Growth-Ready Contracts
 
+> **FOUNDER'S THREE-PILLAR MANDATE (ADR-029):** progressive Module selection serves small and growing Businesses **functionally** but must NOT be mistaken for proven technical Enterprise-scale capacity. Protect reusable industry modules, financial continuity and a measured infrastructure growth path. [Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) · [Fitness Gates](UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md).
+
+
 **Date:** 2026-10-29
 **Status:** FOUNDER-APPROVED PRODUCT DIRECTION (ADR-020); exact manifests, technical workflow and minimum sets are design proposals; NO CODING.
 

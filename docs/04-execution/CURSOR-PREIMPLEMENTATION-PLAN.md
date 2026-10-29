@@ -105,3 +105,8 @@ DRVO is to let each Business start with a minimum valid **industry/workflow-spec
 ## Pricing and DRVO UI Kit documentation — 2026-10-29 (DRAFT, no implementation)
 
 Founder requested pricing architecture and a reusable Odoo-inspired visual/interaction kit. Review [SaaS Pricing Draft](../01-product/SAAS-PRICING-STRATEGY-DISCOVERY.md) and [DRVO UI Kit Blueprint](../02-architecture/DRVO-ERP-UI-KIT-BLUEPRINT.md). **Neither pricing tiers nor final design tokens are approved.** Preserve ADR-021 editable recommended starters, ADR-016 explicit cost preview, ADR-015 independent App tiles, ADR-020 progressive modules. Do not copy Odoo Enterprise code/assets, or start React/Storybook/Figma implementation from drafts. No code authorization.
+
+
+## ADR-022 UX direction / detailed kit and Hybrid pricing — 2026-10-29
+
+**APPROVED:** Odoo-familiar navigation and multi-view ERP UX using original simpler DRVO branding; preserve independent Apps, role/Biz/Branch scope, Arabic RTL/English LTR, finance/offline statuses. **DRAFT, not code-approved:** [App Shell](../02-architecture/DRVO-APP-SHELL-UX-SPEC.md), [Tokens/Components](../02-architecture/DRVO-DESIGN-TOKENS-AND-COMPONENTS.md), [View Patterns](../02-architecture/DRVO-VIEW-AND-SCREEN-PATTERNS.md). No Odoo proprietary code, assets or unauthorized pixel clone. Hybrid [Pricing Analysis](../01-product/HYBRID-PRICING-MODEL-ANALYSIS.md) remains commercial study; actual fees/billing meters, premium Module inclusions and trial remain unapproved. **Before UI implementation:** founder reviews original DRVO high-fidelity App Shell, List/Form, App Store/Starter, Booking, POS and Financial document screens, RTL/LTR, roles, density and failure states. No app code, Figma file, component library or deployment authorized yet.

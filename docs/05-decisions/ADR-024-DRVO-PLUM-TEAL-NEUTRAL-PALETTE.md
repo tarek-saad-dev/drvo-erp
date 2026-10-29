@@ -56,3 +56,8 @@ These specific color pairs exceed WCAG AA normal-text 4.5:1 threshold, but that 
 See [Design Tokens](../02-architecture/DRVO-DESIGN-TOKENS-AND-COMPONENTS.md), [UI Kit Blueprint](../02-architecture/DRVO-ERP-UI-KIT-BLUEPRINT.md) and [Hybrid Navigation](../02-architecture/DRVO-HYBRID-NAVIGATION-RTL-APP-LAUNCHER.md).
 
 **Documentation approval only: no coding, migrations, new image/mockup files, UI components or production deployment authorized.**
+
+
+## Clarification / founder-approved Business palette customization — ADR-026 (2026-10-29)
+
+The accepted Plum/Teal/Neutrals palette is the **DRVO platform default, original brand baseline and safe fallback**, NOT an unchangeable color mandate for each customer Business. The founder subsequently approved **validated per-Business palette and typography customization**; resolve safe Business brand tokens through centralized Theme Engine, retaining protected success/warning/error/pending semantics and readable text. The older rule against arbitrary *per-industry* replacement remains: a solution preset must not bypass contrast or status safety. Do not treat a customer palette as a separate complete product UI library. Exact algorithm and Theme Settings screens are draft. See [ADR-026](ADR-026-BUSINESS-THEMES-AND-CENTRAL-TYPOGRAPHY.md).

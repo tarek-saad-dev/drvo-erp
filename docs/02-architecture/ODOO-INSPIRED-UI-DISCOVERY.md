@@ -33,3 +33,8 @@ A future **DRVO Platform Control Center** is distinct from any customer's ERP UI
 ## Detailed DRVO ERP UI Kit blueprint — 2026-10-29
 
 The earlier sketch is expanded in [DRVO ERP UI Kit Blueprint](DRVO-ERP-UI-KIT-BLUEPRINT.md): layout tokens, app shell, view engine, reusable controls, transaction/offline states, RTL/LTR and source design deliverables. Functional UX can be benchmarked against Odoo 19, but DRVO must own its visual identity and not copy proprietary Enterprise assets/code. New [Pricing Discovery](../01-product/SAAS-PRICING-STRATEGY-DISCOVERY.md) is a DRAFT, **not** a pricing policy or price list. No UI kit code or editable Figma/Canva asset has been created.
+
+
+## Selected UX direction — ADR-022, 2026-10-29
+
+Founder chose Option A: **Odoo familiarity + unique DRVO identity and simplified ERP UX**. This confirms functional pattern and interaction direction, NOT any exact visuals, copyrighted assets or React implementation. Comprehensive design specs: [App Shell](DRVO-APP-SHELL-UX-SPEC.md), [Tokens & Components](DRVO-DESIGN-TOKENS-AND-COMPONENTS.md), [View Patterns](DRVO-VIEW-AND-SCREEN-PATTERNS.md). [Hybrid Pricing](../01-product/HYBRID-PRICING-MODEL-ANALYSIS.md) remains commercial research, not an accepted plan or price list.

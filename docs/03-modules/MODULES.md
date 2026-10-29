@@ -1,5 +1,8 @@
 # Modules catalog
 
+> **NORTH STAR ADR-029:** Modules are reusable platform capabilities supporting ANY investigated industry and businesses from tiny to huge. The valid minimum Business setup must not be artificially bloated; independent Domain Modules are justified by genuine aggregates/lifecycles. **Adding Modules does not automatically scale SQL/operations** — every major module design must pass [Architecture Fitness Gates](../02-architecture/UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md). [Founder Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md).
+
+
 This is a **planned scope map**, not a statement that modules exist in code.
 
 | Module | Scope | Status |

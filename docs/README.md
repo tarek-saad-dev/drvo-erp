@@ -13,6 +13,14 @@
 9. [Change protocol](04-execution/CHANGE-PROTOCOL.md)
 10. [Changelog](04-execution/CHANGELOG.md)
 
+## Multi-industry architecture (approved direction)
+
+- [ADR-017: Shared Core + Industry Solutions](05-decisions/ADR-017-SHARED-CORE-INDUSTRY-SOLUTIONS.md)
+- [ADR-018: Industry expansion and SaaS scaling direction](05-decisions/ADR-018-INDUSTRY-EXPANSION-AND-SCALE-STRATEGY.md)
+- [Industry architecture and Core/Extension boundary](02-architecture/INDUSTRY-SOLUTIONS-ARCHITECTURE.md)
+- [New Industry Onboarding Playbook — timber manufacturing example](04-execution/NEW-INDUSTRY-ONBOARDING-PLAYBOOK.md)
+- [100+ industry catalog, scale, and Platform Control Center](02-architecture/SAAS-SCALE-CATALOG-AND-CONTROL-CENTER.md)
+
 ## Working agreements
 
 - Never confuse **approved/planned** with **implemented/tested/deployed**.

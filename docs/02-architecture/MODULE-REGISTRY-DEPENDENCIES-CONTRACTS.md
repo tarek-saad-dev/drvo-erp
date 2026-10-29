@@ -117,3 +117,8 @@ No engineering draft here grants permission to write code.
 ## Follow-up lifecycle and contract design — 2026-10-29
 
 Founder selected bundling activation policy (ADR-016). The expanded state machine, quote/revalidation/audit and command/event ownership draft is at [Module Lifecycle and Communication Contracts](MODULE-LIFECYCLE-AND-COMMUNICATION-CONTRACTS.md). Engineering details remain proposals, not preapproval to write code.
+
+
+## Approved Industry Solution composition direction — 2026-10-29
+
+ADR-017/018 add a separately versioned **Industry Solution Registry** on top of (not in place of) the Global Module Registry and BusinessModule activation. A Solution is a reusable manifest/composition with compatible Module refs, Domain Modules, Industry Extensions, default settings/roles, locale constraints and onboarding steps, NOT independent customer-specific code or deployment. A Business can be onboarded by selecting a Solution and approving the full Required dependency/cost plan under ADR-016; activated/authorized Modules still render separately under ADR-015. Distinct domain models deserve new Domain Modules with Core + Extension (ADR-006); do not force all business functionality into generic adapters. Exact schema/manifest, solution version upgrades and compatibility rules are pending design: [Industry Solutions Architecture](INDUSTRY-SOLUTIONS-ARCHITECTURE.md).

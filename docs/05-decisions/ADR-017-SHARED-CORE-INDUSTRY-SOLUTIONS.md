@@ -38,3 +38,8 @@ DRVO ERP is a **multi-tenant, multi-industry SaaS product platform** based on:
 Industry Solution manifest schema, exact module boundaries, reusable extension hook mechanics, pricing/licensing, launch dates outside Salon/Clinic, regulatory compliance per country/industry, and operational scale SLAs require separate design and evidence.
 
 **No application code, SQL migration, deployment or production testing authorized.**
+
+
+## Founder boundary clarification (2026-10-29): ADR-019
+
+The founder selected Option B: **Industry Domain Modules are conditional on real independent lifecycle, data/aggregate ownership and security needs**, not mandatory for every Industry Solution. Reuse Shared Core only for truly stable invariants; bounded differences belong in Extensions; independent operational, privacy-sensitive or transactionally distinct domains deserve owned Modules with their own Core+Extension. For Salon, barber/resource allocation and service commission are likely Extensions; dedicated Salon Service Execution is conditional on having its own lifecycle. Clinic records and manufacturing/MRP are strong candidate independent domains but exact release scope remains pending. [ADR-019](ADR-019-CONDITIONAL-DOMAIN-MODULE-BOUNDARY.md) and [classification matrix](../02-architecture/CORE-EXTENSION-DOMAIN-BOUNDARY-MATRIX.md) control the interpretation. No coding approved.

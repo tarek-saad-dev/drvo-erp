@@ -38,3 +38,8 @@ The earlier sketch is expanded in [DRVO ERP UI Kit Blueprint](DRVO-ERP-UI-KIT-BL
 ## Selected UX direction — ADR-022, 2026-10-29
 
 Founder chose Option A: **Odoo familiarity + unique DRVO identity and simplified ERP UX**. This confirms functional pattern and interaction direction, NOT any exact visuals, copyrighted assets or React implementation. Comprehensive design specs: [App Shell](DRVO-APP-SHELL-UX-SPEC.md), [Tokens & Components](DRVO-DESIGN-TOKENS-AND-COMPONENTS.md), [View Patterns](DRVO-VIEW-AND-SCREEN-PATTERNS.md). [Hybrid Pricing](../01-product/HYBRID-PRICING-MODEL-ANALYSIS.md) remains commercial research, not an accepted plan or price list.
+
+
+## Hybrid Navigation accepted — ADR-023 (2026-10-29)
+
+Founder chose Option C: a common original DRVO App Shell with **Sidebar, Tabs or focused Workspace** per Module, rather than universal Sidebar or topbar-only. This remains Odoo-familiar in conventions without copying proprietary visual assets/code. [ADR-023](../05-decisions/ADR-023-HYBRID-NAVIGATION-BY-MODULE.md), [Hybrid Navigation & RTL/App Launcher](DRVO-HYBRID-NAVIGATION-RTL-APP-LAUNCHER.md), [List/Form details](DRVO-LIST-FORM-UX-DETAILED.md) specify design proposals; measurements, final Module patterns and visuals are not yet approved.

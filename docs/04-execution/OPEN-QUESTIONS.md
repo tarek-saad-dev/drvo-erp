@@ -284,3 +284,8 @@ These four points supersede earlier open recommendations in this document. **Tec
 ## Technical validation remaining — 2026-10-29
 
 Before implementation authorization: inspect SQL Server version/edition/VPS capacity, select data access driver, establish/test off-host backup and restoration, verify actual POS devices and IndexedDB eviction/offline login threat model, settle RPO/RTO and country-specific fiscal integration details. [Infrastructure Checklist](INFRASTRUCTURE-OFFLINE-PRECODE-CHECKLIST.md). No tests have been executed.
+
+
+## Windows POS target — 2026-10-29
+
+**Resolved:** V1 POS initially targets Windows Browser; testing plan at [Windows PWA/IndexedDB Test Plan](WINDOWS-POS-OFFLINE-TEST-PLAN.md). **Still open:** exact Windows/browser versions, shared-kiosk Windows user policy, offline local session TTL, PWA storage and eviction safeguards, live SQL Server VPS edition/resources/backups, DB driver/ORM and security verification. Test plan exists but has NOT been executed.

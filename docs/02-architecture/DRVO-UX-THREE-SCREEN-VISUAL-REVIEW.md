@@ -1,7 +1,7 @@
 # DRVO ERP — Three-Screen Visual Concept Review
 
 **Date:** 2026-10-29
-**Status:** DESIGN EXPLORATION; founder approved the *design philosophy* (ADR-025), **not** the pixel-perfect three new concept screens, component library or user flows.
+**Status:** PREVIOUS MOCKUP LAYOUTS REJECTED by founder (2026-10-29). UX philosophy ADR-025 remains accepted; Character/House illustrations and scene-flip idea ADR-027 accepted for further exploration. Do NOT use any of the illustrated page layouts as an implementation blueprint.
 **Palette:** ADR-024 six founder-approved Plum / Teal / Soft Neutral hex values.
 **Concept deliverables:** 3 separate user-facing visual ideas for discussion: App Launcher/Home, Accounting List/Form, and Salon Windows POS. Images shown in chat are conceptual illustrations only and not stored in this repository or editable UI assets.
 
@@ -64,3 +64,8 @@
 - Design-file tooling and future React/Storybook implementation require explicit independent approval.
 
 **No software implementation, Figma/Canva source file, code changes or production actions authorized.**
+
+
+## Founder feedback / visual review reset — 2026-10-29
+
+**Rejected:** every presented screen layout/composition, including Home, Accounting and POS placement. No design acceptance of the Page Shell, tables, sidebars or grids can be inferred from these images. **Liked and accepted as direction:** professional Odoo depth × Duolingo ease, original industry Character Family/House illustration style, meaningful flip/transition between select screens, customer-specific colors and selected/uploaded fonts, centrally managed typography. Continue to new layouts only AFTER specifying [Business Theme Engine](BUSINESS-THEME-ENGINE-AND-FONT-ASSETS-BLUEPRINT.md) and [Industry Character/Motion Blueprint](CHARACTER-ILLUSTRATION-MOTION-BLUEPRINT.md). ADR-024 remains default brand and ADR-023 remains navigation *pattern*, not precise layout. [ADR-026](../05-decisions/ADR-026-BUSINESS-THEMES-AND-CENTRAL-TYPOGRAPHY.md); [ADR-027](../05-decisions/ADR-027-INDUSTRY-CHARACTERS-SCENES-AND-MOTION.md).

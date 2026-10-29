@@ -101,3 +101,8 @@ Founder-approved ADR-017/018 require a **Solution release/assignment lifecycle**
 ## Conditional Domain Module lifecycle classification — ADR-019 (2026-10-29)
 
 Before registering any new vertical Module, complete the Core-vs-Extension-vs-new-domain assessment in [Boundary Matrix](CORE-EXTENSION-DOMAIN-BOUNDARY-MATRIX.md). A Solution can activate only Shared Modules and selected compatible Extensions, or additionally distinct Domain Modules if those own independent processes; the platform must not auto-generate one giant Operations Module per vertical. Specialized Modules still publish Core+Extension contracts and interact with shared domains via owned commands/events, not cross-owned-table mutations. The classification policy is founder-approved; exact Salon/Clinic/Manufacturing candidate mapping and event schemas are still technical proposals.
+
+
+## Founder approved additive Business growth — ADR-020 (2026-10-29)
+
+A Business can operate on an industry-appropriate minimum dependency-valid starter set, then add new released modules/compatible extensions without replacing its Business or resetting historical records. Activation is Business-scoped and follows ADR-016 explicit bundle pricing/Required dependencies. New modules may require a platform deploy and schema migration before per-Business activation; the platform must not claim installability for undeveloped functionality. Salon V1 begins **without standalone Service Execution Module**; Booking/POS/HR/Inventory remain source owners for their functions. Future multi-step execution may become a separate module after discovery without retroactive fabricated steps. See [ADR-020](../05-decisions/ADR-020-INCREMENTAL-BUSINESS-MODULES-AND-SALON-V1.md).

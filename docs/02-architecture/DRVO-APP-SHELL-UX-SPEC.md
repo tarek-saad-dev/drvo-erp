@@ -121,3 +121,8 @@ No code, mockup file, SQL migration or deployment authorized.
 ## Approved branded palette — ADR-024 (2026-10-29)
 
 Founder accepted original DRVO **Plum + Teal + Soft Neutrals**: `#74536E` Primary Plum, `#553E53` Deep Plum, `#1A7B80` Action Teal, `#F7F6F8` Page, `#FFFFFF` Panel, `#27242B` Main Text. Use Plum for shell/app-selection context, Teal for primary actions and neutral content surfaces. Avoid a dominating decorative Business Home Hero that hides actionable modules/KPIs below viewport; exact small-versus-none still open. App Shell hybrid navigation (ADR-023), RTL/LTR roles and first viewport priorities remain unchanged. Color direction approved; exact nav geometry, fonts, app-tile treatments and finalized mockups await visual review. See [ADR-024](../05-decisions/ADR-024-DRVO-PLUM-TEAL-NEUTRAL-PALETTE.md).
+
+
+## North Star lens — founder-approved ADR-025 (2026-10-29)
+
+Professional ERP complexity belongs in its capabilities, **not** as permanent onboarding clutter. Shell/Home keeps current Business/Branch and Apps visible, owner actions clear, and empty/alert states helpful; it doesn't push tasks below a marketing hero. Sidebar/Tabs/Workspace remains per-Module (ADR-023); choose friendly, operational or expert density by user task and never conceal financial/permission controls. Use original ADR-024 Plum/Teal colors, tasteful feedback, Arabic-first layouts and keyboard accessibility. [UX North Star Playbook](DRVO-UX-NORTH-STAR-PLAYBOOK.md), [Three Screen Review](DRVO-UX-THREE-SCREEN-VISUAL-REVIEW.md), [ADR-025](../05-decisions/ADR-025-ERP-PROFESSIONALISM-EVERYDAY-SIMPLICITY.md). Geometry and screen designs remain in review.

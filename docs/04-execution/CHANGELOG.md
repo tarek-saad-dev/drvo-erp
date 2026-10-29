@@ -276,3 +276,11 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - Founder explicitly ruled out a standalone Salon Service Execution Module in V1; Booking/POS/HR/Inventory + Salon Extensions still own existing service functions, commissions, attribution and recipe consumption.
 - Added Incremental Business Module Growth architecture spec; updated boundaries, registry/lifecycle, Cursor pre-code plan, catalog, ADR register and documentation index.
 - Documentation only; no application code, SQL migration, server testing or deployment.
+
+
+## 2026-10-29 — Founder approved Odoo-familiar DRVO visual/interaction direction (ADR-022)
+
+- New ADR-022: Odoo-familiar App Launcher, standard ERP views and navigation with original DRVO visual identity, lower user complexity, RTL/LTR and financial/offline clarity.
+- Detailed DRAFTS: App Shell UX Specification, Design Tokens & Components, ERP View/Screen Patterns. None are finished/approved visual designs or code assets.
+- New Hybrid Pricing Analysis (still DRAFT): Business base + branch/seat allowance + optional premium modules and usage; compared with current public Odoo pricing for reference, not DRVO prices.
+- Linked new drafts to ADR register, docs index, current state, preimplementation plan and open questions. No code, SQL migration, production change or generated Figma kit.

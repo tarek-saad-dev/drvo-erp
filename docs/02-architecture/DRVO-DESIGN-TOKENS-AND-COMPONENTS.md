@@ -5,7 +5,7 @@
 **Sources:** [UI Kit Blueprint](DRVO-ERP-UI-KIT-BLUEPRINT.md), [App Shell](DRVO-APP-SHELL-UX-SPEC.md).
 
 ## 1. Token governance
-A single independent DRVO design system spans marketing/onboarding, customer ERP Modules, POS, owner mobile and internal admin. Tokens are semantic rather than arbitrary copied color/spacing values. Proposed naming levels: `primitive.*`, `semantic.*`, `component.*`; light default, future dark/high-contrast only after tested. All Modules use shared tokens, never hardcode a new style for each sector. Brand overrides cannot override financial states or readability.
+A single independent DRVO design system spans marketing/onboarding, customer ERP Modules, POS, owner mobile and internal admin. **ADR-026 confirms the DRVO palette is a default/fallback; authorized Businesses can override validated brand and typography tokens centrally.** Tokens are semantic rather than arbitrary copied color/spacing values. Proposed naming levels: `primitive.*`, `semantic.*`, `component.*`; light default, future dark/high-contrast only after tested. All Modules use shared tokens, never hardcode a new style for each sector. Brand overrides cannot override financial states or readability.
 
 ## 2. Founder-approved DRVO palette (ADR-024) + proposed non-color dimensions
 | Token | Candidate value | Role |
@@ -121,3 +121,12 @@ The earlier green-first candidate was superseded. Adopt **Plum + Teal + Soft Neu
 ## ADR-025 component personality — calm, helpful, precise (2026-10-29)
 
 **Approved principle:** genuine friendly feedback and clear primary actions; not colorful childish gamification. Distinguish `UserActionAcknowledged` / `DraftSaved` from server-verified `Posted`, `Paid`, `Synced`, `Reconciled`. Design short purposeful motion and tactile affordances for selection/cart, optional guidance in onboarding, readable error recovery and skeletons; no confetti on payment/posting. Keep high-density finance table variants and accessibility/RTL in same kit. See [UX North Star](DRVO-UX-NORTH-STAR-PLAYBOOK.md). Exact durations/components and typography remain draft.
+
+
+## Founder-approved Business Themes and custom fonts — ADR-026 (2026-10-29)
+
+**Centralized typography is mandatory**: all App/Module/Pos typography inherits a trusted `font.body.ar/en`, `font.heading.ar/en`, numeric/mono fallback and type-scale mapping. Business administrators with branding permission may choose supported licensed font packs or upload a custom licensed font via a validated asset lifecycle. Business may override brand/action accent tokens after contrast validation; the ADR-024 Plum/Teal palette remains default/fallback and semantic statuses are protected. Do not hardcode font-family/palette per Component/Module; do not accept arbitrary CSS/JS. User display prefs (e.g., density/reduced motion) are distinct from Business branding. Exact upload workflow and first V1 editor scope remain drafts. [Theme Engine Blueprint](BUSINESS-THEME-ENGINE-AND-FONT-ASSETS-BLUEPRINT.md), [ADR-026](../05-decisions/ADR-026-BUSINESS-THEMES-AND-CENTRAL-TYPOGRAPHY.md).
+
+## Original industry characters and intentional motion — ADR-027
+
+DRVO will develop reusable, original profession Character/Scene Packs for discovery, onboarding, meaningful empty states and optional quiet Home guidance, **not** for money-heavy operational screens. Use scene slots and a controlled Motion Grammar (including a possible house/scene flip effect), not hard-coded animated characters in individual pages. Respect reduced motion, resource use, RTL focus and static fallbacks. Earlier 3 illustrated mockup **layouts are rejected**; their character/scene spirit is approved. [Character & Motion Blueprint](CHARACTER-ILLUSTRATION-MOTION-BLUEPRINT.md), [ADR-027](../05-decisions/ADR-027-INDUSTRY-CHARACTERS-SCENES-AND-MOTION.md).

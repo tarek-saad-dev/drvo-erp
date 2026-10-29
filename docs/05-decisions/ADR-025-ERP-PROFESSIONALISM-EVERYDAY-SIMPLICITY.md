@@ -98,3 +98,8 @@ Users are not locked to a mode; the same platform can surface different density 
 - Next design signoffs: screen-by-screen layout, typography, density, interaction variants, component states, offline/financial badges, responsive RTL/LTR.
 
 **No app code, SQL migrations, deployed UI library, Figma or production changes authorized.**
+
+
+## Founder extension — Character Art + Business Theme, ADR-026 / ADR-027 (2026-10-29)
+
+The founder expressly approved a custom **DRVO profession-specific Character Family, industry illustrations and carefully targeted motion** (with interest in house/building illustration and an optional flip page/scene transition), while expressly **rejecting all previous mockup layouts** as final compositions. This **does not** contradict the no-third-party-mascot/no-gamified-accounting boundary above: use original licensed professional character art for onboarding, selected empty states, industry discovery and optional home hints, not over financial journals, POS checkout, HR payroll or other sensitive workflow. Each Business may have its own validated brand palette and licensed custom-selected/uploaded fonts through one centralized Typography/Theme Engine, while system statuses remain protected. ADR-024 is the default/fallback palette, not a forced tenant palette. [ADR-026](ADR-026-BUSINESS-THEMES-AND-CENTRAL-TYPOGRAPHY.md), [ADR-027](ADR-027-INDUSTRY-CHARACTERS-SCENES-AND-MOTION.md). No code/visual asset implementation authorized.

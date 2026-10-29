@@ -170,3 +170,8 @@ Founder chose Windows Browser as initial POS target. Created [Windows Offline Te
 ## VPS read-only audit access — 2026-10-29
 
 Prepared [VPS Read-only Audit Runbook](../04-execution/VPS-READONLY-AUDIT-RUNBOOK.md). GitHub access exists, but direct SSH/VPS execution is unavailable here; no VPS/SQL Server inspection or Windows/IndexedDB tests have been performed. Founder code restriction remains active.
+
+
+## SQL Server data access evaluation — 2026-10-29
+
+Reviewed node-mssql, TypeORM and Prisma SQL Server options. Recommended node-mssql/tedious plus explicit financial repositories and versioned SQL migrations; recommendation NOT approved or tested. [Data Access Memo](../04-execution/SQLSERVER-DATA-ACCESS-SELECTION.md). No code or VPS access.

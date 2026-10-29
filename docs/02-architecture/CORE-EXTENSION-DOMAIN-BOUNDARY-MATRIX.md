@@ -1,7 +1,7 @@
 # Core / Extension / Domain Module Boundary Matrix — Salon, Clinic, Manufacturing
 
 **Date:** 2026-10-29
-**Status:** DRAFT TECHNICAL CLASSIFICATION based on founder-approved conditional boundary rule ADR-019.
+**Status:** DRAFT TECHNICAL CLASSIFICATION; ADR-019 boundary rule and ADR-020 Salon V1 no-standalone-Service-Execution decision accepted; exact contracts pending.
 **Scope:** Architecture analysis; not final modules, schemas, UI inventory or implementation permission.
 
 ## 1. Decision rule
@@ -32,10 +32,10 @@ Core **does not import** specialized industry code. Adapters implement declared 
 | Cash custody/transfers, branch treasury | Treasury | salon close-of-day UX | Not needed by default |
 | Journal, AR/AP, financial periods | Accounting | account mapping/tax policy by jurisdiction | Not needed by default |
 | Reporting and analytics | Reporting | salon utilization/service/employee KPIs | Not needed by default |
-| Multi-stage service execution (start/pause/steps/sign-off), if truly independent | Booking/HR/POS provide references | Optional coordination hooks | **Candidate standalone Service Execution** only if its own aggregate/state, permissions and lifecycle justify it |
+| Multi-stage service execution (start/pause/steps/sign-off) | Booking/HR/POS are existing reference owners | Not needed for V1; evaluate after real demand | **EXCLUDED from Salon V1 as standalone Module (ADR-020)**; may be independently designed later |
 | Queue management, if operationally distinct from appointment booking | Booking as scheduling authority | Salon queue display and priority policy | Evaluate independently; not assumed mandatory V1 module |
 
-**Salon conclusion:** begin from common Modules plus bounded Salon Extensions. Do not force a giant Salon Domain Module. This does not remove any founder-approved salon workflows: advanced execution can be a dedicated owned Module if mapping demonstrates a different lifecycle.
+**Salon conclusion:** founder accepted start with Shared Core Modules + Salon Extensions and **NO standalone Service Execution Module in Salon V1** (ADR-020). Existing booking/POS/staff attribution/commission/recipe workflows stay within their owners; step-by-step execution lifecycle is future candidate only. Do not force a giant Salon Domain Module.
 
 ## 3. Clinic (second intended industry — no clinical implementation approved)
 
@@ -73,7 +73,7 @@ Core **does not import** specialized industry code. Adapters implement declared 
 | Cash receipt | Treasury/Accounting per approved posting contract | `CashReceived` / a verified tender reconciliation event |
 | Stock consumed | Inventory | `StockConsumed` from authoritative service/sale execution |
 | Commission accrued | HR / Payroll | `CommissionAccrued` with deterministic service attribution |
-| Service step completed, if independent workflow | Potential Salon Service Execution | `ServiceExecutionStepCompleted` (hypothetical) |
+| Step-by-step service execution (future, NOT V1) | No standalone V1 owner; future analysis only | Any `ServiceExecutionStepCompleted` event is hypothetical and not a V1 contract |
 
 These event names/edges are proposals, not approved schemas. Critical GL transaction boundary and idempotent correction rules still require final technical sign-off.
 
@@ -86,8 +86,13 @@ These event names/edges are proposals, not approved schemas. Critical GL transac
 - Maintain a single codebase and V1 one shared SQL Server DB until separate scaling evidence supports change.
 
 ## 7. Pending sign-off
-Actual Salon Service Execution ownership and whether Queue belongs to Booking or a separate Module; exact Booking resource abstraction; full Module list vs launcher tiles; extension conflict resolution, permissions/events/transaction boundaries and new industry manifests. These require architecture decisions, not hidden assumptions.
+Salon Service Execution is excluded from V1 (ADR-020); future lifecycle/ownership is deferred. Still open: whether Queue belongs to Booking or a separate Module; exact Booking resource abstraction; full Module list vs launcher tiles; extension conflict resolution, permissions/events/transaction boundaries and new industry manifests. These require architecture decisions, not hidden assumptions.
 
 Links: [ADR-019](../05-decisions/ADR-019-CONDITIONAL-DOMAIN-MODULE-BOUNDARY.md), [ADR-017](../05-decisions/ADR-017-SHARED-CORE-INDUSTRY-SOLUTIONS.md), [Module Registry/Contracts](MODULE-REGISTRY-DEPENDENCIES-CONTRACTS.md), [Industry Architecture](INDUSTRY-SOLUTIONS-ARCHITECTURE.md).
 
 **This document is an analysis proposal; no implementation authorized.**
+
+
+## Approved incremental-business strategy — ADR-020
+
+Each Business can launch with an industry-appropriate minimum **valid** module set and install further compatible modules later, always respecting Required dependencies/financial security and bundle approval. The comprehensive Salon commercial V1 platform scope remains unchanged except for the explicitly excluded standalone Service Execution Module; see [Incremental Business Modules](INCREMENTAL-BUSINESS-MODULE-GROWTH.md). Final per-Business starter list remains technical/commercial design.

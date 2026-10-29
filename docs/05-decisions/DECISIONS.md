@@ -31,6 +31,8 @@ Accepted directions are **not implemented features**.
 
 | ADR-023 | Unified Shell with Hybrid per-Module navigation patterns | Accepted direction | [ADR-023](ADR-023-HYBRID-NAVIGATION-BY-MODULE.md) |
 
+| ADR-024 | Original DRVO Plum + Teal + Soft Neutral palette | Accepted visual baseline | [ADR-024](ADR-024-DRVO-PLUM-TEAL-NEUTRAL-PALETTE.md) |
+
 **Product launch and pilot decisions** are recorded in [Product Discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md) and [Roadmap](../04-execution/ROADMAP.md).
 
 When superseding decisions, preserve the original and cross-link replacements.

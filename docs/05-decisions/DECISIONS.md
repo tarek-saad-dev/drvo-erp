@@ -1,5 +1,8 @@
 # Architecture Decision Record (ADR) register
 
+> **FOUNDATIONAL DECISION:** [ADR-029 — DRVO ERP Three-Pillar Architecture Mission](ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md) and [Founder Architecture Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) govern all future architectural work: Egypt-scale platform, extensible any-industry capability, micro-to-enterprise functional AND technical scale. Do not confuse an ambition with verified deployment capacity.
+
+
 Accepted directions are **not implemented features**.
 
 | ID | Decision | Status | Record |
@@ -39,6 +42,8 @@ Accepted directions are **not implemented features**.
 | ADR-027 | Original profession-specific character scenes and purposeful motion | Accepted direction | [ADR-027](ADR-027-INDUSTRY-CHARACTERS-SCENES-AND-MOTION.md) |
 
 | ADR-028 | Soft 2.5D profession characters + Miniature 3D industry environments | Accepted art direction | [ADR-028](ADR-028-SOFT-2_5D-CHARACTERS-MINIATURE-3D-SCENES.md) |
+
+| ADR-029 | Founder architecture mission: national ERP platform, any-industry extensibility, micro-to-enterprise functional and technical scale | Accepted foundational guardrails | [ADR-029](ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md) |
 
 **Product launch and pilot decisions** are recorded in [Product Discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md) and [Roadmap](../04-execution/ROADMAP.md).
 

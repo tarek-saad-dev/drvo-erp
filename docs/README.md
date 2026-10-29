@@ -71,3 +71,10 @@
 
 - [ADR-024 — Plum + Teal + Soft Neutral DRVO palette](05-decisions/ADR-024-DRVO-PLUM-TEAL-NEUTRAL-PALETTE.md) — accepted six principal colors; accessible component states, typography and page-level designs still require review.
 - [Updated Design Tokens](02-architecture/DRVO-DESIGN-TOKENS-AND-COMPONENTS.md) — replaces the superseded unapproved green-first candidate.
+
+
+## Founder-approved ERP × everyday-simplicity UX North Star — 2026-10-29
+
+- [ADR-025 — ERP Professionalism × Everyday Simplicity](05-decisions/ADR-025-ERP-PROFESSIONALISM-EVERYDAY-SIMPLICITY.md) — accepted product UX philosophy: Odoo structure, Duolingo clarity, DRVO identity.
+- [DRVO UX North Star Playbook](02-architecture/DRVO-UX-NORTH-STAR-PLAYBOOK.md) — guidelines for guidance, density, feedback, financial truth and module reusability.
+- [App Launcher + Accounting + POS Three-Screen Visual Review](02-architecture/DRVO-UX-THREE-SCREEN-VISUAL-REVIEW.md) — design exploration, **not** final screens or code.

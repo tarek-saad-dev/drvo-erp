@@ -127,3 +127,8 @@ ADR-017/018 add a separately versioned **Industry Solution Registry** on top of 
 ## Conditional Industry Module classification — approved ADR-019 (2026-10-29)
 
 An Industry Solution manifest does **not** require an always-present industry-specific Domain Module. It may comprise Shared Business Modules plus bounded Extensions when that genuinely fulfills the industry processes. Independent Domain Modules are registered when their owned aggregates, permissions and lifecycle are justified (e.g. Clinical Records, Manufacturing/MRP); each such Module retains its own Core+Extension design (ADR-006) and own App identity if user-facing (ADR-015). See [Boundary Matrix](CORE-EXTENSION-DOMAIN-BOUNDARY-MATRIX.md) and [ADR-019](../05-decisions/ADR-019-CONDITIONAL-DOMAIN-MODULE-BOUNDARY.md). Concrete dependencies must follow actual contracts; no invented required industry mega-app.
+
+
+## Founder-approved progressive Business activation — ADR-020 (2026-10-29)
+
+Industry Solution is an **initial compatible starter bundle**, not a frozen installation: any Business can begin with its essential valid Modules and later add more compatible Modules or Extensions when released, with versioned registry contracts, Business-scoped entitlements, audit, and explicit ADR-016 Required-dependency/cost approval. Do not pretend every application is optional where financial/permission correctness needs it; exact starter manifests remain pending. Salon V1 specifically must **not** require or install a standalone Service Execution Module. See [incremental Business module plan](INCREMENTAL-BUSINESS-MODULE-GROWTH.md) and [ADR-020](../05-decisions/ADR-020-INCREMENTAL-BUSINESS-MODULES-AND-SALON-V1.md).

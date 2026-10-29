@@ -63,7 +63,7 @@ The arrangement above is a **reading-order description**, not an exact final dra
 | Width below 768 | Mobile navigation sheet + task-specific cards/views | Owner/quick operations, not full desktop finance parity |
 | Windows POS primary test | 1366×768, 1920×1080 | Cashier operation and browser zoom |
 
-Height, hit targets, keyboard focus, contrast and label wrapping must be tested at actual Arabic/English content and WCAG zoom conditions; no numeric layout here is final approval. The existing candidate brand colors from [Tokens doc](DRVO-DESIGN-TOKENS-AND-COMPONENTS.md) are likewise NOT approved.
+Height, hit targets, keyboard focus, contrast and label wrapping must be tested at actual Arabic/English content and WCAG zoom conditions; no numeric layout here is final approval. **The six primary palette colors are NOW approved in [ADR-024](../05-decisions/ADR-024-DRVO-PLUM-TEAL-NEUTRAL-PALETTE.md);** typography, component-state shades, numerical navigation dimensions and full page layout remain drafts.
 
 ## 4. Arabic RTL / English LTR rules
 - Logical `inline-start/end` governs placement: in RTL context nav starts at right, content extends to left; in LTR sidebar starts at left. Topbar order follows language without changing priority or functional grouping.
@@ -119,3 +119,8 @@ Height, hit targets, keyboard focus, contrast and label wrapping must be tested 
 - Final interaction prototypes; no Figma/React source artifact exists.
 
 **Status summary:** Hybrid pattern **approved**, all numerical tokens/per-module assignments and visual defaults are **proposals**, no code authorization.
+
+
+## Original DRVO palette — founder-approved ADR-024
+
+Use Primary Plum `#74536E` or Deep Plum `#553E53` for global brand/navigation contexts, Teal `#1A7B80` for action buttons, soft Canvas `#F7F6F8` and white `#FFFFFF` panels for records, dark text `#27242B`. The App Launcher uses the palette consistently in RTL/LTR without copying Odoo icon assets or its pixel-specific product UI. **Home must be app/task-first, avoiding a large marketing Hero that crowds the primary viewport**; whether to remove or shrink it is a separate visual review. RGB hex tokens are accepted; Sidebar width, topbar height and tile sizes remain proposed. [ADR-024](../05-decisions/ADR-024-DRVO-PLUM-TEAL-NEUTRAL-PALETTE.md).

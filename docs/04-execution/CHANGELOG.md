@@ -193,3 +193,10 @@ Added ARCHITECTURE-READINESS-REVIEW.md: reconciled historical rule conflicts, li
 - Recorded founder SQL Server selection and recommended Next.js + NestJS/TypeScript modular-monolith stack.
 - Created Technology Architecture baseline and phased V1 plan, with tenancy, offline, financial safety and prerequisite decision gates.
 - No source code, migrations, infrastructure changes or production deployment.
+
+
+## 2026-10-29 — Final architecture decision round
+
+- Approved ADR-007 Module Dependencies, ADR-008 Commission Plan precedence, ADR-009 SQL Server VPS / IndexedDB PWA as initial storage.
+- Created Cursor preimplementation plan and listed four explicitly undecided financial policy blockers.
+- No code, deployment or migration executed.

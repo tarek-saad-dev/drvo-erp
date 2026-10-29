@@ -42,3 +42,8 @@ SQL Server on VPS, Next.js UI + NestJS API recommended, PWA with local IndexedDB
 
 ## Exit criteria
 A signed environment inventory, device test matrix, backup/restore drill and security controls checklist; approved outstanding low-level contracts; founder authorization. Until then: planning only.
+
+
+## Device scope confirmation — 2026-10-29
+
+Founder selected **Windows Browser** as the initial cashier POS environment. Target test proposal: Windows desktop with Chrome and/or Microsoft Edge; exact supported versions and kiosk/shared-user usage still unapproved. Focus IndexedDB and PWA qualification on Windows browser profiles, power/browser restart, multiple windows, storage eviction and loss incidents. No tablet/mobile acceptance requirement for first release. [Windows Offline Test Plan](WINDOWS-POS-OFFLINE-TEST-PLAN.md). Planning only; no environment verification performed.

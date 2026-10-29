@@ -209,3 +209,9 @@ Added ARCHITECTURE-READINESS-REVIEW.md: reconciled historical rule conflicts, li
 - Added ADR-012 temporary last known cost for negative stock and correction on later receipt.
 - Added ADR-013 late offline sale dates retained and accounting adjustment in open period.
 - Added implementation readiness gate and updated Cursor plan. No code/deployment; explicit owner authorization still required.
+
+
+## 2026-10-29 — Technical sign-off draft
+
+- Added technical sign-off checklist covering offline credit overruns, unverified electronic proof, missing historical stock cost, late-period taxes and infrastructure/device readiness.
+- Retained unresolved operational policies and explicit no-code gate.

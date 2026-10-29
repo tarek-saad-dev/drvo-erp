@@ -34,3 +34,13 @@ B4 Late month: sale occurred Oct 31 and syncs Nov 3 after October payroll, tax a
 
 ## File status
 All designs are proposals, not runtime code, not production migrations. Unresolved B1-B4 forbid work on their dependent monetary flows until policy approval. Founder explicitly asked not to begin coding while critical requirements remain.
+
+
+## Financial founder decisions resolved — 2026-10-29
+
+ADR-010 approved: offline credit is locally recorded immediately and exceeding limit is flagged/reviewed after sync. This is an explicit offline-only exception to online hard-limit enforcement; excess credit remediation still to design.
+ADR-011 approved: electronic tender recorded using customer-provided evidence; mismatches later reviewed. Customer evidence does NOT equal independently verified settlement and cannot mark provider PAID.
+ADR-012 approved: last known cost provisionally on negative inventory, then a linked adjustment after later purchase; missing cost / multi-receipt strategy TBD.
+ADR-013 approved: preserve original sale date, post late offline sale journal to open period with documented adjustment; statutory tax period review TBD.
+
+Prior B1-B4 questions are now answered at founder product-intent level, but the execution gate still needs exact payment, credit-remediation, tax, storage/security and infrastructure contracts. See [Readiness Gate](IMPLEMENTATION-READINESS-GATE.md). **Do not write code absent owner's explicit permission.**

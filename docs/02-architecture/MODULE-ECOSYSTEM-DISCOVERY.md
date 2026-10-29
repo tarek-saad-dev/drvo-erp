@@ -1,6 +1,6 @@
 # DRVO ERP Module Ecosystem — Architecture Proposal
 Date: 2026-10-29
-Status: DRAFT for founder discussion; NOT approved implementation design; NO CODING.
+Status: PARTIAL APPROVAL — independent visible Apps accepted in ADR-015; remaining design details proposed; NO CODING.
 
 ## Current accepted baseline
 - One SQL Server database for V1, Tenant > Business > Branch with Business-scoped accounting and independent branch operations.
@@ -33,3 +33,8 @@ Platform Kernel + Catalog + Customers + POS + Booking + Treasury + Accounting + 
 
 ## Open architecture questions
 First visible app set and pricing entitlements, WhatsApp role in commercial V1 (optional at launch or later), module activation approval roles and dependency purchase experience, Clinic clinical scope, and final UI direction.
+
+
+## Approved app identity update — 2026-10-29
+
+Founder selected Option A: **every user-facing Module appears as its own independent App**, Odoo-like. Do not group them into Sales/Finance/Operations mega-apps as the default launcher. This does not require separate code deployments or databases. See [ADR-015](../05-decisions/ADR-015-EACH-MODULE-INDEPENDENT-APP.md). The exact V1 app inventory and Module Registry/contracts are still under design: [Registry and Contracts](MODULE-REGISTRY-DEPENDENCIES-CONTRACTS.md).

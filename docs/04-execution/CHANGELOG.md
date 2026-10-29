@@ -301,3 +301,12 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - Recorded ADR-024, replaced old palette candidate in Tokens, synchronized UI Kit/Hybrid navigation/App Shell, ADR register, docs index, Current State, Open Questions and Cursor preimplementation plan.
 - Contrast ratios for five proposed text-background pairs checked numerically; full design usability/WCAG sign-off not complete.
 - Documentation only; no code, Figma project, migration or Production deployment.
+
+
+## 2026-10-29 — Founder approved ERP Professionalism × Duolingo-inspired Clarity (ADR-025)
+
+- ADR-025: original DRVO UX North Star — serious system, friendly surface; standard Odoo-grade ERP Views/Apps with Duolingo-inspired clarity, restrained feedback and user-task fit. No source/assets copied and no finance gamification.
+- New UX North Star Playbook: Guide/Work/Analyze experience calibration, 12 screen laws, roles, feedback, accessibility and handoff checks.
+- New three-screen visual review brief: separate App Launcher/Home, Accounting List/Form and Salon Windows POS concepts in approved Plum/Teal palette; image mockups are conversational design exploration, not deployed screens or GitHub binary files.
+- Cross-linked UI Kit, App Shell, List/Form, Tokens, index, Current State, Open Questions and Cursor pre-code plan.
+- Documentation only: no app code, SQL changes, Figma source file, tests or deployment.

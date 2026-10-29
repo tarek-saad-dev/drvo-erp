@@ -1,4 +1,7 @@
 # Cursor Implementation Plan — Pre-code Gate
+
+> **READ FIRST / HARD BLOCKER ADR-029:** [Founder Project Architecture Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) is mandatory for any Cursor/Codex/engineer: (1) Egypt-scale one-platform SaaS ambition, (2) any industry via reusable Shared Modules, bounded Extensions, conditional owned Domain Modules and versioned Solutions, (3) very small to huge enterprise via minimum valid Modules **PLUS separately tested physical infrastructure/capacity**. Complete [Universal ERP Architecture Fitness Gates](../02-architecture/UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md) before any major code architecture choice; block customer/industry forks, required-all-app installation, hidden financial controls, cross-tenant data and assuming module count proves scale. Still NO CODE AUTHORIZED.
+
 Date: 2026-10-29. Status: planning only; **DO NOT WRITE APP CODE until critical blockers resolved and founder authorizes development**.
 
 ## Recorded latest decisions

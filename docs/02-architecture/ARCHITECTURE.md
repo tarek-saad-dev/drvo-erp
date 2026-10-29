@@ -47,3 +47,8 @@ Migrations, least privilege, audit, backups, encrypted transport, tested auth an
 ## Founder-approved tenancy requirements (2026-10-28)
 
 Tenant represents owner account, with multiple independently branded/accounted Businesses of possibly different industries. Each Branch belongs to one Business. Business customer directory and core pricing can be shared among Branches, while pricing overrides, stock, treasuries, shifts and scoped employee permissions exist at Branch level. Each Business chooses active modules and extensions; one module may have multiple compatible extensions. Shared database with strong tenant isolation. Tenant-scoped accounts (no account shared across Tenants), with separate per-Branch roles and sensitive audit history. See [Tenancy Architecture](TENANCY-ARCHITECTURE.md). Dependencies and detailed schema are still open.
+
+
+## Independent visible application modules — founder-approved 2026-10-29
+
+Every user-facing Module is an independent App in the Business launcher. Apps are still within the single Modular Monolith and shared SQL Server V1 database; code deployment and per-Business enablement are separate. See [ADR-015](../05-decisions/ADR-015-EACH-MODULE-INDEPENDENT-APP.md). The detailed Module Registry, Dependencies and communication contract design is [draft](MODULE-REGISTRY-DEPENDENCIES-CONTRACTS.md), not yet ratified.

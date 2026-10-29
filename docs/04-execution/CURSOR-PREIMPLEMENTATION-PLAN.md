@@ -63,3 +63,8 @@ The environment and offline-security verification checklist is now documented at
 ## POS Windows target verification — 2026-10-29
 
 Approved initial device category: **Windows Browser**. [Windows PWA/IndexedDB Offline Test Plan](WINDOWS-POS-OFFLINE-TEST-PLAN.md) lists 20 evidence-driven tests. Chrome/Edge support versions, kiosk/shared Windows profiles, offline auth TTL and SQL Server deployment checks require selection. No coding or tests performed; explicit founder authorization still required.
+
+
+## SQL Server driver recommendation — 2026-10-29
+
+See [Data Access Selection](SQLSERVER-DATA-ACCESS-SELECTION.md): node-mssql + tedious recommended for explicit transactional financial writes; TypeORM/Prisma compared, not selected as final without proof. No dependencies installed or code written.

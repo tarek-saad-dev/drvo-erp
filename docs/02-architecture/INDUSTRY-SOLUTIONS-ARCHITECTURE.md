@@ -1,5 +1,8 @@
 # Industry Solutions Architecture — Shared Platform, Domain Boundaries and Composition
 
+> **MANDATORY:** [Founder Architecture Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) and [ADR-029](../05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md) require expansion into any justified industry through reusable Core, bounded Extensions and independent owned Domain Modules as needed. Industry readiness must be validated; Module count does not prove enterprise technical scale. Use [Fitness Gates](UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md) in each fit-gap and Module review.
+
+
 **Date:** 2026-10-29
 **Status:** Founder-approved direction (ADR-017 and ADR-019), detailed contracts and module inventory are proposed pending design sign-off.
 **Scope:** product architecture and rules, NOT code or migrations.

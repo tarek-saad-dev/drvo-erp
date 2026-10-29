@@ -136,3 +136,8 @@ Founder selected SQL Server. Engineering recommendation: Next.js + NestJS/TypeSc
 ## Final architecture decision update — 2026-10-29
 
 New ADRs 007-009 approved at business direction level: Required/Optional dependencies with conflict prevention, Commission Plan-defined opener rate precedence, SQL Server VPS + PWA IndexedDB initial offline queue. Four financial policies unresolved (offline credit, payment verification, negative stock costing, late closed-month sales). Cursor pre-code plan exists; NO coding approved.
+
+
+## Four financial ADRs and implementation readiness — 2026-10-29
+
+Founder approved offline immediate credit with after-sync excess review, record customer evidence of offline electronic tender with later discrepancy review, provisional last-known cost for negative stock with subsequent adjustment, and posting late-arriving offline sale to an open GL period while retaining original sale date. See ADR-010..013 and [Implementation Readiness Gate](../04-execution/IMPLEMENTATION-READINESS-GATE.md). Readiness is **technical design signoff pending**, not permission to code. No app or DB changes.

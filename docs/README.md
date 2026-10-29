@@ -43,3 +43,9 @@
 
 - [ADR-021 — Recommended and customizable industry starter](05-decisions/ADR-021-CUSTOMIZABLE-RECOMMENDED-INDUSTRY-STARTER.md)
 - [Industry Starter and Activation — design draft](02-architecture/INDUSTRY-STARTER-AND-ACTIVATION-DESIGN.md)
+
+
+## Pricing and UI/UX discovery drafts — 2026-10-29
+
+- [SaaS Pricing Strategy Discovery](01-product/SAAS-PRICING-STRATEGY-DISCOVERY.md) — candidate commercial models, no DRVO prices approved.
+- [DRVO ERP UI Kit Blueprint](02-architecture/DRVO-ERP-UI-KIT-BLUEPRINT.md) — Odoo-inspired component/view/template system, not an implemented kit.

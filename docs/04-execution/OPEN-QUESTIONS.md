@@ -326,3 +326,10 @@ Pending founder review: exact V1 app tiles/capability grouping; contract between
 ## Core/Extension/Domain classification decision — 2026-10-29
 
 **RESOLVED policy:** founder accepted Option B (ADR-019). Domain Module per industry is **conditional**, not mandatory. Shared invariants remain in Core, bounded industry variation in Extensions, and independently owned aggregates/privacy-sensitive or production workflows in new Domain Modules, each still Core+Extension per ADR-006. [Boundary Matrix](../02-architecture/CORE-EXTENSION-DOMAIN-BOUNDARY-MATRIX.md) proposes Salon/Clinic/Manufacturing examples. **OPEN technical detail:** final Salon Service Execution / Queue data ownership; exactly which Salon hooks and cross-module events are needed, financial transaction and replay acceptance; clinic privacy scope; manufacturing domain split; exact V1 app tiles and Registry manifests. No code authorized.
+
+
+## Incremental Business growth / Salon service execution clarification — 2026-10-29
+
+**APPROVED ADR-020:** each Business may start with its industry-appropriate minimum valid Module bundle and add compatible Modules later; no required automatic install of every SaaS Module, but compulsory financial/security/dependency behavior remains. **Salon V1 has NO standalone Service Execution Module.** Existing sale/booking/service executor attribution/HR commission/inventory recipe functionality is not cut; it remains with shared Module owners/Salon Extensions. Old 'should Salon V1 include a separate Service Execution Module?' question is resolved. [ADR-020](../05-decisions/ADR-020-INCREMENTAL-BUSINESS-MODULES-AND-SALON-V1.md); [progressive business design](../02-architecture/INCREMENTAL-BUSINESS-MODULE-GROWTH.md).
+
+**STILL OPEN:** exact mandatory starter bundle per industry and workflow, app-vs-internal dependency boundaries, salon queue ownership, future multi-step Service Execution trigger (if ever), entitlement/pricing, activation state machine and extension compatibility, event and financial transaction contract. No implementation permission.

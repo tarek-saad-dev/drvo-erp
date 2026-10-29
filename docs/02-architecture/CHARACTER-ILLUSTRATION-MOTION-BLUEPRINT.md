@@ -1,7 +1,7 @@
 # DRVO ERP — Industry Character Family, Illustrated Scenes and Motion Grammar Blueprint
 
 **Date:** 2026-10-29
-**Status:** DESIGN BLUEPRINT. Industry character/scene/motion *direction* approved by founder in ADR-027; no specific art, page-flip duration, asset production, pack marketplace or implementation approved.
+**Status:** DESIGN BLUEPRINT. Industry character/scene/motion direction approved in ADR-027; **Soft Editorial 2.5D characters + Miniature 3D-style scenes accepted** in ADR-028. No individual art asset, exact page-flip duration, renderer, asset production, pack marketplace or implementation approved.
 **Related:** ADR-025 UX North Star, ADR-026 Business Theme Engine, ADR-017 Industry Solutions.
 
 ## 1. Goal: profession-specific visual soul with ERP precision
@@ -93,3 +93,8 @@ Build the first **Salon Character Mini Pack** for onboarding/industry selection,
 **Links:** [ADR-027](../05-decisions/ADR-027-INDUSTRY-CHARACTERS-SCENES-AND-MOTION.md), [Theme Blueprint](BUSINESS-THEME-ENGINE-AND-FONT-ASSETS-BLUEPRINT.md), [UX North Star](DRVO-UX-NORTH-STAR-PLAYBOOK.md), [Visual Review](DRVO-UX-THREE-SCREEN-VISUAL-REVIEW.md).
 
 **No code, design source files, illustration/animation assets or deployment authorized.**
+
+
+## Founder-selected unified art style — ADR-028 (2026-10-29)
+
+Founder agreed with pairing **Soft Editorial 2.5D** for all original industry characters and **Miniature/Isometric 3D-inspired** architecture/scenes with unified lighting, material and perspective treatment. The earlier **A/B/C art-style candidates** in Section 6 are superseded at the high-level style-choice level, but specific model detail, lighting, texture, character pose and the end asset package remain open. First concept scope: [DRVO Barber + Salon Storefront + Real Estate House](DRVO-ART-DIRECTION-FIRST-CONCEPT-PACK.md). House/building scene flip is still only a candidate transition, not an approved animation spec. Previous screenshots' layout compositions remain rejected. [ADR-028](../05-decisions/ADR-028-SOFT-2_5D-CHARACTERS-MINIATURE-3D-SCENES.md). No code.

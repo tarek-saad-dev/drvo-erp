@@ -304,3 +304,8 @@ Read-only operator instructions are at [VPS Audit Runbook](VPS-READONLY-AUDIT-RU
 ## Module ecosystem and UX discovery — 2026-10-29
 
 Pending founder review: exact V1 app tiles/capability grouping; contract between Core and extension for every module and optional multi-extension interactions; business-scoped install/disable billing and prerequisites; WhatsApp add-on at V1 launch vs later; Clinic Pack launch and sensitive domain boundary; original DRVO UX design referencing (not reproducing) Odoo; Cashier pure-logic/test reuse boundary and migration strategy. [Module proposal](../02-architecture/MODULE-ECOSYSTEM-DISCOVERY.md), [UX proposal](../02-architecture/ODOO-INSPIRED-UI-DISCOVERY.md), [Cashier review](CASHER-REUSE-DISCOVERY.md). DRAFT only.
+
+
+## Module architecture review — 2026-10-29
+
+**Approved:** ADR-015 each user-facing Module is a separate App tile; not default-grouped mega-apps. This resolves navigation grouping choice, not OQ-009 exact V1 app inventory or OQ-013 contracts. Details still to ratify: Global Module Registry and Business-scoped activation, exact Required/Optional edges and dependency-install approval, paid add-on permissions, WhatsApp V1 availability, Salon Pack visibility, Clinic Pack separate rollout, journal consistency boundary. [Draft spec](../02-architecture/MODULE-REGISTRY-DEPENDENCIES-CONTRACTS.md). No coding.

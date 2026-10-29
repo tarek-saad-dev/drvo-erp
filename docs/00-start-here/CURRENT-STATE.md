@@ -175,3 +175,8 @@ Prepared [VPS Read-only Audit Runbook](../04-execution/VPS-READONLY-AUDIT-RUNBOO
 ## SQL Server data access evaluation — 2026-10-29
 
 Reviewed node-mssql, TypeORM and Prisma SQL Server options. Recommended node-mssql/tedious plus explicit financial repositories and versioned SQL migrations; recommendation NOT approved or tested. [Data Access Memo](../04-execution/SQLSERVER-DATA-ACCESS-SELECTION.md). No code or VPS access.
+
+
+## Module and UX architecture expansion — 2026-10-29
+
+Draft proposals (NOT approved decisions): [module ecosystem](../02-architecture/MODULE-ECOSYSTEM-DISCOVERY.md), [Odoo-inspired DRVO UI](../02-architecture/ODOO-INSPIRED-UI-DISCOVERY.md), and [Cashier reuse review](../04-execution/CASHER-REUSE-DISCOVERY.md). Founder rightly identified module interoperation, module catalog, optional WhatsApp, cross-industry Clinic evolution, Business activation and new-Business templates as outstanding architecture questions. No application code, test or production change.

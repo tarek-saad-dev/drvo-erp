@@ -131,3 +131,8 @@ Cross-module review documented at [Architecture Readiness Review](../04-executio
 ## Technology baseline — 2026-10-29
 
 Founder selected SQL Server. Engineering recommendation: Next.js + NestJS/TypeScript modular monolith, worker, offline device queue, dedicated SQL Server data layer. See [Technology Architecture](../02-architecture/TECHNOLOGY-ARCHITECTURE.md), [V1 Execution Plan](../04-execution/V1-IMPLEMENTATION-PLAN.md). Critical business and hosting/runtime design blockers remain. NO code implementation authorized.
+
+
+## Final architecture decision update — 2026-10-29
+
+New ADRs 007-009 approved at business direction level: Required/Optional dependencies with conflict prevention, Commission Plan-defined opener rate precedence, SQL Server VPS + PWA IndexedDB initial offline queue. Four financial policies unresolved (offline credit, payment verification, negative stock costing, late closed-month sales). Cursor pre-code plan exists; NO coding approved.

@@ -4,6 +4,10 @@
 **Source:** Founder discovery, Section 1 + six approved follow-ups  
 **Status:** Product vision approved; feature/MVP scope and technical choices pending
 
+## FOUNDER'S PRIMARY ARCHITECTURE MISSION — 2026-10-30
+
+**This is the overarching project purpose, not a decorative future feature:** DRVO ERP aspires to become one of Egypt's largest ERP platforms, expandable into **any economically viable industry after proper discovery/engineering**, and able to serve Businesses from **very small to very large** using both progressive compatible Module activation **and separately tested infrastructure/operational scalability**. Build one product platform, not per-customer ERP forks. The three pillars are founder-approved design guardrails under [Architecture Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) and [ADR-029](../05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md). No claim of already leading Egypt, instantly supporting every industry, or current unlimited Enterprise workload. All future V1/industry/pricing decisions must pass the [Fitness Gates](../02-architecture/UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md).
+
 ## Product vision
 
 DRVO ERP is a **comprehensive, modular, multi-tenant ERP SaaS platform**, delivered incrementally. Businesses can assemble capabilities like puzzle pieces and expand them over time. It should support owners, partners, directors, managers, employees and customers, while remaining easy for non-technical staff.

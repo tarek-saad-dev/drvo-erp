@@ -51,7 +51,7 @@
 - Conflicts/incompatibility: reject activation or version upgrade with actionable reason.
 - Dependency graph checked for missing modules, cycles, version mismatch, incompatible extensions, pricing/entitlement and authorization before commit.
 - Side-by-side compatible extensions allowed; if two extensions conflict for one workflow, require explicit selection/priority rather than silently picking one.
-- Business activation must never silently purchase paid prerequisite modules.
+- Business activation must never silently purchase paid prerequisite modules. **ADR-016 approved:** show all Required prerequisites and their costs in one explicit bundled activation preview/approval; no separate prerequisite-by-prerequisite manual installation required.
 
 **Example proposed edges:** POS -> Catalog (Required), POS -> Customers (Optional for anonymous cash sales, Required only for Credit workflow); Salon execution extension -> HR service attribution contract (Required for that feature), -> Inventory recipe (Optional until that feature enabled); Booking -> Customers (proposed Required); WhatsApp -> Messaging provider/channel Core (Required), Booking/POS notifications as Optional event integrations. **All concrete edges require confirmation**; the accepted policy is Required/Optional, not these example links.
 
@@ -104,7 +104,7 @@ Activation across multiple Businesses/industries; required dependencies and opti
 
 ## 9. Decisions founder still needs to make
 1. Exact V1 tile inventory (which app names appear), distinct from domain module inventory.
-2. When Required prerequisite is missing, *show full installation preview and approve prerequisites together* vs block and make user install manually (no silent billing either way).
+2. **RESOLVED — ADR-016:** display full Required dependency bundle and any prices for one explicit approval; still open: approver roles, billing/proration and technical commit/retry strategy.
 3. Which role can activate/deactivate modules (Owner only vs privileged Manager), and billable integration approval.
 4. WhatsApp optional app available day one vs later release, and whether it talks to DRVO AutoResponse.
 5. Whether Salon Pack appears as separate app tile or is activated as underlying industry extension with its features inside POS/Booking/HR.
@@ -112,3 +112,8 @@ Activation across multiple Businesses/industries; required dependencies and opti
 7. First UI designs and permission/navigation screen contract.
 
 No engineering draft here grants permission to write code.
+
+
+## Follow-up lifecycle and contract design — 2026-10-29
+
+Founder selected bundling activation policy (ADR-016). The expanded state machine, quote/revalidation/audit and command/event ownership draft is at [Module Lifecycle and Communication Contracts](MODULE-LIFECYCLE-AND-COMMUNICATION-CONTRACTS.md). Engineering details remain proposals, not preapproval to write code.

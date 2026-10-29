@@ -284,3 +284,11 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - Detailed DRAFTS: App Shell UX Specification, Design Tokens & Components, ERP View/Screen Patterns. None are finished/approved visual designs or code assets.
 - New Hybrid Pricing Analysis (still DRAFT): Business base + branch/seat allowance + optional premium modules and usage; compared with current public Odoo pricing for reference, not DRVO prices.
 - Linked new drafts to ADR register, docs index, current state, preimplementation plan and open questions. No code, SQL migration, production change or generated Figma kit.
+
+
+## 2026-10-29 — Founder accepted Hybrid Navigation per Module (ADR-023)
+
+- ADR-023: global DRVO Shell with controlled Sidebar/Tabs/Workspace variants according to workflow; consistent independent App Launcher, authorizations and RTL/LTR. Supersedes proposal for compulsory sidebar on every app.
+- New draft specs: Hybrid Navigation / measurement candidates / App Launcher / RTL-LTR, plus detailed List/Form UX with financial/error/saved-filter and record transition semantics.
+- Synced decision register, App Shell, tokens, View Patterns, UI Kit Blueprint, docs index, Current State, Open Questions and Cursor pre-code plan.
+- All numerical UI measurements/colors/Module assignments remain **proposals** pending founder visual review. No product code, SQL migrations, visual Figma kit or production changes.

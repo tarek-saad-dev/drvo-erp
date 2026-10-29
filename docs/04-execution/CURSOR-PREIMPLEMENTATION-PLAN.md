@@ -68,3 +68,8 @@ Approved initial device category: **Windows Browser**. [Windows PWA/IndexedDB Of
 ## SQL Server driver recommendation — 2026-10-29
 
 See [Data Access Selection](SQLSERVER-DATA-ACCESS-SELECTION.md): node-mssql + tedious recommended for explicit transactional financial writes; TypeORM/Prisma compared, not selected as final without proof. No dependencies installed or code written.
+
+
+## New pre-code design gate: module ecosystem and user experience — 2026-10-29
+
+Before code permission, obtain founder approval for V1 module taxonomy, Core/Extension boundaries, synchronous interface/event contracts, global module release vs Business activation flow, WhatsApp integration, clinic pack separation, and DRVO-branded Odoo-inspired UI. Review drafts: [Module Ecosystem](../02-architecture/MODULE-ECOSYSTEM-DISCOVERY.md), [UI](../02-architecture/ODOO-INSPIRED-UI-DISCOVERY.md), [Cashier reuse](CASHER-REUSE-DISCOVERY.md). Do NOT treat draft as final decisions.

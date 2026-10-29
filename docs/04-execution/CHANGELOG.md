@@ -251,3 +251,13 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - ADR-016 accepted: preview Required transitive dependency bundle with prices and receive one explicit approval to activate it together.
 - Added detailed proposed BusinessModule lifecycle, platform release vs tenant activation, versioned command/event contracts, outbox, idempotency and test matrix.
 - Synced ADR register, module registry draft, Cursor plan, open questions, current state. No code or DB changes.
+
+
+## 2026-10-29 — Founder approved multi-industry DRVO product-line and long-term SaaS scale direction
+
+- ADR-017: platform Kernel + reusable business Core/Modules + narrow Extensions + independent Vertical Domain Modules + versioned Industry Solutions. Continue Core+Extension for every Module; do not clone each sector or stretch generic Booking/CRM across unrelated domains.
+- ADR-018: reusable industry discovery/Fit-Gap/productization lifecycle and future search-based 100+ sector catalog, customer per-Business app launcher, separate DRVO Platform Control Center; distinguish sector count, Tenant count and enterprise workload.
+- Documented hypothetical large Egypt timber importer/supplier/manufacturer: Import/Landed Cost, Manufacturing/MRP, quality, stock costing, migration/QA and reuse/productization.
+- V1 remains Salon/Cut Salon, Clinic second, ONE SQL Server database. Future multi-pool or dedicated deployments are options, not current scope or performance guarantee.
+- New canonical docs: Industry Solutions Architecture, New Industry Onboarding Playbook, SaaS Scale Catalog & Control Center; updates to docs index, ADR register, vision, architecture, module catalog/registry/lifecycle, UX, roadmap, Cursor pre-code plan and state/open questions.
+- **Documentation changes only. No app code, DB migrations, tests, deployment, server changes or sign-off to start programming.**

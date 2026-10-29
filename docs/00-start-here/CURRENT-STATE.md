@@ -160,3 +160,8 @@ These four points supersede earlier open recommendations in this document. **Tec
 ## Pre-code infrastructure review — 2026-10-29
 
 Created [Infrastructure + Offline Pre-Code Checklist](../04-execution/INFRASTRUCTURE-OFFLINE-PRECODE-CHECKLIST.md). Actual VPS, SQL Server version/capacity, backup restore, POS devices and IndexedDB durability NOT yet inspected or tested. Code remains unauthorized.
+
+
+## Windows POS browser decision — 2026-10-29
+
+Founder chose Windows Browser as initial POS target. Created [Windows Offline Test Plan](../04-execution/WINDOWS-POS-OFFLINE-TEST-PLAN.md) for IndexedDB queue and PWA cases (20 test scenarios); no testing conducted, no code authorized.

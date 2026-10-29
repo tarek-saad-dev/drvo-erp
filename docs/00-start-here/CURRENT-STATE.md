@@ -155,3 +155,8 @@ Founder approved offline immediate credit with after-sync excess review, record 
 4. **Late offline sale after month close:** preserve original sale date and post linked adjustment into the current open accounting period, **without a separate additional manual tax review step** by default. This is a workflow preference, not a waiver of mandatory local tax laws, filing obligations, or jurisdiction-specific validations before production.
 
 These four points supersede earlier open recommendations in this document. **Technical sign-off for these business behaviors is approved; overall production/implementation authorization is NOT given. No coding without explicit founder permission.**
+
+
+## Pre-code infrastructure review — 2026-10-29
+
+Created [Infrastructure + Offline Pre-Code Checklist](../04-execution/INFRASTRUCTURE-OFFLINE-PRECODE-CHECKLIST.md). Actual VPS, SQL Server version/capacity, backup restore, POS devices and IndexedDB durability NOT yet inspected or tested. Code remains unauthorized.

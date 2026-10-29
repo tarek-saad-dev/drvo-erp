@@ -95,3 +95,8 @@ Form vs Document: use **FormView** for ordinary entities; use **DocumentView** v
 Exact row heights/tokens, column pinning, saved-view/pivot scope in V1, action bar position, Record Form page vs drawer criteria, density defaults, actual screen mockups and acceptance metrics. These must be approved separately.
 
 **This is a documentation proposal only. No code, Figma kit or production changes.**
+
+
+## ADR-025 everyday simplicity without reducing expert control
+
+Founder approved Odoo professional depth with Duolingo-inspired clarity. For List/Form, simplify default search/filter visibility, inline help, actions and layout while preserving advanced filters, bulk operations, monetary totals, posted/paid separation, reversal/audit, saved view features when supported, authorizations and keyboard navigation. Expert accounting density remains appropriate; no playful/gamified financial posting. Offer a clear first action and explicit pending/failure feedback, not celebratory fake success. [UX Playbook](DRVO-UX-NORTH-STAR-PLAYBOOK.md), [Three-Screen Review](DRVO-UX-THREE-SCREEN-VISUAL-REVIEW.md). Visual decisions still unapproved.

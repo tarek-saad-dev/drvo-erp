@@ -1,5 +1,8 @@
 # DRVO ERP — New Industry Solution Intake, Delivery and Productization Playbook
 
+> **FOUNDATIONAL MANDATE (ADR-029):** This is the controlled process to extend one DRVO platform to new industries without untested universal support claims. Each intake must pass [Founder Architecture Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) and [Industry/Scale Fitness Gates](../02-architecture/UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md): fit-gap plus independent workload/security/enterprise readiness, not merely an app list.
+
+
 **Date:** 2026-10-29
 **Status:** APPROVED PROCESS DIRECTION via ADR-018. Per-client steps, contracts, capacity and effort estimates are examples/plans.
 **Goal:** repeatedly enter new business industries without cloning entire ERP products.

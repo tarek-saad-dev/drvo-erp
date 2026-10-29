@@ -356,3 +356,10 @@ New DISCUSSION DRAFTS: [Pricing Strategy](../01-product/SAAS-PRICING-STRATEGY-DI
 **Still OPEN for UX:** topbar/sidebar alternative, final brand palette/font/icons, compact/comfortable default, full page-by-page user journeys, Figma or alternative source kit, final screen approvals, MVP view engine breadth, phone feature set. The approved *direction* is not final UI details.
 
 **Still OPEN for pricing:** Hybrid [model analysis](../01-product/HYBRID-PRICING-MODEL-ANALYSIS.md) is a recommendation; choose Business/Branch/active-operator primary meter, plan inclusions and limits, exact prices EGP/Gulf, included recommended preselection, trial/manual billing/renewals/proration/refunds and paid activation roles. Odoo prices are external benchmark, not DRVO policy. No code authorized.
+
+
+## Hybrid Navigation pattern decision — ADR-023 (2026-10-29)
+
+**RESOLVED:** founder selected **C — Hybrid per Module**. Single global DRVO App Shell with one original UI Kit; Sidebar for complex hierarchical Modules, Tabs for shallow Modules, Workspace for high-focus POS and optional Booking Calendar. Independent authorized App tiles and Business/Branch scopes remain. The prior topbar-only vs always-sidebar global choice is CLOSED. Details: [ADR-023](../05-decisions/ADR-023-HYBRID-NAVIGATION-BY-MODULE.md), [Hybrid Navigation & RTL](../02-architecture/DRVO-HYBRID-NAVIGATION-RTL-APP-LAUNCHER.md), [List/Form detail](../02-architecture/DRVO-LIST-FORM-UX-DETAILED.md).
+
+**OPEN design approvals:** actual Module-to-pattern map and special Booking mode, exact responsive shell geometry/sidebar/tabs/table control sizes, brand color/fonts, App Launcher tile order/favorites, RTL mobile behavior, List/Form action layout/saved filters and first high-fidelity screen prototypes. Existing Pricing Hybrid model and real price points remain unapproved. Docs only, no code.

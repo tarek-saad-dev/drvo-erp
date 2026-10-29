@@ -347,3 +347,12 @@ Pending founder review: exact V1 app tiles/capability grouping; contract between
 New DISCUSSION DRAFTS: [Pricing Strategy](../01-product/SAAS-PRICING-STRATEGY-DISCOVERY.md) and [DRVO UI Kit Blueprint](../02-architecture/DRVO-ERP-UI-KIT-BLUEPRINT.md). Candidate Hybrid: Business base tier + sensible included allowance + only premium differentiated Add-ons / metered outside costs (not accepted). Kit: Odoo-like interaction/view family with original DRVO-owned visual language, full RTL/LTR, role and finance/offline states (not approved final UI).
 
 **OPEN to founder:** first billing metric (Business/Branch/active operator/users) and plan boundaries; included vs premium Modules and WhatsApp/AI consumption; trial/manual collection/grace and refund policy; if no-extra-cost recommended apps should be preselected (paid optional off by default); UX shell/navigation choice, brand/tokens, screen density, full Kit source format/design tool, and screen sign-off criteria. Do not treat benchmark Odoo public prices as DRVO prices. No code authorized.
+
+
+## UX direction ADR-022 and Hybrid pricing study — 2026-10-29
+
+**RESOLVED:** founder selected Odoo-familiar App Shell + reusable ERP view UX **with simpler original DRVO identity** (ADR-022), explicitly not copying Enterprise assets/code. Specs are drafts: [App Shell](../02-architecture/DRVO-APP-SHELL-UX-SPEC.md), [Tokens](../02-architecture/DRVO-DESIGN-TOKENS-AND-COMPONENTS.md), [Views](../02-architecture/DRVO-VIEW-AND-SCREEN-PATTERNS.md).
+
+**Still OPEN for UX:** topbar/sidebar alternative, final brand palette/font/icons, compact/comfortable default, full page-by-page user journeys, Figma or alternative source kit, final screen approvals, MVP view engine breadth, phone feature set. The approved *direction* is not final UI details.
+
+**Still OPEN for pricing:** Hybrid [model analysis](../01-product/HYBRID-PRICING-MODEL-ANALYSIS.md) is a recommendation; choose Business/Branch/active-operator primary meter, plan inclusions and limits, exact prices EGP/Gulf, included recommended preselection, trial/manual billing/renewals/proration/refunds and paid activation roles. Odoo prices are external benchmark, not DRVO policy. No code authorized.

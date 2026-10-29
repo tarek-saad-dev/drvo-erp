@@ -363,3 +363,10 @@ New DISCUSSION DRAFTS: [Pricing Strategy](../01-product/SAAS-PRICING-STRATEGY-DI
 **RESOLVED:** founder selected **C — Hybrid per Module**. Single global DRVO App Shell with one original UI Kit; Sidebar for complex hierarchical Modules, Tabs for shallow Modules, Workspace for high-focus POS and optional Booking Calendar. Independent authorized App tiles and Business/Branch scopes remain. The prior topbar-only vs always-sidebar global choice is CLOSED. Details: [ADR-023](../05-decisions/ADR-023-HYBRID-NAVIGATION-BY-MODULE.md), [Hybrid Navigation & RTL](../02-architecture/DRVO-HYBRID-NAVIGATION-RTL-APP-LAUNCHER.md), [List/Form detail](../02-architecture/DRVO-LIST-FORM-UX-DETAILED.md).
 
 **OPEN design approvals:** actual Module-to-pattern map and special Booking mode, exact responsive shell geometry/sidebar/tabs/table control sizes, brand color/fonts, App Launcher tile order/favorites, RTL mobile behavior, List/Form action layout/saved filters and first high-fidelity screen prototypes. Existing Pricing Hybrid model and real price points remain unapproved. Docs only, no code.
+
+
+## DRVO palette decision — ADR-024 (2026-10-29)
+
+**CLOSED:** founder accepted original Plum + Teal + Soft-Neutral DRVO color direction and six principal hex values: `#74536E`, `#553E53`, `#1A7B80`, `#F7F6F8`, `#FFFFFF`, `#27242B`; old green-first proposal superseded. Strongly prefer an Apps/action-first Home instead of oversized Hero, but removing vs shrinking banner remains a mockup-level choice. See [ADR-024](../05-decisions/ADR-024-DRVO-PLUM-TEAL-NEUTRAL-PALETTE.md).
+
+**STILL OPEN:** final logo/font/icon identity, accessible semantic color ramps (focus/hover/disabled/status), visual samples for 3 primary screens, final RTL layout/spacing sizes, Starter/Pricing overlays, and full Design Kit/Figma source. Hybrid subscription model not approved. No coding authorization.

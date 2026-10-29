@@ -78,3 +78,8 @@ Before code permission, obtain founder approval for V1 module taxonomy, Core/Ext
 ## Module App Launcher decision — 2026-10-29
 
 ADR-015 ACCEPTED: every user-facing Module is an independent App tile, not grouped into Finance/Sales/Operations super-apps. The backend is still a Modular Monolith and SQL Server remains one shared V1 database. [Registry, dependencies and contract design](../02-architecture/MODULE-REGISTRY-DEPENDENCIES-CONTRACTS.md) is an engineering draft: activation workflow, precise dependencies, paid prerequisite approval, extension visibility, event ownership and critical accounting consistency remain pre-code architecture gates. **No coding authorized.**
+
+
+## Module activation UX accepted — 2026-10-29
+
+ADR-016 founder-approved: selected Module plus **all Required prerequisite Modules and applicable costs** displayed in a single activation preview, approved once as a bundle. No silent paid activations or forced separate manual prerequisite installs. See [ADR-016](../05-decisions/ADR-016-BUNDLED-REQUIRED-DEPENDENCIES.md) and [Module Lifecycle/Communication Contracts](../02-architecture/MODULE-LIFECYCLE-AND-COMMUNICATION-CONTRACTS.md) for DRAFT implementation state machine, idempotency, event contracts, activation rollback tests and remaining design gates. No code authorized.

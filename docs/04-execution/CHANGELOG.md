@@ -236,3 +236,11 @@ These four points supersede earlier open recommendations in this document. **Tec
 ## 2026-10-29 — VPS pre-code audit runbook
 
 Created read-only audit instructions, with explicit unexecuted status: no direct SSH connection available, so no server facts verified. No code or server changes.
+
+
+## 2026-10-29 — Founder selection: independent module Apps
+
+- ADR-015 accepted: each user-facing module is independently visible like Odoo, no default navigation mega-app grouping.
+- Created Module Registry/Dependencies/Contracts engineering specification, explicitly draft.
+- Linked documents in architecture, current state, decision register, Cursor plan and open questions.
+- No application code, SQL migration or deployment executed.

@@ -289,3 +289,8 @@ Before implementation authorization: inspect SQL Server version/edition/VPS capa
 ## Windows POS target — 2026-10-29
 
 **Resolved:** V1 POS initially targets Windows Browser; testing plan at [Windows PWA/IndexedDB Test Plan](WINDOWS-POS-OFFLINE-TEST-PLAN.md). **Still open:** exact Windows/browser versions, shared-kiosk Windows user policy, offline local session TTL, PWA storage and eviction safeguards, live SQL Server VPS edition/resources/backups, DB driver/ORM and security verification. Test plan exists but has NOT been executed.
+
+
+## VPS audit status — 2026-10-29
+
+Read-only operator instructions are at [VPS Audit Runbook](VPS-READONLY-AUDIT-RUNBOOK.md); actual resource/version, encryption and backup evidence are still missing because direct server access is not available. Need redacted operator output and verified restore test, browser/storage device testing and ORM selection before production readiness. No code authorization.

@@ -1,5 +1,8 @@
 # Current state
 
+> **FOUNDATION / NO EXCEPTION:** [Founder Three-Pillar Project Charter](PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md), [ADR-029](../05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md). The product must target Egypt-scale platform adoption, an extensible method to serve any *investigated* business industry, and Business sizes micro-to-enterprise. Domain/module composition enables feature growth; operational/capacity scaling is a separate measurable design axis. Mission is accepted, **not yet a verified capacity claim**.
+
+
 **As of:** 2026-10-28  
 **Phase:** Founder Discovery / Documentation (Phase 0)  
 **Implementation:** NOT STARTED  
@@ -249,3 +252,8 @@ Founder explicitly approved **ERP seriousness/professional power of Odoo + Duoli
 ## Founder-selected DRVO Character Art Direction — ADR-028 (2026-10-29)
 
 **ACCEPTED:** unified **Soft 2.5D Editorial characters** + **Miniature/Isometric 3D-inspired industry buildings/scenes** with consistent shapes, lighting and material. First art exploration: DRVO Barber Character, Miniature Salon Storefront, Real Estate/House Miniature and optional scene.flip storyboard. Founder acceptance is of general style/direction, **not** the exact generated illustrations, prior rejected page layouts, any real 3D runtime, animation timing, V1 industry launch expansion or production assets. See [ADR-028](../05-decisions/ADR-028-SOFT-2_5D-CHARACTERS-MINIATURE-3D-SCENES.md), [Concept Pack](../02-architecture/DRVO-ART-DIRECTION-FIRST-CONCEPT-PACK.md). No code, graphics asset production pipeline or deployment authorized.
+
+
+## The project's overriding founder mission — ADR-029, 2026-10-30
+
+Founder explicitly identified 3 non-negotiable foundations: **(1)** aspire to become one of the largest ERP platforms in Egypt, **(2)** architecture expandable into ANY target industry through stable reusable Shared Core, governed Extensions, conditional Domain Modules, Integrations and Industry Solutions without per-client forks, **(3)** capability to serve micro/small/SME/very large Enterprise with minimum valid installed Apps **AND** physically scalable, evidence-driven tenant isolation/SQL/processing/recovery. **Do not infer unlimited operations from Module composition.** This is the primary project definition and is linked at the top of START-HERE, docs README, Product Vision, Architecture and Cursor plan. [Charter](PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) · [ADR-029](../05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md) · [Fitness Gates](../02-architecture/UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md). Phase 0/no code/SQL/production changes. V1 Salon Cut Salon; Clinic second, future sectors require actual productization.

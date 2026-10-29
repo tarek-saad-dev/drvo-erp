@@ -370,3 +370,10 @@ New DISCUSSION DRAFTS: [Pricing Strategy](../01-product/SAAS-PRICING-STRATEGY-DI
 **CLOSED:** founder accepted original Plum + Teal + Soft-Neutral DRVO color direction and six principal hex values: `#74536E`, `#553E53`, `#1A7B80`, `#F7F6F8`, `#FFFFFF`, `#27242B`; old green-first proposal superseded. Strongly prefer an Apps/action-first Home instead of oversized Hero, but removing vs shrinking banner remains a mockup-level choice. See [ADR-024](../05-decisions/ADR-024-DRVO-PLUM-TEAL-NEUTRAL-PALETTE.md).
 
 **STILL OPEN:** final logo/font/icon identity, accessible semantic color ramps (focus/hover/disabled/status), visual samples for 3 primary screens, final RTL layout/spacing sizes, Starter/Pricing overlays, and full Design Kit/Figma source. Hybrid subscription model not approved. No coding authorization.
+
+
+## Founder-approved UX North Star — ADR-025 (2026-10-29)
+
+**RESOLVED philosophy:** Odoo-grade ERP workflow power with Duolingo-inspired clarity, friendliness, progressive disclosure, high craft and restrained user feedback, retaining DRVO original brand (ADR-024) and Hybrid per Module shell (ADR-023). No copying proprietary assets, no infantilizing accounting, no fake financial/offline states. New docs: [ADR-025](../05-decisions/ADR-025-ERP-PROFESSIONALISM-EVERYDAY-SIMPLICITY.md), [Playbook](../02-architecture/DRVO-UX-NORTH-STAR-PLAYBOOK.md), [3-Screen Review](../02-architecture/DRVO-UX-THREE-SCREEN-VISUAL-REVIEW.md).
+
+**OPEN detailed UX:** review new App Launcher/Accounting/POS visual directions, Home hero absent vs reduced, final navigation/map, typography/icon family, context coaching and motion variants, exact row density, save/post/offline states, keyboard and responsive sign-offs. Founder approved direction, not all screen pixels or a Figma/react implementation.

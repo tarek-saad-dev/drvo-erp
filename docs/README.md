@@ -78,3 +78,12 @@
 - [ADR-025 — ERP Professionalism × Everyday Simplicity](05-decisions/ADR-025-ERP-PROFESSIONALISM-EVERYDAY-SIMPLICITY.md) — accepted product UX philosophy: Odoo structure, Duolingo clarity, DRVO identity.
 - [DRVO UX North Star Playbook](02-architecture/DRVO-UX-NORTH-STAR-PLAYBOOK.md) — guidelines for guidance, density, feedback, financial truth and module reusability.
 - [App Launcher + Accounting + POS Three-Screen Visual Review](02-architecture/DRVO-UX-THREE-SCREEN-VISUAL-REVIEW.md) — design exploration, **not** final screens or code.
+
+
+## Founder-approved Business theming + industry illustration experience — 2026-10-29
+
+- [ADR-026 — Per-Business Theme, safe palette and centralized selectable/uploadable fonts](05-decisions/ADR-026-BUSINESS-THEMES-AND-CENTRAL-TYPOGRAPHY.md) — architectural direction accepted; implementation details pending.
+- [Business Theme Engine & Font Assets Blueprint](02-architecture/BUSINESS-THEME-ENGINE-AND-FONT-ASSETS-BLUEPRINT.md) — draft technical contract, license/security/preview and fallback policy.
+- [ADR-027 — Original profession Character Family, Scene Registry and purposeful Motion](05-decisions/ADR-027-INDUSTRY-CHARACTERS-SCENES-AND-MOTION.md) — design direction accepted; asset packs/motion not yet produced.
+- [Character, Illustration & Motion Blueprint](02-architecture/CHARACTER-ILLUSTRATION-MOTION-BLUEPRINT.md) — draft industry packs and optional flip/scene transition.
+- [Visual Review](02-architecture/DRVO-UX-THREE-SCREEN-VISUAL-REVIEW.md) — previous screen **layouts explicitly rejected** by founder; do not implement them as-is.

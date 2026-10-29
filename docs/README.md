@@ -87,3 +87,9 @@
 - [ADR-027 — Original profession Character Family, Scene Registry and purposeful Motion](05-decisions/ADR-027-INDUSTRY-CHARACTERS-SCENES-AND-MOTION.md) — design direction accepted; asset packs/motion not yet produced.
 - [Character, Illustration & Motion Blueprint](02-architecture/CHARACTER-ILLUSTRATION-MOTION-BLUEPRINT.md) — draft industry packs and optional flip/scene transition.
 - [Visual Review](02-architecture/DRVO-UX-THREE-SCREEN-VISUAL-REVIEW.md) — previous screen **layouts explicitly rejected** by founder; do not implement them as-is.
+
+
+## First DRVO Character art direction selected — 2026-10-29
+
+- [ADR-028 — Soft 2.5D characters + Miniature 3D-inspired industry scenes](05-decisions/ADR-028-SOFT-2_5D-CHARACTERS-MINIATURE-3D-SCENES.md) — selected visual direction, no final art approved.
+- [Art Direction Concept Pack 01 — Barber, Salon Storefront, Property House & Flip Storyboard](02-architecture/DRVO-ART-DIRECTION-FIRST-CONCEPT-PACK.md) — design handoff draft. Earlier UI layouts are still rejected.

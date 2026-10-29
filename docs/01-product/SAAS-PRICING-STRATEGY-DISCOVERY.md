@@ -90,3 +90,8 @@ Never equate a draft invoice, offered payment method or manual payment claim to 
 5. Payment/renewal/proration/suspension/refund controls and activation permission roles.
 
 **No prices finalized; no code, database changes or deployment authorized.**
+
+
+## Follow-up Hybrid study — 2026-10-29
+
+Reviewed Odoo official Pricing (as external comparative context only), and modelled how Business-plan/Branch-capacity/active-seat allowance/premium industry modules/WhatsApp-AI usage would affect different customer profiles without inventing DRVO price points. [Hybrid Pricing Model Analysis](HYBRID-PRICING-MODEL-ANALYSIS.md) is a DRAFT; founder has not yet selected the billing unit, actual EGP/Gulf prices, inclusions, trial or renewal policy. Keep ADR-021 editable Starter and ADR-016 explicit all-Required cost disclosure.

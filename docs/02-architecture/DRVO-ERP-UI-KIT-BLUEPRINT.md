@@ -98,7 +98,7 @@ Module owns domain schema/API and permitted actions; generic view merely renders
 
 ## 11. Unresolved decisions
 - Exact DRVO brand palette/icon direction, dense Odoo-like layout vs more relaxed landing; light/dark and theme scope.
-- Universal topbar + per-app navigation shape; persistent left sidebar vs contextual menus in Arabic RTL.
+- **RESOLVED ADR-023:** one Global Shell with controlled Hybrid Navigation per Module (Sidebar/Tabs/Workspace). **Still open:** exact per-Module pattern, physical RTL placements, responsive behavior and visual prototypes.
 - The first launch V1 app tiles, permissions and screen hierarchy.
 - Design tool (Figma vs Canva or another), component delivery method and source ownership.
 - Saved views/filter/user customization depth in V1; the View Engine implementation scope.
@@ -111,3 +111,8 @@ Module owns domain schema/API and permitted actions; generic view merely renders
 ## Founder choice — 2026-10-29 (ADR-022)
 
 **APPROVED DIRECTION:** Odoo-familiar app launcher, reusable ERP views and keyboard/workflow interaction patterns; **original DRVO** brand, simpler default surfaces and Arabic-first usability. It is not a copyright or source-code cloning decision. [ADR-022](../05-decisions/ADR-022-ODOO-FAMILIARITY-ORIGINAL-DRVO-UI.md) is authoritative for intent. Detailed DRAFTS: [App Shell](DRVO-APP-SHELL-UX-SPEC.md), [Design Tokens & Components](DRVO-DESIGN-TOKENS-AND-COMPONENTS.md), [View & Screen Patterns](DRVO-VIEW-AND-SCREEN-PATTERNS.md). Exact colors/measurements and layouts remain awaiting founder visual sign-off; none are coded or available as editable Figma kit.
+
+
+## Founder-selected Hybrid App Navigation — ADR-023 (2026-10-29)
+
+The direction is accepted: unified DRVO global context and original design system, with Module-specific Sidebar, shallow Tabs or full-canvas Workspace based on workload. The Sidebar is NOT forced for every App. Detailed **draft** candidate measurements, App Launcher scope, RTL/LTR, List/Form interactions and accessibility are at [Hybrid Navigation](DRVO-HYBRID-NAVIGATION-RTL-APP-LAUNCHER.md) and [List/Form Detailed](DRVO-LIST-FORM-UX-DETAILED.md). Exact dimensions, colors, per-App mapping and Figma/React implementation are still not approved. [ADR-023](../05-decisions/ADR-023-HYBRID-NAVIGATION-BY-MODULE.md).

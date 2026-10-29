@@ -333,10 +333,3 @@ Pending founder review: exact V1 app tiles/capability grouping; contract between
 **APPROVED ADR-020:** each Business may start with its industry-appropriate minimum valid Module bundle and add compatible Modules later; no required automatic install of every SaaS Module, but compulsory financial/security/dependency behavior remains. **Salon V1 has NO standalone Service Execution Module.** Existing sale/booking/service executor attribution/HR commission/inventory recipe functionality is not cut; it remains with shared Module owners/Salon Extensions. Old 'should Salon V1 include a separate Service Execution Module?' question is resolved. [ADR-020](../05-decisions/ADR-020-INCREMENTAL-BUSINESS-MODULES-AND-SALON-V1.md); [progressive business design](../02-architecture/INCREMENTAL-BUSINESS-MODULE-GROWTH.md).
 
 **STILL OPEN:** exact mandatory starter bundle per industry and workflow, app-vs-internal dependency boundaries, salon queue ownership, future multi-step Service Execution trigger (if ever), entitlement/pricing, activation state machine and extension compatibility, event and financial transaction contract. No implementation permission.
-
-
-## Progressive Business Modules and Salon execution decision — 2026-10-29
-
-**RESOLVED ADR-020:** each Business starts with minimum valid industry/workflow essentials and adds compatible Modules later, preserving data and respecting Required dependencies, auth and financial integrity. **Salon V1 does NOT ship a standalone Service Execution Module**; Booking, POS, HR commissions/targets, Inventory recipes and Salon Extensions still support the approved service flows. This is not a cut of the comprehensive Salon platform launch requirements. [ADR-020](../05-decisions/ADR-020-INCREMENTAL-BUSINESS-MODULES-AND-SALON-V1.md).
-
-**OPEN:** exact minimum bundles/mandatory financial app prerequisites, future execution workflow requirements (only if later requested), queue ownership, activation approvals/pricing/compatibility and cross-module accounting consistency contracts. [Incremental Growth](../02-architecture/INCREMENTAL-BUSINESS-MODULE-GROWTH.md).

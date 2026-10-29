@@ -260,3 +260,8 @@ Founder selected **SQL Server**. Proposed Next.js frontend, dedicated NestJS mod
 ## Final architecture round — 2026-10-29
 
 APPROVED: Required/Optional module dependencies with conflict checks (ADR-007), opener commission precedence defined in Commission Plan (ADR-008), SQL Server on VPS + POS PWA with IndexedDB local queue as initial choice (ADR-009). Not approved: offline credit handling, electronic tender verification/settlement, negative stock costing, late offline sale posting after month close. These four remain blockers for the relevant financial code. No implementation authorized. [Cursor preimplementation plan](CURSOR-PREIMPLEMENTATION-PLAN.md).
+
+
+## Final four financial founder answers — 2026-10-29
+
+Resolved at product-intent level: offline credit recorded immediately with post-sync over-limit review ([ADR-010](../05-decisions/ADR-010-OFFLINE-CREDIT.md)); customer payment evidence recorded and discrepancies reviewed without pretending proof is settlement ([ADR-011](../05-decisions/ADR-011-OFFLINE-ELECTRONIC-PAYMENT-EVIDENCE.md)); provisional last known cost for negative stock plus later adjustment ([ADR-012](../05-decisions/ADR-012-NEGATIVE-STOCK-COSTING.md)); preserve original sale date and post to open accounting period with documented adjustment ([ADR-013](../05-decisions/ADR-013-LATE-OFFLINE-POSTING-CLOSED-PERIOD.md)). Supersedes earlier unanswered B1-B4 entries above. Remaining implementation-critical details: excess-credit follow-up policy, unverified/failed electronic tender financial outcome, first-ever unknown cost, statutory tax treatment for late sales, offline security/SQL Server hosting/driver.

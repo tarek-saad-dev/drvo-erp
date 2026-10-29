@@ -327,3 +327,11 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - New Art Direction Concept Pack 01 documents Barber Character, Salon Storefront, Real Estate House and optional scene.flip storyboard with reduced motion/static fallbacks and identity/theme independence.
 - Visual explorations shared in conversation are concept art boards, **not** approved final illustration assets or editable Figma/GitHub product files. All previously rejected ERP screen element layouts remain rejected.
 - ADR index, ADR-027 character guidelines, Character & Motion Blueprint, UX review, docs index, Current State, Open Questions and Cursor plan synced. No code/SQL or deployment.
+
+
+## 2026-10-30 — Founder sets the non-negotiable DRVO ERP Three-Pillar Architecture Mission (ADR-029)
+
+- Founder intent made the **highest project-level architecture rule**, not an optional vision footnote: build an Egypt-scale ERP platform, extensible into any target industry without separate code forks and operable across micro-to-very large customers by functional Module composition PLUS separately verified infrastructure/capacity scalability.
+- Added top-level [Founder Architecture Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md), accepted [ADR-029](../05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md), and detailed design [Universal ERP Fitness Gates](../02-architecture/UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md).
+- Linked as **mandatory first reading** in START-HERE and README; embedded into Product Vision, Architecture, Industry Solutions, SaaS Scale Catalog, Modules, Industry Onboarding, Incremental Growth, Cursor Pre-code Gate, Change Protocol, Current State and Open Questions.
+- Explicitly reject equivalence of extra Modules with higher SQL/operational throughput and unsupported claims about universal/enterprise readiness. Existing V1 Modular Monolith and shared SQL Server unchanged; future placement and capacity changes only on evidence. No coding, SQL migration, test, server or production changes.

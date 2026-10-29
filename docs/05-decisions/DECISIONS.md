@@ -22,6 +22,7 @@ Accepted directions are **not implemented features**.
 | ADR-016 | Required dependencies shown/priced and approved as one activation bundle | Accepted | [ADR-016](ADR-016-BUNDLED-REQUIRED-DEPENDENCIES.md) |
 | ADR-017 | Shared Core + Domain Modules + Industry Solutions | Accepted direction | [ADR-017](ADR-017-SHARED-CORE-INDUSTRY-SOLUTIONS.md) |
 | ADR-018 | Repeatable industry expansion + growth-ready SaaS direction | Accepted strategic direction | [ADR-018](ADR-018-INDUSTRY-EXPANSION-AND-SCALE-STRATEGY.md) |
+| ADR-019 | Conditional Extension vs independent Domain Module boundaries | Accepted | [ADR-019](ADR-019-CONDITIONAL-DOMAIN-MODULE-BOUNDARY.md) |
 
 **Product launch and pilot decisions** are recorded in [Product Discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md) and [Roadmap](../04-execution/ROADMAP.md).
 

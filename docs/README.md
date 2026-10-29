@@ -1,17 +1,21 @@
 # DRVO ERP documentation index
 
+> **FOUNDATIONAL FOUNDER MISSION — READ BEFORE ALL OTHER DOCS:** [DRVO ERP Architecture Charter: Egypt-scale platform × Any Industry × Micro-to-Enterprise](00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md). Enforced by [ADR-029](05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md) and [Universal ERP Architecture Fitness Gates](02-architecture/UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md). All architecture/module decisions must assess all three pillars. This is a strategic mission, not current verified enterprise capacity.
+
+
 ## Required reading for a new developer or AI agent
 
-1. [Start here](00-start-here/START-HERE.md)
-2. [Current state](00-start-here/CURRENT-STATE.md)
-3. [Product vision](01-product/VISION.md)
-4. [Architecture](02-architecture/ARCHITECTURE.md)
-5. [Module catalog](03-modules/MODULES.md)
-6. [Roadmap](04-execution/ROADMAP.md)
-7. [Decision register](05-decisions/DECISIONS.md)
-8. [Open questions](04-execution/OPEN-QUESTIONS.md)
-9. [Change protocol](04-execution/CHANGE-PROTOCOL.md)
-10. [Changelog](04-execution/CHANGELOG.md)
+1. **[Founder Architecture Charter — mandatory first](00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md)**
+2. [Start here](00-start-here/START-HERE.md)
+3. [Current state](00-start-here/CURRENT-STATE.md)
+4. [Product vision](01-product/VISION.md)
+5. [Architecture](02-architecture/ARCHITECTURE.md)
+6. [Module catalog](03-modules/MODULES.md)
+7. [Roadmap](04-execution/ROADMAP.md)
+8. [Decision register](05-decisions/DECISIONS.md)
+9. [Open questions](04-execution/OPEN-QUESTIONS.md)
+10. [Change protocol](04-execution/CHANGE-PROTOCOL.md)
+11. [Changelog](04-execution/CHANGELOG.md)
 
 ## Multi-industry architecture (approved direction)
 
@@ -93,3 +97,8 @@
 
 - [ADR-028 — Soft 2.5D characters + Miniature 3D-inspired industry scenes](05-decisions/ADR-028-SOFT-2_5D-CHARACTERS-MINIATURE-3D-SCENES.md) — selected visual direction, no final art approved.
 - [Art Direction Concept Pack 01 — Barber, Salon Storefront, Property House & Flip Storyboard](02-architecture/DRVO-ART-DIRECTION-FIRST-CONCEPT-PACK.md) — design handoff draft. Earlier UI layouts are still rejected.
+
+
+## Strategic architecture guardrail — founder mandate 2026-10-30
+
+[ADR-029](05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md) makes the 3 pillars enforceable: Egypt-scale product foundation, expansion into **new industries through Core/Extensions/Domain Modules/Industry Solutions**, and progressive functional **plus independent operational/infrastructure scalability** from micro Business to enterprise. [Project Charter](00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) and [Fitness Gates](02-architecture/UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md) are mandatory for all new engineering choices; no unsupported “unlimited sectors / users” claims.

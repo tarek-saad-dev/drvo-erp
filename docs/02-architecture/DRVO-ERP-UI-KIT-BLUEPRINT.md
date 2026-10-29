@@ -97,7 +97,7 @@ Module owns domain schema/API and permitted actions; generic view merely renders
 - Future sector adds domain-specific widgets only where generic views are insufficient; it must consume shared tokens/primitives/navigation and permission contracts.
 
 ## 11. Unresolved decisions
-- Exact DRVO brand palette/icon direction, dense Odoo-like layout vs more relaxed landing; light/dark and theme scope.
+- **Color direction resolved ADR-024:** Plum/Teal/Soft-Neutral palette and six core hex values. Still open: final icons, typography, layout density, light/dark and full screen treatments.
 - **RESOLVED ADR-023:** one Global Shell with controlled Hybrid Navigation per Module (Sidebar/Tabs/Workspace). **Still open:** exact per-Module pattern, physical RTL placements, responsive behavior and visual prototypes.
 - The first launch V1 app tiles, permissions and screen hierarchy.
 - Design tool (Figma vs Canva or another), component delivery method and source ownership.
@@ -116,3 +116,8 @@ Module owns domain schema/API and permitted actions; generic view merely renders
 ## Founder-selected Hybrid App Navigation — ADR-023 (2026-10-29)
 
 The direction is accepted: unified DRVO global context and original design system, with Module-specific Sidebar, shallow Tabs or full-canvas Workspace based on workload. The Sidebar is NOT forced for every App. Detailed **draft** candidate measurements, App Launcher scope, RTL/LTR, List/Form interactions and accessibility are at [Hybrid Navigation](DRVO-HYBRID-NAVIGATION-RTL-APP-LAUNCHER.md) and [List/Form Detailed](DRVO-LIST-FORM-UX-DETAILED.md). Exact dimensions, colors, per-App mapping and Figma/React implementation are still not approved. [ADR-023](../05-decisions/ADR-023-HYBRID-NAVIGATION-BY-MODULE.md).
+
+
+## Approved DRVO palette — ADR-024 (2026-10-29)
+
+Founder approved **Plum + Teal + Soft Neutrals** as original DRVO identity influenced by Odoo ERP usability, without copied brand/assets. Primary Plum `#74536E`, Deep Plum `#553E53`, Action Teal `#1A7B80`, Page Canvas `#F7F6F8`, white panels `#FFFFFF`, Main Text `#27242B`. Replace earlier unapproved green-first swatches. In customer ERP, Plum communicates app/navigation context, Teal highlights primary actions, neutrals dominate List/Form/POS, and semantic financial/sync statuses remain distinct. Avoid oversized decorative Home Hero that pushes Apps/KPIs below first viewport; exact reduced/no-Hero treatment still open. This overrides historical references above saying 'exact colors unapproved' **only for the six accepted primary hex values**; exact font, semantic/interaction ramps, contrast of all components and page-level layout still require design review. [ADR-024](../05-decisions/ADR-024-DRVO-PLUM-TEAL-NEUTRAL-PALETTE.md), [Tokens](DRVO-DESIGN-TOKENS-AND-COMPONENTS.md).

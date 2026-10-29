@@ -261,3 +261,10 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - V1 remains Salon/Cut Salon, Clinic second, ONE SQL Server database. Future multi-pool or dedicated deployments are options, not current scope or performance guarantee.
 - New canonical docs: Industry Solutions Architecture, New Industry Onboarding Playbook, SaaS Scale Catalog & Control Center; updates to docs index, ADR register, vision, architecture, module catalog/registry/lifecycle, UX, roadmap, Cursor pre-code plan and state/open questions.
 - **Documentation changes only. No app code, DB migrations, tests, deployment, server changes or sign-off to start programming.**
+
+
+## 2026-10-29 — Founder accepted conditional Core/Extension/Domain Module boundaries
+
+- ADR-019 Option B accepted: separate Domain Modules only where lifecycle/ownership/privacy/financial invariants justify them; use bounded Extensions for variation of truly shared business logic; no compulsory industry mega-app.
+- Added draft per-capability classification matrix for Salon V1 plus Clinic and Manufacturing stress tests, documenting Salon Service Execution as candidate, not mandatory; Clinic Clinical Records and Manufacturing/MRP separate-domain candidates only.
+- Linked the decision into architecture, module registry/lifecycle, docs index, Cursor plan, current state, open questions and ADR register. **Documentation only; no app code, DB migration, tests or production actions.**

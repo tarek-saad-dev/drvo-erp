@@ -23,6 +23,7 @@ Accepted directions are **not implemented features**.
 | ADR-017 | Shared Core + Domain Modules + Industry Solutions | Accepted direction | [ADR-017](ADR-017-SHARED-CORE-INDUSTRY-SOLUTIONS.md) |
 | ADR-018 | Repeatable industry expansion + growth-ready SaaS direction | Accepted strategic direction | [ADR-018](ADR-018-INDUSTRY-EXPANSION-AND-SCALE-STRATEGY.md) |
 | ADR-019 | Conditional Extension vs independent Domain Module boundaries | Accepted | [ADR-019](ADR-019-CONDITIONAL-DOMAIN-MODULE-BOUNDARY.md) |
+| ADR-020 | Start Business with essentials, expand Modules later; no standalone Salon Service Execution V1 | Accepted | [ADR-020](ADR-020-INCREMENTAL-BUSINESS-MODULES-AND-SALON-V1.md) |
 
 **Product launch and pilot decisions** are recorded in [Product Discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md) and [Roadmap](../04-execution/ROADMAP.md).
 

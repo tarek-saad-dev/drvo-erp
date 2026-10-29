@@ -31,3 +31,9 @@
 - Avoid credentials, secrets, customer data, and production dumps in docs.
 - Use relative links. Prefer one canonical document per topic.
 - Document uncertainty instead of inventing a decision.
+
+
+## Progressive per-Business module strategy (founder-approved)
+
+- [ADR-020 — Start each Business with essentials; no Salon Service Execution Module in V1](05-decisions/ADR-020-INCREMENTAL-BUSINESS-MODULES-AND-SALON-V1.md)
+- [Incremental Business Module Growth — architecture design](02-architecture/INCREMENTAL-BUSINESS-MODULE-GROWTH.md)

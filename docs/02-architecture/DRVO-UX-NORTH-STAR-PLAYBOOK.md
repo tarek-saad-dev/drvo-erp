@@ -73,3 +73,8 @@ Use [Visual Review Brief](DRVO-UX-THREE-SCREEN-VISUAL-REVIEW.md) to compare the 
 Official research: Odoo 19 front-end and views; Duolingo design blog and operating principles, linked in [ADR-025](../05-decisions/ADR-025-ERP-PROFESSIONALISM-EVERYDAY-SIMPLICITY.md). This is a strategic synthesis for DRVO, not a claim both products use the exact same UX architecture or that Duolingo's SDUI is approved to implement.
 
 **No code, design source files, DB migrations or deployment authorized.**
+
+
+## Founder-approved visual story and customer branding — ADR-026/027 (2026-10-29)
+
+The prior mockup page **layouts are not approved**. Take forward original industry-relevant **Character Families**, illustrated environment scenes (house/storefront/clinic/factory) and optional delightful, low-cost flip transitions during guided setup/industry selection. Daily finance/stock/counting screens still prioritize task, accuracy, states and density; graphic style remains professional, accessible and optional. The **DRVO default Plum/Teal** palette (ADR-024) is overridden only by an authenticated Business's validated brand color/font profile; fonts come from central Typography System, including licensed custom uploads when safely supported, and never hardcoded per Module. [ADR-026](../05-decisions/ADR-026-BUSINESS-THEMES-AND-CENTRAL-TYPOGRAPHY.md) · [ADR-027](../05-decisions/ADR-027-INDUSTRY-CHARACTERS-SCENES-AND-MOTION.md).

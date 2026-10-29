@@ -27,6 +27,8 @@ Accepted directions are **not implemented features**.
 
 | ADR-021 | Recommended customizable Industry Starter with Required dependencies | Accepted | [ADR-021](ADR-021-CUSTOMIZABLE-RECOMMENDED-INDUSTRY-STARTER.md) |
 
+| ADR-022 | Odoo-familiar ERP patterns with simpler original DRVO UX | Accepted direction | [ADR-022](ADR-022-ODOO-FAMILIARITY-ORIGINAL-DRVO-UI.md) |
+
 **Product launch and pilot decisions** are recorded in [Product Discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md) and [Roadmap](../04-execution/ROADMAP.md).
 
 When superseding decisions, preserve the original and cross-link replacements.

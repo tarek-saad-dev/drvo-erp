@@ -116,3 +116,8 @@ Founder chose one Shell with per-Module controlled Sidebar, shallow Tabs, or Foc
 ## Color palette approved — ADR-024 (2026-10-29)
 
 The earlier green-first candidate was superseded. Adopt **Plum + Teal + Soft Neutrals** with `#74536E` Primary Plum, `#553E53` Deep Plum, `#1A7B80` Action Teal, `#F7F6F8` Page, `#FFFFFF` Panel, `#27242B` Text. Use Plum in navigation and App identity, Teal for actions, neutrals for transactional content. Use separate text+icon semantic statuses; an action-colored button does not certify a payment/ledger success. Keep the first viewport focused on actionable apps/data instead of a dominant decorative Hero. Full details: [ADR-024](../05-decisions/ADR-024-DRVO-PLUM-TEAL-NEUTRAL-PALETTE.md). No component library code has been built.
+
+
+## ADR-025 component personality — calm, helpful, precise (2026-10-29)
+
+**Approved principle:** genuine friendly feedback and clear primary actions; not colorful childish gamification. Distinguish `UserActionAcknowledged` / `DraftSaved` from server-verified `Posted`, `Paid`, `Synced`, `Reconciled`. Design short purposeful motion and tactile affordances for selection/cart, optional guidance in onboarding, readable error recovery and skeletons; no confetti on payment/posting. Keep high-density finance table variants and accessibility/RTL in same kit. See [UX North Star](DRVO-UX-NORTH-STAR-PLAYBOOK.md). Exact durations/components and typography remain draft.

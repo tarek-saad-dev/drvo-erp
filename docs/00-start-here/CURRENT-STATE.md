@@ -165,3 +165,8 @@ Created [Infrastructure + Offline Pre-Code Checklist](../04-execution/INFRASTRUC
 ## Windows POS browser decision — 2026-10-29
 
 Founder chose Windows Browser as initial POS target. Created [Windows Offline Test Plan](../04-execution/WINDOWS-POS-OFFLINE-TEST-PLAN.md) for IndexedDB queue and PWA cases (20 test scenarios); no testing conducted, no code authorized.
+
+
+## VPS read-only audit access — 2026-10-29
+
+Prepared [VPS Read-only Audit Runbook](../04-execution/VPS-READONLY-AUDIT-RUNBOOK.md). GitHub access exists, but direct SSH/VPS execution is unavailable here; no VPS/SQL Server inspection or Windows/IndexedDB tests have been performed. Founder code restriction remains active.

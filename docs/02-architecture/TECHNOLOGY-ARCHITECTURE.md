@@ -47,3 +47,11 @@ No target CPU/memory/cost or SLA claim until profiling.
 
 ## Gate to implementation
 Product decisions B1 offline credit policy, B2 pending electronic tender outcome, B3 supported valuation/cost adjustment, B4 late closed-period posting/tax, B5 module activation dependencies, B6 commission precedence. Technical decisions T1 MSSQL edition/hosting & recovery, T2 ORM/data access/migration driver, T3 offline device storage and security, T4 tax/currency strategy. Architecture is a baseline recommendation, not implementation authorization.
+
+
+## Founder final-round update (2026-10-29)
+
+- SQL Server hosted on VPS + POS PWA with IndexedDB local queue **approved initial direction** (ADR-009).
+- Required/Optional Module Dependencies with conflict prevention **approved** (ADR-007); supersedes earlier undecided note above.
+- Commission Plan-configurable opener precedence **approved** (ADR-008).
+- Offline credit, electronic tender confirmation, negative stock valuation, and after-month-close offline posting remain explicitly undecided. No app code to be written until gates are resolved and authorized.

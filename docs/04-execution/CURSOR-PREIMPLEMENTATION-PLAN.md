@@ -1,0 +1,36 @@
+# Cursor Implementation Plan — Pre-code Gate
+Date: 2026-10-29. Status: planning only; **DO NOT WRITE APP CODE until critical blockers resolved and founder authorizes development**.
+
+## Recorded latest decisions
+Approved: Required/Optional module dependencies with conflict checks (ADR-007), Commission Plan controls opener rule precedence (ADR-008), SQL Server VPS + PWA IndexedDB per-device offline queue initial architecture (ADR-009). Existing: all tender methods selectable regardless of connectivity; shift/day provisional then reconciled final. Next.js + NestJS recommended application stack.
+**UNDECIDED:** (1) offline customer credit / global cap, (2) pending electronic tender disposition and provider verification, (3) negative inventory costing, (4) offline sale posting against closed month. None should be silently defaulted by Cursor.
+
+## Business-policy blocking questions / scenarios
+B1 Offline credit: two independently disconnected tills sell to one customer with credit limit 1000, each trying 800 — whether provisional posting, reserved caps, or later review? UI may select Credit, but unconfirmed debt must not bypass approved hard limit.
+B2 Electronic payment: POS selects wallet/transfer/card offline without verifiable authorization — invoice can be draft/pending/posted with what receivable status? Failure after sync? Never assert provider PAID without evidence.
+B3 Stock cost: product on-hand zero, two offline sales at negative quantity, later purchase at higher price — what interim COGS and correction entries? Selecting method at Business level alone does not settle cost algorithm.
+B4 Late month: sale occurred Oct 31 and syncs Nov 3 after October payroll, tax and GL closed — record original occurredAt and choose posting period/adjustment and audit approach.
+
+## Technical pre-code checks (owner/developer review)
+- SQL Server version/edition, VPS RAM/storage/backup recovery, separate DB access and migration policy.
+- PWA browser/devices, IndexedDB persistence and secure offline auth time limit, data loss drill; no forced local backup promise.
+- ORM/migration SQL Server support and schema constraint strategy.
+- Multi-tenant scopes / compound FKs / optional RLS proof of concept, API authorization matrix.
+- Data retention/privacy, target countries and configurable tax basics.
+- Commission Plan conflict resolution/rounding; Module manifests and activation permission billing decisions.
+
+## Cursor work packages AFTER gates and explicit go-ahead
+0. Add repository structure and ADR-based acceptance test checklist, no feature implementation without approval.
+1. Next.js UI shell, NestJS service, SQL Server schema migrations and test container/database; authenticated Tenant/Business/Branch context and RBAC isolation tests.
+2. Core immutable financial entities, journals/receivables, tender select/verify, outbox/inbox idempotency.
+3. POS catalog/cart/drafts, invoices/refunds and cashier shifts, cash counts and provisional day closing.
+4. Inventory/Purchasing and salon service Recipe; refund stock handling, negative-stock review.
+5. HR Commission Plan/employee ledger/payroll; targets and opener rewards.
+6. PWA IndexedDB offline queue, local auth, sync failure/replay, loss incident and reconciliation.
+7. End-to-end test, staged pilot, documented rollback and backups.
+
+## Mandatory test acceptance
+20 duplicate offline submissions => one posted invoice, stock movement, journal, commission; cross-Tenant requests denied; pending provider tenders never settled; credit limit safe across concurrent devices; negative stock flagged and valued consistently; late close reconciliation audited; salary deduction separate from approved cash shortage; accounting debits=credits.
+
+## File status
+All designs are proposals, not runtime code, not production migrations. Unresolved B1-B4 forbid work on their dependent monetary flows until policy approval. Founder explicitly asked not to begin coding while critical requirements remain.

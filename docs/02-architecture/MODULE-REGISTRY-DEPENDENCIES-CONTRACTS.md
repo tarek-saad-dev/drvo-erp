@@ -132,8 +132,3 @@ An Industry Solution manifest does **not** require an always-present industry-sp
 ## Founder-approved progressive Business activation — ADR-020 (2026-10-29)
 
 Industry Solution is an **initial compatible starter bundle**, not a frozen installation: any Business can begin with its essential valid Modules and later add more compatible Modules or Extensions when released, with versioned registry contracts, Business-scoped entitlements, audit, and explicit ADR-016 Required-dependency/cost approval. Do not pretend every application is optional where financial/permission correctness needs it; exact starter manifests remain pending. Salon V1 specifically must **not** require or install a standalone Service Execution Module. See [incremental Business module plan](INCREMENTAL-BUSINESS-MODULE-GROWTH.md) and [ADR-020](../05-decisions/ADR-020-INCREMENTAL-BUSINESS-MODULES-AND-SALON-V1.md).
-
-
-## Founder-approved progressive activation — ADR-020 (2026-10-29)
-
-Each Business can start with a minimum valid industry/workflow-specific set and later enable compatible released Modules and Extensions, checking all Required dependencies, entitlements, compatibility, permissions, cost preview and explicit bundled approval (ADR-016). Module selection does NOT require installing all SaaS modules, but necessary accounting/security invariants may be required for selected operations. Salon V1 **does not require a standalone Service Execution Module**. Preserve historic data; separate global platform release/schema migration from per-Business activation. See [ADR-020](../05-decisions/ADR-020-INCREMENTAL-BUSINESS-MODULES-AND-SALON-V1.md) and [Incremental Business Growth](INCREMENTAL-BUSINESS-MODULE-GROWTH.md).

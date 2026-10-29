@@ -45,3 +45,12 @@ The system measurably improves client businesses' operations. Specific three-mon
 - GitHub documentation is the source of truth.
 
 See [Section 1 discovery](DISCOVERY-01-FOLLOWUPS.md), [roadmap](../04-execution/ROADMAP.md), [decision log](../05-decisions/DECISIONS.md) and [open questions](../04-execution/OPEN-QUESTIONS.md).
+
+
+## Founder-approved multi-industry product line — 2026-10-29
+
+DRVO ERP is intended as a **multi-industry SaaS product platform**, not a separate clone of Salon, Clinic, Education, Real Estate and Manufacturing systems. Shared stable business capabilities (e.g., invoices, booking, cash/treasury, accounting, reporting) are reused; scoped Industry Extensions alter compatible workflows; genuinely distinct domains (clinical records, courses/enrollment, property/deals, MRP/manufacturing) become owned Modules with their own Core + Extension contract. A reusable **Industry Solution** composes released Modules, extensions, defaults and onboarding into a specialized customer product. This is accepted product direction [ADR-017](../05-decisions/ADR-017-SHARED-CORE-INDUSTRY-SOLUTIONS.md).
+
+New industries follow Discovery → Fit-Gap → Domain Design → Module/Integration Design → UX → Engineering/QA → Cutover → Productization, so later similar customers can start from a versioned Solution instead of a custom fork [ADR-018](../05-decisions/ADR-018-INDUSTRY-EXPANSION-AND-SCALE-STRATEGY.md). Industry Solution selection may precede app activation, but each visible app remains independently navigable (ADR-015) and required paid dependencies remain explicitly bundled/priced/approved (ADR-016).
+
+**Ambition vs capability:** extendibility is a long-term design goal; readiness for every industry, customer size, country, compliance regime or performance tier is NOT an existing feature or a guarantee. Salon V1 remains first; Clinics second. Manufacturing, education and real estate are hypothetical future industry examples and are not launch commitments.

@@ -28,3 +28,8 @@ Approve 5 high-fidelity **original DRVO** design screens: Business App Home, Mod
 Founder accepted Industry Solution selection as customer entry point: searchable/filterable sector catalog (e.g., Beauty & Services, Healthcare, Education, Real Estate, Manufacturing, Trade & Distribution). Selecting a sector chooses a compatible starter composition; required apps/costs still require explicit approval (ADR-016). An unsupported sector should offer a transparent request/discovery path rather than false availability. **Industry Solution is not one giant app**: once Business is entered, show only activated/authorized independent app tiles (ADR-015); owner may switch among Businesses of different industries.
 
 A future **DRVO Platform Control Center** is distinct from any customer's ERP UI and is intended for solutions, registry versions/extensions, tenants, plans, rollout and health/capacity. Avoid a flat grid of 100 industries inside customer app home. UI specifics, access and screens remain drafts. See [SaaS Catalog and Control Center](SAAS-SCALE-CATALOG-AND-CONTROL-CENTER.md). Original design direction (not Odoo pixel-copy) remains.
+
+
+## Detailed DRVO ERP UI Kit blueprint — 2026-10-29
+
+The earlier sketch is expanded in [DRVO ERP UI Kit Blueprint](DRVO-ERP-UI-KIT-BLUEPRINT.md): layout tokens, app shell, view engine, reusable controls, transaction/offline states, RTL/LTR and source design deliverables. Functional UX can be benchmarked against Odoo 19, but DRVO must own its visual identity and not copy proprietary Enterprise assets/code. New [Pricing Discovery](../01-product/SAAS-PRICING-STRATEGY-DISCOVERY.md) is a DRAFT, **not** a pricing policy or price list. No UI kit code or editable Figma/Canva asset has been created.

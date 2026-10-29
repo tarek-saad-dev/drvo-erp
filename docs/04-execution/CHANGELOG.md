@@ -200,3 +200,12 @@ Added ARCHITECTURE-READINESS-REVIEW.md: reconciled historical rule conflicts, li
 - Approved ADR-007 Module Dependencies, ADR-008 Commission Plan precedence, ADR-009 SQL Server VPS / IndexedDB PWA as initial storage.
 - Created Cursor preimplementation plan and listed four explicitly undecided financial policy blockers.
 - No code, deployment or migration executed.
+
+
+## 2026-10-29 — Four final financial founder decisions
+
+- Added ADR-010 offline credit with post-sync over-limit review (offline exception to previously approved global hard stop).
+- Added ADR-011 customer evidence of electronic payment with later reconciliation (not verified provider payment).
+- Added ADR-012 temporary last known cost for negative stock and correction on later receipt.
+- Added ADR-013 late offline sale dates retained and accounting adjustment in open period.
+- Added implementation readiness gate and updated Cursor plan. No code/deployment; explicit owner authorization still required.

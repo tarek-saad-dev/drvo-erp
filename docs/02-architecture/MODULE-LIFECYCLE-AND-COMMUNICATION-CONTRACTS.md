@@ -91,3 +91,8 @@ Each call/event includes authenticated or service-derived Tenant/Business/Branch
 - Original DRVO app launcher, Apps catalog and activation preview UI (Odoo-inspired, not pixel-perfect copied).
 
 **No code. No SQL migration. No deployment.**
+
+
+## Industry Solution and vertical lifecycle overlay — 2026-10-29
+
+Founder-approved ADR-017/018 require a **Solution release/assignment lifecycle** alongside (but distinct from) Global Module release and Business activation: discover and analyze industry → classify common Core vs Extension vs new Domain Module → design/implement separately after explicit development authorization → validate contracts/security/finance/compatibility → publish versioned Solution manifest referencing released Modules/extensions → select Solution for new Business → preview required bundle and any prices with one approval (ADR-016) → initialize/configure Business scope → show independent apps (ADR-015) → productize and upgrade with version compatibility. Solution selection never executes untrusted code or creates separate SQL schema per customer. See [Industry Solutions Architecture](INDUSTRY-SOLUTIONS-ARCHITECTURE.md) and [New Industry Playbook](../04-execution/NEW-INDUSTRY-ONBOARDING-PLAYBOOK.md). Existing technical contract and state machine proposals still require separate approval.

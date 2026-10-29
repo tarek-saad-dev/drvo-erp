@@ -292,3 +292,12 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - New draft specs: Hybrid Navigation / measurement candidates / App Launcher / RTL-LTR, plus detailed List/Form UX with financial/error/saved-filter and record transition semantics.
 - Synced decision register, App Shell, tokens, View Patterns, UI Kit Blueprint, docs index, Current State, Open Questions and Cursor pre-code plan.
 - All numerical UI measurements/colors/Module assignments remain **proposals** pending founder visual review. No product code, SQL migrations, visual Figma kit or production changes.
+
+
+## 2026-10-29 — Founder approved DRVO Plum + Teal + Soft Neutral color baseline (ADR-024)
+
+- Official palette (replacing green-first DRAFT): Plum `#74536E`, Deep Plum `#553E53`, Action Teal `#1A7B80`, Canvas `#F7F6F8`, white surfaces and Main Text `#27242B`.
+- Defined broad use across App Launcher, Accounting List/Form and Windows POS; no unlicensed Odoo source/assets. Customer Home should favor actionable Apps/KPIs over oversized decorative Hero (exact absence/reduced size still open).
+- Recorded ADR-024, replaced old palette candidate in Tokens, synchronized UI Kit/Hybrid navigation/App Shell, ADR register, docs index, Current State, Open Questions and Cursor preimplementation plan.
+- Contrast ratios for five proposed text-background pairs checked numerically; full design usability/WCAG sign-off not complete.
+- Documentation only; no code, Figma project, migration or Production deployment.

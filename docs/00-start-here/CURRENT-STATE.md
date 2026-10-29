@@ -207,3 +207,8 @@ ADR-016 accepted: apps selected with missing Required dependencies show one bund
 ## Founder-approved progressive Business composition — 2026-10-29
 
 ADR-020: every Business may begin with its own minimum valid set of industry/workflow Modules and add compatible Modules/Extensions later with explicit Required dependency/cost approval, safe versioned contracts and preserved financial history. **No standalone Salon Service Execution Module in V1**. Existing Booking/POS/HR/Inventory Salon-related functionality remains; this is not an unintended reduction of approved comprehensive Salon commercial V1 coverage. [ADR-020](../05-decisions/ADR-020-INCREMENTAL-BUSINESS-MODULES-AND-SALON-V1.md) and [growth design](../02-architecture/INCREMENTAL-BUSINESS-MODULE-GROWTH.md). No coding authorized.
+
+
+## Founder approved recommended, customizable Industry Starters — 2026-10-29
+
+**ADR-021 accepted:** a new Business chooses an Industry Solution and starts with a recommended but editable selection of compatible Modules and Extensions. Recommended/optional apps can be removed unless required by a selected capability. Global Module Registry Required dependency closure plus platform/security/finance integrity always apply; complete prerequisites and any charges get one explicit bundle approval (ADR-016). Industry Solution Registry supplies starter recommendations and config/role templates, **not** authority to override real Module dependencies. This is an onboarding choice, not a reduction to comprehensive Salon V1. [ADR-021](../05-decisions/ADR-021-CUSTOMIZABLE-RECOMMENDED-INDUSTRY-STARTER.md), [design draft](../02-architecture/INDUSTRY-STARTER-AND-ACTIVATION-DESIGN.md). No coding authorized.

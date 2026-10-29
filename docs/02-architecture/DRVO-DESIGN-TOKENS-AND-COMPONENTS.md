@@ -104,3 +104,8 @@ Modules describe page title, icons, nav groups, searchable fields, columns, form
 Actual brand palette and typeface, visual source format/design tool, light/dark, component sizes after usability, topbar/sidebar options, per-country currency and tax display. Do not treat this draft as a finished or accessible-certified Kit.
 
 **No code/library/Figma artifacts produced.**
+
+
+## Hybrid Navigation component variants — ADR-023 (2026-10-29)
+
+Founder chose one Shell with per-Module controlled Sidebar, shallow Tabs, or Focused Workspace navigation. The values in Section 2 (56px Topbar, 240/64px Sidebar, 36/44px table rows, 40px controls) remain **unapproved candidate tokens** to test in RTL/LTR with Arabic text and desktop/phone layouts. Add documented `GlobalTopbar`, `BusinessSwitcher`, `BranchSwitcher`, `AppLauncher`, `SidebarNav`, `ModuleTabs`, `WorkspaceHeader`, `Breadcrumbs`, `ViewToolbar` and `RecordActionBar` to the shared kit; avoid new brand/component variant per industry. [ADR-023](../05-decisions/ADR-023-HYBRID-NAVIGATION-BY-MODULE.md), [Detailed hybrid UX](DRVO-HYBRID-NAVIGATION-RTL-APP-LAUNCHER.md), [List/Form detailed UX](DRVO-LIST-FORM-UX-DETAILED.md). No final pixel approval or code.

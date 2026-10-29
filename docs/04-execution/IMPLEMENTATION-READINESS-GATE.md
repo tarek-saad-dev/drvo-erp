@@ -1,4 +1,7 @@
 # Implementation Readiness — Final Financial Decisions Assessment
+
+> **ADDITIONAL NON-NEGOTIABLE GATE (ADR-029):** Before authorizing platform code, every new architectural implementation must pass founder's [3-Pillar Architecture Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) and [Universal ERP Fitness Gates](../02-architecture/UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md). This adds multi-industry reuse, small Business minimum valid starter, enterprise-specific workload/isolation/evolution path to existing money/offline readiness checks. No implementation authorization inferred.
+
 Date: 2026-10-29. Status: **Business rules recorded; NOT authorized to code**.
 
 ## Newly approved

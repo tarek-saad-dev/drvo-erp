@@ -202,3 +202,8 @@ ADR-016 accepted: apps selected with missing Required dependencies show one bund
 ## Founder-approved domain boundary choice — 2026-10-29
 
 **ADR-019 accepted (Option B):** create separate Industry Domain Modules only where their independent aggregates/lifecycle/permissions/privacy/financial rules justify them; use bounded Industry Extensions where shared Core already owns the workflow. No compulsory giant Salon/Clinic/Manufacturing operations module for every Industry Solution. Salon V1 likely composes shared POS/Booking/HR/Inventory/etc. with Salon Extensions; independently owned service execution is a candidate only if analysis justifies it. Clinic Clinical Records and Manufacturing/MRP are future domain-boundary stress tests, not planned V1 commitments. See [ADR-019](../05-decisions/ADR-019-CONDITIONAL-DOMAIN-MODULE-BOUNDARY.md) and draft [Matrix](../02-architecture/CORE-EXTENSION-DOMAIN-BOUNDARY-MATRIX.md). No coding authorization.
+
+
+## Founder-approved progressive Business composition — 2026-10-29
+
+ADR-020: every Business may begin with its own minimum valid set of industry/workflow Modules and add compatible Modules/Extensions later with explicit Required dependency/cost approval, safe versioned contracts and preserved financial history. **No standalone Salon Service Execution Module in V1**. Existing Booking/POS/HR/Inventory Salon-related functionality remains; this is not an unintended reduction of approved comprehensive Salon commercial V1 coverage. [ADR-020](../05-decisions/ADR-020-INCREMENTAL-BUSINESS-MODULES-AND-SALON-V1.md) and [growth design](../02-architecture/INCREMENTAL-BUSINESS-MODULE-GROWTH.md). No coding authorized.

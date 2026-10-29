@@ -294,3 +294,8 @@ Before implementation authorization: inspect SQL Server version/edition/VPS capa
 ## VPS audit status — 2026-10-29
 
 Read-only operator instructions are at [VPS Audit Runbook](VPS-READONLY-AUDIT-RUNBOOK.md); actual resource/version, encryption and backup evidence are still missing because direct server access is not available. Need redacted operator output and verified restore test, browser/storage device testing and ORM selection before production readiness. No code authorization.
+
+
+## Data access decision — 2026-10-29
+
+[SQL Server Data Access Memo](SQLSERVER-DATA-ACCESS-SELECTION.md) recommends node-mssql + tedious, explicit financial transactions and reviewed SQL migrations, pending proof. Confirm compatible server/driver versions, real SQL integration tests and owner signoff. No implementation authorized.

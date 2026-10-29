@@ -231,3 +231,8 @@ These four points supersede earlier open recommendations in this document. **Tec
 - Founder selected Windows Browser initial POS hardware category.
 - Added 20-case Windows PWA/IndexedDB test plan covering restart, failure recovery, multi-device replay, site-data loss, payments and reconciliation.
 - Linked into infrastructure checklist and Cursor plan; no tests or code executed.
+
+
+## 2026-10-29 — VPS pre-code audit runbook
+
+Created read-only audit instructions, with explicit unexecuted status: no direct SSH connection available, so no server facts verified. No code or server changes.

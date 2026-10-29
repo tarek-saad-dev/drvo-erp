@@ -99,3 +99,8 @@ Produce a Core vs Extension vs Domain Module boundary matrix *per selected capab
 ## Business starter bundles / Salon V1 policy — founder approved ADR-020 (2026-10-29)
 
 Every Business may start with the minimum valid modules needed for its chosen workflows and add compatible modules as the Business grows. This is distinct from narrowing the approved comprehensive Salon V1 platform deliverable. Shared Kernel and required finance/security prerequisites cannot be omitted just to advertise a minimal bundle. Salon V1 explicitly has **no standalone Service Execution Domain Module**; Booking/POS/HR/Inventory and bounded Salon Extensions own the existing service-related functions. An independent advanced execution workflow could be designed, released, then enabled per Business later. Read [ADR-020](../05-decisions/ADR-020-INCREMENTAL-BUSINESS-MODULES-AND-SALON-V1.md) and [incremental composition spec](INCREMENTAL-BUSINESS-MODULE-GROWTH.md).
+
+
+## Progressive Business growth — ADR-020 (founder approved)
+
+An Industry Solution is a configurable starter bundle of minimum **valid** Modules for a Business, which can enable compatible modules/extensions as it grows. Required finance/security prerequisites remain enforced; activation follows ADR-016. Salon V1 has **no standalone Service Execution Module**; Booking/POS/HR/Inventory and their Salon Extensions own existing workflows. Future dedicated execution could be introduced through the normal release and Business activation lifecycle. This does not reduce the previously approved comprehensive Salon commercial V1 scope. [ADR-020](../05-decisions/ADR-020-INCREMENTAL-BUSINESS-MODULES-AND-SALON-V1.md).

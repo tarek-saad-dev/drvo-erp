@@ -58,3 +58,10 @@
 - [Design Tokens & Components](02-architecture/DRVO-DESIGN-TOKENS-AND-COMPONENTS.md) — **draft** colors, dimensions, controls and states; not approved brand colors.
 - [Reusable ERP Views & Screen Patterns](02-architecture/DRVO-VIEW-AND-SCREEN-PATTERNS.md) — **draft** List/Form/Kanban/Calendar/Graph/Pivot/POS designs.
 - [Hybrid Pricing Model Analysis](01-product/HYBRID-PRICING-MODEL-ANALYSIS.md) — **commercial study only**, no approved prices.
+
+
+## Hybrid Navigation approved; detailed UI handoff drafts — 2026-10-29
+
+- [ADR-023 — Unified DRVO Shell, Hybrid Navigation by Module](05-decisions/ADR-023-HYBRID-NAVIGATION-BY-MODULE.md) — accepted principle; exact navigation layout not visually signed off.
+- [Hybrid Navigation, App Launcher, RTL/LTR and Measurement Candidates](02-architecture/DRVO-HYBRID-NAVIGATION-RTL-APP-LAUNCHER.md) — detailed UX **DRAFT**.
+- [List/Form Detailed UX](02-architecture/DRVO-LIST-FORM-UX-DETAILED.md) — shared record/search/finance/permission behavior **DRAFT**.

@@ -340,3 +340,10 @@ Pending founder review: exact V1 app tiles/capability grouping; contract between
 **RESOLVED ADR-021:** option B, **recommended customizable** Industry Starter. User can choose/deselect suggested optional apps; Module Registry-enforced Required dependency closure, financial and RBAC invariants cannot be bypassed. Explicit one-bundle price/approval (ADR-016) and incremental additions (ADR-020) remain. Fixed immutable industry bundles and blank expert-only install are NOT the chosen default. [ADR-021](../05-decisions/ADR-021-CUSTOMIZABLE-RECOMMENDED-INDUSTRY-STARTER.md) · [Starter/Activation draft](../02-architecture/INDUSTRY-STARTER-AND-ACTIVATION-DESIGN.md).
 
 **Still open:** precise Salon suggested apps and whether recommendation is pre-checked; Global Module financial dependency edges vs visible/purchasable app; Module approver role and paid add-ons, quote/proration failures, Business industry switching/upgrades, final activation state machine and contract schemas. Do not treat draft examples as approved implementation.
+
+
+## Pricing and UI/UX Kit discovery — 2026-10-29
+
+New DISCUSSION DRAFTS: [Pricing Strategy](../01-product/SAAS-PRICING-STRATEGY-DISCOVERY.md) and [DRVO UI Kit Blueprint](../02-architecture/DRVO-ERP-UI-KIT-BLUEPRINT.md). Candidate Hybrid: Business base tier + sensible included allowance + only premium differentiated Add-ons / metered outside costs (not accepted). Kit: Odoo-like interaction/view family with original DRVO-owned visual language, full RTL/LTR, role and finance/offline states (not approved final UI).
+
+**OPEN to founder:** first billing metric (Business/Branch/active operator/users) and plan boundaries; included vs premium Modules and WhatsApp/AI consumption; trial/manual collection/grace and refund policy; if no-extra-cost recommended apps should be preselected (paid optional off by default); UX shell/navigation choice, brand/tokens, screen density, full Kit source format/design tool, and screen sign-off criteria. Do not treat benchmark Odoo public prices as DRVO prices. No code authorized.

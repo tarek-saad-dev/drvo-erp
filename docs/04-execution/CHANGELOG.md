@@ -319,3 +319,11 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - Founder explicitly rejected earlier screen **layouts**; preserve liked graphical character/house elements only, not distribution of Home/Accounting/POS UI elements.
 - Created deep Theme Engine & Custom Font Asset Blueprint plus Character/Illustration/Motion Blueprint, covering ownership/role governance, safe font uploads, original art licensing, scene map, motion fallback and V1 architecture seams vs optional rollout.
 - Linked ADR-026/027 with Design Tokens, UX North Star, UI Kit, visual review, decision index and Cursor Pre-Code Plan. Documentation only; no app code, SQL migration, new design assets, font files or production deployments.
+
+
+## 2026-10-29 — Founder accepted Soft 2.5D × Miniature 3D art pairing (ADR-028)
+
+- New ADR-028: Soft Editorial 2.5D original profession Character Family combined with coherent miniature/isometric 3D-looking buildings/scenes, visual style only.
+- New Art Direction Concept Pack 01 documents Barber Character, Salon Storefront, Real Estate House and optional scene.flip storyboard with reduced motion/static fallbacks and identity/theme independence.
+- Visual explorations shared in conversation are concept art boards, **not** approved final illustration assets or editable Figma/GitHub product files. All previously rejected ERP screen element layouts remain rejected.
+- ADR index, ADR-027 character guidelines, Character & Motion Blueprint, UX review, docs index, Current State, Open Questions and Cursor plan synced. No code/SQL or deployment.

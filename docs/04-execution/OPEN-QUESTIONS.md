@@ -299,3 +299,8 @@ Read-only operator instructions are at [VPS Audit Runbook](VPS-READONLY-AUDIT-RU
 ## Data access decision — 2026-10-29
 
 [SQL Server Data Access Memo](SQLSERVER-DATA-ACCESS-SELECTION.md) recommends node-mssql + tedious, explicit financial transactions and reviewed SQL migrations, pending proof. Confirm compatible server/driver versions, real SQL integration tests and owner signoff. No implementation authorized.
+
+
+## Module ecosystem and UX discovery — 2026-10-29
+
+Pending founder review: exact V1 app tiles/capability grouping; contract between Core and extension for every module and optional multi-extension interactions; business-scoped install/disable billing and prerequisites; WhatsApp add-on at V1 launch vs later; Clinic Pack launch and sensitive domain boundary; original DRVO UX design referencing (not reproducing) Odoo; Cashier pure-logic/test reuse boundary and migration strategy. [Module proposal](../02-architecture/MODULE-ECOSYSTEM-DISCOVERY.md), [UX proposal](../02-architecture/ODOO-INSPIRED-UI-DISCOVERY.md), [Cashier review](CASHER-REUSE-DISCOVERY.md). DRAFT only.

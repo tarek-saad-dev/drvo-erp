@@ -65,3 +65,9 @@
 - [ADR-023 — Unified DRVO Shell, Hybrid Navigation by Module](05-decisions/ADR-023-HYBRID-NAVIGATION-BY-MODULE.md) — accepted principle; exact navigation layout not visually signed off.
 - [Hybrid Navigation, App Launcher, RTL/LTR and Measurement Candidates](02-architecture/DRVO-HYBRID-NAVIGATION-RTL-APP-LAUNCHER.md) — detailed UX **DRAFT**.
 - [List/Form Detailed UX](02-architecture/DRVO-LIST-FORM-UX-DETAILED.md) — shared record/search/finance/permission behavior **DRAFT**.
+
+
+## Founder-approved DRVO visual palette — 2026-10-29
+
+- [ADR-024 — Plum + Teal + Soft Neutral DRVO palette](05-decisions/ADR-024-DRVO-PLUM-TEAL-NEUTRAL-PALETTE.md) — accepted six principal colors; accessible component states, typography and page-level designs still require review.
+- [Updated Design Tokens](02-architecture/DRVO-DESIGN-TOKENS-AND-COMPONENTS.md) — replaces the superseded unapproved green-first candidate.

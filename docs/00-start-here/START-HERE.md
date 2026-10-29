@@ -1,5 +1,8 @@
 # Start here — project handoff
 
+> **READ FIRST — FOUNDER'S NON-NEGOTIABLE 3-PILLAR ARCHITECTURE CHARTER:** [DRVO ERP Project North Star](PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md). All future Modules, Industry Solutions, pricing and infrastructure architecture must pass its universal-industry / micro-to-enterprise / Egypt-scale review. The mission is design intent, not a proven capacity claim. [ADR-029](../05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md).
+
+
 **Project:** DRVO ERP  
 **Baseline date:** 2026-10-27  
 **Phase:** 0 — documentation / architecture  
@@ -7,11 +10,13 @@
 
 DRVO ERP is a new multi-tenant, multi-industry, modular ERP SaaS product. Cashier POS remains separate and operational; useful features may be adapted after review. DRVO's UI direction is **inspired by Odoo**, not a verbatim copy.
 
-The initial implementation strategy is a **modular monolith** with a shared POS core and optional industry extensions. Salon is the first vertical, Retail the second, while Clinic requirements need separate discovery.
+The initial implementation strategy is a **modular monolith** with a shared POS core and optional industry extensions. Salon is the first vertical, **medical Clinic is the second approved direction** (superseding the obsolete Retail-second plan); medical data/compliance requirements need separate discovery.
 
 ## Handoff checklist
 
 Before planning or coding, read:
+- **[Founder Architecture Charter — FIRST](PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md)**
+- **[Universal ERP Scale & Industry Fitness Gates](../02-architecture/UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md)**
 - [Current state](CURRENT-STATE.md)
 - [Architecture](../02-architecture/ARCHITECTURE.md)
 - [Decisions](../05-decisions/DECISIONS.md)

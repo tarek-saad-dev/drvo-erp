@@ -141,3 +141,8 @@ New ADRs 007-009 approved at business direction level: Required/Optional depende
 ## Four financial ADRs and implementation readiness — 2026-10-29
 
 Founder approved offline immediate credit with after-sync excess review, record customer evidence of offline electronic tender with later discrepancy review, provisional last-known cost for negative stock with subsequent adjustment, and posting late-arriving offline sale to an open GL period while retaining original sale date. See ADR-010..013 and [Implementation Readiness Gate](../04-execution/IMPLEMENTATION-READINESS-GATE.md). Readiness is **technical design signoff pending**, not permission to code. No app or DB changes.
+
+
+## Technical Sign-off checkpoint — 2026-10-29
+
+[Technical Design Sign-off](../04-execution/TECHNICAL-DESIGN-SIGNOFF.md) created with proposed financial edge-case contracts and acceptance tests. Status: draft awaiting founder approval. No coding authorized or executed.

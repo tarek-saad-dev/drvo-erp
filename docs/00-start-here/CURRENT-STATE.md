@@ -185,3 +185,8 @@ Draft proposals (NOT approved decisions): [module ecosystem](../02-architecture/
 ## Module App identity — approved 2026-10-29
 
 Founder picked independent visible Modules (Odoo-like App Launcher), ADR-015. This is compatible with existing Modular Monolith, Core+Extensions, Required/Optional Dependencies, Business-scoped activation and one SQL Server database for V1. [Module Registry/Dependencies/Contracts](../02-architecture/MODULE-REGISTRY-DEPENDENCIES-CONTRACTS.md) is a draft awaiting product and technical sign-off. No application development approved.
+
+
+## Required dependency activation policy — founder-approved 2026-10-29
+
+ADR-016 accepted: apps selected with missing Required dependencies show one bundle preview with all prerequisites and applicable charges, for one explicit user approval; no hidden extra paid modules. [ADR-016](../05-decisions/ADR-016-BUNDLED-REQUIRED-DEPENDENCIES.md). [Lifecycle and Contracts](../02-architecture/MODULE-LIFECYCLE-AND-COMMUNICATION-CONTRACTS.md) is a draft architecture proposal; coding remains explicitly unauthorized.

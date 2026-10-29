@@ -309,3 +309,8 @@ Pending founder review: exact V1 app tiles/capability grouping; contract between
 ## Module architecture review — 2026-10-29
 
 **Approved:** ADR-015 each user-facing Module is a separate App tile; not default-grouped mega-apps. This resolves navigation grouping choice, not OQ-009 exact V1 app inventory or OQ-013 contracts. Details still to ratify: Global Module Registry and Business-scoped activation, exact Required/Optional edges and dependency-install approval, paid add-on permissions, WhatsApp V1 availability, Salon Pack visibility, Clinic Pack separate rollout, journal consistency boundary. [Draft spec](../02-architecture/MODULE-REGISTRY-DEPENDENCIES-CONTRACTS.md). No coding.
+
+
+## Required Module activation decision — 2026-10-29
+
+**RESOLVED:** founder approved Option A: a single activation preview of the selected Module plus its full Required dependency set and all applicable costs, followed by one explicit approval to activate together; see [ADR-016](../05-decisions/ADR-016-BUNDLED-REQUIRED-DEPENDENCIES.md). Remaining questions: exact V1 app catalog and dependencies, who can approve/install/pay, proration/entitlement failure semantics, disabling an app with dependents, WhatsApp launch timing, Salon Pack visual representation, core extension hook conflicts, and first-journal financial consistency. [Architecture draft](../02-architecture/MODULE-LIFECYCLE-AND-COMMUNICATION-CONTRACTS.md).

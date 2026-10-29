@@ -67,3 +67,8 @@ The founder selected: **"B — حسب الحاجة الحقيقية؛ Extensions
 Fill the [Core/Extension/Domain Boundary Matrix](../02-architecture/CORE-EXTENSION-DOMAIN-BOUNDARY-MATRIX.md) and ratify final Salon ownership + extension interfaces; evaluate Clinic and Manufacturing as *design stress tests* only. Then specify actual Module Registry/Industry Solution manifests and commands/events.
 
 **No application code, database migration, server access, testing or deployment authorized.**
+
+
+## Salon V1 explicit decision — ADR-020 (2026-10-29)
+
+Founder has now explicitly decided **no standalone Service Execution Module in Salon V1**. Do not treat earlier conditional examples as V1 launch commitments. Existing salon service invoicing and attribution, booking, commissions, targets and consumable recipes belong in approved Shared Modules/Salon Extensions. Advanced step-by-step execution may be considered as a future separately owned Domain Module when needs justify it. Businesses generally start with minimum valid Modules and expand by activating more later. [ADR-020](ADR-020-INCREMENTAL-BUSINESS-MODULES-AND-SALON-V1.md).

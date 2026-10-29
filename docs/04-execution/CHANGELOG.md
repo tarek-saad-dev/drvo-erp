@@ -310,3 +310,12 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - New three-screen visual review brief: separate App Launcher/Home, Accounting List/Form and Salon Windows POS concepts in approved Plum/Teal palette; image mockups are conversational design exploration, not deployed screens or GitHub binary files.
 - Cross-linked UI Kit, App Shell, List/Form, Tokens, index, Current State, Open Questions and Cursor pre-code plan.
 - Documentation only: no app code, SQL changes, Figma source file, tests or deployment.
+
+
+## 2026-10-29 — Founder approved Business Theme Architecture and profession-specific Character/Motion UX
+
+- ADR-026 accepted: each Business can customize validated color palettes and centrally selected/uploaded **licensed fonts**, with single-point Typography/Theme tokens across Apps, tenant-aware safe resolution, auditing, rollback, accessibility and protected financial statuses. ADR-024 DRVO Plum/Teal remains default/fallback.
+- ADR-027 accepted: original profession Character Family, industry scene registry (house/storefront, salon, clinic, manufacturing etc.) and meaningful optional flip/other motion for guided pages, with reduced-motion/static fallbacks and no checkout/finance disruption.
+- Founder explicitly rejected earlier screen **layouts**; preserve liked graphical character/house elements only, not distribution of Home/Accounting/POS UI elements.
+- Created deep Theme Engine & Custom Font Asset Blueprint plus Character/Illustration/Motion Blueprint, covering ownership/role governance, safe font uploads, original art licensing, scene map, motion fallback and V1 architecture seams vs optional rollout.
+- Linked ADR-026/027 with Design Tokens, UX North Star, UI Kit, visual review, decision index and Cursor Pre-Code Plan. Documentation only; no app code, SQL migration, new design assets, font files or production deployments.

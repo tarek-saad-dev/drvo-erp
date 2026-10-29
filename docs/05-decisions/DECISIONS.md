@@ -19,6 +19,7 @@ Accepted directions are **not implemented features**.
 | ADR-012 | Negative stock provisional costing | Accepted | [ADR-012](ADR-012-NEGATIVE-STOCK-COSTING.md) |
 | ADR-013 | Late offline posting to open accounting period | Accepted | [ADR-013](ADR-013-LATE-OFFLINE-POSTING-CLOSED-PERIOD.md) |
 | ADR-015 | Each Module is a separate visible App tile | Accepted | [ADR-015](ADR-015-EACH-MODULE-INDEPENDENT-APP.md) |
+| ADR-016 | Required dependencies shown/priced and approved as one activation bundle | Accepted | [ADR-016](ADR-016-BUNDLED-REQUIRED-DEPENDENCIES.md) |
 
 **Product launch and pilot decisions** are recorded in [Product Discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md) and [Roadmap](../04-execution/ROADMAP.md).
 

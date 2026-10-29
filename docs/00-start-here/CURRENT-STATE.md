@@ -180,3 +180,8 @@ Reviewed node-mssql, TypeORM and Prisma SQL Server options. Recommended node-mss
 ## Module and UX architecture expansion — 2026-10-29
 
 Draft proposals (NOT approved decisions): [module ecosystem](../02-architecture/MODULE-ECOSYSTEM-DISCOVERY.md), [Odoo-inspired DRVO UI](../02-architecture/ODOO-INSPIRED-UI-DISCOVERY.md), and [Cashier reuse review](../04-execution/CASHER-REUSE-DISCOVERY.md). Founder rightly identified module interoperation, module catalog, optional WhatsApp, cross-industry Clinic evolution, Business activation and new-Business templates as outstanding architecture questions. No application code, test or production change.
+
+
+## Module App identity — approved 2026-10-29
+
+Founder picked independent visible Modules (Odoo-like App Launcher), ADR-015. This is compatible with existing Modular Monolith, Core+Extensions, Required/Optional Dependencies, Business-scoped activation and one SQL Server database for V1. [Module Registry/Dependencies/Contracts](../02-architecture/MODULE-REGISTRY-DEPENDENCIES-CONTRACTS.md) is a draft awaiting product and technical sign-off. No application development approved.

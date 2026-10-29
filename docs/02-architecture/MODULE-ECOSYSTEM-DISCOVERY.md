@@ -1,6 +1,6 @@
 # DRVO ERP Module Ecosystem — Architecture Proposal
 Date: 2026-10-29
-Status: PARTIAL APPROVAL — independent visible Apps accepted in ADR-015; remaining design details proposed; NO CODING.
+Status: PARTIAL APPROVAL — independent visible Apps (ADR-015) and multi-industry composition direction (ADR-017/018) accepted; concrete module inventories/interfaces remain proposed; NO CODING.
 
 ## Current accepted baseline
 - One SQL Server database for V1, Tenant > Business > Branch with Business-scoped accounting and independent branch operations.
@@ -38,3 +38,8 @@ First visible app set and pricing entitlements, WhatsApp role in commercial V1 (
 ## Approved app identity update — 2026-10-29
 
 Founder selected Option A: **every user-facing Module appears as its own independent App**, Odoo-like. Do not group them into Sales/Finance/Operations mega-apps as the default launcher. This does not require separate code deployments or databases. See [ADR-015](../05-decisions/ADR-015-EACH-MODULE-INDEPENDENT-APP.md). The exact V1 app inventory and Module Registry/contracts are still under design: [Registry and Contracts](MODULE-REGISTRY-DEPENDENCIES-CONTRACTS.md).
+
+
+## Approved industry composition update — 2026-10-29
+
+Earlier three-layer outline is an incomplete draft now extended to **Platform Kernel → Shared Business Modules → (bounded Industry Extensions OR independent Vertical Domain Modules) → versioned Industry Solutions**, with optional integrations. These elements compose rather than duplicate separate codebases. Reuse invariant business logic only; new domains (clinical records, education enrollment, property management, manufacturing/MRP) need owned Modules, not a giant booking or CRM extension. Each Domain Module still follows Core + Extension (ADR-006). A buyer chooses an Industry Solution for guided onboarding; each authorized activated Module remains a separate App (ADR-015). See the canonical [Industry Solutions Architecture](INDUSTRY-SOLUTIONS-ARCHITECTURE.md), [ADR-017](../05-decisions/ADR-017-SHARED-CORE-INDUSTRY-SOLUTIONS.md) and [ADR-018](../05-decisions/ADR-018-INDUSTRY-EXPANSION-AND-SCALE-STRATEGY.md). Do not treat examples of future sectors as ready/commercially scheduled.

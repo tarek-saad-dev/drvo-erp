@@ -255,3 +255,8 @@ Review identified seven production-critical design gates: offline credit, electr
 ## Technology Architecture — 2026-10-29
 
 Founder selected **SQL Server**. Proposed Next.js frontend, dedicated NestJS modular-monolith API, TypeScript workers and per-device offline local queue; this application stack is an engineering recommendation, not an explicit founder-approved framework choice. Critical gates: offline credit, external tender verification/settlement, negative-stock valuation, late closed-period posting, module dependencies, opener commission rate precedence, SQL Server hosting/version, ORM driver, device storage/security and tax rules. **Do not start coding until blocker decisions recorded.** [Technology Architecture](../02-architecture/TECHNOLOGY-ARCHITECTURE.md) · [V1 Plan](V1-IMPLEMENTATION-PLAN.md).
+
+
+## Final architecture round — 2026-10-29
+
+APPROVED: Required/Optional module dependencies with conflict checks (ADR-007), opener commission precedence defined in Commission Plan (ADR-008), SQL Server on VPS + POS PWA with IndexedDB local queue as initial choice (ADR-009). Not approved: offline credit handling, electronic tender verification/settlement, negative stock costing, late offline sale posting after month close. These four remain blockers for the relevant financial code. No implementation authorized. [Cursor preimplementation plan](CURSOR-PREIMPLEMENTATION-PLAN.md).

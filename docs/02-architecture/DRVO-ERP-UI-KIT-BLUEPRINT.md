@@ -106,3 +106,8 @@ Module owns domain schema/API and permitted actions; generic view merely renders
 - Pricing-plan presentation and whether included Recommended apps are preselected.
 
 **This document is a detailed design blueprint, not an implemented UI Kit and not authorization to code.**
+
+
+## Founder choice — 2026-10-29 (ADR-022)
+
+**APPROVED DIRECTION:** Odoo-familiar app launcher, reusable ERP views and keyboard/workflow interaction patterns; **original DRVO** brand, simpler default surfaces and Arabic-first usability. It is not a copyright or source-code cloning decision. [ADR-022](../05-decisions/ADR-022-ODOO-FAMILIARITY-ORIGINAL-DRVO-UI.md) is authoritative for intent. Detailed DRAFTS: [App Shell](DRVO-APP-SHELL-UX-SPEC.md), [Design Tokens & Components](DRVO-DESIGN-TOKENS-AND-COMPONENTS.md), [View & Screen Patterns](DRVO-VIEW-AND-SCREEN-PATTERNS.md). Exact colors/measurements and layouts remain awaiting founder visual sign-off; none are coded or available as editable Figma kit.

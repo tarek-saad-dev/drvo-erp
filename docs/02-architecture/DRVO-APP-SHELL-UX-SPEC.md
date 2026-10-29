@@ -116,3 +116,8 @@ No code, mockup file, SQL migration or deployment authorized.
 ## Founder-approved Hybrid navigation — ADR-023 (2026-10-29)
 
 **Option C accepted:** one global DRVO App Shell, with Module-specific navigation from controlled `sidebar | tabs | workspace` patterns. This *supersedes* earlier implication that all modules must always have a Sidebar. Desktop/Laptop/Tablet/Mobile dimensions remain **draft candidates**, not founder-approved token values. Read [Hybrid Navigation, RTL & App Launcher](DRVO-HYBRID-NAVIGATION-RTL-APP-LAUNCHER.md) for criteria, candidate 56px global bar/240px Sidebar/64px collapsed/44px tabs, RTL, active-only app launcher, permission/error states, and [List/Form Detailed UX](DRVO-LIST-FORM-UX-DETAILED.md) for behavior independent of navigation pattern. Modules never use arbitrary one-off shells. No code.
+
+
+## Approved branded palette — ADR-024 (2026-10-29)
+
+Founder accepted original DRVO **Plum + Teal + Soft Neutrals**: `#74536E` Primary Plum, `#553E53` Deep Plum, `#1A7B80` Action Teal, `#F7F6F8` Page, `#FFFFFF` Panel, `#27242B` Main Text. Use Plum for shell/app-selection context, Teal for primary actions and neutral content surfaces. Avoid a dominating decorative Business Home Hero that hides actionable modules/KPIs below viewport; exact small-versus-none still open. App Shell hybrid navigation (ADR-023), RTL/LTR roles and first viewport priorities remain unchanged. Color direction approved; exact nav geometry, fonts, app-tile treatments and finalized mockups await visual review. See [ADR-024](../05-decisions/ADR-024-DRVO-PLUM-TEAL-NEUTRAL-PALETTE.md).

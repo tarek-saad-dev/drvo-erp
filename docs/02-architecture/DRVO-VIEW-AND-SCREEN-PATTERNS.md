@@ -106,3 +106,8 @@ Validate: 1) 1440px desktop and Windows POS 1366x768; 2) 390px owner phone; 3) A
 4. No auto-generation of 100 full industry screens from incomplete templates; verify each domain-specific workflow.
 
 **No application code, final kit, design file or deployment.**
+
+
+## Founder-approved Hybrid Shell context (ADR-023, 2026-10-29)
+
+List/Form/Document generic views must render inside whichever **approved Module navigation variant** is in use: Sidebar for hierarchical apps, Tabs for shallow apps; focused POS/Calendar Workspaces use specialized task layouts where generic FormView would impair operation. Keep record links/back restoration, URL search/filter state, RBAC, audit and financial posting semantics consistent across all variants. Full interaction spec: [Detailed List/Form UX](DRVO-LIST-FORM-UX-DETAILED.md); App Launcher and RTL: [Hybrid Navigation](DRVO-HYBRID-NAVIGATION-RTL-APP-LAUNCHER.md). Exact row heights, columns, action placement, final per-Module navigation assignment and mobile behavior remain drafts, not ADR-approved values.

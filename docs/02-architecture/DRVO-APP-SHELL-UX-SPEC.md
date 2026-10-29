@@ -1,7 +1,7 @@
 # DRVO ERP — App Shell, Navigation and Responsive UX Contract
 
 **Date:** 2026-10-29
-**Status:** DESIGN DRAFT. ADR-022 approves familiarity with Odoo and original DRVO identity; all placements/sizes/routes below are proposed.
+**Status:** DESIGN DRAFT. ADR-022 approves Odoo-familiar original DRVO identity; ADR-023 approves **Hybrid Navigation depending on Module workload**. Exact sizes/layout/mapping below remain proposed.
 **References:** [ADR-022](../05-decisions/ADR-022-ODOO-FAMILIARITY-ORIGINAL-DRVO-UI.md) · [UI Kit Blueprint](DRVO-ERP-UI-KIT-BLUEPRINT.md).
 
 ## 1. Product surfaces and routing responsibility
@@ -19,7 +19,7 @@
 
 **Proposed desktop scaffold:**
 1. **Global topbar:** DRVO home/app launcher, selected Business (always visible), selected Branch if context-dependent, page-scoped or global search entry, action/notification inbox, quick user/settings/help.
-2. **Context sidebar:** Module navigation groups, current Module and user permissions; collapsible, remembered per user/device; never duplicate generic app picker inside nested groups.
+2. **Context Module navigation (ADR-023):** choose approved Sidebar, shallow Horizontal Tabs or Focused Workspace per Module; Sidebar is NOT universal. Module pattern is controlled by trusted UI manifest and justified task structure; do not duplicate generic app picker.
 3. **Work area:** page breadcrumb or parent, page title/object identity, primary action + contextual secondary actions, search/filter/group toolbar, selected View tabs, content, pagination/bulk footer when relevant.
 4. **Transient overlays:** confirmations, financial impact/approval, relation picker, large edit drawer, conflict resolution; overlays trap focus appropriately.
 5. **System status:** only actionable sync, payment, permission, pending reconciliation or errors; no permanent noisy banners when healthy.
@@ -104,10 +104,15 @@ Navigation and module availability are derived from BusinessModule state, subscr
 - Set measurable targets and perform user studies with real Salon cashier, manager and accountant before visual sign-off.
 
 ## 11. Open design review
-1. Standard global topbar + contextual sidebar vs topbar + only in-module tabs.
+1. **RESOLVED by ADR-023: Hybrid per Module.** Remaining: choose concrete Sidebar/Tabs/Workspace assignments and alternates, plus final global topbar design.
 2. Home tile layout: compact app grid and owner summary density.
 3. Search placement, action menu, saved filter and breadcrumbs behavior.
 4. Exact logo, palette, font and icon system, compact table density and dark mode.
 5. Functional mobile screen coverage and Windows POS ergonomics.
 
 No code, mockup file, SQL migration or deployment authorized.
+
+
+## Founder-approved Hybrid navigation — ADR-023 (2026-10-29)
+
+**Option C accepted:** one global DRVO App Shell, with Module-specific navigation from controlled `sidebar | tabs | workspace` patterns. This *supersedes* earlier implication that all modules must always have a Sidebar. Desktop/Laptop/Tablet/Mobile dimensions remain **draft candidates**, not founder-approved token values. Read [Hybrid Navigation, RTL & App Launcher](DRVO-HYBRID-NAVIGATION-RTL-APP-LAUNCHER.md) for criteria, candidate 56px global bar/240px Sidebar/64px collapsed/44px tabs, RTL, active-only app launcher, permission/error states, and [List/Form Detailed UX](DRVO-LIST-FORM-UX-DETAILED.md) for behavior independent of navigation pattern. Modules never use arbitrary one-off shells. No code.

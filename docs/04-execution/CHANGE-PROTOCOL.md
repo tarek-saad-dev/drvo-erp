@@ -1,7 +1,10 @@
 # Documentation change protocol
 
+> **MANDATORY FOUNDER ARCHITECTURE CHARTER FIRST:** [Project North Star](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) and [ADR-029](../05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md). Each material platform/Module/Industry/enterprise-size decision MUST complete the [Architecture Fitness Record](../02-architecture/UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md) covering all three pillars (Egypt-scale platform, any-industry extensibility, micro-to-enterprise functional AND operational scale). No silent architecture exceptions or unsupported capacity claims.
+
+
 1. **Capture:** describe requested change and expected business outcome.
-2. **Impact analysis:** identify affected modules, interfaces, tables, security, tests and docs.
+2. **Impact analysis & Charter fitness:** identify affected Modules, interfaces, data, finance/security, operations and docs; assess the **three founder pillars**, minimal Business vs very large Enterprise, reuse vs industry fork, and capacity/tenant placement. Mark PASS / NEEDS DESIGN / BLOCKED and document evidence gaps.
 3. **Decision:** for material architectural choices, write a new ADR. Never silently erase the old rationale.
 4. **Update spec:** edit canonical architecture/module/product docs and links.
 5. **Implement:** ship small, tested changes.

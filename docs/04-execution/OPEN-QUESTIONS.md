@@ -265,3 +265,8 @@ APPROVED: Required/Optional module dependencies with conflict checks (ADR-007), 
 ## Final four financial founder answers — 2026-10-29
 
 Resolved at product-intent level: offline credit recorded immediately with post-sync over-limit review ([ADR-010](../05-decisions/ADR-010-OFFLINE-CREDIT.md)); customer payment evidence recorded and discrepancies reviewed without pretending proof is settlement ([ADR-011](../05-decisions/ADR-011-OFFLINE-ELECTRONIC-PAYMENT-EVIDENCE.md)); provisional last known cost for negative stock plus later adjustment ([ADR-012](../05-decisions/ADR-012-NEGATIVE-STOCK-COSTING.md)); preserve original sale date and post to open accounting period with documented adjustment ([ADR-013](../05-decisions/ADR-013-LATE-OFFLINE-POSTING-CLOSED-PERIOD.md)). Supersedes earlier unanswered B1-B4 entries above. Remaining implementation-critical details: excess-credit follow-up policy, unverified/failed electronic tender financial outcome, first-ever unknown cost, statutory tax treatment for late sales, offline security/SQL Server hosting/driver.
+
+
+## Technical Design Sign-off review — 2026-10-29
+
+[Technical Design Sign-off](TECHNICAL-DESIGN-SIGNOFF.md) was drafted, **NOT APPROVED**. Outstanding A-E: handling excess offline credit, failed customer evidence and unpaid tender, product with no prior known cost, country-specific taxes on late postings, and device/SQL Server security/operations readiness. Product intent ADR-010..013 remains accepted; implementation remains blocked until specific operational contracts and explicit code permission.

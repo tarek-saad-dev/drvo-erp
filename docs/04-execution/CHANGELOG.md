@@ -268,3 +268,11 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - ADR-019 Option B accepted: separate Domain Modules only where lifecycle/ownership/privacy/financial invariants justify them; use bounded Extensions for variation of truly shared business logic; no compulsory industry mega-app.
 - Added draft per-capability classification matrix for Salon V1 plus Clinic and Manufacturing stress tests, documenting Salon Service Execution as candidate, not mandatory; Clinic Clinical Records and Manufacturing/MRP separate-domain candidates only.
 - Linked the decision into architecture, module registry/lifecycle, docs index, Cursor plan, current state, open questions and ADR register. **Documentation only; no app code, DB migration, tests or production actions.**
+
+
+## 2026-10-29 — Approved essentials-first Business activation and Salon V1 module scope
+
+- ADR-020: Business starts with minimum dependency-valid starter and may add compatible Modules/Extensions later without customer-specific system forks.
+- Founder explicitly ruled out a standalone Salon Service Execution Module in V1; Booking/POS/HR/Inventory + Salon Extensions still own existing service functions, commissions, attribution and recipe consumption.
+- Added Incremental Business Module Growth architecture spec; updated boundaries, registry/lifecycle, Cursor pre-code plan, catalog, ADR register and documentation index.
+- Documentation only; no application code, SQL migration, server testing or deployment.

@@ -1,5 +1,8 @@
 # DRVO ERP — 100+ Industry Catalog, SaaS Scale and Platform Control Center
 
+> **FOUNDATIONAL MANDATE ADR-029:** Egypt-scale product ambition; any industry via repeatable released solutions, and customers from micro to very large enterprises through **functional module growth AND separate measured tenant/SQL/workload capacity growth**. This document's phases are a proposed scale path, not enterprise-ready proof. [Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) · [Fitness Gates](UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md).
+
+
 **Date:** 2026-10-29
 **Status:** Approved product direction ADR-018; technical/UX/deployment detail is a proposal only. No production capacity claim.
 

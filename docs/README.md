@@ -37,3 +37,9 @@
 
 - [ADR-020 — Start each Business with essentials; no Salon Service Execution Module in V1](05-decisions/ADR-020-INCREMENTAL-BUSINESS-MODULES-AND-SALON-V1.md)
 - [Incremental Business Module Growth — architecture design](02-architecture/INCREMENTAL-BUSINESS-MODULE-GROWTH.md)
+
+
+## Industry Starter selection
+
+- [ADR-021 — Recommended and customizable industry starter](05-decisions/ADR-021-CUSTOMIZABLE-RECOMMENDED-INDUSTRY-STARTER.md)
+- [Industry Starter and Activation — design draft](02-architecture/INDUSTRY-STARTER-AND-ACTIVATION-DESIGN.md)

@@ -69,3 +69,8 @@
 ## Founder feedback / visual review reset — 2026-10-29
 
 **Rejected:** every presented screen layout/composition, including Home, Accounting and POS placement. No design acceptance of the Page Shell, tables, sidebars or grids can be inferred from these images. **Liked and accepted as direction:** professional Odoo depth × Duolingo ease, original industry Character Family/House illustration style, meaningful flip/transition between select screens, customer-specific colors and selected/uploaded fonts, centrally managed typography. Continue to new layouts only AFTER specifying [Business Theme Engine](BUSINESS-THEME-ENGINE-AND-FONT-ASSETS-BLUEPRINT.md) and [Industry Character/Motion Blueprint](CHARACTER-ILLUSTRATION-MOTION-BLUEPRINT.md). ADR-024 remains default brand and ADR-023 remains navigation *pattern*, not precise layout. [ADR-026](../05-decisions/ADR-026-BUSINESS-THEMES-AND-CENTRAL-TYPOGRAPHY.md); [ADR-027](../05-decisions/ADR-027-INDUSTRY-CHARACTERS-SCENES-AND-MOTION.md).
+
+
+## Original DRVO art direction accepted — ADR-028 (2026-10-29)
+
+The founder selected a hybrid **Soft 2.5D Character + Miniature 3D-style Buildings/Environments** visual direction. This applies to new original art concept studies, not to the **rejected prior Home/Accounting/POS page compositions**. First reference characters/scenes: Barber, Salon storefront and Real Estate house. A future scene.flip storyboard may be tested only as a voluntary, nonblocking guided transition with static fallback. [Art Concept Pack](DRVO-ART-DIRECTION-FIRST-CONCEPT-PACK.md), [ADR-028](../05-decisions/ADR-028-SOFT-2_5D-CHARACTERS-MINIATURE-3D-SCENES.md).

@@ -25,6 +25,8 @@ Accepted directions are **not implemented features**.
 | ADR-019 | Conditional Extension vs independent Domain Module boundaries | Accepted | [ADR-019](ADR-019-CONDITIONAL-DOMAIN-MODULE-BOUNDARY.md) |
 | ADR-020 | Start Business with essentials, expand Modules later; no standalone Salon Service Execution V1 | Accepted | [ADR-020](ADR-020-INCREMENTAL-BUSINESS-MODULES-AND-SALON-V1.md) |
 
+| ADR-021 | Recommended customizable Industry Starter with Required dependencies | Accepted | [ADR-021](ADR-021-CUSTOMIZABLE-RECOMMENDED-INDUSTRY-STARTER.md) |
+
 **Product launch and pilot decisions** are recorded in [Product Discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md) and [Roadmap](../04-execution/ROADMAP.md).
 
 When superseding decisions, preserve the original and cross-link replacements.

@@ -21,3 +21,10 @@ Do not copy Odoo Enterprise source, licensed themes, distinctive brand assets, i
 
 ## UX verification before coding
 Approve 5 high-fidelity **original DRVO** design screens: Business App Home, Module Store, POS, module List/Record view, new Business onboarding. Test both Arabic RTL and English, owner/manager/cashier tasks, empty/loading/permission states and large invoice tables.
+
+
+## Industry discovery and 100+ sector navigation — approved direction 2026-10-29
+
+Founder accepted Industry Solution selection as customer entry point: searchable/filterable sector catalog (e.g., Beauty & Services, Healthcare, Education, Real Estate, Manufacturing, Trade & Distribution). Selecting a sector chooses a compatible starter composition; required apps/costs still require explicit approval (ADR-016). An unsupported sector should offer a transparent request/discovery path rather than false availability. **Industry Solution is not one giant app**: once Business is entered, show only activated/authorized independent app tiles (ADR-015); owner may switch among Businesses of different industries.
+
+A future **DRVO Platform Control Center** is distinct from any customer's ERP UI and is intended for solutions, registry versions/extensions, tenants, plans, rollout and health/capacity. Avoid a flat grid of 100 industries inside customer app home. UI specifics, access and screens remain drafts. See [SaaS Catalog and Control Center](SAAS-SCALE-CATALOG-AND-CONTROL-CENTER.md). Original design direction (not Odoo pixel-copy) remains.

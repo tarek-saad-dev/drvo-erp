@@ -40,3 +40,8 @@ Founder confirmed **one comprehensive commercial V1**, not separate pilot/replac
 ## Final MVP clarification — 2026-10-28
 
 Keep Cut Salon's existing booking website and integrate against the new DRVO API. Cash-only offline sales may result in stock shortages after synchronization; surface these for review. Accounting journal-entry workflow awaits detailed module design. Test internally throughout development, but launch one comprehensive commercial V1 after all release gates. [Decision](../01-product/MVP-RELEASE-STRATEGY.md).
+
+
+## Product line strategy expansion — founder-approved direction (2026-10-29)
+
+DRVO uses Shared Core and industry-specific Domain Modules/Extensions composed as **versioned Industry Solutions** (ADR-017), not a customer-specific software fork or a single all-industry data model. Adding a new industry follows discovery, Fit-Gap, domain/contract design, UX, build (only after authorization), QA, cutover and reusable productization (ADR-018). The initial release order is **unchanged**: Salon commercial V1 with Cut Salon validation, then Clinic as second vertical. Education, Real Estate and Timber Manufacturing are illustrative future opportunities, **not scheduled releases or commitments**. Capacity scaling or enterprise dedicated placement requires measured demand and new operational design, not automatic V1 promises. [Playbook](NEW-INDUSTRY-ONBOARDING-PLAYBOOK.md); [SaaS Scale](../02-architecture/SAAS-SCALE-CATALOG-AND-CONTROL-CENTER.md).

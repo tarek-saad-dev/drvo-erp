@@ -33,6 +33,8 @@ Accepted directions are **not implemented features**.
 
 | ADR-024 | Original DRVO Plum + Teal + Soft Neutral palette | Accepted visual baseline | [ADR-024](ADR-024-DRVO-PLUM-TEAL-NEUTRAL-PALETTE.md) |
 
+| ADR-025 | ERP professional depth with Duolingo-inspired everyday clarity and original DRVO UX | Accepted direction | [ADR-025](ADR-025-ERP-PROFESSIONALISM-EVERYDAY-SIMPLICITY.md) |
+
 **Product launch and pilot decisions** are recorded in [Product Discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md) and [Roadmap](../04-execution/ROADMAP.md).
 
 When superseding decisions, preserve the original and cross-link replacements.

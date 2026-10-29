@@ -73,3 +73,8 @@ See [Data Access Selection](SQLSERVER-DATA-ACCESS-SELECTION.md): node-mssql + te
 ## New pre-code design gate: module ecosystem and user experience — 2026-10-29
 
 Before code permission, obtain founder approval for V1 module taxonomy, Core/Extension boundaries, synchronous interface/event contracts, global module release vs Business activation flow, WhatsApp integration, clinic pack separation, and DRVO-branded Odoo-inspired UI. Review drafts: [Module Ecosystem](../02-architecture/MODULE-ECOSYSTEM-DISCOVERY.md), [UI](../02-architecture/ODOO-INSPIRED-UI-DISCOVERY.md), [Cashier reuse](CASHER-REUSE-DISCOVERY.md). Do NOT treat draft as final decisions.
+
+
+## Module App Launcher decision — 2026-10-29
+
+ADR-015 ACCEPTED: every user-facing Module is an independent App tile, not grouped into Finance/Sales/Operations super-apps. The backend is still a Modular Monolith and SQL Server remains one shared V1 database. [Registry, dependencies and contract design](../02-architecture/MODULE-REGISTRY-DEPENDENCIES-CONTRACTS.md) is an engineering draft: activation workflow, precise dependencies, paid prerequisite approval, extension visibility, event ownership and critical accounting consistency remain pre-code architecture gates. **No coding authorized.**

@@ -119,3 +119,8 @@ No owner has been assigned; roles are proposed, not claims about staffed teams.
 ## FND-01 / FND-10 follow-up — isolation design draft 2026-10-30
 
 The [Tenant/Business/Branch Isolation Contract](TENANT-BUSINESS-BRANCH-ISOLATION-CONTRACT.md), [40 Security Tests](TENANT-ISOLATION-NEGATIVE-TEST-MATRIX.md) and [PROPOSED ADR-030](../05-decisions/ADR-030-TENANT-ISOLATION-ENFORCEMENT.md) now detail trusted scope, resource ownership, scoped FK alternatives, workers, cache/files, BI and revocation. **Only documentation advanced**: FND-01 and FND-10 remain OPEN until founder/security signoff and separately authorized executable verification. No tests have run.
+
+
+## FND-02/FND-04 Financial Architecture Contract follow-up — 2026-10-30
+
+[Financial Consistency Contract](FINANCIAL-CONSISTENCY-CONTRACT.md), [46 Failure/Recovery Test Cases](FINANCIAL-CONSISTENCY-FAILURE-TEST-MATRIX.md), [ADR-031 PROPOSED](../05-decisions/ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md) now spell out atomic vs durable-pending initial GL, owner-specific sale/journal/tender/stock/commission status, idempotent source/effect/return, Founder ADR-009–013 exceptions and multi-tenant recovery. **FND-02/FND-04 remain OPEN** pending founder choice, accounting posting/receipt policy and future executable tests. This improves technical specification only, not actual security/finance/capacity readiness.

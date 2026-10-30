@@ -27,7 +27,7 @@ flowchart TB
     I["Shared platform infrastructure: reliable delivery / observability"]
     C --> K --> O --> H
     O --> X --> I --> D
-    K -. "trusted scope & audit policy" .-> I
+    K -.->|"trusted scope and audit policy"| I
 ```
 
 **A shared physical database does not authorize one Module to write another Module's tables.** Event delivery design must not imply global ordering or exactly-once message transport. Cross-module mandatory financial consistency is **not resolved here**.

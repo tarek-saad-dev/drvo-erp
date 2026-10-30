@@ -404,3 +404,10 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - Updated Core Architecture Constitution, Founder Charter, Decision Register, docs README/START-HERE, Architecture and Industry Solutions/Tenancy blueprints, point-in-time scenario review addenda, Cursor plan, Current State and Open Questions to distinguish accepted vs open.
 - **No change** to Founder Charter three pillars, V1 Modular Monolith/shared SQL direction, accepted older business-specific ADRs or proposed ADR-030/031/032. No app code, SQL, actual tests, VPS or Production changes.
 
+
+
+## 2026-10-30 — ADR-034 Founder approves Optional Enterprise Organization
+
+- Accepted [ADR-034 — Optional Enterprise Organization](../05-decisions/ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md): Tenant→Business→Branch remains V1 default, optional extensible group structure for complex enterprises, financial/legal ownership and security permissions separate from management relationships.
+- Updated [Core Constitution](../00-start-here/DRVO-CORE-ARCHITECTURE-CONSTITUTION.md), [Founder Policy Brief](../02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md), original [CONST-02 Proposal](../02-architecture/ENTERPRISE-ORGANIZATION-STRUCTURE-POLICY-PROPOSAL.md) for historical traceability, ADR register, README/START-HERE/Tenancy/Current State/Open Questions/Cursor plan.
+- **CONST-02 RESOLVED**; next two general platform-level policies remain OPEN: governed Extension ecosystem (CONST-03) and validated industry/geography eligibility (CONST-04). No per-Module design or implementation/SQL/production work.

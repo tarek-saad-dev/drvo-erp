@@ -2,7 +2,7 @@
 ## The rules for building the platform, not the design of individual Modules
 
 **Date:** 2026-10-30  
-**Status:** **FOUNDER-CONFIRMED ARCHITECTURAL DIRECTION AND PHASE-0 FOCUS**. This document restates accepted platform principles; it does **not** approve any outstanding engineering implementation choice.  
+**Status:** **V1 STABLE — FOUNDER-APPROVED PHASE-0 DESIGN DIRECTION** after [final foundation review](../02-architecture/CORE-CONSTITUTION-V1-FINAL-FOUNDATION-REVIEW.md). This is not implemented, tested, commercially certified or permission to start engineering.  
 **Applies to:** DRVO Platform, every Module/Extension/Industry Solution, all future engineers and AI agents.  
 **Source of authority:** [Founder's Three-Pillar Charter](PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) and [ADR-029](../05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md). This Constitution makes the platform-level rules **short, usable and enforceable**; it does not replace the Charter or silently override other accepted ADRs.
 
@@ -19,7 +19,7 @@
 ## B. The seven universal platform laws
 
 ### LAW 1 — One product platform, no customer-specific forks
-- Keep one shared DRVO product codebase and one common platform foundation. Salon is the first Industry, **not** the boundary of the system.
+- Keep one shared DRVO product codebase and one common platform foundation. **Global-ready by architecture (ADR-036 ACCEPTED):** Egypt and Salon are initial delivery targets, not permanent country/industry restrictions; no mandatory separate product fork for each market.
 - Variations belong in configuration, reviewed Extensions or genuinely distinct Domain Modules. A bespoke customer fork is a design failure by default.
 - **Business identity is industry-agnostic (ADR-033 ACCEPTED):** one Business may operate several activities through compatible Modules/Extensions/Industry Solutions; a primary industry is a recommendation, not an exclusive permanent Business type. Separate true legal/financial Businesses when warranted; do not fuse their books or permissions.
 - A future independently deployed component may be justified by measurable demands, not by fashion.
@@ -32,7 +32,7 @@
 ### LAW 3 — Expand through extensions; split a domain only when justified
 - Shared behavior belongs in Core. Industry-specific variability belongs in reviewed Extension contracts where the underlying domain lifecycle stays stable.
 - A truly different aggregate, security boundary, compliance obligation or state lifecycle may require an **independent Domain Module**, not an unsafe generic switch.
-- Industry Solutions are **versioned compositions** of compatible existing Modules/Extensions, not a duplicated ERP for each industry.
+- Industry Solutions are **versioned compositions** of compatible existing Modules/Extensions, not a duplicated ERP for each industry. Country-specific differences use approved compatible localization contracts/configuration/extensions or distinct Domain Modules where real security/lifecycle obligations require them (ADR-036).
 - **Governed third-party ecosystem (ADR-035 ACCEPTED):** DRVO welcomes independent developers, but any Extension executing inside DRVO-managed runtime requires DRVO-controlled review, versioning, permission scope, compatibility checks and release approval. No speculative empty Modules, unnecessary per-industry scaffolds or untrusted arbitrary tenant-supplied executable plugins.
 
 ### LAW 4 — Isolate every Tenant, Business and Branch
@@ -45,6 +45,7 @@
 - Every Module exposes declared, versioned boundaries for the interactions it actually needs; typed commands and domain events preserve data ownership.
 - Version changes, extension conflicts and deactivation must not silently corrupt historical records or break existing Businesses.
 - A Business activates compatible **already released** capabilities; customer activation does not upload unknown server code or run arbitrary database migrations.
+- **Verified industry & jurisdiction eligibility (ADR-036 ACCEPTED):** an available Module does not mean every sector/country combination is ready. Only validated released combinations may be activated or advertised as supported; disclose limitations and respect market-specific regulatory, privacy and financial checks.
 - **External Integrations (ADR-035):** connect through official versioned APIs/events with explicitly scoped credentials, never direct production database access. Release review for executable in-platform Extensions does not imply identical source-code review of external services.
 - Required vs Optional dependencies are explicit, incompatibilities are rejected, and all Required app costs appear in **one approved bundle** (ADR-007/016).
 
@@ -58,7 +59,7 @@
 - Trustworthy role scope, audit, immutable historical financial effects, idempotent corrections/retries, disaster-recovery planning and privacy boundaries are **platform obligations**.
 - If a financial operation is unfinished, the system must not claim it is paid, posted or reconciled. The exact journal transaction strategy belongs in the Accounting/POS technical design, **not this Constitution**.
 - A disabled/expired optional App may stop new authorized features; it cannot erase posted history or silently abandon mandatory past obligations.
-- Never claim "supported", "secure", "enterprise-ready" or "unlimited" based only on an architecture diagram; use signed scope and evidence.
+- Never claim "supported", "secure", "enterprise-ready" or "unlimited" based only on an architecture diagram; use signed scope and evidence. Global extensibility is NOT universal country/industry legal or operational approval (ADR-036).
 
 ## C. Simple architectural vocabulary
 
@@ -117,14 +118,19 @@ When documents conflict, **do not guess a new rule, retroactively approve a prop
 
 ## G. First alignment and four-scenario review — 2026-10-30
 
-[Constitution Consistency Review 01](../02-architecture/CORE-CONSTITUTION-CONSISTENCY-REVIEW-01.md) compared the seven laws with accepted architectural ADRs and found **no direct high-level normative contradiction among the reviewed decisions**. [Four-Scenario Stress Review](../02-architecture/CORE-CONSTITUTION-FOUR-SCENARIO-STRESS-REVIEW.md) tested the **principles conceptually only** against micro Salon, chain/multiple Businesses, large Manufacturing and future medical Clinic. The original review identified four general clarifications. **CONST-01 is now RESOLVED by founder-approved [ADR-033](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md): Business identity is independent of Industry and compatible multi-industry activity can coexist in a Business.** **CONST-02 is now RESOLVED by founder-approved [ADR-034](../05-decisions/ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md): optional extensible Enterprise Organization, with simple V1 Tenant → Business → Branch preserved and no automatic cross-Business privileges.** **CONST-03 is now RESOLVED by founder-approved [ADR-035](../05-decisions/ADR-035-GOVERNED-THIRD-PARTY-EXTENSION-ECOSYSTEM.md): Open for Developers — Controlled by DRVO.** Only **CONST-04** remains OPEN: validated industry/region release eligibility. See [remaining founder decision brief](../02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md). A review does not certify runtime/security/compliance or settle deferred low-level Module contracts. No code.
+[Constitution Consistency Review 01](../02-architecture/CORE-CONSTITUTION-CONSISTENCY-REVIEW-01.md) compared the seven laws with accepted architectural ADRs and found **no direct high-level normative contradiction among the reviewed decisions**. [Four-Scenario Stress Review](../02-architecture/CORE-CONSTITUTION-FOUR-SCENARIO-STRESS-REVIEW.md) tested the **principles conceptually only** against micro Salon, chain/multiple Businesses, large Manufacturing and future medical Clinic. The original review identified four general clarifications. **CONST-01 is now RESOLVED by founder-approved [ADR-033](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md): Business identity is independent of Industry and compatible multi-industry activity can coexist in a Business.** **CONST-02 is now RESOLVED by founder-approved [ADR-034](../05-decisions/ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md): optional extensible Enterprise Organization, with simple V1 Tenant → Business → Branch preserved and no automatic cross-Business privileges.** **CONST-03 is now RESOLVED by founder-approved [ADR-035](../05-decisions/ADR-035-GOVERNED-THIRD-PARTY-EXTENSION-ECOSYSTEM.md): Open for Developers — Controlled by DRVO.** **CONST-04 is now RESOLVED by founder-approved [ADR-036](../05-decisions/ADR-036-GLOBAL-READY-VERIFIED-INDUSTRY-COUNTRY-RELEASES.md): One Global Platform — Verified Industry & Country Releases.** All four Constitution-level foundation decisions are RESOLVED. See [remaining founder decision brief](../02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md). A review does not certify runtime/security/compliance or settle deferred low-level Module contracts. No code.
 
 
 ## H. Enterprise organization decision — ADR-034 accepted (2026-10-30)
 
-Founder approved [ADR-034](../05-decisions/ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md): Enterprise-ready, Small-Business Simple. The Tenant/Business/Branch baseline remains, with an **optional** enterprise group/relationship layer for holdings/subsidiaries and management reporting. **No cross-entity permissions or ledgers are implicit**, and no physical org-tree or SQL/API work is approved. CONST-01 (ADR-033) and CONST-02 (ADR-034) now RESOLVED; CONST-03 is RESOLVED by ADR-035; only CONST-04 remains OPEN in the [Foundation Policy Brief](../02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md).
+Founder approved [ADR-034](../05-decisions/ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md): Enterprise-ready, Small-Business Simple. The Tenant/Business/Branch baseline remains, with an **optional** enterprise group/relationship layer for holdings/subsidiaries and management reporting. **No cross-entity permissions or ledgers are implicit**, and no physical org-tree or SQL/API work is approved. CONST-01 (ADR-033) and CONST-02 (ADR-034) now RESOLVED; CONST-03 is RESOLVED by ADR-035; CONST-04 is RESOLVED by ADR-036; all four foundation decisions are closed in the [Foundation Policy Brief](../02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md).
 
 
 ## I. Governed Extension ecosystem — ADR-035 accepted (2026-10-30)
 
-Founder approved [ADR-035](../05-decisions/ADR-035-GOVERNED-THIRD-PARTY-EXTENSION-ECOSYSTEM.md): **Open for Developers — Controlled by DRVO**. Internal and external in-platform executable Extensions require controlled review, scoped permissions, compatibility checks and approved releases. External services integrate via official scoped APIs, not direct production SQL access. Marketplace/SDK/sandbox mechanics remain deferred. CONST-01/02/03 are RESOLVED; only CONST-04 remains OPEN. Documentation only.
+Founder approved [ADR-035](../05-decisions/ADR-035-GOVERNED-THIRD-PARTY-EXTENSION-ECOSYSTEM.md): **Open for Developers — Controlled by DRVO**. Internal and external in-platform executable Extensions require controlled review, scoped permissions, compatibility checks and approved releases. External services integrate via official scoped APIs, not direct production SQL access. Marketplace/SDK/sandbox mechanics remain deferred. CONST-01/02/03/04 are RESOLVED by ADR-033 through ADR-036. Documentation only.
+
+
+## J. Industry & Country support and V1 foundation closure — ADR-036 accepted (2026-10-30)
+
+Founder approved [ADR-036](../05-decisions/ADR-036-GLOBAL-READY-VERIFIED-INDUSTRY-COUNTRY-RELEASES.md): **One Global Platform — Verified Industry & Country Releases**. Shared architecture is globally evolvable, but sector/jurisdiction eligibility and support claims require validated released combinations. A multi-country Enterprise structure does not silently change Business accounting or permissions. All CONST-01..04 general clarifications are accepted; the [V1 Final Foundation Review](../02-architecture/CORE-CONSTITUTION-V1-FINAL-FOUNDATION-REVIEW.md) marks this seven-law Constitution **STABLE AS DESIGN DIRECTION ONLY**. Proposed ADR-030..032 and all implementation/compliance/capacity proof remain separate open gates. No coding, SQL or Production authorization.

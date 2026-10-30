@@ -47,6 +47,8 @@ Accepted directions are **not implemented features**.
 
 | ADR-030 | Enforce Tenant/Business/Branch isolation through trusted scopes, scoped data, workers and exports | **PROPOSED — founder/security sign-off pending** | [ADR-030](ADR-030-TENANT-ISOLATION-ENFORCEMENT.md) |
 
+| ADR-031 | First POS sale + mandatory Accounting journal atomic A vs durable pending B; separated tender/stock/commission truth | **PROPOSED — founder/finance/architecture choice pending** | [ADR-031](ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md) |
+
 **Product launch and pilot decisions** are recorded in [Product Discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md) and [Roadmap](../04-execution/ROADMAP.md).
 
 When superseding decisions, preserve the original and cross-link replacements.

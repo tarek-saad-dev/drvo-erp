@@ -53,6 +53,8 @@ Accepted directions are **not implemented features**.
 
 | ADR-033 | Business identity independent of industry; compatible multi-industry capabilities inside one Business while separate legal/financial entities retain Business boundaries | **ACCEPTED — founder** | [ADR-033](ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md) |
 
+| ADR-034 | Optional extensible Enterprise Organization, while V1 Tenant → Business → Branch remains the default; legal/financial/security scope stays separate | **ACCEPTED — founder** | [ADR-034](ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md) |
+
 **Product launch and pilot decisions** are recorded in [Product Discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md) and [Roadmap](../04-execution/ROADMAP.md).
 
 When superseding decisions, preserve the original and cross-link replacements.

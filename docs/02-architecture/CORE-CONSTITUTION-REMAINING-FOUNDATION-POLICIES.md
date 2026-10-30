@@ -9,6 +9,8 @@
 
 **Question:** Is the accepted V1 Tenant → Business → Branch model an eternal exclusive hierarchy, or the first level of an extensible model able to represent legal groups, subsidiaries, franchises and more complex corporate arrangements?
 
+**Detailed general-policy proposal (still NOT approved):** [Enterprise Organization Structure — CONST-02](ENTERPRISE-ORGANIZATION-STRUCTURE-POLICY-PROPOSAL.md). It proposes an **optional group relationship layer**, while keeping Tenant/Business/Branch ownership unchanged and separating legal, financial, operational and reporting scope. This is a principle, NOT a proposed SQL schema or Module implementation.
+
 **Recommended general rule (NOT YET ACCEPTED):** Keep the V1 Tenant/Business/Branch as the concrete baseline, **but design enterprise organizational identity and permissions with a path to extend the group hierarchy** rather than hard-coding assumptions that a Branch must represent every future subsidiary or that every group has one legally shared ledger. Separate real legal/financial ownership, operating structure and reporting structure. Any cross-Business consolidated views require explicit authorized contracts; do not merge books by default. Avoid building a speculative infinite generic org-tree now.
 
 **Risk of not resolving:** future enterprise onboarding might require changing fundamental identity and authorization throughout all Modules.

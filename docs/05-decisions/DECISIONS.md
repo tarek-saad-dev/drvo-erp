@@ -51,6 +51,8 @@ Accepted directions are **not implemented features**.
 
 | ADR-032 | Business-scoped immutable module activation plan and quote, idempotent entitlement and safe version/dependency lifecycle | **PROPOSED — founder/billing/security approval pending** | [ADR-032](ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md) |
 
+| ADR-033 | Business identity independent of industry; compatible multi-industry capabilities inside one Business while separate legal/financial entities retain Business boundaries | **ACCEPTED — founder** | [ADR-033](ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md) |
+
 **Product launch and pilot decisions** are recorded in [Product Discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md) and [Roadmap](../04-execution/ROADMAP.md).
 
 When superseding decisions, preserve the original and cross-link replacements.

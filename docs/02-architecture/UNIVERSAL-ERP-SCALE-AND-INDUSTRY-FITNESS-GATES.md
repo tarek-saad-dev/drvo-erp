@@ -99,3 +99,8 @@ Approving ADR / founder sign-off:
 **References:** [Founder Architecture Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md), [ADR-029](../05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md), [Industry Architecture](INDUSTRY-SOLUTIONS-ARCHITECTURE.md), [SaaS Scale](SAAS-SCALE-CATALOG-AND-CONTROL-CENTER.md), [Incremental Module Growth](INCREMENTAL-BUSINESS-MODULE-GROWTH.md).
 
 **No app code, data migrations, load test or production deployment authorized.**
+
+
+## Actual Phase-0 findings — 2026-10-30
+
+[Foundation Review 01](FOUNDATION-ARCHITECTURE-REVIEW-2026-10-30.md) exercised these gates at the **documentation level** using hypothetical single-chair Salon, multi-branch Salon chain and large timber manufacturer. Results: shared reusable architecture **fits directionally**; Tenant/Business/Branch isolation, POS GL consistency, module activation concurrency and module/event compatibility remain **NEEDS DESIGN / implementation blockers**. No Gate D load, backup or penetration tests have been executed. [Core contract alternatives](FOUNDATION-CORE-CONTRACTS-PROPOSAL.md) are proposed. This is **not** a pass certificate or claim that enterprises are served today.

@@ -36,7 +36,8 @@
 - No speculative empty Modules, unnecessary per-industry scaffolds or untrusted arbitrary tenant-supplied executable plugins.
 
 ### LAW 4 — Isolate every Tenant, Business and Branch
-- Tenant → Business → Branch ownership and server-enforced authorization are universal. A user's access to one Business or Branch never implies access to another.
+- Tenant → Business → Branch ownership and server-enforced authorization are universal.
+- **Optional Enterprise Organization (ADR-034 ACCEPTED):** keep the V1 hierarchy simple while allowing future group/subsidiary organizational relationships **separately from** legal identity, Business books, operating sites and permissions. Group membership never grants automatic cross-Business access. A user's access to one Business or Branch never implies access to another.
 - Default Deny + explicit membership and permissions govern *every* API, report, file, cache and background operation. Financial/sensitive data gets stronger checks where required.
 - Isolation follows the data, including future Enterprise Tenant placement and migration; UI hiding is never a security control.
 
@@ -47,7 +48,8 @@
 - Required vs Optional dependencies are explicit, incompatibilities are rejected, and all Required app costs appear in **one approved bundle** (ADR-007/016).
 
 ### LAW 6 — Growth is designed and measured, never assumed
-- **Functional growth:** recommend a customizable minimal valid Industry Starter, add Modules and Branches when needed, preserve existing data. A small Business is not forced to pay for/use all Apps.
+- **Functional growth:** recommend a customizable minimal valid Industry Starter, add Modules and Branches when needed, preserve existing data.
+- **Organizational growth:** small Businesses need no holding-company configuration; larger customers may adopt an optional evolving Enterprise grouping layer without a second ERP codebase. A small Business is not forced to pay for/use all Apps.
 - **Operational growth:** keep clear options for scaling workers, read workloads, SQL capacity, Tenant placement and recoverability as proven demand requires. V1 Modular Monolith + shared tenant-aware SQL Server is an **initial baseline**, not infinite scale.
 - Every substantial design must consider a one-person Business, a multi-branch operation and a high-volume Enterprise. Never equate 30 Modules with higher capacity than 3.
 
@@ -114,4 +116,9 @@ When documents conflict, **do not guess a new rule, retroactively approve a prop
 
 ## G. First alignment and four-scenario review — 2026-10-30
 
-[Constitution Consistency Review 01](../02-architecture/CORE-CONSTITUTION-CONSISTENCY-REVIEW-01.md) compared the seven laws with accepted architectural ADRs and found **no direct high-level normative contradiction among the reviewed decisions**. [Four-Scenario Stress Review](../02-architecture/CORE-CONSTITUTION-FOUR-SCENARIO-STRESS-REVIEW.md) tested the **principles conceptually only** against micro Salon, chain/multiple Businesses, large Manufacturing and future medical Clinic. The original review identified four general clarifications. **CONST-01 is now RESOLVED by founder-approved [ADR-033](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md): Business identity is independent of Industry and compatible multi-industry activity can coexist in a Business.** Three general questions remain OPEN: enterprise organization hierarchy, governed Extension ecosystem and industry/region release eligibility. See [remaining founder decision brief](../02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md). A review does not certify runtime/security/compliance or settle deferred low-level Module contracts. No code.
+[Constitution Consistency Review 01](../02-architecture/CORE-CONSTITUTION-CONSISTENCY-REVIEW-01.md) compared the seven laws with accepted architectural ADRs and found **no direct high-level normative contradiction among the reviewed decisions**. [Four-Scenario Stress Review](../02-architecture/CORE-CONSTITUTION-FOUR-SCENARIO-STRESS-REVIEW.md) tested the **principles conceptually only** against micro Salon, chain/multiple Businesses, large Manufacturing and future medical Clinic. The original review identified four general clarifications. **CONST-01 is now RESOLVED by founder-approved [ADR-033](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md): Business identity is independent of Industry and compatible multi-industry activity can coexist in a Business.** **CONST-02 is now RESOLVED by founder-approved [ADR-034](../05-decisions/ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md): optional extensible Enterprise Organization, with simple V1 Tenant → Business → Branch preserved and no automatic cross-Business privileges.** Only **two** Constitution-level questions remain OPEN: governed Extension ecosystem and validated industry/region release eligibility. See [remaining founder decision brief](../02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md). A review does not certify runtime/security/compliance or settle deferred low-level Module contracts. No code.
+
+
+## H. Enterprise organization decision — ADR-034 accepted (2026-10-30)
+
+Founder approved [ADR-034](../05-decisions/ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md): Enterprise-ready, Small-Business Simple. The Tenant/Business/Branch baseline remains, with an **optional** enterprise group/relationship layer for holdings/subsidiaries and management reporting. **No cross-entity permissions or ledgers are implicit**, and no physical org-tree or SQL/API work is approved. CONST-01 (ADR-033) and CONST-02 (ADR-034) now RESOLVED; CONST-03/04 remain OPEN in the [Foundation Policy Brief](../02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md).

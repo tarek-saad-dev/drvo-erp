@@ -45,3 +45,8 @@ Commit source sale and outbox atomically; mark accepted but `ACCOUNTING_PENDING`
 Until founder and Finance/Architecture reviewers select A or B and settle required account/receipt/status contracts, `FND-02 = OPEN`. Publication of this ADR or the linked design is **NOT approval to code**, and V1 existing financial product rules remain valid without an inferred implementation mechanism.
 
 [Financial Consistency Contract](../02-architecture/FINANCIAL-CONSISTENCY-CONTRACT.md) · [46 Negative/Recovery Tests](../02-architecture/FINANCIAL-CONSISTENCY-FAILURE-TEST-MATRIX.md) · [Foundation Review](../02-architecture/FOUNDATION-ARCHITECTURE-REVIEW-2026-10-30.md).
+
+
+## Detailed walkthrough and finance-review matrix added — 2026-10-30
+
+[Sale-to-Ledger end-to-end design](../02-architecture/SALE-TO-LEDGER-END-TO-END-DESIGN-2026-10-30.md) illustrates Option A and B side by side, source/effect replay, independent Treasury/stock/HR states and micro/SME/Enterprise stress lenses. [Financial Account Mapping & Close Gates](../02-architecture/FINANCIAL-ACCOUNT-MAPPING-AND-CLOSE-GATES-DESIGN.md) explicitly separates physically received cash, verified provider/bank settlement, identified customer AR, unverified electronic screenshot and anonymous collection exception; E1/E2 classification is a Finance choice, **not an accepted GL account code**. This addition **DOES NOT SELECT A OR B**, and does not authorize code, SQL, tests or Production.

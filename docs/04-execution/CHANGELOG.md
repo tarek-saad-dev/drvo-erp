@@ -378,3 +378,12 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - Added [50 Future Failure/Concurrency Tests](../02-architecture/MODULE-ACTIVATION-FAILURE-TEST-MATRIX.md), **zero executed**.
 - Created [ADR-032 PROPOSED](../05-decisions/ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md), linked in Decision Register, foundational architecture, README/START-HERE, Module Registry/Lifecycle, Industry Starter, Cursor pre-code plan, readiness, questions and Current State.
 - No application code, SQL migrations, benchmarks, VPS or Production operations. FND-02/03/05 still open.
+
+
+## 2026-10-30 — Founder clarifies Phase-0: one Core Architecture Constitution, not every Module detail
+
+- Founder explicitly reaffirmed that DRVO ERP must establish a strong general **platform-level architecture rulebook** rather than prematurely specifying every Module's business/SQL/payment/event internals.
+- Added [DRVO Core Architecture Constitution](../00-start-here/DRVO-CORE-ARCHITECTURE-CONSTITUTION.md) as concise and founder-confirmed Phase-0 direction: seven universal laws, canonical layer definitions, seven review questions, and explicit NOW-vs-LATER scope discipline.
+- Preserved [Founder's Three-Pillar Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) as supreme strategic authority. Navigation hierarchy: Charter (why) → Constitution (platform how) → Accepted ADRs (specific approved decisions) → specialist drafts (not adopted technical choices).
+- Linked and prioritized Constitution in docs README, START-HERE, architecture baseline, Cursor preimplementation plan, Change Protocol and Current State. Existing proposed ADR-030/031/032 and detailed POS/Accounting/Module Activation plans are retained **for later specialist review**, not actively resolved in Phase 0. No previously accepted business rule revoked.
+- Docs-only. No application code, SQL migrations, tests, VPS or Production operations.

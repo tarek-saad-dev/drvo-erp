@@ -141,3 +141,8 @@ The matrix specifies duplicate replay, outages, payment verification mismatch, n
 7. Complete Tenant/Business/Branch P0 [ADR-030 (proposed)](../05-decisions/ADR-030-TENANT-ISOLATION-ENFORCEMENT.md) isolation and least-privilege verification.
 
 **Today:** `DESIGN READY FOR REVIEW; FND-02/FND-04 OPEN; 0 TESTS RUN; NO CODE AUTHORIZATION`.
+
+
+## End-to-end financial operation / accounting decision supplements — 2026-10-30
+
+[Sale-to-Ledger Walkthrough](SALE-TO-LEDGER-END-TO-END-DESIGN-2026-10-30.md) now documents the full candidate Option A vs B transaction sequencing, source-owned state vector, double-refund and outage cases, plus reuse for different-sized and different-industry Businesses. [Financial Account Mapping and Close Gates](FINANCIAL-ACCOUNT-MAPPING-AND-CLOSE-GATES-DESIGN.md) separately proposes the accounting questions for cash custody, **unverified electronic evidence**, credit AR, anonymous collection, negative stock cost, late-period tax and close procedures. Neither document changes founder-approved ADR-009–013, **nor approves journal mapping, A/B choice, exact enum/schema or executable tests**. FND-02/FND-04 remain OPEN.

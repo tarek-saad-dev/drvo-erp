@@ -37,3 +37,8 @@ Before treating the current architecture as build-ready, read the [Foundation Ar
 ## Tenant Isolation first security design gate — 2026-10-30
 
 Read the [Tenant/Business/Branch Isolation Contract](../02-architecture/TENANT-BUSINESS-BRANCH-ISOLATION-CONTRACT.md), [40 negative threat and test scenarios](../02-architecture/TENANT-ISOLATION-NEGATIVE-TEST-MATRIX.md), and [PROPOSED ADR-030](../05-decisions/ADR-030-TENANT-ISOLATION-ENFORCEMENT.md) before any scoped API/SQL/worker implementation. Approved product-level identity and default-deny roles are preserved, but detailed FK/RLS, Support/Manager delegated powers and data movement are not yet signed off. **No code or security tests performed.**
+
+
+## P0 Financial Source-of-Truth Gate — 2026-10-30
+
+Before implementing POS, Accounting, Treasury, Inventory, HR commissions or offline financial sync, read [Financial Consistency Contract](../02-architecture/FINANCIAL-CONSISTENCY-CONTRACT.md), [46 Failure/Recovery Tests](../02-architecture/FINANCIAL-CONSISTENCY-FAILURE-TEST-MATRIX.md), and [ADR-031 (PROPOSED)](../05-decisions/ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md). The first mandatory POS GL journal **A atomic vs B durable pending** is still unresolved; no single `POSTED/PAID/RECONCILED` shorthand and no customer screenshot as provider settlement. Founder product rules ADR-009–013 remain binding but no code/testing authorized.

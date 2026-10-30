@@ -1,7 +1,7 @@
-# DRVO ERP — Remaining Foundation Policy Choices (One Open)
+# DRVO ERP — Foundation Policy Decisions (All Four Resolved)
 
 **Date:** 2026-10-30
-**Status:** **CONST-01 and CONST-02 RESOLVED by approved ADR-033/034. CONST-03 RESOLVED by approved ADR-035; only CONST-04 remains PROPOSED, not accepted.**
+**Status:** **CONST-01 through CONST-04 ALL RESOLVED by founder-approved ADR-033/034/035/036. Architecture Constitution V1 stable as design direction; implementation/compliance/capacity not approved.**
 **Scope:** Only cross-platform architectural laws; no POS/Accounting/Module activation schemas, manifests, implementation tests or deployment.
 **Already resolved:** CONST-01 mixed-industry Business by [ADR-033 ACCEPTED](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md): Business ≠ Industry; a Business may compose compatible capabilities/Industry Solutions without new ERP fork or mandatory second Business.
 
@@ -27,28 +27,28 @@
 
 **Deferred:** runtime sandbox, signing method, SDK, publishing UI, source review rules and marketplace economics.
 
-## CONST-04 — Supported industries and jurisdictions
+## CONST-04 — Supported industries and jurisdictions (RESOLVED by ADR-036)
 
 **Question:** Does a selectable Industry Solution or Module mean it is legally and functionally ready in Egypt or any other target jurisdiction?
 
-**Recommended general rule (NOT YET ACCEPTED):** DRVO declares **validated support scope** for each released capability/industry solution as applicable: relevant workflows, sensitivity/security and geographic/compliance boundaries. Only advertise/enable released combinations where required safety, finance and law have been evaluated. Unsupported combinations are explicitly disclosed; never claim that Egyptian Salon support automatically means GCC Clinic support. Region/industry eligibility is a platform release rule, not a per-client customer fork.
+**Founder-approved general rule ([ADR-036 ACCEPTED](../05-decisions/ADR-036-GLOBAL-READY-VERIFIED-INDUSTRY-COUNTRY-RELEASES.md)):** One global product foundation, with reusable Modules/Extensions and governed Localization contracts.  DRVO declares **validated support scope** for each released capability/industry solution as applicable: relevant workflows, sensitivity/security and geographic/compliance boundaries. Only advertise/enable released combinations where required safety, finance and law have been evaluated. Unsupported combinations are explicitly disclosed; never claim that Egyptian Salon support automatically means GCC Clinic support. Region/industry eligibility is a platform release rule, not a per-client customer fork.
 
 **Risk of not resolving:** unsupported regulated industries can be mistaken for validated ERP offerings.
 
 **Deferred:** country-specific regulations, tax engines, residency rules, detailed compliance certification checklists and legal advice.
 
-## Founder decision matrix — one question remains open
+## Founder decision matrix — all four resolved
 
 | ID | Recommended principle | Impact if approved | Current status |
 |---|---|---|---|
 | CONST-02 | V1 hierarchy stays, with optional extensible Enterprise Organization | Future groups/subsidiaries without rearchitecting whole platform | **RESOLVED — ADR-034 ACCEPTED** |
 | CONST-03 | No arbitrary executable customer plugins; governed release lifecycle for third parties | Security and controlled ecosystem growth | **RESOLVED — ADR-035 ACCEPTED** |
-| CONST-04 | Explicit validated support per industry/jurisdiction before availability claims | Safe multi-sector and cross-border onboarding | **OPEN — PROPOSED** |
+| CONST-04 | Global-ready platform; explicitly validated support per industry/jurisdiction before availability claims | Safe multi-sector and cross-border onboarding | **RESOLVED — ADR-036 ACCEPTED** |
 
-## After final CONST-04 approval
-1. Update the **seven existing Constitution laws with minimal clarifications**, avoiding new bulky technical specifications.
-2. Record accepted founder-level ADR(s) only for genuinely new decisions; do not multiply ADRs where a rule already clearly covers the case.
-3. Run a one-page final cross-platform readiness review (Charter consistency + four scenarios + three policy decisions). Mark **Architecture Constitution V1 as stable design direction**, not secure/enterprise-verified production.
-4. Move to a **Platform Kernel boundary map** only after general laws are settled and before any specialist Module design.
+## Post-approval outcomes and remaining engineering gates
+1. **Completed:** minimally clarified the same seven Constitution laws and recorded accepted ADR-033..036.
+2. **Completed:** [Constitution V1 Final Foundation Review](CORE-CONSTITUTION-V1-FINAL-FOUNDATION-REVIEW.md) — stable design direction, **not** production/country/security certification.
+3. **Next Phase-0 design:** create a Platform Kernel boundary map before any specialist Module implementation.
+4. **Still independent:** ADR-030/031/032 remain PROPOSED; tax/medical/locale/hosting specifics, security validation and operational capacity need later design and evidence.
 
 **No code/SQL/migrations/tests/server/deployment.**

@@ -42,3 +42,8 @@ Read the [Tenant/Business/Branch Isolation Contract](../02-architecture/TENANT-B
 ## P0 Financial Source-of-Truth Gate — 2026-10-30
 
 Before implementing POS, Accounting, Treasury, Inventory, HR commissions or offline financial sync, read [Financial Consistency Contract](../02-architecture/FINANCIAL-CONSISTENCY-CONTRACT.md), [46 Failure/Recovery Tests](../02-architecture/FINANCIAL-CONSISTENCY-FAILURE-TEST-MATRIX.md), and [ADR-031 (PROPOSED)](../05-decisions/ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md). The first mandatory POS GL journal **A atomic vs B durable pending** is still unresolved; no single `POSTED/PAID/RECONCILED` shorthand and no customer screenshot as provider settlement. Founder product rules ADR-009–013 remain binding but no code/testing authorized.
+
+
+## Financial journey — mandatory before any implementation (2026-10-30)
+
+New [End-to-End Sale-to-Ledger Design](../02-architecture/SALE-TO-LEDGER-END-TO-END-DESIGN-2026-10-30.md) traces one authorized POS operation through typed Sales/Accounting boundary, deterministic replay, Outbox Stock/HR/Treasury obligations, distinct receipt/GL/payment/cost statuses, refunds and offline/late-period reconciliation. [Tender Mapping & Close Gate Review](../02-architecture/FINANCIAL-ACCOUNT-MAPPING-AND-CLOSE-GATES-DESIGN.md) **does NOT approve any chart of accounts, tax accounting or final posting policy**. ADR-031 remains proposed; Option A vs B needs formal founder/accountant/architect review. No code or tests.

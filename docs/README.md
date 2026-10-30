@@ -1,12 +1,15 @@
 # DRVO ERP documentation index
 
+> **PHASE-0 CURRENT PRIORITY — CORE RULES, NOT PER-MODULE IMPLEMENTATION DETAILS:** Read [DRVO Core Architecture Constitution](00-start-here/DRVO-CORE-ARCHITECTURE-CONSTITUTION.md) immediately after the [Founder Architecture Charter](00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md). Founder confirmed focus on seven universal platform laws and cross-industry/size stress review. Deep POS/Accounting/Activation drafts remain deferred specialist designs; proposed ADR-030/031/032 have NOT been adopted. No code authorization.
+
 > **FOUNDATIONAL FOUNDER MISSION — READ BEFORE ALL OTHER DOCS:** [DRVO ERP Architecture Charter: Egypt-scale platform × Any Industry × Micro-to-Enterprise](00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md). Enforced by [ADR-029](05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md) and [Universal ERP Architecture Fitness Gates](02-architecture/UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md). All architecture/module decisions must assess all three pillars. This is a strategic mission, not current verified enterprise capacity.
 
 
 ## Required reading for a new developer or AI agent
 
-1. **[Founder Architecture Charter — mandatory first](00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md)**
-2. [Start here](00-start-here/START-HERE.md)
+1. **[Founder Architecture Charter — WHY](00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md)**
+2. **[DRVO Core Architecture Constitution — HOW](00-start-here/DRVO-CORE-ARCHITECTURE-CONSTITUTION.md)**
+3. [Start here](00-start-here/START-HERE.md)
 3. [Current state](00-start-here/CURRENT-STATE.md)
 4. [Product vision](01-product/VISION.md)
 5. [Architecture](02-architecture/ARCHITECTURE.md)

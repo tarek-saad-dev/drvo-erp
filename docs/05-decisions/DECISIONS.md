@@ -45,6 +45,8 @@ Accepted directions are **not implemented features**.
 
 | ADR-029 | Founder architecture mission: national ERP platform, any-industry extensibility, micro-to-enterprise functional and technical scale | Accepted foundational guardrails | [ADR-029](ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md) |
 
+| ADR-030 | Enforce Tenant/Business/Branch isolation through trusted scopes, scoped data, workers and exports | **PROPOSED — founder/security sign-off pending** | [ADR-030](ADR-030-TENANT-ISOLATION-ENFORCEMENT.md) |
+
 **Product launch and pilot decisions** are recorded in [Product Discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md) and [Roadmap](../04-execution/ROADMAP.md).
 
 When superseding decisions, preserve the original and cross-link replacements.

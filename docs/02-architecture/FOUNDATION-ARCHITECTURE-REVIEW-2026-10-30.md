@@ -124,3 +124,8 @@ The [Tenant/Business/Branch Isolation Contract](TENANT-BUSINESS-BRANCH-ISOLATION
 ## FND-02/FND-04 Financial Architecture Contract follow-up — 2026-10-30
 
 [Financial Consistency Contract](FINANCIAL-CONSISTENCY-CONTRACT.md), [46 Failure/Recovery Test Cases](FINANCIAL-CONSISTENCY-FAILURE-TEST-MATRIX.md), [ADR-031 PROPOSED](../05-decisions/ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md) now spell out atomic vs durable-pending initial GL, owner-specific sale/journal/tender/stock/commission status, idempotent source/effect/return, Founder ADR-009–013 exceptions and multi-tenant recovery. **FND-02/FND-04 remain OPEN** pending founder choice, accounting posting/receipt policy and future executable tests. This improves technical specification only, not actual security/finance/capacity readiness.
+
+
+## FND-03, FND-05, FND-09 module activation design package — 2026-10-30
+
+[Detailed Activation & Dependency Engine Contract](MODULE-ACTIVATION-DEPENDENCY-ENGINE-CONTRACT.md), [50 planned adversarial tests](MODULE-ACTIVATION-FAILURE-TEST-MATRIX.md), and [ADR-032 PROPOSED](../05-decisions/ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md) now cover immutable per-Business graph+quote, complete Required closure, explicit priced approval, entitlement/payment distinction, concurrent activations/disable, safe partial initialization, released version/Extension conflicts, retention and scaling guardrails. These are **design advances, NOT closure or test evidence**. FND-03/05/09 remain open until founder/billing/security signoff and separately authorized validation. [Financial Atomicity decision gate](FINANCIAL-ATOMICITY-DECISION-GATE.md) also clarifies no A/B first GL performance result exists.

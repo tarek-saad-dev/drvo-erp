@@ -1,6 +1,8 @@
 # DRVO ERP documentation index
 
-> **NEW FOUNDER DECISION — ADR-033 ACCEPTED:** [Business identity is independent of Industry](05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md). One Business can compose compatible multi-industry capabilities; do not create another Business merely for a different industry. Actual legal/financial boundaries remain separate. [Three remaining general Constitution policy proposals](02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md) are **OPEN**; not approved or implementation instructions.
+> **LATEST FOUNDER DECISION — ADR-034 ACCEPTED:** [Optional Enterprise Organization](05-decisions/ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md): Tenant→Business→Branch stays the simple V1 foundation; larger groups may use an optional organizational relationship layer without merging legal books or granting implicit access. **CONST-01/02 RESOLVED; CONST-03/04 remain OPEN.**
+
+> **NEW FOUNDER DECISION — ADR-033 ACCEPTED:** [Business identity is independent of Industry](05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md). One Business can compose compatible multi-industry capabilities; do not create another Business merely for a different industry. Actual legal/financial boundaries remain separate. [Two remaining general Constitution policy proposals](02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md) are **CONST-03/04 remain OPEN**; ADR-034 has now resolved Enterprise Structure. No implementation instructions.
 
 > **PHASE-0 CURRENT PRIORITY — CORE RULES, NOT PER-MODULE IMPLEMENTATION DETAILS:** Read [DRVO Core Architecture Constitution](00-start-here/DRVO-CORE-ARCHITECTURE-CONSTITUTION.md) immediately after the [Founder Architecture Charter](00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md). Founder confirmed focus on seven universal platform laws and cross-industry/size stress review. Deep POS/Accounting/Activation drafts remain deferred specialist designs; proposed ADR-030/031/032 have NOT been adopted. No code authorization.
 
@@ -150,7 +152,7 @@ These documents elaborate [ADR-031 PROPOSED](05-decisions/ADR-031-FINANCIAL-CONS
 
 - [Review 01: seven-law Constitution alignment against founder-accepted ADRs](02-architecture/CORE-CONSTITUTION-CONSISTENCY-REVIEW-01.md) — no direct platform-law contradiction found among reviewed accepted ADRs; resolves apparent scope clashes, leaves four cross-platform policy questions open. **Documentation review, not verified readiness.**
 - [Four-Scenario Stress Review](02-architecture/CORE-CONSTITUTION-FOUR-SCENARIO-STRESS-REVIEW.md) — micro Salon, multi-branch/multi-business group, large Manufacturer, future Clinic; checks general platform boundaries only, no module implementation details.
-- **Phase-0 status:** mixed-industry one-Business composition **RESOLVED by ADR-033**. Next focus only the **three remaining** general policies: enterprise organizational hierarchy extensibility, governed Extension ecosystem and country/industry release eligibility. Do not select POS GL A/B, exact module pricing/states or SQL keys here. Existing ADR-030/031/032 still PROPOSED; no code.
+- **Phase-0 status:** mixed-industry one-Business composition **RESOLVED by ADR-033**. Next focus only the **two remaining** general policies: governed Extension ecosystem and country/industry release eligibility; Enterprise Structure is accepted via ADR-034. Do not select POS GL A/B, exact module pricing/states or SQL keys here. Existing ADR-030/031/032 still PROPOSED; no code.
 
 
 ## Foundation architecture: accepted Business independence and remaining proposals
@@ -158,3 +160,8 @@ These documents elaborate [ADR-031 PROPOSED](05-decisions/ADR-031-FINANCIAL-CONS
 - [ADR-033 ACCEPTED — Business Identity Is Independent of Industry](05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md).
 - [Three remaining founder-level Foundation Policies — proposals only](02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md): enterprise hierarchy, reviewed third-party Extensions, validated industry/country availability.
 - **Do not** interpret the accepted ADR as physical SQL/authorization implementation readiness; technical ADR-030/031/032 remain PROPOSED. Phase 0 docs only.
+
+
+## Enterprise Structure — Accepted ADR-034
+
+[Founder-approved Enterprise Organization rule](05-decisions/ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md) keeps an optional extensible management/grouping capability without altering V1 Tenant/Business/Branch. [Remaining two policy questions](02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md) concern governed developer Extensions and country/industry support validation. No code or schema selected.

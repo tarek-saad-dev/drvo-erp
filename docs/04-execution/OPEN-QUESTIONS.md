@@ -441,3 +441,9 @@ CONST-01 is **accepted and resolved** in [ADR-033](../05-decisions/ADR-033-BUSIN
 **RESOLVED CONST-01:** a Business is independent of its industry category and may combine compatible sectors/Industry Solution capabilities; separate legal/financial Businesses remain separate. [ADR-033 ACCEPTED](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md).
 
 **OPEN CONST-02/03/04:** enterprise organization hierarchy, governed third-party Extension releases, verified industry/country eligibility. Proposed options: [Three Foundation Policies — founder brief](../02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md). Do NOT silently approve them or launch low-level implementation.
+
+
+## CONST-02 founder review proposal — 2026-10-30
+
+The current **NOT ACCEPTED** [Enterprise Organization Structure Proposal](../02-architecture/ENTERPRISE-ORGANIZATION-STRUCTURE-POLICY-PROPOSAL.md) keeps Tenant→Business→Branch unchanged for V1 and proposes an *optional* extensible group relationship layer for large Enterprises, separating legal/financial ownership, operating sites, management/reporting hierarchy and access. **Founder approval pending.** No hierarchical tables/SQL or cross-Tenant data federation authorized.
+

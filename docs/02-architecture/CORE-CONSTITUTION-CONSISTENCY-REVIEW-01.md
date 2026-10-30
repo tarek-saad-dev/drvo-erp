@@ -68,3 +68,8 @@ Run [Four Scenario Constitution Stress Review](CORE-CONSTITUTION-FOUR-SCENARIO-S
 ## Post-review founder decision — ADR-033 accepted (2026-10-30)
 
 This report is a **point-in-time assessment**; its earlier C-01 proposal has now been explicitly resolved by [ADR-033 ACCEPTED](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md). One Business may combine compatible industry capabilities without copying ERP or creating another Business solely because its industry changes. Keep actual legal/financial separation and security guarantees. **C-02/03/04 remain OPEN** in the [Founder Policy Brief](CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md). C-05 remains covered by the original Charter. No code, tests or operational readiness claims.
+
+
+## Final status addendum — 2026-10-30 (supersedes the open-question counts above)
+
+The original review remains a point-in-time source. Its C-01..C-04 clarification candidates have all been resolved as platform principles by [ADR-033](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md), [ADR-034](../05-decisions/ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md), [ADR-035](../05-decisions/ADR-035-GOVERNED-THIRD-PARTY-EXTENSION-ECOSYSTEM.md), and [ADR-036](../05-decisions/ADR-036-GLOBAL-READY-VERIFIED-INDUSTRY-COUNTRY-RELEASES.md). C-05 remains covered by the existing Charter. [Final Constitution V1 Foundation Review](CORE-CONSTITUTION-V1-FINAL-FOUNDATION-REVIEW.md) marks **stable design direction**, not engineering, compliance or Production readiness. ADR-030..032 remain proposed.

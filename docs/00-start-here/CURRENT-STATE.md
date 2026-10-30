@@ -1,5 +1,7 @@
 # Current state
 
+> **CURRENT FOUNDER FOUNDATION DECISION: ADR-033 ACCEPTED — BUSINESS ≠ INDUSTRY.** [ADR-033](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md) means one Business may combine compatible industries/Modules without forced separate Business, while true legal/financial businesses remain distinct. **Only three platform Constitution questions remain OPEN**: org hierarchy beyond V1, controlled Extension developer ecosystem, verified industry/jurisdiction support; [founder brief](../02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md). ADR-030/031/032 still proposed. Phase 0 docs only.
+
 > **FOUNDATION / NO EXCEPTION:** [Founder Three-Pillar Project Charter](PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md), [ADR-029](../05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md). The product must target Egypt-scale platform adoption, an extensible method to serve any *investigated* business industry, and Business sizes micro-to-enterprise. Domain/module composition enables feature growth; operational/capacity scaling is a separate measurable design axis. Mission is accepted, **not yet a verified capacity claim**.
 
 
@@ -292,3 +294,8 @@ Founder explicitly confirmed that the goal NOW is **a strong general-purpose Arc
 ## Constitution alignment and four-industry/size stress review — 2026-10-30
 
 [Seven-Law Consistency Review](../02-architecture/CORE-CONSTITUTION-CONSISTENCY-REVIEW-01.md) checked the platform Constitution against accepted architectural ADR-002/003/006/007/015/016/017/018/019/020/021/029: **no direct contradiction found at this high-level scope**, no implementation evidence or comprehensive conflict-proof claim. [Conceptual Four-Scenario Stress Review](../02-architecture/CORE-CONSTITUTION-FOUR-SCENARIO-STRESS-REVIEW.md) considered 1-chair Salon, multi-branch/multi-Business group, large Manufacturer and future Clinic. Four cross-platform policy questions remain OPEN: (1) mixed-industry **same Business** vs separate Businesses, (2) complex enterprise hierarchy above/beside V1 Tenant/Business/Branch, (3) governed external Extension release ecosystem, (4) region/industry validated release eligibility. **Do not solve individual Module transaction mechanics in Phase 0.** Founder Charter and seven Constitution laws remain unchanged. ADR-030/031/032 still PROPOSED. Docs only; no production/test/code.
+
+
+## Founder's Business/Industry independence approval — 2026-10-30
+
+Founder accepted [ADR-033 Business Identity Is Independent of Industry](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md). CONST-01 RESOLVED at general platform level; one Business may compose multiple industry activities and compatible extensions; primary industry is non-exclusive onboarding recommendation, separate legal/financial Business units remain separate. [Remaining Foundation Brief](../02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md) tracks CONST-02/03/04 **PROPOSED / open**. Existing high-level Charter and Seven Laws unchanged except clarification; no Module specifics implemented, no actual scale evidence, no SQL/code/VPS/Production changes.

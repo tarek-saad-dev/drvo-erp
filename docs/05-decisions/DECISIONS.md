@@ -49,6 +49,8 @@ Accepted directions are **not implemented features**.
 
 | ADR-031 | First POS sale + mandatory Accounting journal atomic A vs durable pending B; separated tender/stock/commission truth | **PROPOSED — founder/finance/architecture choice pending** | [ADR-031](ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md) |
 
-| ADR-032 | Business-scoped immutable module activation plan and quote, idempotent entitlement and safe version/dependency lifecycle | **PROPOSED — founder/billing/security approval pending** | [ADR-032](ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md) |\n\n**Product launch and pilot decisions** are recorded in [Product Discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md) and [Roadmap](../04-execution/ROADMAP.md).
+| ADR-032 | Business-scoped immutable module activation plan and quote, idempotent entitlement and safe version/dependency lifecycle | **PROPOSED — founder/billing/security approval pending** | [ADR-032](ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md) |
+
+**Product launch and pilot decisions** are recorded in [Product Discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md) and [Roadmap](../04-execution/ROADMAP.md).
 
 When superseding decisions, preserve the original and cross-link replacements.

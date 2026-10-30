@@ -106,3 +106,8 @@ Before registering any new vertical Module, complete the Core-vs-Extension-vs-ne
 ## Founder approved additive Business growth — ADR-020 (2026-10-29)
 
 A Business can operate on an industry-appropriate minimum dependency-valid starter set, then add new released modules/compatible extensions without replacing its Business or resetting historical records. Activation is Business-scoped and follows ADR-016 explicit bundle pricing/Required dependencies. New modules may require a platform deploy and schema migration before per-Business activation; the platform must not claim installability for undeveloped functionality. Salon V1 begins **without standalone Service Execution Module**; Booking/POS/HR/Inventory remain source owners for their functions. Future multi-step execution may become a separate module after discovery without retroactive fabricated steps. See [ADR-020](../05-decisions/ADR-020-INCREMENTAL-BUSINESS-MODULES-AND-SALON-V1.md).
+
+
+## Priority architecture audit overlay — 2026-10-30
+
+The design correctly separates Global Module release and per-Business activation and allows Core/Extension/Domain composition. It is **NOT implementation-approved** until [Foundation Review FND-01–05](FOUNDATION-ARCHITECTURE-REVIEW-2026-10-30.md): trusted scope, which critical POS/Accounting work commits atomically versus via durable pending, idempotent activation despite concurrent changes, signed release/versioned contracts and deterministic extension conflict rules. [Proposed contracts & finance A/B](FOUNDATION-CORE-CONTRACTS-PROPOSAL.md) explicitly remain choices, **not** accepted transaction policies. No code or SQL migrations authorized.

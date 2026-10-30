@@ -117,3 +117,10 @@
 - [Tenant/Business/Branch Isolation Contract](02-architecture/TENANT-BUSINESS-BRANCH-ISOLATION-CONTRACT.md) — proposed detailed security ownership/scope contract, with approved product requirements distinguished from pending SQL/role decisions.
 - [40 Adversarial and Negative Authorization Tests](02-architecture/TENANT-ISOLATION-NEGATIVE-TEST-MATRIX.md) — test plan only; 0 executed.
 - [ADR-030 Proposed Isolation Enforcement](05-decisions/ADR-030-TENANT-ISOLATION-ENFORCEMENT.md) — **NOT APPROVED** as a physical DB/security design; founder/security sign-off needed before coding.
+
+
+## P0 financial source-of-truth and recovery architecture — 2026-10-30
+
+- [Financial Consistency Contract](02-architecture/FINANCIAL-CONSISTENCY-CONTRACT.md) — **PROPOSED** typed sale / Accounting GL / Treasury tender / stock cost / HR commission boundaries, honesty of statuses, source/effect dedupe, offline replay, refunds and period handling; preserves founder ADR-009–013.
+- [46 Financial Negative/Recovery Tests](02-architecture/FINANCIAL-CONSISTENCY-FAILURE-TEST-MATRIX.md) — **design-only test specification**; zero executed.
+- [ADR-031 — First Mandatory Accounting Journal Boundary](05-decisions/ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md) — **PROPOSED, NOT APPROVED**: same-SQL atomic A recommended if measured performance permits; otherwise durable accepted/pending B with hard reconciliation barrier. No source-of-truth policy adopted or implementation authorized.

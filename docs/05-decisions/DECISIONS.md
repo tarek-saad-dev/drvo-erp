@@ -55,6 +55,8 @@ Accepted directions are **not implemented features**.
 
 | ADR-034 | Optional extensible Enterprise Organization, while V1 Tenant → Business → Branch remains the default; legal/financial/security scope stays separate | **ACCEPTED — founder** | [ADR-034](ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md) |
 
+| ADR-035 | Open for Developers — Controlled by DRVO; reviewed and scoped in-platform Extensions, official APIs for external Integrations | **ACCEPTED — founder** | [ADR-035](ADR-035-GOVERNED-THIRD-PARTY-EXTENSION-ECOSYSTEM.md) |
+
 **Product launch and pilot decisions** are recorded in [Product Discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md) and [Roadmap](../04-execution/ROADMAP.md).
 
 When superseding decisions, preserve the original and cross-link replacements.

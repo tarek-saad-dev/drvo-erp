@@ -77,3 +77,8 @@ Review **only the four general clarifications** above and record a concise accep
 ## After review: approved resolution of mixed-industry Business — ADR-033
 
 The Case B question on multiple Industry activities **within one Business** is now resolved as a general rule in [ADR-033 ACCEPTED](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md): one Business can use compatible Modules/Industry Solutions from multiple sectors while accounting/security legal boundaries remain intact. The other three general policy clarifications (Enterprise org hierarchy, third-party Extension governance, jurisdiction/sector readiness) remain OPEN in [Founder Brief](CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md). Historic hypothetical outcomes above are retained for traceability; no product/enterprise performance was actually tested.
+
+
+## Final status addendum — 2026-10-30 (supersedes the open-question counts above)
+
+The historical scenario findings and original open-question wording above are retained as a trace of the **pre-approval** conceptual exercise. The four general clarifications are **now resolved**: [CONST-01 / ADR-033](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md), [CONST-02 / ADR-034](../05-decisions/ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md), [CONST-03 / ADR-035](../05-decisions/ADR-035-GOVERNED-THIRD-PARTY-EXTENSION-ECOSYSTEM.md), [CONST-04 / ADR-036](../05-decisions/ADR-036-GLOBAL-READY-VERIFIED-INDUSTRY-COUNTRY-RELEASES.md). See [Constitution V1 Final Foundation Review](CORE-CONSTITUTION-V1-FINAL-FOUNDATION-REVIEW.md). This does not change the scenarios into implementation, legal, security or capacity proof.

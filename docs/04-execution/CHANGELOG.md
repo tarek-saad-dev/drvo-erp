@@ -361,3 +361,11 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - Wrote [46 Future Failure/Recovery Test Cases](../02-architecture/FINANCIAL-CONSISTENCY-FAILURE-TEST-MATRIX.md): no tests actually performed.
 - Wrote [ADR-031 PROPOSED](../05-decisions/ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md): Option A atomic first GL+sale in V1 shared SQL conditionally recommended if latency/locking measurable, Option B durable accepted sale with GL_PENDING alternative, **neither approved**.
 - Linked Architecture, Module Registry/Lifecycle, Foundation Review/Core Contracts, README/START-HERE, Cursor, Readiness Gate, Current State and Open Questions. FND-02/FND-04 remain OPEN; no app code, SQL, VPS, testing or production change.
+
+
+## 2026-10-30 — Financial vertical slice & account-mapping design review
+
+- Authored [Sale-to-Ledger End-to-End Design](../02-architecture/SALE-TO-LEDGER-END-TO-END-DESIGN-2026-10-30.md): typed same-SQL atomic vs durable-pending candidate paths, separate sale/GL/treasury/stock/HR state owners, replay/retry/refund behavior, and micro/SME/Enterprise industry stress lenses.
+- Authored [Financial Account Mapping and Close Gates](../02-architecture/FINANCIAL-ACCOUNT-MAPPING-AND-CLOSE-GATES-DESIGN.md): finance review options for cash, credit AR, screenshot-only electronic tender, anonymous buyer collection, cost-pending/late-period corrections and shift/accounting close requirements. No fabricated CoA or tax claims.
+- Integrated links into docs README, Start Here, ADR-031 proposed, Financial Consistency Contract, Cursor preimplementation plan, Open Questions and Current State.
+- **ADR-031 remains PROPOSED; A recommended conditionally, B still open.** No code, SQL migration, security/performance test execution, VPS or Production change.

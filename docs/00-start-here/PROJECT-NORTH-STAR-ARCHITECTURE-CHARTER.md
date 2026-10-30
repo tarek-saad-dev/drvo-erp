@@ -115,3 +115,8 @@ Before approving any architecture change, document:
 ## How this Charter is applied — founder scope confirmation 2026-10-30
 
 The Charter remains the **supreme WHY** (Egypt-scale ambition, any-industry expansion, every business size). Founder clarified Phase-0 should focus on **universal architecture laws rather than predesigning the technical internals of individual Modules**. The canonical short platform-wide HOW is the [DRVO Core Architecture Constitution](DRVO-CORE-ARCHITECTURE-CONSTITUTION.md). For daily work: read Charter → Constitution → accepted ADR register → task-specific detail only when justified. Previously authored financial/Module Activation design drafts remain archived as future reference **without claiming implementation adoption**; accepted founder product decisions are not repealed. No code authorized.
+
+
+## Founder-approved Business independence from Industry — ADR-033 (2026-10-30)
+
+The Charter's any-industry ambition now has an explicit accepted platform rule: [ADR-033](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md) confirms **Business ≠ Industry**. One Business can compose multiple compatible activities/Modules/Extensions without a duplicate codebase or mandatory second Business; real legal/financial entities remain separated as appropriate. Three other Constitution-level policy questions remain pending: [Founder Decision Brief](../02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md). No implementation authorization.

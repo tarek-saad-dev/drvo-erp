@@ -47,3 +47,8 @@ Before implementing POS, Accounting, Treasury, Inventory, HR commissions or offl
 ## Financial journey — mandatory before any implementation (2026-10-30)
 
 New [End-to-End Sale-to-Ledger Design](../02-architecture/SALE-TO-LEDGER-END-TO-END-DESIGN-2026-10-30.md) traces one authorized POS operation through typed Sales/Accounting boundary, deterministic replay, Outbox Stock/HR/Treasury obligations, distinct receipt/GL/payment/cost statuses, refunds and offline/late-period reconciliation. [Tender Mapping & Close Gate Review](../02-architecture/FINANCIAL-ACCOUNT-MAPPING-AND-CLOSE-GATES-DESIGN.md) **does NOT approve any chart of accounts, tax accounting or final posting policy**. ADR-031 remains proposed; Option A vs B needs formal founder/accountant/architect review. No code or tests.
+
+
+## Next platform foundation: Business-scoped Module Activation Engine — 2026-10-30
+
+**Read before any registry, billing/entitlement, Apps catalog, activation/disable/upgrade or Industry Solution code:** [Module Activation Dependency Contract](../02-architecture/MODULE-ACTIVATION-DEPENDENCY-ENGINE-CONTRACT.md), [50 Concurrency & Failure Tests](../02-architecture/MODULE-ACTIVATION-FAILURE-TEST-MATRIX.md), [ADR-032 PROPOSED](../05-decisions/ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md). The founder-approved required full-bundle priced preview/one consent is NOT blanket authorization to implement the proposed state machine, paid approver roles, payment policy or specific Salon graph. Financial first GL A/B is additionally gated by [Atomicity/Performance Decision Gate](../02-architecture/FINANCIAL-ATOMICITY-DECISION-GATE.md), and remains OPEN. No implementation/testing authorization.

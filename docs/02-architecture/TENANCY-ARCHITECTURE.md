@@ -84,3 +84,8 @@ Platform-wide unique username; sign in with username/password without asking for
 ## Accepted cross-industry Business identity — ADR-033 (2026-10-30)
 
 See [ADR-033](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md). Tenant → Business → Branch remains V1 hierarchy; Industry is an **independent composable classification**, not the immutable Business identity. One Business may enable compatible Salon, Retail and other sector capabilities without a forced second Business; real separately registered/financially independent Businesses keep distinct books, permissions and membership. No Holding/subsidiary tree, cross-Business consolidation implementation, multi-country legal design or physical SQL approved. [Three remaining founder platform policies](CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md) remain proposals.
+
+
+## Enterprise Organization general law accepted — ADR-034 (2026-10-30)
+
+[ADR-034 ACCEPTED](../05-decisions/ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md): keep Tenant→Business→Branch as V1's simple security/accounting hierarchy and allow an **optional, extensible** Enterprise group/relationship layer for holdings and subsidiaries. Groups are not automatically legal entities, bank accounts, access rights or a replacement for Branch. Group reporting and intercompany actions need explicit authorized contracts later. **No new required hierarchy level or physical SQL structure** is approved, and actual capacity remains untested. CONST-02 RESOLVED.

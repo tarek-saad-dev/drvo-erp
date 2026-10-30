@@ -110,3 +110,8 @@ Before approving any architecture change, document:
 [ADR-029 — Three-Pillar Architecture Mission](../05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md) · [Industry Architecture](../02-architecture/INDUSTRY-SOLUTIONS-ARCHITECTURE.md) · [Scale Strategy](../02-architecture/SAAS-SCALE-CATALOG-AND-CONTROL-CENTER.md).
 
 **This Charter governs future work. It is NOT a claim of a completed system or a license to start coding.**
+
+
+## How this Charter is applied — founder scope confirmation 2026-10-30
+
+The Charter remains the **supreme WHY** (Egypt-scale ambition, any-industry expansion, every business size). Founder clarified Phase-0 should focus on **universal architecture laws rather than predesigning the technical internals of individual Modules**. The canonical short platform-wide HOW is the [DRVO Core Architecture Constitution](DRVO-CORE-ARCHITECTURE-CONSTITUTION.md). For daily work: read Charter → Constitution → accepted ADR register → task-specific detail only when justified. Previously authored financial/Module Activation design drafts remain archived as future reference **without claiming implementation adoption**; accepted founder product decisions are not repealed. No code authorized.

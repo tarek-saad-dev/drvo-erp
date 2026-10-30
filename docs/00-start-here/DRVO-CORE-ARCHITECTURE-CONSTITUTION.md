@@ -109,3 +109,8 @@ All prior deep drafts **remain accessible** but are **NON-BINDING technical work
 When documents conflict, **do not guess a new rule, retroactively approve a proposal or silently erase accepted founder decisions**. Record the conflict and request an explicit, versioned ADR decision. Exceptions to a platform law require founder review, written reason and migration/exit plan. Every new contributor/Cursor/Codex process reads Charter → Constitution → ADR Register → task-specific documents.
 
 **Current status:** founder explicitly confirms the **focus on universal architecture rules, not premature per-Module implementation detail**. No code, SQL, benchmarks, servers or Production changes authorized.
+
+
+## G. First alignment and four-scenario review — 2026-10-30
+
+[Constitution Consistency Review 01](../02-architecture/CORE-CONSTITUTION-CONSISTENCY-REVIEW-01.md) compared the seven laws with accepted architectural ADRs and found **no direct high-level normative contradiction among the reviewed decisions**. [Four-Scenario Stress Review](../02-architecture/CORE-CONSTITUTION-FOUR-SCENARIO-STRESS-REVIEW.md) tested the **principles conceptually only** against micro Salon, chain/multiple Businesses, large Manufacturing and future medical Clinic. Existing laws remain unchanged, while four founder-level **GENERAL POLICY CLARIFICATIONS** remain OPEN: mixed-industry operation inside one Business, adaptable organization/legal-entity hierarchy, governed Extension ecosystem and industry/region verified eligibility. A review does not certify runtime/security/compliance or settle deferred low-level Module contracts. No code.

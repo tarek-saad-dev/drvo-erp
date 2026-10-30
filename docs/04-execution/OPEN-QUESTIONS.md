@@ -425,13 +425,19 @@ P0 FND-01/FND-10: draft [trusted Tenant/Business/Branch Isolation Contract](../0
 
 ## Founder Constitution review: general platform decisions only — 2026-10-30
 
-[Core Constitution Consistency Review 01](../02-architecture/CORE-CONSTITUTION-CONSISTENCY-REVIEW-01.md) and [Four-Scenario Stress Review](../02-architecture/CORE-CONSTITUTION-FOUR-SCENARIO-STRESS-REVIEW.md) found no high-level normative conflict among the reviewed accepted platform ADRs, but identify **four OPEN FOUNDER-LEVEL GENERAL PLATFORM questions** (NOT per-Module/SQL decisions):
+[Core Constitution Consistency Review 01](../02-architecture/CORE-CONSTITUTION-CONSISTENCY-REVIEW-01.md) and [Four-Scenario Stress Review](../02-architecture/CORE-CONSTITUTION-FOUR-SCENARIO-STRESS-REVIEW.md) found no high-level normative conflict among the reviewed accepted platform ADRs, but originally identified four Constitution-level questions. **CONST-01 is now RESOLVED by accepted ADR-033; only CONST-02/03/04 remain OPEN** (NOT per-Module/SQL decisions):
 
 | ID | Platform-level question | Why it matters |
 |---|---|---|
-| CONST-01 | May one **Business** combine several different Industry Solutions/capabilities, versus using several Businesses under one Tenant? | Avoid the one-hardcoded-industry-per-Business product trap while preserving legal ledgers/isolation |
 | CONST-02 | What general rule permits organizational structures above/beside Tenant→Business→Branch for huge groups/subsidiaries, without replacing the accepted V1 hierarchy now? | Enterprise extensibility and safe cross-legal-entity scope |
 | CONST-03 | Must future marketplace/external Extensions always be reviewed/versioned/permission-scoped **platform releases**, never executable arbitrary code uploaded by a Business? | Scalable ecosystem without giving client-supplied code platform privileges |
 | CONST-04 | Must Industry Solutions/Modules be offered only where their **industry + geography/compliance support** has been validated and declared? | Prevent false "universal" claims for regulated sectors/markets |
 
-These are questions, **not newly accepted ADR policies**. The existing founder-approved Charter and seven-law Constitution remain unchanged, technical ADR-030/031/032 remain PROPOSED. Focus Phase 0 on general foundations only; defer exact POS GL, pricing, tax, SQL, Module activation states and detailed clinical/manufacturing workflows.
+CONST-01 is **accepted and resolved** in [ADR-033](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md). The three rows above remain **questions, not accepted policies**. The Charter and Constitution now reflect ADR-033; technical ADR-030/031/032 remain PROPOSED. Focus Phase 0 on general foundations only; defer exact POS GL, pricing, tax, SQL, Module activation states and detailed clinical/manufacturing workflows.
+
+
+## Current general Constitution policy status — ADR-033 accepted (2026-10-30)
+
+**RESOLVED CONST-01:** a Business is independent of its industry category and may combine compatible sectors/Industry Solution capabilities; separate legal/financial Businesses remain separate. [ADR-033 ACCEPTED](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md).
+
+**OPEN CONST-02/03/04:** enterprise organization hierarchy, governed third-party Extension releases, verified industry/country eligibility. Proposed options: [Three Foundation Policies — founder brief](../02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md). Do NOT silently approve them or launch low-level implementation.

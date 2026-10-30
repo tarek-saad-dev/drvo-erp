@@ -131,3 +131,11 @@
 - [End-to-End Sale-to-Ledger Design Walkthrough](02-architecture/SALE-TO-LEDGER-END-TO-END-DESIGN-2026-10-30.md) — reusable transaction, source-of-truth status vector, recovery windows, optional downstream effects and micro/SME/Enterprise stress cases. **Design only, A vs B still open**.
 - [Financial Account Mapping and Close Gates Design](02-architecture/FINANCIAL-ACCOUNT-MAPPING-AND-CLOSE-GATES-DESIGN.md) — cash custody, credit AR, unverified electronic claim, anonymous collection exception, closed period and cost-pending treatment; actual CoA/tax/receipt/close accounting sign-off **still OPEN**.
 These documents elaborate [ADR-031 PROPOSED](05-decisions/ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md) and preserve ADR-009–013, the founder [Three Pillar Charter](00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md), and the ban on code before separate authorization.
+
+
+## Module Engine & Financial Atomicity Gate — 2026-10-30
+
+- [Financial Atomicity Decision & Performance Gate](02-architecture/FINANCIAL-ATOMICITY-DECISION-GATE.md) — Option A same-SQL Sale+first GL recommended **conditionally**, Option B remains alternative; no benchmark, no acceptance.
+- [Module Activation & Dependency Engine Contract](02-architecture/MODULE-ACTIVATION-DEPENDENCY-ENGINE-CONTRACT.md) — full Required closure, exact price consent, scoped idempotent activation, staged recovery, entitlement truth, secure extension/version changes, deactivation safety. **Design proposal**.
+- [50 Module Activation Negative/Concurrency Tests](02-architecture/MODULE-ACTIVATION-FAILURE-TEST-MATRIX.md) — specification, **zero executed**.
+- [ADR-032 PROPOSED — Business Module Activation/Entitlement/Version Contract](05-decisions/ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md) — unapproved technical recommendation. Founder ADR-007/015/016/020/021 remain accepted, and no code/SQL/Production is authorized.

@@ -41,3 +41,8 @@
 ## Permission evaluation decision (2026-10-28)
 
 Founder accepted **Allow-only + Default Deny** for V1. An action without a valid applicable Allow permission is rejected. No explicit Deny rule. All operations still require scoped membership, resource ownership and security checks. The QR card use case remains unspecified and is not authorization on its own.
+
+
+## P0 trusted authorization / scope hardening draft — 2026-10-30
+
+The [Detailed Isolation Contract](TENANT-BUSINESS-BRANCH-ISOLATION-CONTRACT.md) proposes consistent trusted server-side Tenant/Business/Branch context across APIs, finance/report/export/cache and workers, with [40 negative tests](TENANT-ISOLATION-NEGATIVE-TEST-MATRIX.md). Existing decisions: platform-global unique username, Owner explicit Business Membership, one Role per Branch, Allow-only + Default Deny, Manager scoped profit — are preserved. Delegation, Owner bootstrap, revocation of long-running jobs, support break-glass and physical SQL/RLS remain open; [ADR-030](../05-decisions/ADR-030-TENANT-ISOLATION-ENFORCEMENT.md) is PROPOSED, not approved or implemented.

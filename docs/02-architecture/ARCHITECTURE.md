@@ -86,3 +86,8 @@ A proposed [Financial Consistency Contract](FINANCIAL-CONSISTENCY-CONTRACT.md) a
 ## P0 Module Activation & Financial Atomicity Review (2026-10-30)
 
 [Financial Atomicity/Performance Decision Gate](FINANCIAL-ATOMICITY-DECISION-GATE.md) records what is needed to choose ADR-031 option A vs B with actual finance mapping, measured p95/SQL lock/cross-Tenant tests; **not accepted, no measured load**. [Module Activation Engine](MODULE-ACTIVATION-DEPENDENCY-ENGINE-CONTRACT.md) and [50 Failure Cases](MODULE-ACTIVATION-FAILURE-TEST-MATRIX.md) give the foundation the user needs to start with few Modules and add more without one-off code forks, price/permission fraud, invalid dependency DAGs or historical-data loss. [ADR-032 PROPOSED](../05-decisions/ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md) is NOT final policy. FND-02/03/05 remain OPEN, and enterprise physical scale still requires independent tests. No code/SQL deployment.
+
+
+## Founder platform identity clarification — ADR-033 accepted (2026-10-30)
+
+[Business identity is industry-independent](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md). Tenant/Business/Branch authorization remains stable as one Business combines compatible Industry Solutions and Modules; distinct legal/financial Businesses retain separate books and grants. Primary industry is not permanent exclusive classification. [Three remaining policy proposals](CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md) are not accepted. No schema/design implementation inferred.

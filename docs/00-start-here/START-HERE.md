@@ -32,3 +32,8 @@ Before editing: identify impacted docs, tests and architecture. After editing: u
 ## Phase-0 foundation review — 2026-10-30 (MANDATORY before implementation)
 
 Before treating the current architecture as build-ready, read the [Foundation Architecture Gap Review](../02-architecture/FOUNDATION-ARCHITECTURE-REVIEW-2026-10-30.md) and [Core Contracts Proposal](../02-architecture/FOUNDATION-CORE-CONTRACTS-PROPOSAL.md). The founder charter direction is accepted, but tenant-scoped resource/worker isolation, POS first journal consistency, atomic dependency/paid activation, Module compatibility and enterprise workload proof are NOT yet finalized or tested. Review findings are proposals/risks, not production bugs or approved schemas. No code is authorized.
+
+
+## Tenant Isolation first security design gate — 2026-10-30
+
+Read the [Tenant/Business/Branch Isolation Contract](../02-architecture/TENANT-BUSINESS-BRANCH-ISOLATION-CONTRACT.md), [40 negative threat and test scenarios](../02-architecture/TENANT-ISOLATION-NEGATIVE-TEST-MATRIX.md), and [PROPOSED ADR-030](../05-decisions/ADR-030-TENANT-ISOLATION-ENFORCEMENT.md) before any scoped API/SQL/worker implementation. Approved product-level identity and default-deny roles are preserved, but detailed FK/RLS, Support/Manager delegated powers and data movement are not yet signed off. **No code or security tests performed.**

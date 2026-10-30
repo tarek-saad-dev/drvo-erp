@@ -1,7 +1,7 @@
-# DRVO ERP — Remaining Foundation Policy Choices (Two Open)
+# DRVO ERP — Remaining Foundation Policy Choices (One Open)
 
 **Date:** 2026-10-30
-**Status:** **CONST-01 and CONST-02 RESOLVED by approved ADR-033/034. CONST-03 and CONST-04 remain PROPOSED, not accepted.**
+**Status:** **CONST-01 and CONST-02 RESOLVED by approved ADR-033/034. CONST-03 RESOLVED by approved ADR-035; only CONST-04 remains PROPOSED, not accepted.**
 **Scope:** Only cross-platform architectural laws; no POS/Accounting/Module activation schemas, manifests, implementation tests or deployment.
 **Already resolved:** CONST-01 mixed-industry Business by [ADR-033 ACCEPTED](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md): Business ≠ Industry; a Business may compose compatible capabilities/Industry Solutions without new ERP fork or mandatory second Business.
 
@@ -17,11 +17,11 @@
 
 **Deferred:** new group/subsidiary entity schema, memberships, tax group accounting, permissions and SQL table design.
 
-## CONST-03 — Trusted Extension ecosystem
+## CONST-03 — Trusted Extension ecosystem (RESOLVED by ADR-035)
 
 **Question:** How can third-party developers eventually contribute Extensions and Integrations without letting an arbitrary Business-uploaded package execute with core SaaS privileges?
 
-**Recommended general rule (NOT YET ACCEPTED):** All extensions capable of executing inside DRVO's platform must be **reviewed, versioned, permission-scoped, compatibility-tested and released through a controlled DRVO release/approval lifecycle**, regardless of whether authored internally or externally. Tenant activation only selects approved compatible releases/configurations. An external Integration must follow explicit APIs/scoped credentials. Exact sandbox/plugin marketplace architecture to be designed when opening third-party publishing.
+**Founder-approved general rule ([ADR-035 ACCEPTED](../05-decisions/ADR-035-GOVERNED-THIRD-PARTY-EXTENSION-ECOSYSTEM.md)):** All extensions capable of executing inside DRVO's platform must be **reviewed, versioned, permission-scoped, compatibility-tested and released through a controlled DRVO release/approval lifecycle**, regardless of whether authored internally or externally. Tenant activation only selects approved compatible releases/configurations. An external Integration must follow explicit APIs/scoped credentials. Exact sandbox/plugin marketplace architecture to be designed when opening third-party publishing.
 
 **Risk of not resolving:** an ecosystem could become a direct security and backwards-compatibility threat to every Tenant.
 
@@ -37,15 +37,15 @@
 
 **Deferred:** country-specific regulations, tax engines, residency rules, detailed compliance certification checklists and legal advice.
 
-## Founder decision matrix — two questions remain open
+## Founder decision matrix — one question remains open
 
 | ID | Recommended principle | Impact if approved | Current status |
 |---|---|---|---|
 | CONST-02 | V1 hierarchy stays, with optional extensible Enterprise Organization | Future groups/subsidiaries without rearchitecting whole platform | **RESOLVED — ADR-034 ACCEPTED** |
-| CONST-03 | No arbitrary executable customer plugins; governed release lifecycle for third parties | Security and controlled ecosystem growth | **OPEN — PROPOSED** |
+| CONST-03 | No arbitrary executable customer plugins; governed release lifecycle for third parties | Security and controlled ecosystem growth | **RESOLVED — ADR-035 ACCEPTED** |
 | CONST-04 | Explicit validated support per industry/jurisdiction before availability claims | Safe multi-sector and cross-border onboarding | **OPEN — PROPOSED** |
 
-## After remaining approvals
+## After final CONST-04 approval
 1. Update the **seven existing Constitution laws with minimal clarifications**, avoiding new bulky technical specifications.
 2. Record accepted founder-level ADR(s) only for genuinely new decisions; do not multiply ADRs where a rule already clearly covers the case.
 3. Run a one-page final cross-platform readiness review (Charter consistency + four scenarios + three policy decisions). Mark **Architecture Constitution V1 as stable design direction**, not secure/enterprise-verified production.

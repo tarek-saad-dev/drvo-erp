@@ -46,3 +46,8 @@ Previous product-rule signoff does not mean DRVO is ready to write the architect
 ## Financial consistency detailed contract review — 2026-10-30
 
 The [Financial Consistency Contract](../02-architecture/FINANCIAL-CONSISTENCY-CONTRACT.md) and [46 Future Failure/Recovery Tests](../02-architecture/FINANCIAL-CONSISTENCY-FAILURE-TEST-MATRIX.md) detail owner-separated sale/GL/tender/stock/HR states and ADR-009–013 outcomes. [ADR-031](../05-decisions/ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md) is PROPOSED, not signed off: V1 shared SQL atomic sale+first GL preferred only conditionally on latency/lock evidence; durable GL_PENDING option requires hard reconciliation. Final tender accounts, receipts, tax policy, refund ordering, status names, operation/effect dedupe and close-blocker rules remain precode P0. **Zero tests run; no code permitted.**
+
+
+## Module Activation & Financial Atomicity are still pre-code blockers — 2026-10-30
+
+[First-GL Atomicity Decision Gate](../02-architecture/FINANCIAL-ATOMICITY-DECISION-GATE.md) explains why choosing A vs B requires explicit finance mapping and **future authorized measured** SQL/p95/throughput evidence; ADR-031 remains PROPOSED. [Module Activation Contract](../02-architecture/MODULE-ACTIVATION-DEPENDENCY-ENGINE-CONTRACT.md), [50 Test Scenarios](../02-architecture/MODULE-ACTIVATION-FAILURE-TEST-MATRIX.md) and [ADR-032 PROPOSED](../05-decisions/ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md) define design review of full bundle price consent, state/entitlement truth, concurrency, version compatibility, historical integrity. Final approver/pricing/migrations/SQL implementation remain OPEN. Nothing here permits writing application code, SQL or running benchmarks.

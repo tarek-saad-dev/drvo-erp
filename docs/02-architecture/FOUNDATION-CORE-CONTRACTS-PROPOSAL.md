@@ -108,3 +108,8 @@ Two candidate choices for the FIRST mandatory journal of a POS sale:
 ## P0 Scope Contract expanded — 2026-10-30
 
 Use the [Detailed Isolation Contract](TENANT-BUSINESS-BRANCH-ISOLATION-CONTRACT.md) and [40-case Threat/Test Matrix](TENANT-ISOLATION-NEGATIVE-TEST-MATRIX.md) as detailed proposal for Section 1. They preserve founder-approved identity and Default-Deny semantics and expose still-open FK layout, optional RLS and support/delegation decisions. [ADR-030](../05-decisions/ADR-030-TENANT-ISOLATION-ENFORCEMENT.md) remains PROPOSED. Financial POS/GL A vs B, activation and versioning options are not altered.
+
+
+## Financial boundary elaboration — 2026-10-30
+
+[Financial Consistency Contract](FINANCIAL-CONSISTENCY-CONTRACT.md) and [46-Failure Matrix](FINANCIAL-CONSISTENCY-FAILURE-TEST-MATRIX.md) elaborate Section 5, preserving earlier unsolved A (same SQL transaction) vs B (durable `ACCOUNTING_PENDING`) options and founder ADR-009–013. [ADR-031](../05-decisions/ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md) records a conditional **recommendation for Option A, NOT a selected posting policy**. Final account mapping for unverified electronic tender, period/tax handling, idempotency, partial refunds, close/reconciliation and latency remain open. No code.

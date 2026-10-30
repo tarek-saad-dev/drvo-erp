@@ -79,3 +79,8 @@ Platform-wide unique username; sign in with username/password without asking for
 ## Detailed P0 isolation contract drafted — 2026-10-30
 
 [Isolation Contract](TENANT-BUSINESS-BRANCH-ISOLATION-CONTRACT.md) and [40-case Negative Threat/Test Matrix](TENANT-ISOLATION-NEGATIVE-TEST-MATRIX.md) now detail Tenant→Business→Branch ownership, protected API/SQL/resource relationships, safe authorization for background events/jobs, cache/search/BI/files and future placement. Existing founder requirements **platform-global unique usernames, explicit Business Owner membership, one Role per Branch, Allow-only + Default Deny, Business-wide locale and scoped Manager profit** remain unchanged. Physical scoped FK/index/RLS choice, exact effective-role matrix and support break-glass remain OPEN; [ADR-030](../05-decisions/ADR-030-TENANT-ISOLATION-ENFORCEMENT.md) is **PROPOSED only**. No code/SQL, no tests run.
+
+
+## Accepted cross-industry Business identity — ADR-033 (2026-10-30)
+
+See [ADR-033](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md). Tenant → Business → Branch remains V1 hierarchy; Industry is an **independent composable classification**, not the immutable Business identity. One Business may enable compatible Salon, Retail and other sector capabilities without a forced second Business; real separately registered/financially independent Businesses keep distinct books, permissions and membership. No Holding/subsidiary tree, cross-Business consolidation implementation, multi-country legal design or physical SQL approved. [Three remaining founder platform policies](CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md) remain proposals.

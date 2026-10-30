@@ -111,3 +111,8 @@ A Business can operate on an industry-appropriate minimum dependency-valid start
 ## Priority architecture audit overlay — 2026-10-30
 
 The design correctly separates Global Module release and per-Business activation and allows Core/Extension/Domain composition. It is **NOT implementation-approved** until [Foundation Review FND-01–05](FOUNDATION-ARCHITECTURE-REVIEW-2026-10-30.md): trusted scope, which critical POS/Accounting work commits atomically versus via durable pending, idempotent activation despite concurrent changes, signed release/versioned contracts and deterministic extension conflict rules. [Proposed contracts & finance A/B](FOUNDATION-CORE-CONTRACTS-PROPOSAL.md) explicitly remain choices, **not** accepted transaction policies. No code or SQL migrations authorized.
+
+
+## FND-02/FND-04 Financial Contract review required — 2026-10-30
+
+The accepted Core/Extension and at-least-once outbox direction must follow [Financial Consistency Contract](FINANCIAL-CONSISTENCY-CONTRACT.md) for owner-specific sale, first GL, tender verification, stock cost and HR commission truth. [ADR-031](../05-decisions/ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md) is **PROPOSED**: Option A (same SQL transaction for source sale + first mandatory balanced GL) conditionally recommended based on future measured V1 latency; B (durable accepted sale with GL_PENDING) alternative and hard reconciliation remains viable. No actual Posting boundary approved, and no fund/paid badge inferred from customer evidence. [46 Failure Tests](FINANCIAL-CONSISTENCY-FAILURE-TEST-MATRIX.md) specify replay/refund/late-period/stock/credit invariants (zero tests executed). FND-02/FND-04 remain OPEN.

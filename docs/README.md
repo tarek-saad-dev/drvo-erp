@@ -1,13 +1,8 @@
 # DRVO ERP documentation index
 
-> **LATEST FOUNDER DECISION — ADR-034 ACCEPTED:** [Optional Enterprise Organization](05-decisions/ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md): Tenant→Business→Branch stays the simple V1 foundation; larger groups may use an optional organizational relationship layer without merging legal books or granting implicit access. **CONST-01/02 RESOLVED; CONST-03/04 remain OPEN.**
+> **CURRENT PLATFORM STATUS — 2026-10-31:** [Core Constitution V1](00-start-here/DRVO-CORE-ARCHITECTURE-CONSTITUTION.md) and [ADR-033 through ADR-037](05-decisions/DECISIONS.md) are **founder-approved architectural direction**. [Lean Kernel](05-decisions/ADR-037-LEAN-PLATFORM-KERNEL-BOUNDARY.md) separates universal platform governance from Business-domain data and workflows. The [Universal Master Architecture Map](02-architecture/DRVO-UNIVERSAL-ERP-ARCHITECTURE-MASTER-MAP-V1.md) and Kernel 01–04 are **working responsibility maps**, not implemented or ratified technical architecture. [Foundation Closure and New-Industry Gates](04-execution/FOUNDATION-CLOSURE-AND-NEW-INDUSTRY-READINESS-GATES.md) explicitly mark **F0 approved; F1 documented for review; F2 technical readiness OPEN**. ADR-030/031/032 remain PROPOSED. No code, SQL, runtime tests or Production authorization.
 
-> **NEW FOUNDER DECISION — ADR-033 ACCEPTED:** [Business identity is independent of Industry](05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md). One Business can compose compatible multi-industry capabilities; do not create another Business merely for a different industry. Actual legal/financial boundaries remain separate. [Two remaining general Constitution policy proposals](02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md) are **CONST-03/04 remain OPEN**; ADR-034 has now resolved Enterprise Structure. No implementation instructions.
-
-> **PHASE-0 CURRENT PRIORITY — CORE RULES, NOT PER-MODULE IMPLEMENTATION DETAILS:** Read [DRVO Core Architecture Constitution](00-start-here/DRVO-CORE-ARCHITECTURE-CONSTITUTION.md) immediately after the [Founder Architecture Charter](00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md). Founder confirmed focus on seven universal platform laws and cross-industry/size stress review. Deep POS/Accounting/Activation drafts remain deferred specialist designs; proposed ADR-030/031/032 have NOT been adopted. No code authorization.
-
-> **FOUNDATIONAL FOUNDER MISSION — READ BEFORE ALL OTHER DOCS:** [DRVO ERP Architecture Charter: Egypt-scale platform × Any Industry × Micro-to-Enterprise](00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md). Enforced by [ADR-029](05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md) and [Universal ERP Architecture Fitness Gates](02-architecture/UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md). All architecture/module decisions must assess all three pillars. This is a strategic mission, not current verified enterprise capacity.
-
+> **MANDATORY READING ORDER:** [Founder Charter](00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) → [Constitution V1](00-start-here/DRVO-CORE-ARCHITECTURE-CONSTITUTION.md) → [Accepted ADR Register](05-decisions/DECISIONS.md) → [Master Map](02-architecture/DRVO-UNIVERSAL-ERP-ARCHITECTURE-MASTER-MAP-V1.md) → targeted Module/technical drafts. Historical date-stamped proposals below remain reference material only and do not override later approved ADRs.
 
 ## Required reading for a new developer or AI agent
 
@@ -23,6 +18,16 @@
 10. [Open questions](04-execution/OPEN-QUESTIONS.md)
 11. [Change protocol](04-execution/CHANGE-PROTOCOL.md)
 12. [Changelog](04-execution/CHANGELOG.md)
+
+## Unified architecture navigation (new foundation)
+
+- **[Master Map V1 — where every feature belongs](02-architecture/DRVO-UNIVERSAL-ERP-ARCHITECTURE-MASTER-MAP-V1.md)** — classify universal Kernel, Shared Modules, Extensions, independent Domains, Integrations, Industry Solutions, commercial platform and Operations.
+- [Kernel 01 — Identity, Tenancy & Authorization](02-architecture/PLATFORM-KERNEL-IDENTITY-TENANCY-AUTHORIZATION-BOUNDARY-V1.md) — working map; ADR-030 proposed.
+- [Kernel 02 — Module Registry & Lifecycle](02-architecture/PLATFORM-KERNEL-MODULE-REGISTRY-AND-LIFECYCLE-BOUNDARY-V1.md) — working map; ADR-032 proposed.
+- [Kernel 03 — Entitlements vs DRVO commercial subscriptions](02-architecture/PLATFORM-KERNEL-ENTITLEMENTS-AND-SUBSCRIPTION-BOUNDARY-V1.md) — working map; no pricing/billing engine approved.
+- [Kernel 04 — Audit & Contracts](02-architecture/PLATFORM-KERNEL-AUDIT-AND-CONTRACTS-BOUNDARY-V1.md) — working map; ADR-031 proposed.
+- **[F0 / F1 / F2 Foundation Closure & New-Industry Gates](04-execution/FOUNDATION-CLOSURE-AND-NEW-INDUSTRY-READINESS-GATES.md)** — precise boundaries between approved principles, conceptual maps and pending engineering proof.
+- [New Industry Onboarding Playbook](04-execution/NEW-INDUSTRY-ONBOARDING-PLAYBOOK.md) — repeatable business/sector intake, not instant country or industry certification.
 
 ## Multi-industry architecture (approved direction)
 

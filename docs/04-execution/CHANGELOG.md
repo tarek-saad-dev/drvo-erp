@@ -352,3 +352,12 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - Authored [40-case Negative Threat/Test Matrix](../02-architecture/TENANT-ISOLATION-NEGATIVE-TEST-MATRIX.md): API IDOR, SQL cross-ancestor references, cache/search/export/BI, spoofed event workers, support/clinic privacy, stale revocation and future Tenant placement. **No tests executed.**
 - Added [ADR-030 (PROPOSED)](../05-decisions/ADR-030-TENANT-ISOLATION-ENFORCEMENT.md) with recommended server-derived trusted scope + scoped data enforcement; physical FK design/RLS, Manager delegation and support break-glass await founder/security review.
 - Cross-linked README/START-HERE/Tenancy/Identity/Architecture Foundation Review/Core Contracts/Cursor plan/Open Questions/Current State. P0 FND-01 remains OPEN; no application code, SQL, security test, VPS or production modifications.
+
+
+## 2026-10-30 — P0 Financial consistency design package (no code)
+
+- Reviewed founder-approved ADR-009–013 for SQL Server + Windows/PWA IndexedDB offline, credit post-sync holds, customer-evidence electronic payments, provisional/missing negative-stock cost and open-period posting of delayed offline sales.
+- Wrote [Financial Consistency Contract](../02-architecture/FINANCIAL-CONSISTENCY-CONTRACT.md) with separately truthful POS sale / Accounting first GL / Treasury payment verification / Inventory valuation / HR commission and reconciled states, source/effect idempotency, refunds and recoveries.
+- Wrote [46 Future Failure/Recovery Test Cases](../02-architecture/FINANCIAL-CONSISTENCY-FAILURE-TEST-MATRIX.md): no tests actually performed.
+- Wrote [ADR-031 PROPOSED](../05-decisions/ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md): Option A atomic first GL+sale in V1 shared SQL conditionally recommended if latency/locking measurable, Option B durable accepted sale with GL_PENDING alternative, **neither approved**.
+- Linked Architecture, Module Registry/Lifecycle, Foundation Review/Core Contracts, README/START-HERE, Cursor, Readiness Gate, Current State and Open Questions. FND-02/FND-04 remain OPEN; no app code, SQL, VPS, testing or production change.

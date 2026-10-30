@@ -63,3 +63,8 @@ These belong to dedicated Module/ops delivery phases. Their existing detailed do
 Run [Four Scenario Constitution Stress Review](CORE-CONSTITUTION-FOUR-SCENARIO-STRESS-REVIEW.md). Then write **only** short founder-level proposed clarifications for C-01 through C-04 if needed, with scope/compatibility impacts; leave C-05 covered by existing Charter unless an actual contradiction emerges. Do not generate more technical module-level drafts as a response to these general questions.
 
 **No app code, SQL migrations, runtime tests, VPS or Production changes.**
+
+
+## Post-review founder decision — ADR-033 accepted (2026-10-30)
+
+This report is a **point-in-time assessment**; its earlier C-01 proposal has now been explicitly resolved by [ADR-033 ACCEPTED](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md). One Business may combine compatible industry capabilities without copying ERP or creating another Business solely because its industry changes. Keep actual legal/financial separation and security guarantees. **C-02/03/04 remain OPEN** in the [Founder Policy Brief](CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md). C-05 remains covered by the original Charter. No code, tests or operational readiness claims.

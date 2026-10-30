@@ -72,3 +72,8 @@ For each imaginary Business ask the same seven Constitution questions:
 Review **only the four general clarifications** above and record a concise accepted ADR if they represent new policies. If the founder agrees that existing laws already cover the case, mark `COVERED BY EXISTING LAW` and do NOT inflate the constitution or ADR inventory. If unresolved, keep `OPEN` without demanding low-level design.
 
 **Conclusion:** the Constitution survives these four conceptual situations as a coherent foundation, with four explicit **policy boundary questions** remaining. This is direction-level fitness, not security certification, universal industry readiness, Enterprise SLA or permission to implement. **Phase-0 docs only.**
+
+
+## After review: approved resolution of mixed-industry Business — ADR-033
+
+The Case B question on multiple Industry activities **within one Business** is now resolved as a general rule in [ADR-033 ACCEPTED](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md): one Business can use compatible Modules/Industry Solutions from multiple sectors while accounting/security legal boundaries remain intact. The other three general policy clarifications (Enterprise org hierarchy, third-party Extension governance, jurisdiction/sector readiness) remain OPEN in [Founder Brief](CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md). Historic hypothetical outcomes above are retained for traceability; no product/enterprise performance was actually tested.

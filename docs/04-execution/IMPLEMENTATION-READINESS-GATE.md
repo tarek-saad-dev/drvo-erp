@@ -36,3 +36,8 @@ Two-device credit limit exceeded flagged and not silently discarded; fake custom
 4. **Late offline sale after month close:** preserve original sale date and post linked adjustment into the current open accounting period, **without a separate additional manual tax review step** by default. This is a workflow preference, not a waiver of mandatory local tax laws, filing obligations, or jurisdiction-specific validations before production.
 
 These four points supersede earlier open recommendations in this document. **Technical sign-off for these business behaviors is approved; overall production/implementation authorization is NOT given. No coding without explicit founder permission.**
+
+
+## Mandatory cross-cutting architecture gaps — 2026-10-30
+
+Previous product-rule signoff does not mean DRVO is ready to write the architecture or ship. [Foundation Review](../02-architecture/FOUNDATION-ARCHITECTURE-REVIEW-2026-10-30.md) records P0 pending technical contracts: verified Tenant/Business/Branch resource and event/worker/cache scope; POS-first GL atomicity vs durable pending and financial status; paid activation concurrency/quote/idempotency; Core/Extension/version/event ownership. No actual tests or production evidence. [Core Contracts Proposal](../02-architecture/FOUNDATION-CORE-CONTRACTS-PROPOSAL.md) is for approval discussion, not an automatic decision. **All implementation still needs explicit founder code authorization.**

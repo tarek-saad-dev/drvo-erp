@@ -120,6 +120,10 @@ flowchart TB
 
 **Follow-up working boundary map:** [Kernel 02 — Module Registry & Lifecycle](PLATFORM-KERNEL-MODULE-REGISTRY-AND-LIFECYCLE-BOUNDARY-V1.md) separates global release, Industry Solution composition, per-Business activation, paid entitlement and per-user access, without accepting ADR-032 or physical activation design.
 
+**Additional Phase-0 working boundaries:** [Kernel 03 — Entitlements & DRVO Subscription Boundary](PLATFORM-KERNEL-ENTITLEMENTS-AND-SUBSCRIPTION-BOUNDARY-V1.md) separates effective rights from commercial payment truth; [Kernel 04 — Audit & Contracts](PLATFORM-KERNEL-AUDIT-AND-CONTRACTS-BOUNDARY-V1.md) separates trusted cross-cutting governance from domain-owned records.
+
+**One entrypoint for future industries:** [DRVO ERP Master Architecture Map V1](DRVO-UNIVERSAL-ERP-ARCHITECTURE-MASTER-MAP-V1.md) and [Foundation Closure / New-Industry Gates](../04-execution/FOUNDATION-CLOSURE-AND-NEW-INDUSTRY-READINESS-GATES.md). They are navigation/working policy checks, not implementation sign-off.
+
 ## 8. Approval / implementation status
 
 - **Accepted already:** overarching Charter and Constitution V1; ADR-002/003/006/007/015/016/017/018/019/020/021/029/033/034/035/036 as individually scoped.

@@ -421,3 +421,17 @@ P0 FND-01/FND-10: draft [trusted Tenant/Business/Branch Isolation Contract](../0
 ## P0 Module Activation and initial GL decision fitness — 2026-10-30
 
 [ADR-032 PROPOSED](../05-decisions/ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md), [Activation Engine](../02-architecture/MODULE-ACTIVATION-DEPENDENCY-ENGINE-CONTRACT.md), [50 Planned Tests](../02-architecture/MODULE-ACTIVATION-FAILURE-TEST-MATRIX.md) document the open FND-03/05/09 scope. **Unresolved:** final Salon starter & actual Required edges, Business-wide purchasing authorization and Manager delegation, manual payment/verified entitlement/proration/refunds, bundle initializer/compensation, concurrent graph CAS, version/hook policy, disable/suspend while dependents and financial obligations exist, test workload and enterprise placement. **No tests executed.** [Financial A/B Decision Gate](../02-architecture/FINANCIAL-ATOMICITY-DECISION-GATE.md) keeps FND-02 unresolved until accounting GL/tender mapping, founder choice and measured p95/SQL failure evidence exist; do not infer adoption of Option A from the conditional recommendation. No code permission granted.
+
+
+## Founder Constitution review: general platform decisions only — 2026-10-30
+
+[Core Constitution Consistency Review 01](../02-architecture/CORE-CONSTITUTION-CONSISTENCY-REVIEW-01.md) and [Four-Scenario Stress Review](../02-architecture/CORE-CONSTITUTION-FOUR-SCENARIO-STRESS-REVIEW.md) found no high-level normative conflict among the reviewed accepted platform ADRs, but identify **four OPEN FOUNDER-LEVEL GENERAL PLATFORM questions** (NOT per-Module/SQL decisions):
+
+| ID | Platform-level question | Why it matters |
+|---|---|---|
+| CONST-01 | May one **Business** combine several different Industry Solutions/capabilities, versus using several Businesses under one Tenant? | Avoid the one-hardcoded-industry-per-Business product trap while preserving legal ledgers/isolation |
+| CONST-02 | What general rule permits organizational structures above/beside Tenant→Business→Branch for huge groups/subsidiaries, without replacing the accepted V1 hierarchy now? | Enterprise extensibility and safe cross-legal-entity scope |
+| CONST-03 | Must future marketplace/external Extensions always be reviewed/versioned/permission-scoped **platform releases**, never executable arbitrary code uploaded by a Business? | Scalable ecosystem without giving client-supplied code platform privileges |
+| CONST-04 | Must Industry Solutions/Modules be offered only where their **industry + geography/compliance support** has been validated and declared? | Prevent false "universal" claims for regulated sectors/markets |
+
+These are questions, **not newly accepted ADR policies**. The existing founder-approved Charter and seven-law Constitution remain unchanged, technical ADR-030/031/032 remain PROPOSED. Focus Phase 0 on general foundations only; defer exact POS GL, pricing, tax, SQL, Module activation states and detailed clinical/manufacturing workflows.

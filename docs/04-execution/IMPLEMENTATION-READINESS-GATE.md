@@ -41,3 +41,8 @@ These four points supersede earlier open recommendations in this document. **Tec
 ## Mandatory cross-cutting architecture gaps — 2026-10-30
 
 Previous product-rule signoff does not mean DRVO is ready to write the architecture or ship. [Foundation Review](../02-architecture/FOUNDATION-ARCHITECTURE-REVIEW-2026-10-30.md) records P0 pending technical contracts: verified Tenant/Business/Branch resource and event/worker/cache scope; POS-first GL atomicity vs durable pending and financial status; paid activation concurrency/quote/idempotency; Core/Extension/version/event ownership. No actual tests or production evidence. [Core Contracts Proposal](../02-architecture/FOUNDATION-CORE-CONTRACTS-PROPOSAL.md) is for approval discussion, not an automatic decision. **All implementation still needs explicit founder code authorization.**
+
+
+## Financial consistency detailed contract review — 2026-10-30
+
+The [Financial Consistency Contract](../02-architecture/FINANCIAL-CONSISTENCY-CONTRACT.md) and [46 Future Failure/Recovery Tests](../02-architecture/FINANCIAL-CONSISTENCY-FAILURE-TEST-MATRIX.md) detail owner-separated sale/GL/tender/stock/HR states and ADR-009–013 outcomes. [ADR-031](../05-decisions/ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md) is PROPOSED, not signed off: V1 shared SQL atomic sale+first GL preferred only conditionally on latency/lock evidence; durable GL_PENDING option requires hard reconciliation. Final tender accounts, receipts, tax policy, refund ordering, status names, operation/effect dedupe and close-blocker rules remain precode P0. **Zero tests run; no code permitted.**

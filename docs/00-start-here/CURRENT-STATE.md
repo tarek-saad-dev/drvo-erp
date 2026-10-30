@@ -1,5 +1,7 @@
 # Current state
 
+> **LATEST PLATFORM LAW — ADR-034 ACCEPTED (ENTERPRISE ORGANIZATION OPTIONAL).** [ADR-034](../05-decisions/ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md) retains Tenant→Business→Branch while permitting **optional** Enterprise group relationships without implicit cross-Business permissions/merged books. **CONST-01 and CONST-02 RESOLVED; only CONST-03 and CONST-04 remain OPEN**. This supersedes older phase snapshots below; no code/SQL/tests/Production.
+
 > **CURRENT FOUNDER FOUNDATION DECISION: ADR-033 ACCEPTED — BUSINESS ≠ INDUSTRY.** [ADR-033](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md) means one Business may combine compatible industries/Modules without forced separate Business, while true legal/financial businesses remain distinct. **Only three platform Constitution questions remain OPEN**: org hierarchy beyond V1, controlled Extension developer ecosystem, verified industry/jurisdiction support; [founder brief](../02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md). ADR-030/031/032 still proposed. Phase 0 docs only.
 
 > **FOUNDATION / NO EXCEPTION:** [Founder Three-Pillar Project Charter](PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md), [ADR-029](../05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md). The product must target Egypt-scale platform adoption, an extensible method to serve any *investigated* business industry, and Business sizes micro-to-enterprise. Domain/module composition enables feature growth; operational/capacity scaling is a separate measurable design axis. Mission is accepted, **not yet a verified capacity claim**.
@@ -299,3 +301,8 @@ Founder explicitly confirmed that the goal NOW is **a strong general-purpose Arc
 ## Founder's Business/Industry independence approval — 2026-10-30
 
 Founder accepted [ADR-033 Business Identity Is Independent of Industry](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md). CONST-01 RESOLVED at general platform level; one Business may compose multiple industry activities and compatible extensions; primary industry is non-exclusive onboarding recommendation, separate legal/financial Business units remain separate. [Remaining Foundation Brief](../02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md) tracks CONST-02/03/04 **PROPOSED / open**. Existing high-level Charter and Seven Laws unchanged except clarification; no Module specifics implemented, no actual scale evidence, no SQL/code/VPS/Production changes.
+
+
+## Founder's enterprise hierarchy approval — ADR-034 (2026-10-30)
+
+Founder accepted [ADR-034](../05-decisions/ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md): Enterprise-ready, Small-Business Simple. Keep V1 Tenant/Business/Branch ownership, add **optional** extensible Enterprise relationships when needed, preserve independent legal/financial books and explicit Business/Branch access. **CONST-02 RESOLVED**, along with earlier CONST-01 (ADR-033). **Only CONST-03 external Extension governance and CONST-04 industry/jurisdiction verified support remain OPEN** in [Foundation Policy Brief](../02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md). No Company/Subsidiary SQL schema, complex generic organization engine or runtime work approved.

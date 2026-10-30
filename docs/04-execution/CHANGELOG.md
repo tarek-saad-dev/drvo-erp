@@ -335,3 +335,12 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - Added top-level [Founder Architecture Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md), accepted [ADR-029](../05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md), and detailed design [Universal ERP Fitness Gates](../02-architecture/UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md).
 - Linked as **mandatory first reading** in START-HERE and README; embedded into Product Vision, Architecture, Industry Solutions, SaaS Scale Catalog, Modules, Industry Onboarding, Incremental Growth, Cursor Pre-code Gate, Change Protocol, Current State and Open Questions.
 - Explicitly reject equivalence of extra Modules with higher SQL/operational throughput and unsupported claims about universal/enterprise readiness. Existing V1 Modular Monolith and shared SQL Server unchanged; future placement and capacity changes only on evidence. No coding, SQL migration, test, server or production changes.
+
+
+## 2026-10-30 — Foundation Architecture Review 01 / no-code assessment
+
+- Reviewed Module Registry & Dependencies, Module Lifecycle/Communication, Tenancy, Industry Starter, Core-Extension/Domain boundaries, Industry Solutions and SaaS Scale against accepted three-pillar founder charter ADR-029.
+- New [Foundation Architecture Review 01](../02-architecture/FOUNDATION-ARCHITECTURE-REVIEW-2026-10-30.md): 12 prioritized P0/P1/P2 design gaps, no runtime defects assumed; hypothetical micro Salon, multi-branch chain, and large manufacturing assessment.
+- New [Core Contracts Proposal](../02-architecture/FOUNDATION-CORE-CONTRACTS-PROPOSAL.md): scope, activation/entitlement/versioning, event/finance boundary and future placement design seams; all are explicitly unapproved technical options.
+- Clarified in Tenancy Architecture that ADR-007/016 supersede earlier dependency-not-approved note while final paid activation approver remains open; linked review to key architecture docs, README, pre-code/readiness gates and Open Questions.
+- No application code, actual database schema, tests, server access or Production deployment.

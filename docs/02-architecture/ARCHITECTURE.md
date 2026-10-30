@@ -1,5 +1,7 @@
 # Architecture baseline
 
+> **Architecture index (Phase 0):** [Master Architecture Map](DRVO-UNIVERSAL-ERP-ARCHITECTURE-MASTER-MAP-V1.md), [Kernel 03 Entitlements](PLATFORM-KERNEL-ENTITLEMENTS-AND-SUBSCRIPTION-BOUNDARY-V1.md), [Kernel 04 Audit and Contracts](PLATFORM-KERNEL-AUDIT-AND-CONTRACTS-BOUNDARY-V1.md), and [Foundation Readiness Gates](../04-execution/FOUNDATION-CLOSURE-AND-NEW-INDUSTRY-READINESS-GATES.md). These are documentation and design reviews; ADR-030/031/032 remain proposed.
+
 > **FOUNDER-APPROVED LEAN KERNEL PRINCIPLE — [ADR-037](../05-decisions/ADR-037-LEAN-PLATFORM-KERNEL-BOUNDARY.md):** universal identity/scope/permissions and module governance belong to a small shared Kernel; POS/Accounting/HR and other Business-domain records/workflows remain with their Module owners. The [Kernel Boundary Map V1](PLATFORM-KERNEL-BOUNDARY-MAP-V1-PROPOSAL.md) is updated to show this principle accepted; **adjacent component placement and technical contracts are still working proposals**. No code, SQL or Production authorization.
 
 

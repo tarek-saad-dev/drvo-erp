@@ -28,6 +28,7 @@
 - A Module has a clear responsibility and ownership of its domain data and rules, with a **reusable Core and declared, bounded Extension points** (ADR-006).
 - Separate *Module identity*, *visible App tile*, *industry solution*, *configuration* and *deployment*. Per founder ADR-015, each selected user-facing Business Module gets its own authorized App tile.
 - A Module must not update another Module's authoritative records behind its back.
+- **Lean Platform Kernel boundary (ADR-037 ACCEPTED):** the Kernel enforces common identity, trusted scope, permissions, capability governance and security/audit contracts; operational business lifecycles and authoritative records belong to independently owned Modules. Kernel is not a POS/Accounting/HR God Module.
 
 ### LAW 3 — Expand through extensions; split a domain only when justified
 - Shared behavior belongs in Core. Industry-specific variability belongs in reviewed Extension contracts where the underlying domain lifecycle stays stable.
@@ -134,3 +135,8 @@ Founder approved [ADR-035](../05-decisions/ADR-035-GOVERNED-THIRD-PARTY-EXTENSIO
 ## J. Industry & Country support and V1 foundation closure — ADR-036 accepted (2026-10-30)
 
 Founder approved [ADR-036](../05-decisions/ADR-036-GLOBAL-READY-VERIFIED-INDUSTRY-COUNTRY-RELEASES.md): **One Global Platform — Verified Industry & Country Releases**. Shared architecture is globally evolvable, but sector/jurisdiction eligibility and support claims require validated released combinations. A multi-country Enterprise structure does not silently change Business accounting or permissions. All CONST-01..04 general clarifications are accepted; the [V1 Final Foundation Review](../02-architecture/CORE-CONSTITUTION-V1-FINAL-FOUNDATION-REVIEW.md) marks this seven-law Constitution **STABLE AS DESIGN DIRECTION ONLY**. Proposed ADR-030..032 and all implementation/compliance/capacity proof remain separate open gates. No coding, SQL or Production authorization.
+
+
+## K. Lean Platform Kernel — ADR-037 accepted (2026-10-31)
+
+Founder approved [ADR-037](../05-decisions/ADR-037-LEAN-PLATFORM-KERNEL-BOUNDARY.md): **universal platform control belongs in a Lean Kernel; Business Modules independently own their data and workflows**. This clarifies the existing seven laws without adding an eighth. Exact component boundaries for Industry Solution catalog, DRVO commercial billing, localization delivery, UI shell and runtime services are *not* approved technical placements; see the [Kernel Boundary Map working draft](../02-architecture/PLATFORM-KERNEL-BOUNDARY-MAP-V1-PROPOSAL.md). ADR-030/031/032 remain PROPOSED; this decision authorizes no code, SQL, tests or deployment.

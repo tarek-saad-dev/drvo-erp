@@ -124,3 +124,10 @@
 - [Financial Consistency Contract](02-architecture/FINANCIAL-CONSISTENCY-CONTRACT.md) — **PROPOSED** typed sale / Accounting GL / Treasury tender / stock cost / HR commission boundaries, honesty of statuses, source/effect dedupe, offline replay, refunds and period handling; preserves founder ADR-009–013.
 - [46 Financial Negative/Recovery Tests](02-architecture/FINANCIAL-CONSISTENCY-FAILURE-TEST-MATRIX.md) — **design-only test specification**; zero executed.
 - [ADR-031 — First Mandatory Accounting Journal Boundary](05-decisions/ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md) — **PROPOSED, NOT APPROVED**: same-SQL atomic A recommended if measured performance permits; otherwise durable accepted/pending B with hard reconciliation barrier. No source-of-truth policy adopted or implementation authorized.
+
+
+## Financial vertical slice: Sale → Ledger → Settlement — 2026-10-30
+
+- [End-to-End Sale-to-Ledger Design Walkthrough](02-architecture/SALE-TO-LEDGER-END-TO-END-DESIGN-2026-10-30.md) — reusable transaction, source-of-truth status vector, recovery windows, optional downstream effects and micro/SME/Enterprise stress cases. **Design only, A vs B still open**.
+- [Financial Account Mapping and Close Gates Design](02-architecture/FINANCIAL-ACCOUNT-MAPPING-AND-CLOSE-GATES-DESIGN.md) — cash custody, credit AR, unverified electronic claim, anonymous collection exception, closed period and cost-pending treatment; actual CoA/tax/receipt/close accounting sign-off **still OPEN**.
+These documents elaborate [ADR-031 PROPOSED](05-decisions/ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md) and preserve ADR-009–013, the founder [Three Pillar Charter](00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md), and the ban on code before separate authorization.

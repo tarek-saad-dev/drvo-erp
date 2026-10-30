@@ -142,3 +142,10 @@ These documents elaborate [ADR-031 PROPOSED](05-decisions/ADR-031-FINANCIAL-CONS
 - [Module Activation & Dependency Engine Contract](02-architecture/MODULE-ACTIVATION-DEPENDENCY-ENGINE-CONTRACT.md) — full Required closure, exact price consent, scoped idempotent activation, staged recovery, entitlement truth, secure extension/version changes, deactivation safety. **Design proposal**.
 - [50 Module Activation Negative/Concurrency Tests](02-architecture/MODULE-ACTIVATION-FAILURE-TEST-MATRIX.md) — specification, **zero executed**.
 - [ADR-032 PROPOSED — Business Module Activation/Entitlement/Version Contract](05-decisions/ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md) — unapproved technical recommendation. Founder ADR-007/015/016/020/021 remain accepted, and no code/SQL/Production is authorized.
+
+
+## Core Constitution — Phase-0 high-level alignment and stress review (2026-10-30)
+
+- [Review 01: seven-law Constitution alignment against founder-accepted ADRs](02-architecture/CORE-CONSTITUTION-CONSISTENCY-REVIEW-01.md) — no direct platform-law contradiction found among reviewed accepted ADRs; resolves apparent scope clashes, leaves four cross-platform policy questions open. **Documentation review, not verified readiness.**
+- [Four-Scenario Stress Review](02-architecture/CORE-CONSTITUTION-FOUR-SCENARIO-STRESS-REVIEW.md) — micro Salon, multi-branch/multi-business group, large Manufacturer, future Clinic; checks general platform boundaries only, no module implementation details.
+- **Phase-0 next focus:** settle only mixed-industry one-Business composition, enterprise organizational hierarchy extensibility, reviewed Extension ecosystem, and country/industry release eligibility. Do not select POS GL A/B, exact module pricing/states or SQL keys here. Existing ADR-030/031/032 still PROPOSED; no code.

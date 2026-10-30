@@ -27,3 +27,8 @@ Before planning or coding, read:
 Before editing: identify impacted docs, tests and architecture. After editing: update status, changelog, ADR(s), roadmap and implementation evidence as appropriate. Never claim deployment without verification.
 
 **Repository:** https://github.com/tarek-saad-dev/drvo-erp
+
+
+## Phase-0 foundation review — 2026-10-30 (MANDATORY before implementation)
+
+Before treating the current architecture as build-ready, read the [Foundation Architecture Gap Review](../02-architecture/FOUNDATION-ARCHITECTURE-REVIEW-2026-10-30.md) and [Core Contracts Proposal](../02-architecture/FOUNDATION-CORE-CONTRACTS-PROPOSAL.md). The founder charter direction is accepted, but tenant-scoped resource/worker isolation, POS first journal consistency, atomic dependency/paid activation, Module compatibility and enterprise workload proof are NOT yet finalized or tested. Review findings are proposals/risks, not production bugs or approved schemas. No code is authorized.

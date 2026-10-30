@@ -118,6 +118,8 @@ flowchart TB
 
 **Follow-up working boundary map:** [Kernel 01 — Identity, Tenancy & Authorization](PLATFORM-KERNEL-IDENTITY-TENANCY-AUTHORIZATION-BOUNDARY-V1.md) reconciles existing approved founder requirements with the open ADR-030 design gates. It is a working document, not an implementation sign-off.
 
+**Follow-up working boundary map:** [Kernel 02 — Module Registry & Lifecycle](PLATFORM-KERNEL-MODULE-REGISTRY-AND-LIFECYCLE-BOUNDARY-V1.md) separates global release, Industry Solution composition, per-Business activation, paid entitlement and per-user access, without accepting ADR-032 or physical activation design.
+
 ## 8. Approval / implementation status
 
 - **Accepted already:** overarching Charter and Constitution V1; ADR-002/003/006/007/015/016/017/018/019/020/021/029/033/034/035/036 as individually scoped.

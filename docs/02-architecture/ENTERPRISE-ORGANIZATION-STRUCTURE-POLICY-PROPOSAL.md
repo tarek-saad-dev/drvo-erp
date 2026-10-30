@@ -1,17 +1,17 @@
 # DRVO ERP — Enterprise Organization Structure (CONST-02)
 
 **Date:** 2026-10-30  
-**Status:** **PROPOSED — founder review; NOT approved, built, or production-tested.**  
+**Status:** **FOUNDER-APPROVED DIRECTION — ACCEPTED via [ADR-034](../05-decisions/ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md);** this file preserves the original proposal for traceability. **Not implemented or production-tested.**  
 **Scope:** Platform-wide organizational principles ONLY. No SQL tables, generic organization-engine implementation, module workflows, accounting journals, APIs or UI screen specs.  
 **Read first:** [Founder Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) → [Core Architecture Constitution](../00-start-here/DRVO-CORE-ARCHITECTURE-CONSTITUTION.md) → [ADR-003](../05-decisions/ADR-003-tenant-model.md) and [ADR-033](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md).
 
-## One-line proposed law
+## One-line law (approved by ADR-034)
 
 > **Enterprise-ready, small-business simple:** Preserve the existing Tenant → Business → Branch ownership/security baseline, while making enterprise corporate relationships an **optional, extensible organization layer**. Legal/financial ownership, operating sites, management/reporting relationships and authorization scopes must not be confused or forced into one rigid tree.
 
 **العربي:** الشركة الصغيرة تستخدم Tenant → Business → Branch ببساطة. المجموعة الضخمة تقدر تنظم شركات تابعة ومجموعات وعلاقات إدارية من غير نسخة ERP مختلفة، ومن غير ما نستخدم Branch مكان شركة قانونية أو نخلط حسابات الشركات.
 
-## Seven proposed platform rules
+## Seven platform principles (approved in substance by ADR-034)
 
 1. **Tenant = DRVO customer account and isolation boundary**, not automatically an individual legal company. An owner can manage multiple distinct Businesses inside one Tenant, as already established by ADR-003; authenticated access to any Business is still explicit.
 2. **Business = the independently controlled operational/accounting ownership unit**. Its legal identity/financial books and permissions are not determined by its industry. ADR-033 already allows compatible Salon, Retail, Manufacturing, etc. activities in one Business. Distinct registered or independently accounted companies are modeled as distinct Businesses when relevant.
@@ -39,12 +39,12 @@
 - It does **not** change ADR-003's existing initial Tenant → Business → Branch and shared database direction, ADR-033's Business ≠ Industry, or existing allow-only authorization commitments.
 - It does **not** assert DRVO is technically ready for 50 companies/300 sites, because load, isolation, recovery and compliance are not yet empirically demonstrated.
 
-## Founder approval question (one decision, no engineering detail)
+## Founder approval outcome — 2026-10-30 (no engineering detail)
 
-**Approve this general architecture rule?**
+**Approved: [ADR-034 — Optional Enterprise Organization Structure](../05-decisions/ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md).**
 
 > Keep V1 Tenant → Business → Branch as the simple default; preserve an **optional extensible organization/relationship capability** for holdings/subsidiaries and complex Enterprises, without conflating financial/legal boundaries, locations, reporting groups, or permissions.
 
-If approved: record a short **ACCEPTED** ADR and minimally clarify the Constitution's Tenant/Business/Branch and scaling laws. If not approved: keep CONST-02 OPEN, adjust only the principle and avoid premature implementation design.
+**Outcome:** CONST-02 RESOLVED as a general platform law; the Constitution now references ADR-034. Specific legal, hierarchy, membership, reporting and persistence choices are deferred until actual Enterprise work.
 
 **No application code, database migration, tests, server, staging or production changes.**

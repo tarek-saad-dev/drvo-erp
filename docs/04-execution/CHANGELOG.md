@@ -344,3 +344,11 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - New [Core Contracts Proposal](../02-architecture/FOUNDATION-CORE-CONTRACTS-PROPOSAL.md): scope, activation/entitlement/versioning, event/finance boundary and future placement design seams; all are explicitly unapproved technical options.
 - Clarified in Tenancy Architecture that ADR-007/016 supersede earlier dependency-not-approved note while final paid activation approver remains open; linked review to key architecture docs, README, pre-code/readiness gates and Open Questions.
 - No application code, actual database schema, tests, server access or Production deployment.
+
+
+## 2026-10-30 — P0 Tenant/Business/Branch Isolation Contract drafted
+
+- Authored detailed [Tenant/Business/Branch Isolation Contract](../02-architecture/TENANT-BUSINESS-BRANCH-ISOLATION-CONTRACT.md), preserving founder-approved global unique usernames, explicit Business membership, one Role per Branch, Allow-only Default Deny, Business-ledger ownership, Manager scope and V1 shared SQL Server.
+- Authored [40-case Negative Threat/Test Matrix](../02-architecture/TENANT-ISOLATION-NEGATIVE-TEST-MATRIX.md): API IDOR, SQL cross-ancestor references, cache/search/export/BI, spoofed event workers, support/clinic privacy, stale revocation and future Tenant placement. **No tests executed.**
+- Added [ADR-030 (PROPOSED)](../05-decisions/ADR-030-TENANT-ISOLATION-ENFORCEMENT.md) with recommended server-derived trusted scope + scoped data enforcement; physical FK design/RLS, Manager delegation and support break-glass await founder/security review.
+- Cross-linked README/START-HERE/Tenancy/Identity/Architecture Foundation Review/Core Contracts/Cursor plan/Open Questions/Current State. P0 FND-01 remains OPEN; no application code, SQL, security test, VPS or production modifications.

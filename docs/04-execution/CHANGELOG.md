@@ -387,3 +387,11 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - Preserved [Founder's Three-Pillar Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) as supreme strategic authority. Navigation hierarchy: Charter (why) → Constitution (platform how) → Accepted ADRs (specific approved decisions) → specialist drafts (not adopted technical choices).
 - Linked and prioritized Constitution in docs README, START-HERE, architecture baseline, Cursor preimplementation plan, Change Protocol and Current State. Existing proposed ADR-030/031/032 and detailed POS/Accounting/Module Activation plans are retained **for later specialist review**, not actively resolved in Phase 0. No previously accepted business rule revoked.
 - Docs-only. No application code, SQL migrations, tests, VPS or Production operations.
+
+
+## 2026-10-30 — Phase-0 Constitution alignment + four-scenario stress review (docs only)
+
+- Compared the seven universal platform laws against accepted architecture ADR-002/003/006/007/015/016/017/018/019/020/021/029 in [Consistency Review 01](../02-architecture/CORE-CONSTITUTION-CONSISTENCY-REVIEW-01.md); found no direct high-level normative contradiction among the reviewed accepted decisions. Clarified scope-related apparent conflicts rather than changing accepted policies.
+- Ran a **conceptual, not executable** [Four-Scenario Architecture Review](../02-architecture/CORE-CONSTITUTION-FOUR-SCENARIO-STRESS-REVIEW.md): one-chair Salon, multi-branch/multi-Business group, large manufacturer, future Clinic.
+- Logged four open founder-level general platform clarifications: multi-industry inside **one** Business, enterprise legal hierarchy extensibility, governed future Extension developer ecosystem, industry/region validated support. Did NOT propose SQL schemas, accounting flows, feature inventories or production promises.
+- Linked the review to Constitution, docs README/START-HERE, Current State, Cursor plan and Open Questions. Accepted product ADRs unchanged; proposed ADR-030/031/032 still unapproved. No code/tests/VPS/Production.

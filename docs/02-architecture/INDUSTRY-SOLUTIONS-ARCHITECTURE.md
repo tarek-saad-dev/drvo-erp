@@ -112,3 +112,8 @@ Founder chose **Option B: recommended and customizable Industry Starter**. Selec
 ## Industry presentation capability — ADR-026 / ADR-027 (2026-10-29)
 
 Industry Solution may recommend an original **Industry Character/Scene Pack** and an initial safe Business theme preset; a Business can override **brand palette and typography** after scoped authorization/validation without creating a code fork or changing the Business's functional modules. Art pack registry and theme engine are platform design capabilities, not new mandatory operational Domain Modules. Any custom uploaded font uses approved safe asset lifecycle; artistic scene flip is optional and reduced-motion-safe. ADR-024 Plum/Teal remains the DRVO fallback, protected semantic statuses apply regardless of theme. [Theme Blueprint](BUSINESS-THEME-ENGINE-AND-FONT-ASSETS-BLUEPRINT.md), [Character/Motion Blueprint](CHARACTER-ILLUSTRATION-MOTION-BLUEPRINT.md). No extra launch industry or implementation authorized.
+
+
+## ADR-033 ACCEPTED — Business ≠ Industry (2026-10-30)
+
+[Founder-approved ADR-033](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md) clarifies that industry classification is **not** a one-to-one immutable Business identity. One Business may combine **compatible** capabilities/Extensions from multiple industries or curated Industry Solutions under one Business's books, permissions and audit. A primary industry/Starter is an onboarding aid, not an exclusive type. Different legal or financially independent Businesses remain separate under their Tenant. Industry Solutions stay versioned compositions, not product forks. Mixed activity never bypasses entitlement, security, compliance or compatibility. Exact schema/UX belongs to later Module design; no code.

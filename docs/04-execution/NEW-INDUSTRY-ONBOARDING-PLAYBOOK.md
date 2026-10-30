@@ -1,5 +1,7 @@
 # DRVO ERP — New Industry Solution Intake, Delivery and Productization Playbook
 
+> **2026-10-31 architecture route:** [Master Architecture Map](../02-architecture/DRVO-UNIVERSAL-ERP-ARCHITECTURE-MASTER-MAP-V1.md) determines Kernel vs Module vs Extension vs Independent Domain vs Integration ownership. [Foundation Closure and New-Industry Gates](FOUNDATION-CLOSURE-AND-NEW-INDUSTRY-READINESS-GATES.md) distinguishes approved rules from unresolved engineering sign-off. This Playbook remains the sector intake process, not proof any sector is already ready for release.
+
 > **FOUNDATIONAL MANDATE (ADR-029):** This is the controlled process to extend one DRVO platform to new industries without untested universal support claims. Each intake must pass [Founder Architecture Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) and [Industry/Scale Fitness Gates](../02-architecture/UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md): fit-gap plus independent workload/security/enterprise readiness, not merely an app list.
 
 

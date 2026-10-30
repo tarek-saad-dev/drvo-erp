@@ -1,5 +1,7 @@
 # Architecture baseline
 
+> **PHASE-0 PRIMARY REVIEW: CORE ARCHITECTURE CONSTITUTION.** The founder wants the universal platform rules — one product, Modules with ownership, extensible Industry composition, strict Tenant isolation, versioned Contracts, functional+operational scale, security/financial integrity — settled **before** specialist Module design. Read [Core Architecture Constitution](../00-start-here/DRVO-CORE-ARCHITECTURE-CONSTITUTION.md) after the [Founder Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md). Detailed POS GL/paid module activation proposals in this document remain reference **drafts for later**, not Phase-0 required implementation decisions or signed-off strategies.
+
 > **FOUNDATIONAL ARCHITECTURE CONSTRAINT (ADR-029):** [Founder Architecture Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) — one scalable ERP product, repeatably expandable to new Industries through Shared Modules / Extensions / conditional Domain Modules / Industry Solutions, designed for micro Businesses and enterprise workloads using **two independent scalability axes** (functional module composition AND validated operational/data capacity). Every major design must pass [Industry & Scale Fitness Gates](UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md). V1 shared SQL Server/Modular Monolith is only a measured starting architecture, not an unlimited capacity promise.
 
 

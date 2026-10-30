@@ -1,17 +1,17 @@
-# DRVO ERP — Remaining Three Foundation Policy Choices
+# DRVO ERP — Remaining Foundation Policy Choices (Two Open)
 
 **Date:** 2026-10-30
-**Status:** **FOUNDER DECISION BRIEF — PROPOSALS ONLY, NOT ACCEPTED.**
+**Status:** **CONST-01 and CONST-02 RESOLVED by approved ADR-033/034. CONST-03 and CONST-04 remain PROPOSED, not accepted.**
 **Scope:** Only cross-platform architectural laws; no POS/Accounting/Module activation schemas, manifests, implementation tests or deployment.
 **Already resolved:** CONST-01 mixed-industry Business by [ADR-033 ACCEPTED](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md): Business ≠ Industry; a Business may compose compatible capabilities/Industry Solutions without new ERP fork or mandatory second Business.
 
-## CONST-02 — Organizational structure for giant companies
+## CONST-02 — Enterprise organization (RESOLVED by ADR-034)
 
 **Question:** Is the accepted V1 Tenant → Business → Branch model an eternal exclusive hierarchy, or the first level of an extensible model able to represent legal groups, subsidiaries, franchises and more complex corporate arrangements?
 
-**Detailed general-policy proposal (still NOT approved):** [Enterprise Organization Structure — CONST-02](ENTERPRISE-ORGANIZATION-STRUCTURE-POLICY-PROPOSAL.md). It proposes an **optional group relationship layer**, while keeping Tenant/Business/Branch ownership unchanged and separating legal, financial, operational and reporting scope. This is a principle, NOT a proposed SQL schema or Module implementation.
+**Founder-approved general direction in [ADR-034](../05-decisions/ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md); original brief retained:** [Enterprise Organization Structure — CONST-02](ENTERPRISE-ORGANIZATION-STRUCTURE-POLICY-PROPOSAL.md). It proposes an **optional group relationship layer**, while keeping Tenant/Business/Branch ownership unchanged and separating legal, financial, operational and reporting scope. This is a principle, NOT a proposed SQL schema or Module implementation.
 
-**Recommended general rule (NOT YET ACCEPTED):** Keep the V1 Tenant/Business/Branch as the concrete baseline, **but design enterprise organizational identity and permissions with a path to extend the group hierarchy** rather than hard-coding assumptions that a Branch must represent every future subsidiary or that every group has one legally shared ledger. Separate real legal/financial ownership, operating structure and reporting structure. Any cross-Business consolidated views require explicit authorized contracts; do not merge books by default. Avoid building a speculative infinite generic org-tree now.
+**Accepted general rule (ADR-034; specific implementation deferred):** Keep the V1 Tenant/Business/Branch as the concrete baseline, **but design enterprise organizational identity and permissions with a path to extend the group hierarchy** rather than hard-coding assumptions that a Branch must represent every future subsidiary or that every group has one legally shared ledger. Separate real legal/financial ownership, operating structure and reporting structure. Any cross-Business consolidated views require explicit authorized contracts; do not merge books by default. Avoid building a speculative infinite generic org-tree now.
 
 **Risk of not resolving:** future enterprise onboarding might require changing fundamental identity and authorization throughout all Modules.
 
@@ -37,15 +37,15 @@
 
 **Deferred:** country-specific regulations, tax engines, residency rules, detailed compliance certification checklists and legal advice.
 
-## Founder decision matrix — exactly three remaining questions
+## Founder decision matrix — two questions remain open
 
 | ID | Recommended principle | Impact if approved | Current status |
 |---|---|---|---|
-| CONST-02 | V1 hierarchy stays, with an extensible enterprise org boundary | Future groups/subsidiaries without rearchitecting whole platform | **OPEN — PROPOSED** |
+| CONST-02 | V1 hierarchy stays, with optional extensible Enterprise Organization | Future groups/subsidiaries without rearchitecting whole platform | **RESOLVED — ADR-034 ACCEPTED** |
 | CONST-03 | No arbitrary executable customer plugins; governed release lifecycle for third parties | Security and controlled ecosystem growth | **OPEN — PROPOSED** |
 | CONST-04 | Explicit validated support per industry/jurisdiction before availability claims | Safe multi-sector and cross-border onboarding | **OPEN — PROPOSED** |
 
-## After approvals
+## After remaining approvals
 1. Update the **seven existing Constitution laws with minimal clarifications**, avoiding new bulky technical specifications.
 2. Record accepted founder-level ADR(s) only for genuinely new decisions; do not multiply ADRs where a rule already clearly covers the case.
 3. Run a one-page final cross-platform readiness review (Charter consistency + four scenarios + three policy decisions). Mark **Architecture Constitution V1 as stable design direction**, not secure/enterprise-verified production.

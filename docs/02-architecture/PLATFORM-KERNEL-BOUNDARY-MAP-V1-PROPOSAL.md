@@ -1,7 +1,7 @@
-# DRVO ERP — Platform Kernel Boundary Map V1 (Founder Review Draft)
+# DRVO ERP — Platform Kernel Boundary Map V1 (Founder-Approved Principle; Detailed Design Draft)
 
 **Date:** 2026-10-31  
-**Status:** **PROPOSED — Phase-0 conceptual boundary map for founder review. NOT an accepted ADR or implementation authorization.**  
+**Status:** **LEAN KERNEL PRINCIPLE ACCEPTED via [ADR-037](../05-decisions/ADR-037-LEAN-PLATFORM-KERNEL-BOUNDARY.md); detailed ownership/component placements in this document remain PROPOSED, not a signed-off implementation design.** No code authorization.  
 **Purpose:** Separate *universal platform authority* from *Business-domain ownership* in one globally evolvable DRVO ERP platform. **The seven-law Constitution V1 and accepted ADR-002/003/006/007/015–021/029/033–036 remain authoritative.** This document proposes placements and flags unresolved implementation choices; it does not pre-design every Module.
 
 **Read first:** [Founder Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) → [Seven-law Constitution](../00-start-here/DRVO-CORE-ARCHITECTURE-CONSTITUTION.md) → [ADR Register](../05-decisions/DECISIONS.md) → [Constitution V1 Foundation Review](CORE-CONSTITUTION-V1-FINAL-FOUNDATION-REVIEW.md).
@@ -106,21 +106,22 @@ flowchart TB
 | Very large manufacturer / multi-country holding | No Manufacturing lifecycle in Kernel; compatible Domain Modules and proven workload scale separately | MRP correctness, placement, capacity, jurisdiction compliance |
 | Regulated Clinic | Kernel enforces scope/eligibility; separate sensitive Clinical domain owns records and consent | Clinical privacy compliance, authorization details, country certification |
 
-**Review result:** **PASS AS A CONCEPTUAL PROPOSAL**, not tested product readiness. No new cross-industry Kernel business rule is needed in this map.
+**Review result:** **Lean Kernel principle ACCEPTED by ADR-037; other matrix placements remain conceptual proposals**, not tested product readiness. No new cross-industry Kernel business rule is needed in this map.
 
 ## 7. Founder review questions — platform boundaries only
 
-**Q1 (primary, recommended):** Confirm a **Lean Platform Kernel** (universal identity/scope, access, module governance, entitlement/eligibility gates, trusted audit/contracts) rather than putting Accounting, POS, HR, Industry Solutions and DRVO commercial billing *inside* the Kernel. Adjacent platform catalogs/operations can remain platform-owned without becoming Kernel internals.
+**Q1 — RESOLVED by [ADR-037 ACCEPTED](../05-decisions/ADR-037-LEAN-PLATFORM-KERNEL-BOUNDARY.md):** Adopt **Lean Platform Kernel** with universal scope/auth, module governance, entitlement/eligibility gates and common audit/contract rules. POS, Accounting and other operational Modules own Business truth. Exact placement of adjacent catalogs/DRVO commercial billing is not yet finalized.
 
-**Q2 (follow-up classification):** Keep **Industry Solution composition, country-localization release evidence, business UX shell and commercial billing** as adjacent platform capabilities; Kernel owns only the enforcement of eligibility/entitlements/permissions. Exact component package seams require later design.
+**Q2 (follow-up classification — PROPOSED, NOT YET APPROVED):** Keep **Industry Solution composition, country-localization release evidence, business UX shell and commercial billing** as adjacent platform capabilities; Kernel owns only the enforcement of eligibility/entitlements/permissions. Exact component package seams require later design.
 
 **Q3 (later technical decision, no approval by this map):** Resolve ADR-030 trusted isolation implementation, ADR-031 financial posting boundary and ADR-032 activation transaction/approver design before code. Do not turn their proposals into accepted policy by publishing this map.
 
 ## 8. Approval / implementation status
 
 - **Accepted already:** overarching Charter and Constitution V1; ADR-002/003/006/007/015/016/017/018/019/020/021/029/033/034/035/036 as individually scoped.
-- **New from this document:** a *recommended* logical responsibility/ownership boundary, not an accepted ADR or final tech specification.
+- **Accepted from this document:** Lean Platform Kernel *principle* via ADR-037, not all rows/packaging details.
+- **Still proposed here:** precise placement of adjacent productization/billing/localization/shell capabilities, technical contracts and component boundaries. Not accepted by ADR-037.
 - **Explicitly deferred:** full data model, SQL FKs, RLS, permission evaluation internals, APIs/endpoints, events, activation coordinator, billing provider design, tax/locale policy, enterprise org schema, actual Module inventory, market certification and load/security tests.
 - **No authorization:** code changes, SQL, VPS, staging, Production, or marketing unsupported sectors/countries.
 
-After founder review, record only actual new approved boundary decisions (possibly one concise ADR if needed); then produce an implementation-level Kernel contract design only with explicit engineering authorization.
+Founder approved the high-level Lean Kernel direction in ADR-037. Continue conceptual review of Identity / Tenancy / Trusted Scope and adjacent platform boundaries, while reserving implementation-level contracts and code for separately authorized engineering design.

@@ -88,3 +88,8 @@ A Module's UI category is **derived from selected workflows and dependency graph
 - Performance and financial consistency validation under concurrency/offline conditions.
 
 **Documentation only. No application code or SQL migrations or deploy.**
+
+
+## Immutable full-bundle approval & staged module state — architecture review 2026-10-30
+
+[Detailed Activation Engine](MODULE-ACTIVATION-DEPENDENCY-ENGINE-CONTRACT.md), [50 Future Tests](MODULE-ACTIVATION-FAILURE-TEST-MATRIX.md), and [ADR-032 PROPOSED](../05-decisions/ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md) expand this document's already approved ADR-016/021 recommendation + complete Required dependencies/fees + explicit one-bundle consent. A tenant-scoped Business selection and immutable quote/plan must be revalidated before commit and replay-safe under two tabs; external manual/provided payment evidence is not verified settlement and modules must not appear ACTIVE if required dependency initialization fails. **No actual Salon starter/Required edge, approver, billing terms, physical SQL/state machine or technical policy is newly accepted.** Keep micro Business simplicity and complete commercial Salon V1 product scope. No code authorized.

@@ -10,15 +10,15 @@
 1. **[Founder Architecture Charter — WHY](00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md)**
 2. **[DRVO Core Architecture Constitution — HOW](00-start-here/DRVO-CORE-ARCHITECTURE-CONSTITUTION.md)**
 3. [Start here](00-start-here/START-HERE.md)
-3. [Current state](00-start-here/CURRENT-STATE.md)
-4. [Product vision](01-product/VISION.md)
-5. [Architecture](02-architecture/ARCHITECTURE.md)
-6. [Module catalog](03-modules/MODULES.md)
-7. [Roadmap](04-execution/ROADMAP.md)
-8. [Decision register](05-decisions/DECISIONS.md)
-9. [Open questions](04-execution/OPEN-QUESTIONS.md)
-10. [Change protocol](04-execution/CHANGE-PROTOCOL.md)
-11. [Changelog](04-execution/CHANGELOG.md)
+4. [Current state](00-start-here/CURRENT-STATE.md)
+5. [Product vision](01-product/VISION.md)
+6. [Architecture](02-architecture/ARCHITECTURE.md)
+7. [Module catalog](03-modules/MODULES.md)
+8. [Roadmap](04-execution/ROADMAP.md)
+9. [Decision register](05-decisions/DECISIONS.md)
+10. [Open questions](04-execution/OPEN-QUESTIONS.md)
+11. [Change protocol](04-execution/CHANGE-PROTOCOL.md)
+12. [Changelog](04-execution/CHANGELOG.md)
 
 ## Multi-industry architecture (approved direction)
 

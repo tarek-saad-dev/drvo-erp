@@ -50,3 +50,8 @@ Until founder and Finance/Architecture reviewers select A or B and settle requir
 ## Detailed walkthrough and finance-review matrix added — 2026-10-30
 
 [Sale-to-Ledger end-to-end design](../02-architecture/SALE-TO-LEDGER-END-TO-END-DESIGN-2026-10-30.md) illustrates Option A and B side by side, source/effect replay, independent Treasury/stock/HR states and micro/SME/Enterprise stress lenses. [Financial Account Mapping & Close Gates](../02-architecture/FINANCIAL-ACCOUNT-MAPPING-AND-CLOSE-GATES-DESIGN.md) explicitly separates physically received cash, verified provider/bank settlement, identified customer AR, unverified electronic screenshot and anonymous collection exception; E1/E2 classification is a Finance choice, **not an accepted GL account code**. This addition **DOES NOT SELECT A OR B**, and does not authorize code, SQL, tests or Production.
+
+
+## Decision fitness gate — 2026-10-30
+
+[First-GL Atomicity Decision & Performance Gate](../02-architecture/FINANCIAL-ATOMICITY-DECISION-GATE.md) records exactly what evidence and Finance/Product approvals are required before Option A (conditional preferred V1 SQL co-located sale+GL) or Option B (durable GL_PENDING) can be adopted. **No load test run, no choice approved**; elapsed time, transaction contention, E1/E2 electronic-tender GL account and VAT/cash custody requirements are still open. Module activation [ADR-032 PROPOSED](ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md) cannot make mandatory financial invariants optional.

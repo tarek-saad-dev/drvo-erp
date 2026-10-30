@@ -1,5 +1,7 @@
 # Start here — project handoff
 
+> **CURRENT PHASE-0 FOCUS: PLATFORM CONSTITUTION, NOT PER-MODULE DESIGN.** Read [Founder Charter](PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) **then** [DRVO Core Architecture Constitution](DRVO-CORE-ARCHITECTURE-CONSTITUTION.md). Seven universal platform rules govern; specialist POS/Accounting/Tender/Activation draft contracts are parked until their relevant Module work. This supersedes their priority as the **immediate work queue**, NOT existing founder-approved business decisions. No app code authorized.
+
 > **READ FIRST — FOUNDER'S NON-NEGOTIABLE 3-PILLAR ARCHITECTURE CHARTER:** [DRVO ERP Project North Star](PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md). All future Modules, Industry Solutions, pricing and infrastructure architecture must pass its universal-industry / micro-to-enterprise / Egypt-scale review. The mission is design intent, not a proven capacity claim. [ADR-029](../05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md).
 
 
@@ -16,6 +18,7 @@ The initial implementation strategy is a **modular monolith** with a shared POS 
 
 Before planning or coding, read:
 - **[Founder Architecture Charter — FIRST](PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md)**
+- **[DRVO Core Architecture Constitution — SECOND](DRVO-CORE-ARCHITECTURE-CONSTITUTION.md)**
 - **[Universal ERP Scale & Industry Fitness Gates](../02-architecture/UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md)**
 - [Current state](CURRENT-STATE.md)
 - [Architecture](../02-architecture/ARCHITECTURE.md)

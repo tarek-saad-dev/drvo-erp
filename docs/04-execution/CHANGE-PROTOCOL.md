@@ -24,3 +24,8 @@ For implemented features: specification + security/tenant checks + migration (if
 ## Sources
 
 Repository documentation and reviewed commits are canonical. ChatGPT/Cursor conversations are supporting material.
+
+
+## Constitution-first scope control — 2026-10-30
+
+Before drafting any new technical ADR, read [Founder Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) → [Core Architecture Constitution](../00-start-here/DRVO-CORE-ARCHITECTURE-CONSTITUTION.md). **Classify the change first:** (a) universal platform law/boundary → review NOW in Phase 0; (b) specific Module operation, event enum, payment account, SQL index or UI step → defer to its Module design phase and retain as a **PROPOSED working draft**. An accepted founder product behavior inside a specialist ADR still remains accepted. The existence of a detailed draft never turns its unapproved options into binding Constitution law. Any real exception must document pillar/law impact, migration/exit and explicit founder approval. Phase 0 authorizes docs review, **not application code/tests/migrations/deployment**.

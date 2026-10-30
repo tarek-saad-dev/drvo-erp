@@ -103,3 +103,8 @@ Two candidate choices for the FIRST mandatory journal of a POS sale:
 6. Clinic privacy and Egypt/Gulf statutory design before applicable market/industry release.
 
 **Not a database schema, executable architecture, final sign-off or development authorization.**
+
+
+## P0 Scope Contract expanded — 2026-10-30
+
+Use the [Detailed Isolation Contract](TENANT-BUSINESS-BRANCH-ISOLATION-CONTRACT.md) and [40-case Threat/Test Matrix](TENANT-ISOLATION-NEGATIVE-TEST-MATRIX.md) as detailed proposal for Section 1. They preserve founder-approved identity and Default-Deny semantics and expose still-open FK layout, optional RLS and support/delegation decisions. [ADR-030](../05-decisions/ADR-030-TENANT-ISOLATION-ENFORCEMENT.md) remains PROPOSED. Financial POS/GL A vs B, activation and versioning options are not altered.

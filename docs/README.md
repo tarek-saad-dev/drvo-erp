@@ -102,3 +102,11 @@
 ## Strategic architecture guardrail — founder mandate 2026-10-30
 
 [ADR-029](05-decisions/ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md) makes the 3 pillars enforceable: Egypt-scale product foundation, expansion into **new industries through Core/Extensions/Domain Modules/Industry Solutions**, and progressive functional **plus independent operational/infrastructure scalability** from micro Business to enterprise. [Project Charter](00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) and [Fitness Gates](02-architecture/UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md) are mandatory for all new engineering choices; no unsupported “unlimited sectors / users” claims.
+
+
+## Foundation engineering audit (documentation only) — 2026-10-30
+
+- [Foundation Architecture Review — 12 prioritized gaps + 3 customer walkthroughs](02-architecture/FOUNDATION-ARCHITECTURE-REVIEW-2026-10-30.md) — strategic alignment is promising; financial consistency, Tenant scopes and activation/release contracts remain material design blockers.
+- [Foundation Core Contracts Proposal](02-architecture/FOUNDATION-CORE-CONTRACTS-PROPOSAL.md) — trusted Tenant/Business/Branch context, module activation/extension/event contracts, first POS GL transaction A/B choice and future data-placement seam. Proposed **not** a selected technical stack/schema.
+
+**Read before coding or adding new industry:** founder Charter → gap review → core-contract options → accepted ADRs → implementation readiness gates. No physical DB/code/benchmark validation has taken place.

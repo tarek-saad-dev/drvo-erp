@@ -447,3 +447,8 @@ CONST-01 is **accepted and resolved** in [ADR-033](../05-decisions/ADR-033-BUSIN
 
 The current **NOT ACCEPTED** [Enterprise Organization Structure Proposal](../02-architecture/ENTERPRISE-ORGANIZATION-STRUCTURE-POLICY-PROPOSAL.md) keeps Tenant→Business→Branch unchanged for V1 and proposes an *optional* extensible group relationship layer for large Enterprises, separating legal/financial ownership, operating sites, management/reporting hierarchy and access. **Founder approval pending.** No hierarchical tables/SQL or cross-Tenant data federation authorized.
 
+
+
+## CONST-02 RESOLVED — Enterprise Organization approved by ADR-034 (2026-10-30)
+
+Founder accepted [ADR-034 — Optional Enterprise Organization](../05-decisions/ADR-034-OPTIONAL-ENTERPRISE-ORGANIZATION-STRUCTURE.md). Tenant→Business→Branch stays as the straightforward V1 baseline; optional evolvable group relationships may support holdings/subsidiaries with explicit access/financial ownership. **Do not list CONST-02 as unresolved:** previous open discussion above is historical. **OPEN CONSTITUTION POLICY QUESTIONS = CONST-03 (governed third-party Extensions), CONST-04 (verified country/industry eligibility)**. No group schema, intercompany accounting, multi-Tenant federation, code or tests approved.

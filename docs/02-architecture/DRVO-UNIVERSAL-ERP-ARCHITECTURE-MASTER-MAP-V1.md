@@ -17,7 +17,7 @@ flowchart TB
     UI --> OS
     OS --> K
     API --> K
-    CC -. "privileged scoped governance" .-> K
+    CC -.->|"privileged scoped governance"| K
     subgraph K["LEAN PLATFORM KERNEL — authoritative cross-cutting governance"]
       ID["Identity / Tenant / Business / Branch / Membership / RBAC"]
       R["Released Module Registry / compatibility / Business activation gate"]
@@ -31,7 +31,7 @@ flowchart TB
     end
     C -->|"validated composition & eligibility facts"| K
     B -->|"verified entitlement facts"| K
-    IN -. "secure operations" .-> K
+    IN -.->|"secure operations"| K
     K -->|"allowed scoped commands"| SH
     K -->|"allowed scoped commands"| VD
     subgraph DOM["BUSINESS-DOMAIN OWNERS — authoritative business truth"]
@@ -39,8 +39,8 @@ flowchart TB
       VD["Conditional independent domains: Clinical Records, Courses, Property/Deals, Manufacturing/MRP*"]
     end
     SH <-->|"versioned commands/events (no table writes)"| VD
-    E["Bounded reviewed industry/localization Extensions"] -. "declared hooks" .-> DOM
-    X["Optional messaging, AI, provider Integrations"] -. "scoped official contracts" .-> DOM
+    E["Bounded reviewed industry/localization Extensions"] -.->|"declared hooks"| DOM
+    X["Optional messaging, AI, provider Integrations"] -.->|"scoped official contracts"| DOM
 ```
 
 **Caveats:** Examples in Shared/Domain lists are a **candidate capability catalog**, not proof every App is a released V1 Module, priced tile or approved database table. Reporting ownership may be composition of domain-owned projections and a shared reporting capability — to design later. Diagram arrows are logical trust/ownership flows, **not** approved network, runtime, schema or financial transaction topology. V1 is a Modular Monolith with tenant-aware shared SQL Server initial direction; future pools/dedicated placement require evidence.

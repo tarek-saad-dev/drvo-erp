@@ -67,3 +67,10 @@ Business transfer between Tenants, partner shares, subscription limits/expiratio
 ## Identity follow-up — 2026-10-28
 
 Platform-wide unique username; sign in with username/password without asking for Tenant; tenant resolved from that distinct account. Accounts remain separate across Tenants. Business membership is explicit even for Tenant Owner. One Role per Branch, Manager can create Managers (authorization escalation rules pending), Owner/Manager can create employee accounts. See [Identity & Access](IDENTITY-ACCESS.md). This supersedes the prior suggestion of tenant-qualified usernames.
+
+
+## Later ADR clarification and isolation audit — 2026-10-30
+
+**Historical status reconciliation:** the 2026-10-28 note saying “Module Dependencies NOT APPROVED” reflected an earlier stage; it is **superseded by ADR-007 (Required/Optional/conflict model) and ADR-016 (Required bundle full-price preview and one explicit approval)**. However, the earlier “Owner requests / Super Admin approves” paid activation line is **NOT** final global approval/role policy; [Module Lifecycle Draft](MODULE-LIFECYCLE-AND-COMMUNICATION-CONTRACTS.md) still treats final activation approver/paid roles as OPEN. Founder-approved identity username uniqueness changes are also documented above; do not resurrect tenant-qualified username assumptions from older paragraphs.
+
+**Architectural gap:** the logical hierarchy and negative-isolation intent are approved, but specific Tenant/Business/Branch SQL FK shape, worker scope, cache/search/export/query enforcement, support-operator privilege boundaries and RLS choice are **not yet signed off or tested**. Treat [Foundation Review FND-01/FND-10](FOUNDATION-ARCHITECTURE-REVIEW-2026-10-30.md) and [Trusted Scope Contract Proposal](FOUNDATION-CORE-CONTRACTS-PROPOSAL.md) as a **mandatory pre-code technical review**, not an implemented schema. No code/DB changes authorized.

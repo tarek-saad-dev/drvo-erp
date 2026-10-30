@@ -114,3 +114,8 @@ No owner has been assigned; roles are proposed, not claims about staffed teams.
 - **Next artifact:** [Core Architecture Contract Proposal](FOUNDATION-CORE-CONTRACTS-PROPOSAL.md); explicit founder/engineering choice for sale/GL posting and exact activation policy remains necessary.
 
 **This review is a gap-analysis and decision backlog, not a completed production architecture audit.**
+
+
+## FND-01 / FND-10 follow-up — isolation design draft 2026-10-30
+
+The [Tenant/Business/Branch Isolation Contract](TENANT-BUSINESS-BRANCH-ISOLATION-CONTRACT.md), [40 Security Tests](TENANT-ISOLATION-NEGATIVE-TEST-MATRIX.md) and [PROPOSED ADR-030](../05-decisions/ADR-030-TENANT-ISOLATION-ENFORCEMENT.md) now detail trusted scope, resource ownership, scoped FK alternatives, workers, cache/files, BI and revocation. **Only documentation advanced**: FND-01 and FND-10 remain OPEN until founder/security signoff and separately authorized executable verification. No tests have run.

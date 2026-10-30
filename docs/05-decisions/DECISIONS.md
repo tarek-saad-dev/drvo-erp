@@ -57,6 +57,10 @@ Accepted directions are **not implemented features**.
 
 | ADR-035 | Open for Developers — Controlled by DRVO; reviewed and scoped in-platform Extensions, official APIs for external Integrations | **ACCEPTED — founder** | [ADR-035](ADR-035-GOVERNED-THIRD-PARTY-EXTENSION-ECOSYSTEM.md) |
 
+| ADR-036 | One Global Platform — Verified Industry & Country Releases; no per-market product forks, explicit validated sector/jurisdiction eligibility | **ACCEPTED — founder** | [ADR-036](ADR-036-GLOBAL-READY-VERIFIED-INDUSTRY-COUNTRY-RELEASES.md) |
+
+**Foundation Constitution CONST-01..04:** all four accepted through ADR-033..036; [V1 Final Foundation Review](../02-architecture/CORE-CONSTITUTION-V1-FINAL-FOUNDATION-REVIEW.md) marks stable design direction only. ADR-030..032 remain proposed; no implementation authorized.
+
 **Product launch and pilot decisions** are recorded in [Product Discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md) and [Roadmap](../04-execution/ROADMAP.md).
 
 When superseding decisions, preserve the original and cross-link replacements.

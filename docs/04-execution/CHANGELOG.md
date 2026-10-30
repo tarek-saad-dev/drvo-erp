@@ -395,3 +395,12 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - Ran a **conceptual, not executable** [Four-Scenario Architecture Review](../02-architecture/CORE-CONSTITUTION-FOUR-SCENARIO-STRESS-REVIEW.md): one-chair Salon, multi-branch/multi-Business group, large manufacturer, future Clinic.
 - Logged four open founder-level general platform clarifications: multi-industry inside **one** Business, enterprise legal hierarchy extensibility, governed future Extension developer ecosystem, industry/region validated support. Did NOT propose SQL schemas, accounting flows, feature inventories or production promises.
 - Linked the review to Constitution, docs README/START-HERE, Current State, Cursor plan and Open Questions. Accepted product ADRs unchanged; proposed ADR-030/031/032 still unapproved. No code/tests/VPS/Production.
+
+
+## 2026-10-30 — Founder accepts industry-independent Business identity (ADR-033), Phase 0
+
+- **ACCEPTED founder decision:** [ADR-033 — Business Identity Is Independent of Industry](../05-decisions/ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md). Same Business may run compatible activities and Industry Solutions without a second ERP/code fork or forced new Business. True legal/financial Businesses remain distinct and scoped; onboarding's primary industry is non-exclusive.
+- Marked `CONST-01 RESOLVED` and recorded only three remaining general platform questions: `CONST-02` Enterprise organization hierarchy evolution, `CONST-03` controlled third-party Extension ecosystem, `CONST-04` verified supported geography/industry releases. Recommended options are **PROPOSED ONLY** in [Remaining Foundation Policies](../02-architecture/CORE-CONSTITUTION-REMAINING-FOUNDATION-POLICIES.md).
+- Updated Core Architecture Constitution, Founder Charter, Decision Register, docs README/START-HERE, Architecture and Industry Solutions/Tenancy blueprints, point-in-time scenario review addenda, Cursor plan, Current State and Open Questions to distinguish accepted vs open.
+- **No change** to Founder Charter three pillars, V1 Modular Monolith/shared SQL direction, accepted older business-specific ADRs or proposed ADR-030/031/032. No app code, SQL, actual tests, VPS or Production changes.
+

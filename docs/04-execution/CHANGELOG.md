@@ -369,3 +369,12 @@ Created read-only audit instructions, with explicit unexecuted status: no direct
 - Authored [Financial Account Mapping and Close Gates](../02-architecture/FINANCIAL-ACCOUNT-MAPPING-AND-CLOSE-GATES-DESIGN.md): finance review options for cash, credit AR, screenshot-only electronic tender, anonymous buyer collection, cost-pending/late-period corrections and shift/accounting close requirements. No fabricated CoA or tax claims.
 - Integrated links into docs README, Start Here, ADR-031 proposed, Financial Consistency Contract, Cursor preimplementation plan, Open Questions and Current State.
 - **ADR-031 remains PROPOSED; A recommended conditionally, B still open.** No code, SQL migration, security/performance test execution, VPS or Production change.
+
+
+## 2026-10-30 — First GL fitness gate + Business-scoped Module Activation engine (docs only)
+
+- Added [Financial Atomicity Decision Gate](../02-architecture/FINANCIAL-ATOMICITY-DECISION-GATE.md): initial Sale+mandatory GL Option A remains a conditional design preference only, pending explicit Founder/Finance adoption, SQL contention and POS p95/p99 tests after authorization; B durable pending is the alternative.
+- Added [Module Activation & Dependency Engine Contract](../02-architecture/MODULE-ACTIVATION-DEPENDENCY-ENGINE-CONTRACT.md): scoped immutable plan+quote, transitive Required closure, verified entitlement/payment separate from approval and ACTIVE, per-Business idempotent concurrency, fail/retry/disable/version compatibility and no financial-history deletion; technical contract PROPOSED.
+- Added [50 Future Failure/Concurrency Tests](../02-architecture/MODULE-ACTIVATION-FAILURE-TEST-MATRIX.md), **zero executed**.
+- Created [ADR-032 PROPOSED](../05-decisions/ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md), linked in Decision Register, foundational architecture, README/START-HERE, Module Registry/Lifecycle, Industry Starter, Cursor pre-code plan, readiness, questions and Current State.
+- No application code, SQL migrations, benchmarks, VPS or Production operations. FND-02/03/05 still open.

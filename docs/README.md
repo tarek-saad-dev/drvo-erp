@@ -110,3 +110,10 @@
 - [Foundation Core Contracts Proposal](02-architecture/FOUNDATION-CORE-CONTRACTS-PROPOSAL.md) — trusted Tenant/Business/Branch context, module activation/extension/event contracts, first POS GL transaction A/B choice and future data-placement seam. Proposed **not** a selected technical stack/schema.
 
 **Read before coding or adding new industry:** founder Charter → gap review → core-contract options → accepted ADRs → implementation readiness gates. No physical DB/code/benchmark validation has taken place.
+
+
+## Phase-0 Tenant Isolation Contract and threat tests — 2026-10-30
+
+- [Tenant/Business/Branch Isolation Contract](02-architecture/TENANT-BUSINESS-BRANCH-ISOLATION-CONTRACT.md) — proposed detailed security ownership/scope contract, with approved product requirements distinguished from pending SQL/role decisions.
+- [40 Adversarial and Negative Authorization Tests](02-architecture/TENANT-ISOLATION-NEGATIVE-TEST-MATRIX.md) — test plan only; 0 executed.
+- [ADR-030 Proposed Isolation Enforcement](05-decisions/ADR-030-TENANT-ISOLATION-ENFORCEMENT.md) — **NOT APPROVED** as a physical DB/security design; founder/security sign-off needed before coding.

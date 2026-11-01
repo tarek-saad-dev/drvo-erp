@@ -14,7 +14,7 @@
 1. GitHub PR checks: K0 + K1 + K3 and `DevOps Staging Artifact CI`; app lockfiles tracked and `npm ci`.
 2. Manual GitHub Actions workflow `DRVO ERP — Staging Deploy`, on `main` only, with protected `staging` environment. Builds a self-contained Next.js standalone Web + NestJS API release on GitHub-hosted Linux runners — **no npm build on production VPS**.
 3. GitHub sends a gzip archive via SSH **stdin** to the dedicated `drvoerp-deploy` account with an `authorized_keys` forced command `/usr/local/libexec/drvoerp-receive`.
-4. Receiver only accepts `deploy <40hexsha>`, verifies archive paths and SHA, writes `/srv/drvo-erp/deploy/releases/<sha>`, atomically flips `deploy/current`, restarts **only** `drvoerp-api.service` and `drvoerp-web.service`, probes loopback health, and rolls back the symlink on failure when a previous managed release exists.
+4. Receiver only accepts `deploy <40hexsha>`, verifies archive paths and SHA, writes `/srv/drvo-erp/deploy/releases/<sha>`, atomically flips `deploy/current`, restarts **only** `drvoerp-api.service` and `drvoerp-web.service`, probes loopback health, and restores the previous managed release on failure; **a failed first deployment falls back to the pre-existing /repo build**.
 5. Runtime service processes continue under **drvoerp (nologin)**, with only group-readable releases. SSH deploy account owns releases and can restart exactly the two allowed services via root-owned sudoers; does not get shell or root access through that key.
 
 ## STEP A — VPS operator after PR is merged to main
@@ -43,7 +43,7 @@ curl -fsS http://127.0.0.1:3310/health
 curl -fsS http://127.0.0.1:3311/api/health
 ```
 
-**IMPORTANT:** Do NOT restart `drvoerp-web`/`drvoerp-api` immediately after preparing the drop-ins. The new `deploy/current` symlink is created by the FIRST authorized GitHub deploy. If a first deploy fails before there is a prior release, operator restores the original units with the rollback procedure below.
+**IMPORTANT:** There is no reason to restart `drvoerp-web`/`drvoerp-api` immediately after preparing the drop-ins. The new `deploy/current` symlink is created by the FIRST authorized GitHub deploy. The launcher falls back to the pre-existing `/repo` build if the symlink does not exist; failed first deployment reverts to that build.
 
 ## STEP B — GitHub Environment settings (manual UI, NOT chat)
 
@@ -85,7 +85,7 @@ Compare deployed SHA with GitHub Actions workflow commit and validate public pre
 
 ## STEP D — Stop/restore (only if needed)
 
-The receiver automatically restores the prior managed release on health failure. For a **failed first deploy**, there is no prior managed artifact. Restore the original /repo-based units:
+The receiver automatically restores the prior managed release on health failure and returns to the old `/repo` build on a failed first deployment. **Only** if the host installer itself needs to be rolled back, remove the managed drop-ins and restore the original /repo-based units:
 
 ```bash
 sudo rm -f \

@@ -19,7 +19,6 @@ flock -w 30 9 || { echo "Another DRVO deployment is running" >&2; exit 75; }
 tmp="$(mktemp -d "$base/.incoming.XXXXXXXX")"
 previous=""
 switched=0
-complete=0
 
 cleanup() {
   status=$?
@@ -31,7 +30,14 @@ cleanup() {
     sudo -n /usr/bin/systemctl restart drvoerp-api.service || true
     sudo -n /usr/bin/systemctl restart drvoerp-web.service || true
   elif [[ "$status" -ne 0 && "$switched" -eq 1 ]]; then
-    echo "First deploy failed: no prior version to restore; operator must restore saved systemd units" >&2
+    # No previous managed release: remove only our own symlink, then restart
+    # the root-owned fallback launchers from the original repo build.
+    echo "First deploy failed: restoring original /repo-based staging runtimes" >&2
+    if [[ -L "$base/current" && "$(readlink "$base/current")" == "releases/$sha" ]]; then
+      rm -f -- "$base/current"
+    fi
+    sudo -n /usr/bin/systemctl restart drvoerp-api.service || true
+    sudo -n /usr/bin/systemctl restart drvoerp-web.service || true
   fi
   rm -rf -- "$tmp"
   exit "$status"
@@ -108,5 +114,4 @@ for service in "3311/api/health/drvo-api" "3310/health/drvo-web"; do
   done
   [[ "$ready" -eq 1 ]] || { echo "Health check failed: $expected" >&2; exit 1; }
 done
-complete=1
 printf 'DRVO ERP staging deployment successful: %s\n' "$sha"

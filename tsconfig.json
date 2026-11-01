@@ -15,6 +15,12 @@
     "rootDir": ".",
     "outDir": "dist"
   },
-  "include": ["packages/**/*.ts", "apps/api/src/**/*.ts", "apps/worker/src/**/*.ts"],
-  "exclude": ["dist", "node_modules"]
+  "include": [
+    "packages/**/*.ts",
+    "apps/worker/src/index.ts"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
 }

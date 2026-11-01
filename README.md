@@ -11,6 +11,10 @@ Modular, multi-tenant, multi-industry SaaS business operating system.
 
 **Phase-1 engineering preparation (2026-11-01):** [Pre-code implementation work package](docs/04-execution/PHASE-1-FOUNDATION-IMPLEMENTATION-PACKET.md) defines the first Kernel-first development slices, [Technical Decision Packet](docs/02-architecture/PHASE-1-FOUNDATION-TECHNICAL-DECISION-PACKET.md) keeps ADR-030/031/032 sign-off gaps explicit, and [Standard Module Contract](docs/02-architecture/STANDARD-MODULE-CONTRACT-V1.md) is the draft specification template for every Module. **Documentation only; no tests or application code were run by this package.**
 
+## K1 — Running Web / API / Worker scaffold (2026-11-01)
+
+Development runtimes are now present: `apps/web` (Next.js App Router), `apps/api` (NestJS HTTP) and `apps/worker` (standalone NestJS, idle). They are built/tested independently from the K0 Kernel fixture suite. [K1-RUNTIME.md](K1-RUNTIME.md) contains commands and precise limitations. **Do not use for customers**: no identity, tenancy SQL, subscriptions, ERP modules, financial posting or actual jobs yet. The apps have pinned direct dependencies but still require committed app lockfiles before staging.
+
 ## K0 non-production scaffold (initial development)
 
 The first development slice provides `packages/contracts`, `packages/kernel`, API/Web/Worker boundary placeholders, basic local TypeScript/Node tests and a proposed GitHub Actions CI workflow. It **does not implement** identity, SQL isolation, real Module activation, NestJS/Next.js apps, POS, payment, or financial posting. See [K0-SCAFFOLD.md](K0-SCAFFOLD.md) for local commands and exact limitations. ADR-030/031/032 and actual SQL Server integration remain review gates.

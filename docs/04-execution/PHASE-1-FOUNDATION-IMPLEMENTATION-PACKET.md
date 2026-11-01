@@ -6,6 +6,8 @@
 **Status:** **READY-FOR-FOUNDER/ENGINEERING REVIEW AS A BOUNDED WORK PACKAGE — NOT AUTHORIZATION TO START CODE, SQL OR VPS CHANGES.**  
 **North Star:** One global-ready extensible multi-industry SaaS ERP, one Lean Kernel and independently owned Business Modules. First commercial Salon/Cut Salon Edition, no private forks.
 
+> **2026-11-01 sequencing confirmation:** Following the founder's new development direction, **minimal SaaS Commercial Core is Phase 2 after Kernel**, not an afterthought in a late commercial phase. The Kernel keeps trusted Business-scoped entitlements/Module gates; an adjacent DRVO Billing owner handles plans, verified/manual payments, invoices and renewals; Business Accounting remains a separate customer-domain Module. Only a *free test grant* belongs in Kernel K0.4; real paid activation still requires ADR-032 approved state/consent/settlement semantics. K1 Web/API/Worker runtime PR is a non-production scaffold. Full Salon V1 scope and release gates are unchanged.
+
 ## 1. What is already locked vs not
 
 - **Foundational principles approved:** Constitution V1, Tenant→Business→Branch, industry-independent Business, optional Enterprise relations, governed third-party Extensions, verified country/industry releases and Lean Kernel (ADR-033–037).

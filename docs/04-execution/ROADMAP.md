@@ -2,6 +2,8 @@
 
 **Updated:** 2026-10-28. **Phase 0: Discovery and documentation.** No timeline committed.
 
+> **2026-11-01 development sequencing update:** The non-production K0 TypeScript scaffold is merged; K1 Next.js/NestJS runtimes are being built and tested. **SaaS Commercial Core moves immediately after Platform Kernel**, before full Salon Business Modules: minimum DRVO plans/subscriptions, audited commercial grants, Business-scoped entitlements and activation, and onboarding/Industry Starter. Business Catalog/POS work may overlap with commercial work, but must obey entitlement contracts. Do not confuse *SaaS billing* with customer Business Accounting. Later advanced marketplace/online gateways can follow full V1. ADR-030/031/032 technical sign-off, SQL Server spike and security/financial tests remain separate gates. This note takes precedence over earlier phase numbers below but does not reduce the approved Salon V1 commercial scope or authorize Production.
+
 ## Commercial industry sequence (founder-approved)
 
 1. **Barber salons** — first real pilot at **Cut Salon**.

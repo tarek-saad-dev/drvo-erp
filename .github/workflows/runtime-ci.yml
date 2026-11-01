@@ -1,0 +1,74 @@
+name: K1 Runtime CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install API dependencies
+        run: npm install --prefix apps/api --no-package-lock --no-audit --no-fund
+      - name: Compile and unit-test NestJS API
+        run: npm test --prefix apps/api
+      - name: Probe API via HTTP
+        shell: bash
+        run: |
+          (cd apps/api && API_PORT=3101 npm start > /tmp/drvo-api.log 2>&1 &)
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3101/api/health > /tmp/drvo-api-health.json; then break; fi
+            sleep 1
+          done
+          node -e "const d=require('/tmp/drvo-api-health.json'); if(d.status!=='ok'||d.mode!=='scaffold'||d.service!=='drvo-api') process.exit(1)"
+  web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install web dependencies
+        run: npm install --prefix apps/web --no-package-lock --no-audit --no-fund
+      - name: Build Next.js App Router
+        run: npm run build --prefix apps/web
+      - name: Check web types
+        run: npm run typecheck --prefix apps/web
+      - name: Probe Next.js liveness route
+        shell: bash
+        run: |
+          (cd apps/web && npm start > /tmp/drvo-web.log 2>&1 &)
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3100/health > /tmp/drvo-web-health.json; then break; fi
+            sleep 1
+          done
+          node -e "const d=require('/tmp/drvo-web-health.json'); if(d.status!=='ok'||d.mode!=='scaffold'||d.service!=='drvo-web') process.exit(1)"
+  worker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install worker dependencies
+        run: npm install --prefix apps/worker --no-package-lock --no-audit --no-fund
+      - name: Compile worker
+        run: npm run build --prefix apps/worker
+      - name: Verify isolated worker starts
+        shell: bash
+        run: |
+          (cd apps/worker && npm start > /tmp/drvo-worker.log 2>&1 &)
+          for attempt in {1..20}; do
+            if grep -q "DRVO worker process started" /tmp/drvo-worker.log 2>/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/drvo-worker.log
+          exit 1

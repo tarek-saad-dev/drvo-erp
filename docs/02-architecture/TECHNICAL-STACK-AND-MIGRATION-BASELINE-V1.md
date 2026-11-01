@@ -2,7 +2,7 @@
 
 **Date:** 2026-11-01  
 **Status:** **RECOMMENDED V1 ENGINEERING BASELINE; existing SQL Server/VPS/PWA founder choices remain accepted; remaining stack tools are engineering recommendations pending technical validation.**  
-**Source:** [Technology Architecture](TECHNOLOGY-ARCHITECTURE.md), [ADR-002](../05-decisions/ADR-002-modular-monolith.md), [ADR-009](../05-decisions/ADR-009-OFFLINE-V1-TECH-DIRECTION.md) or authoritative ADR register, [ADR-037](../05-decisions/ADR-037-LEAN-PLATFORM-KERNEL-BOUNDARY.md).
+**Source:** [Technology Architecture](TECHNOLOGY-ARCHITECTURE.md), [ADR-002](../05-decisions/ADR-002-modular-monolith.md), [ADR-009](../05-decisions/ADR-009-SQLSERVER-PWA-OFFLINE.md) or authoritative ADR register, [ADR-037](../05-decisions/ADR-037-LEAN-PLATFORM-KERNEL-BOUNDARY.md).
 
 ## 1. Keep V1 boring, measured and modular
 

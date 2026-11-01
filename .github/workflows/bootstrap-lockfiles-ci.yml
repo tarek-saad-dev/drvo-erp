@@ -1,0 +1,34 @@
+name: DevOps Lockfile Bootstrap (temporary)
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/bootstrap-lockfiles-ci.yml"
+      - "apps/**/package.json"
+permissions:
+  contents: read
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Generate fresh npm lockfiles for pinned app manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+          for app in web api worker; do
+            npm install --prefix "apps/$app" --package-lock-only --ignore-scripts --no-audit --no-fund
+          done
+          node <<'NODE'
+          const fs=require('node:fs'), zlib=require('node:zlib');
+          for(const app of ['web','api','worker']){
+            const lock=fs.readFileSync('apps/'+app+'/package-lock.json');
+            const payload=zlib.gzipSync(lock,{level:9}).toString('base64');
+            console.log('DRVO_LOCK_START:'+app);
+            for(let i=0;i<payload.length;i+=3000)console.log('DRVO_LOCK_CHUNK:'+payload.slice(i,i+3000));
+            console.log('DRVO_LOCK_END:'+app);
+          }
+          NODE

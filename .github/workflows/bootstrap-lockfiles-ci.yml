@@ -23,10 +23,10 @@ jobs:
             npm install --prefix "apps/$app" --package-lock-only --ignore-scripts --no-audit --no-fund
           done
           node <<'NODE'
-          const fs=require('node:fs'), zlib=require('node:zlib');
+          const fs=require('node:fs');
           for(const app of ['web','api','worker']){
             const lock=fs.readFileSync('apps/'+app+'/package-lock.json');
-            const payload=zlib.gzipSync(lock,{level:9}).toString('base64');
+            const payload=encodeURIComponent(lock.toString('utf8'));
             console.log('DRVO_LOCK_START:'+app);
             for(let i=0;i<payload.length;i+=3000)console.log('DRVO_LOCK_CHUNK:'+payload.slice(i,i+3000));
             console.log('DRVO_LOCK_END:'+app);

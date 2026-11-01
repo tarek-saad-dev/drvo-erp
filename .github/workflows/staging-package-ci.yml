@@ -24,6 +24,7 @@ jobs:
           bash -n ops/staging/prepare-host-once.sh
           bash -n ops/staging/start-web.sh
           bash -n ops/staging/start-api.sh
+          bash -n ops/staging/prepare-db-once.sh
           if SSH_ORIGINAL_COMMAND='run arbitrary commands' bash ops/staging/receive-release.sh >/dev/null 2>&1; then
             echo 'Unsafe SSH action was accepted' >&2
             exit 1

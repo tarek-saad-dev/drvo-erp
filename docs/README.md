@@ -4,6 +4,8 @@
 
 > **MANDATORY READING ORDER:** [Founder Charter](00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) → [Constitution V1](00-start-here/DRVO-CORE-ARCHITECTURE-CONSTITUTION.md) → [Accepted ADR Register](05-decisions/DECISIONS.md) → [Master Map](02-architecture/DRVO-UNIVERSAL-ERP-ARCHITECTURE-MASTER-MAP-V1.md) → targeted Module/technical drafts. Historical date-stamped proposals below remain reference material only and do not override later approved ADRs.
 
+> **PRE-CODE HANDOFF — 2026-11-01:** [Phase-1 Kernel Implementation Packet](04-execution/PHASE-1-FOUNDATION-IMPLEMENTATION-PACKET.md) provides bounded engineering PR order and exact outstanding sign-offs; [Technical Decision Packet](02-architecture/PHASE-1-FOUNDATION-TECHNICAL-DECISION-PACKET.md) selects recommended ADR-030/031/032 engineering targets *for review*, not a false accepted/implemented status. [Module Contract Template](02-architecture/STANDARD-MODULE-CONTRACT-V1.md), [Data/Scope Boundaries](02-architecture/FOUNDATION-DATA-AND-CONTRACT-BOUNDARIES-V1.md), [Technology Baseline](02-architecture/TECHNICAL-STACK-AND-MIGRATION-BASELINE-V1.md), [Salon V1 Ownership](03-modules/SALON-V1-OWNERSHIP-AND-DEPENDENCY-STARTER.md) and [Quality/Evidence Plan](04-execution/FOUNDATION-QUALITY-AND-TEST-PLAN-V1.md) complete the reviewable packet. **Code authorization, paid billing, SQL signoff and production tests are NOT implied.**
+
 ## Required reading for a new developer or AI agent
 
 1. **[Founder Architecture Charter — WHY](00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md)**

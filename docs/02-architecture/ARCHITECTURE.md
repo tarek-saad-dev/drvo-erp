@@ -15,6 +15,8 @@
 **Updated:** 2026-10-28  
 **Status:** Direction accepted; implementation architecture pending technical discovery.
 
+> **2026-11-01 Phase-1 pre-code review:** The [Technical Decision Packet](PHASE-1-FOUNDATION-TECHNICAL-DECISION-PACKET.md), [Data and Contract Boundaries](FOUNDATION-DATA-AND-CONTRACT-BOUNDARIES-V1.md), [Technology/Migrations](TECHNICAL-STACK-AND-MIGRATION-BASELINE-V1.md), and [Standard Module Contract](STANDARD-MODULE-CONTRACT-V1.md) provide the first bounded implementation handoff. [Engineering Work Package](../04-execution/PHASE-1-FOUNDATION-IMPLEMENTATION-PACKET.md) gives slices and [Quality Gates](../04-execution/FOUNDATION-QUALITY-AND-TEST-PLAN-V1.md) gives test criteria. ADR-030/031/032 do not silently become accepted by this documentation.
+
 ## Design
 
 Single repository, Modular Monolith. Explicit module boundaries and contracts, with shared platform services and strongly enforced tenant isolation.

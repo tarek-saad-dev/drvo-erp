@@ -41,7 +41,13 @@ install -d -o root -g root -m 0755 /usr/local/libexec
 source_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 install -o root -g root -m 0755 \
   "$source_dir/receive-release.sh" /usr/local/libexec/drvoerp-receive
+install -o root -g root -m 0755 \
+  "$source_dir/start-web.sh" /usr/local/libexec/drvoerp-web-start
+install -o root -g root -m 0755 \
+  "$source_dir/start-api.sh" /usr/local/libexec/drvoerp-api-start
 bash -n /usr/local/libexec/drvoerp-receive
+bash -n /usr/local/libexec/drvoerp-web-start
+bash -n /usr/local/libexec/drvoerp-api-start
 
 # Grant restart authority ONLY for these two specific staging units.
 sudoers="/etc/sudoers.d/drvoerp-deploy"
@@ -68,16 +74,17 @@ printf 'restrict,command="/usr/local/libexec/drvoerp-receive" %s\n' "$pubkey" > 
 chown drvoerp-deploy:drvoerp "$authfile"
 chmod 0600 "$authfile"
 
-# Change only the new DRVO ERP systemd units. Existing processes stay
-# running until the first explicit protected GitHub Actions deployment.
+# Change only the new DRVO ERP systemd units. The new root-owned launchers
+# preserve the existing /repo-based processes on unexpected restarts/reboots
+# until the first successful GitHub managed release; no downtime gap.
 for unit in drvoerp-web.service drvoerp-api.service; do
   install -d -o root -g root -m 0755 "/etc/systemd/system/$unit.d"
 done
 cat > /etc/systemd/system/drvoerp-web.service.d/20-managed-release.conf <<'EOF'
 [Service]
-WorkingDirectory=/srv/drvo-erp/deploy/current/web
+WorkingDirectory=/srv/drvo-erp/repo/apps/web
 ExecStart=
-ExecStart=/usr/bin/node /srv/drvo-erp/deploy/current/web/server.js
+ExecStart=/usr/local/libexec/drvoerp-web-start
 Environment=NODE_ENV=production
 Environment=HOSTNAME=127.0.0.1
 Environment=PORT=3310
@@ -85,9 +92,9 @@ Environment=NEXT_TELEMETRY_DISABLED=1
 EOF
 cat > /etc/systemd/system/drvoerp-api.service.d/20-managed-release.conf <<'EOF'
 [Service]
-WorkingDirectory=/srv/drvo-erp/deploy/current/api
+WorkingDirectory=/srv/drvo-erp/repo/apps/api
 ExecStart=
-ExecStart=/usr/bin/node /srv/drvo-erp/deploy/current/api/dist/main.js
+ExecStart=/usr/local/libexec/drvoerp-api-start
 Environment=NODE_ENV=production
 Environment=API_HOST=127.0.0.1
 Environment=API_PORT=3311

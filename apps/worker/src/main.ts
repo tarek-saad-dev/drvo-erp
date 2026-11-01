@@ -6,7 +6,7 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.createApplicationContext(WorkerModule, {
     abortOnError: false,
   });
-  app.enableShutdownHooks();
+  // Process shutdown is handled here to avoid duplicate signal hooks.
 
   // Infrastructure heartbeat only, not evidence of processing any jobs.
   console.info("DRVO worker process started (idle; no jobs configured)");

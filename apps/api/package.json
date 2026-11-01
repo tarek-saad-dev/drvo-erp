@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "nest start --watch",
+    "dev": "npm run build && node --watch dist/main.js",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/main.js",
     "test": "npm run build && node --test test/*.test.cjs"

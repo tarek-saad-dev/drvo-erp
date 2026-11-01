@@ -1,0 +1,45 @@
+name: K3 Trusted Scope Proof CI
+on:
+  pull_request:
+    paths:
+      - "apps/api/**"
+      - "tools/k3-scope-proof/**"
+      - ".github/workflows/k3-trusted-scope-ci.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  k3-trusted-scope:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Create disposable SQL Server 2022 Developer
+        shell: bash
+        run: |
+          pass="DrvoK3_$(openssl rand -hex 20)!"
+          jwt_secret="$(openssl rand -hex 48)"
+          echo "::add-mask::$pass"
+          echo "::add-mask::$jwt_secret"
+          echo "SQL_TEST_SA_PASSWORD=$pass" >> "$GITHUB_ENV"
+          echo "K3_TEST_SECRET=$jwt_secret" >> "$GITHUB_ENV"
+          docker run -d --name drvo-k3-sql-disposable \
+            -e ACCEPT_EULA=Y -e MSSQL_PID=Developer -e MSSQL_SA_PASSWORD="$pass" \
+            -p 127.0.0.1:14333:1433 mcr.microsoft.com/mssql/server:2022-latest
+      - name: Install API test dependencies
+        run: npm install --prefix apps/api --no-package-lock --no-audit --no-fund
+      - name: Build NestJS API
+        run: npm run build --prefix apps/api
+      - name: Run real HTTP + membership + SQL integration negative tests
+        env:
+          DRVO_SQL_SPIKE_DISPOSABLE: YES
+        run: node tools/k3-scope-proof/verify.cjs
+      - name: SQL Server failure diagnostics
+        if: failure()
+        run: docker logs --tail 90 drvo-k3-sql-disposable || true
+      - name: Cleanup isolated database
+        if: always()
+        run: docker rm -f drvo-k3-sql-disposable || true

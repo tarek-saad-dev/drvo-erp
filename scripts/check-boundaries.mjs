@@ -1,8 +1,9 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // K0-only guard for obvious forbidden imports, not a production static analyzer.
-const root = new URL('../', import.meta.url).pathname;
+const root = fileURLToPath(new URL('../', import.meta.url));
 const kernelDir = join(root, 'packages/kernel/src');
 const forbidden = /(?:from\s*['"]|import\s*\(['"])[^'"]*(?:apps\/|modules\/|\/db\/|\/infrastructure\/)/;
 let checked = 0;

@@ -1,5 +1,7 @@
 # DRVO ERP — Phase 1 First Development Work Package (Kernel Before Modules)
 
+> **2026-11-01 K0 IMPLEMENTATION UPDATE:** [PR #4](https://github.com/tarek-saad-dev/drvo-erp/pull/4) is **merged**. It implements an intentionally bounded K0.0 **TypeScript baseline + CI + pure test fixtures** (not full Next.js/NestJS bootstrap), with eight passing local unit tests and successful PR-head Actions. No SQL/API auth/Module activation/finance runtime. Follow-up [Issue #3](https://github.com/tarek-saad-dev/drvo-erp/issues/3) remains open for framework bootstraps; [Issue #5](https://github.com/tarek-saad-dev/drvo-erp/issues/5) tracks the disposable SQL Server spike; [Issue #2](https://github.com/tarek-saad-dev/drvo-erp/issues/2) tracks ADR/security/finance/billing gates. The original status below is the **pre-code proposal snapshot**, not the current implementation state.
+
 **Date:** 2026-11-01  
 **Status:** **READY-FOR-FOUNDER/ENGINEERING REVIEW AS A BOUNDED WORK PACKAGE — NOT AUTHORIZATION TO START CODE, SQL OR VPS CHANGES.**  
 **North Star:** One global-ready extensible multi-industry SaaS ERP, one Lean Kernel and independently owned Business Modules. First commercial Salon/Cut Salon Edition, no private forks.

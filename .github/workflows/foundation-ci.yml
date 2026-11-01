@@ -1,0 +1,20 @@
+name: K0 Foundation CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  foundation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # K0 currently has no committed lockfile (offline scaffold generation).
+      # Pin npm/lockfile and replace this with npm ci before production readiness.
+      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: npm run verify

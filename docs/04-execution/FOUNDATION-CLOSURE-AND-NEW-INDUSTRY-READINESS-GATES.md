@@ -5,6 +5,8 @@
 **Applies to:** new Businesses using already released capabilities, new industry Modules/Solutions, any V1 platform engineering, and future country/enterprise expansion.  
 **Read first:** [Founder Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md) → [Core Constitution V1](../00-start-here/DRVO-CORE-ARCHITECTURE-CONSTITUTION.md) → [Accepted ADR register](../05-decisions/DECISIONS.md) → [Master Architecture Map](../02-architecture/DRVO-UNIVERSAL-ERP-ARCHITECTURE-MASTER-MAP-V1.md).
 
+> **2026-11-01 supplement:** [Phase-1 Implementation Packet](PHASE-1-FOUNDATION-IMPLEMENTATION-PACKET.md), [Engineering Decision Packet](../02-architecture/PHASE-1-FOUNDATION-TECHNICAL-DECISION-PACKET.md), [Module Contract Template](../02-architecture/STANDARD-MODULE-CONTRACT-V1.md), [Salon V1 Ownership](../03-modules/SALON-V1-OWNERSHIP-AND-DEPENDENCY-STARTER.md) and [Quality Plan](FOUNDATION-QUALITY-AND-TEST-PLAN-V1.md) now specify a bounded first non-production development slice. Status **F2 engineering handoff prepared, NOT technical sign-off or implemented system**. Finance/security/billing ADR signoffs and actual negative/financial/restore/load tests remain outstanding.
+
 ## 1. What "foundation closed" honestly means
 
 There are **three independent closures**, do not label all of them DONE just because a constitution exists.

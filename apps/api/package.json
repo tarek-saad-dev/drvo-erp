@@ -20,6 +20,7 @@
   "devDependencies": {
     "@types/node": "22.15.30",
     "typescript": "5.8.3",
-    "@types/jsonwebtoken": "9.0.9"
+    "@types/jsonwebtoken": "9.0.9",
+    "@types/mssql": "9.1.8"
   }
 }

@@ -1,0 +1,15 @@
+{
+  "name": "drvo-erp",
+  "version": "0.0.0-k0",
+  "private": true,
+  "description": "DRVO ERP non-production K0 foundation scaffold",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "build": "tsc --project tsconfig.json",
+    "test": "npm run build && node --test tests/*.test.cjs",
+    "lint": "node scripts/check-boundaries.mjs",
+    "verify": "npm run typecheck && npm run lint && npm test"
+  },
+  "devDependencies": { "typescript": "5.8.3" }
+}

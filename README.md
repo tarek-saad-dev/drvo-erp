@@ -2,7 +2,7 @@
 
 Modular, multi-tenant, multi-industry SaaS business operating system.
 
-**Project phase:** Architecture and documentation baseline. Application implementation has not started.
+**Project phase:** Architecture baseline plus **K0 non-production TypeScript scaffold**. This is *not* a functional Web/API/Worker runtime or customer-ready ERP.
 
 > [!IMPORTANT]
 > This is a new product. The old Cashier codebase is a reference, not the architectural foundation. No production environment or database has been provisioned yet.
@@ -10,6 +10,10 @@ Modular, multi-tenant, multi-industry SaaS business operating system.
 **Architecture checkpoint (2026-10-31):** The founder-approved seven-law Constitution and Lean Platform Kernel principle define the universal architecture; [Master Architecture Map V1](docs/02-architecture/DRVO-UNIVERSAL-ERP-ARCHITECTURE-MASTER-MAP-V1.md) shows where capabilities belong. [Foundation Closure & New-Industry Readiness Gates](docs/04-execution/FOUNDATION-CLOSURE-AND-NEW-INDUSTRY-READINESS-GATES.md) distinguish approved general principles from unresolved technical decisions ADR-030/031/032, release validation and unrun tests. **The product is not implemented or production ready.**
 
 **Phase-1 engineering preparation (2026-11-01):** [Pre-code implementation work package](docs/04-execution/PHASE-1-FOUNDATION-IMPLEMENTATION-PACKET.md) defines the first Kernel-first development slices, [Technical Decision Packet](docs/02-architecture/PHASE-1-FOUNDATION-TECHNICAL-DECISION-PACKET.md) keeps ADR-030/031/032 sign-off gaps explicit, and [Standard Module Contract](docs/02-architecture/STANDARD-MODULE-CONTRACT-V1.md) is the draft specification template for every Module. **Documentation only; no tests or application code were run by this package.**
+
+## K0 non-production scaffold (initial development)
+
+The first development slice provides `packages/contracts`, `packages/kernel`, API/Web/Worker boundary placeholders, basic local TypeScript/Node tests and a proposed GitHub Actions CI workflow. It **does not implement** identity, SQL isolation, real Module activation, NestJS/Next.js apps, POS, payment, or financial posting. See [K0-SCAFFOLD.md](K0-SCAFFOLD.md) for local commands and exact limitations. ADR-030/031/032 and actual SQL Server integration remain review gates.
 
 ## Start here
 

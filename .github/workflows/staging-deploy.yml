@@ -1,6 +1,15 @@
 name: DRVO ERP — Staging Deploy
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/**'
+      - 'packages/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'ops/staging/**'
+      - '.github/workflows/staging-deploy.yml'
 permissions:
   contents: read
 concurrency:
@@ -8,7 +17,8 @@ concurrency:
   cancel-in-progress: false
 jobs:
   package-and-deploy:
-    if: github.ref == 'refs/heads/main'
+    # Auto-deploy stays OFF until owner sets repo variable after the first verified manual deploy.
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || vars.DRVO_STAGE_AUTO_DEPLOY == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: staging

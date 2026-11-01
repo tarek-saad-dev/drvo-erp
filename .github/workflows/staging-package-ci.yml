@@ -1,0 +1,54 @@
+name: DevOps Staging Artifact CI
+on:
+  pull_request:
+    paths:
+      - "apps/**"
+      - "ops/staging/**"
+      - ".github/workflows/staging-*.yml"
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  verify-staging-bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate staging receiver shell scripts
+        run: |
+          bash -n ops/staging/receive-release.sh
+          bash -n ops/staging/prepare-host-once.sh
+          if SSH_ORIGINAL_COMMAND='run arbitrary commands' bash ops/staging/receive-release.sh >/dev/null 2>&1; then
+            echo 'Unsafe SSH action was accepted' >&2
+            exit 1
+          fi
+      - name: Install from committed dependency lockfiles
+        run: |
+          npm ci --prefix apps/web --no-audit --no-fund
+          npm ci --prefix apps/api --no-audit --no-fund
+          npm ci --prefix apps/worker --no-audit --no-fund
+      - name: Build both staging runtimes
+        run: |
+          npm run build --prefix apps/api
+          npm run build --prefix apps/web
+          npm run typecheck --prefix apps/web
+      - name: Validate standalone Web artifact actually starts on production port
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f apps/web/.next/standalone/server.js
+          test -f apps/api/dist/main.js
+          mkdir -p "$RUNNER_TEMP/preview/.next"
+          cp -a apps/web/.next/standalone/. "$RUNNER_TEMP/preview/"
+          cp -a apps/web/.next/static "$RUNNER_TEMP/preview/.next/static"
+          (cd "$RUNNER_TEMP/preview" && HOSTNAME=127.0.0.1 PORT=3310 node server.js > "$RUNNER_TEMP/standalone.log" 2>&1 &)
+          success=0
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3310/health | grep -q '"service":"drvo-web"'; then success=1; break; fi
+            sleep 1
+          done
+          if [[ "$success" -ne 1 ]]; then cat "$RUNNER_TEMP/standalone.log"; exit 1; fi

@@ -40,12 +40,12 @@ export class K3ScopeProofRepository implements OnModuleDestroy {
         connectionTimeout: 3000,
         requestTimeout: 5000,
       });
-      this.pendingPool = pool.connect().catch(err => {
+      this.pendingPool = pool.connect().catch((err: unknown) => {
         this.pendingPool = undefined;
         throw err;
       });
     }
-    return this.pendingPool;
+    return this.pendingPool!;
   }
 
   async readBranch(actor: K3ActorProof, businessId: string, branchId: string): Promise<K3AuthorizedBranch | null> {

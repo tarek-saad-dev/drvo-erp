@@ -1,0 +1,92 @@
+name: DRVO ERP — Staging Deploy
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: drvo-erp-staging-deploy
+  cancel-in-progress: false
+jobs:
+  package-and-deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify Kernel
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run verify
+      - name: Install reproducible API and Web dependencies
+        run: |
+          npm ci --prefix apps/api --no-audit --no-fund
+          npm ci --prefix apps/web --no-audit --no-fund
+      - name: Build and validate API
+        run: npm test --prefix apps/api
+      - name: Build and validate Web
+        run: |
+          npm run build --prefix apps/web
+          npm run typecheck --prefix apps/web
+      - name: Assemble self-contained release
+        shell: bash
+        run: |
+          set -euo pipefail
+          release="$RUNNER_TEMP/drvo-erp-stage"
+          mkdir -p "$release/web/.next" "$release/api"
+          test -f apps/web/.next/standalone/server.js
+          cp -a apps/web/.next/standalone/. "$release/web/"
+          cp -a apps/web/.next/static "$release/web/.next/static"
+          if [[ -d apps/web/public ]]; then cp -a apps/web/public "$release/web/public"; fi
+          npm ci --prefix apps/api --omit=dev --no-audit --no-fund
+          cp -a apps/api/dist "$release/api/dist"
+          cp -a apps/api/node_modules "$release/api/node_modules"
+          cp apps/api/package.json "$release/api/package.json"
+          test -f "$release/web/server.js"
+          test -f "$release/api/dist/main.js"
+          printf '%s\n' "$GITHUB_SHA" > "$release/release.sha"
+          tar -czf "$RUNNER_TEMP/drvo-erp-release.tgz" -C "$release" .
+      - name: Confirm SSH staging connection settings exist
+        env:
+          DEPLOY_HOST: ${{ secrets.DRVO_STAGE_HOST }}
+          DEPLOY_USER: ${{ secrets.DRVO_STAGE_USER }}
+          DEPLOY_KEY: ${{ secrets.DRVO_STAGE_SSH_PRIVATE_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DRVO_STAGE_KNOWN_HOSTS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ -n "$DEPLOY_HOST" && -n "$DEPLOY_USER" && -n "$DEPLOY_KEY" && -n "$DEPLOY_KNOWN_HOSTS" ]] || {
+            echo "DRVO staging environment is not configured; no deploy was attempted." >&2
+            exit 1
+          }
+          [[ "$DEPLOY_USER" == "drvoerp-deploy" ]] || {
+            echo "Refusing deployment under an unexpected Unix account." >&2
+            exit 1
+          }
+      - name: Stream artifact through pinned SSH forced-command receiver
+        env:
+          DEPLOY_HOST: ${{ secrets.DRVO_STAGE_HOST }}
+          DEPLOY_USER: ${{ secrets.DRVO_STAGE_USER }}
+          DEPLOY_KEY: ${{ secrets.DRVO_STAGE_SSH_PRIVATE_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DRVO_STAGE_KNOWN_HOSTS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          printf '%s\n' "$DEPLOY_KEY" > "$RUNNER_TEMP/drvo-erp-deploy.key"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$RUNNER_TEMP/drvo-erp-known-hosts"
+          chmod 600 "$RUNNER_TEMP/drvo-erp-deploy.key" "$RUNNER_TEMP/drvo-erp-known-hosts"
+          ssh-keygen -y -f "$RUNNER_TEMP/drvo-erp-deploy.key" > /dev/null
+          ssh -T -i "$RUNNER_TEMP/drvo-erp-deploy.key" \
+            -o BatchMode=yes -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$RUNNER_TEMP/drvo-erp-known-hosts" \
+            "$DEPLOY_USER@$DEPLOY_HOST" "deploy $GITHUB_SHA" \
+            < "$RUNNER_TEMP/drvo-erp-release.tgz"
+      - name: Log deployed code revision
+        run: echo "Staging deploy receiver accepted commit $GITHUB_SHA"

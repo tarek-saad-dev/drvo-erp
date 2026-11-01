@@ -1,0 +1,48 @@
+name: K2 SQL Server Disposable Spike
+on:
+  pull_request:
+    paths:
+      - "tools/sql-spike/**"
+      - ".github/workflows/sqlserver-spike.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  isolated-sqlserver:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Start temporary SQL Server 2022 Linux container
+        shell: bash
+        run: |
+          pass="DrvoTmp_$(openssl rand -hex 16)!"
+          echo "::add-mask::$pass"
+          echo "SQL_TEST_SA_PASSWORD=$pass" >> "$GITHUB_ENV"
+          docker run --detach --name drvo-sql-disposable \
+            -e ACCEPT_EULA=Y \
+            -e MSSQL_PID=Developer \
+            -e MSSQL_SA_PASSWORD="$pass" \
+            -p 127.0.0.1:14333:1433 \
+            mcr.microsoft.com/mssql/server:2022-latest
+      - name: Install spike dependencies without touching app lockfiles
+        working-directory: tools/sql-spike
+        run: npm install --no-audit --no-fund
+      - name: Test composite FK, scoped reads, CAS, rollback, decimal and backup restore
+        working-directory: tools/sql-spike
+        env:
+          DRVO_SQL_SPIKE_DISPOSABLE: "YES"
+          SQL_TEST_PORT: "14333"
+          RUN_BACKUP_RESTORE: "1"
+        run: npm run verify
+      - name: Inspect disposable SQL Server container on failure
+        if: failure()
+        shell: bash
+        run: docker logs --tail 120 drvo-sql-disposable || true
+      - name: Delete disposable SQL Server
+        if: always()
+        shell: bash
+        run: docker rm -f drvo-sql-disposable || true

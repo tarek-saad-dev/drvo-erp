@@ -8,7 +8,7 @@
 - `tests`: Node built-in tests run against compiled TypeScript. They test only pure functions, **not** HTTP, SQL, finance, RLS, concurrency or authenticated execution.
 - `.github/workflows`: CI compiles TypeScript, runs fixture unit tests and basic dependency guard. No SQL or integration test stage yet.
 
-Commands (Node 22, npm, TS dev dependency installed): `npm install`, `npm run verify`.
+Commands (Node 22, npm): `npm ci`, `npm run verify`. TypeScript 5.8.3 is locked in `package-lock.json`.
 
 ## Hard gates before adding protected code
 
@@ -16,6 +16,6 @@ Commands (Node 22, npm, TS dev dependency installed): `npm install`, `npm run ve
 2. Compare SQL Server driver and migration tools on a disposable SQL Server before first schema. Confirm real backup/restore.
 3. Ratify ADR-032 before implementing any paid or real persisted activation; this fixture has **no user accounts, commercial state or quote approval**.
 4. Ratify ADR-031 financial source-of-truth and first GL contract before POSTED POS transactions.
-5. Adopt dependency lockfile and test actual framework build when Next/Nest dependencies are added. CI is not evidence of operational tenant security.
+5. Pin and test actual framework versions once Next/Nest dependencies are added. The TypeScript lockfile exists, but CI is not evidence of operational tenant security.
 
 Read [Phase-1 Work Package](docs/04-execution/PHASE-1-FOUNDATION-IMPLEMENTATION-PACKET.md).

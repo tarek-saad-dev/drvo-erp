@@ -41,3 +41,25 @@
 - Next engineering stages: ADR-030 decision, staged migration architecture, scoped identity/RBAC and connection into the new SQL DB, backup/restore rehearsal, and access policy for the preview.
 
 **Scope closed:** first live staging deploy and isolated empty database creation. **Scope open:** reproducible unattended post-merge deployment verification, SQL-backed ERP and customer-data security.
+
+
+## 5. FINAL SIGN-OFF — automatic GitHub-to-VPS deployment PASSED
+
+**Operator verification:** 2026-11-02. Test PR [#17](https://github.com/tarek-saad-dev/drvo-erp/pull/17) changed only a harmless `apps/web/` Markdown marker to exercise `main`'s `push.paths` auto-deploy trigger. K0, K1 and Staging Artifact CI passed. PR #17 was merged, yielding commit **`ad4f5695a1d0152e71cb5bf88d4bfd6c48e0f4a8`**.
+
+Operator executed a post-deployment VPS comparison and shared these exact results:
+
+| Check | Observed |
+|---|---|
+| Expected merge SHA | `ad4f5695a1d0152e71cb5bf88d4bfd6c48e0f4a8` |
+| VPS `deploy/current/release.sha` | `ad4f5695a1d0152e71cb5bf88d4bfd6c48e0f4a8` |
+| Automated commit comparison | `AUTO DEPLOY: PASS` |
+| `drvoerp-web` / `drvoerp-api` | `active`, `active` |
+| Web loopback `/health` | `{"status":"ok","service":"drvo-web","mode":"scaffold"}` |
+| API loopback `/api/health` | `{"status":"ok","service":"drvo-api","mode":"scaffold"}` |
+| `https://erp-stage.drvotech.com/` | `HTTP STATUS: 200` |
+| Operator final-script outcome | `DRVO ERP STAGING DEVOPS: PASS` |
+
+**DECISION: routine STAGING CI/CD DevOps is accepted as COMPLETE.** The observed deployment matching a newly merged GitHub SHA confirms that the staging auto-deploy trigger was enabled and executed for this change. No routine SSH use is needed to deploy Web/API code on qualifying changes to `main`. GitHub Actions run details were not independently fetched for the `push` run via this connector; this sign-off rests on the exact operator-shared VPS outputs.
+
+**NOT CLOSED / NOT ACCEPTANCE OF BUSINESS ERP:** database schema and versioned migrations, app SQL connectivity, real authenticated identity and tenant RBAC, business logic, staging access restriction before sensitive data, SQL backup/restore, monitoring and full VPS swap usage. Preserve separation from Cut Salon and the unrelated `staging-erp.drvotech.com` clinics service. The public Web/API continue to report `mode=scaffold`.

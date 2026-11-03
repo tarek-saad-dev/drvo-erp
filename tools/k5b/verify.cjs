@@ -300,7 +300,7 @@ async function main(){
       const noCookie=await fetch(api+'/members');
       assert.equal(noCookie.status,401);
       const members=await fetch(api+'/members',{headers:{Cookie:cookie}});
-      assert.equal(members.status,200,await members.text());
+      assert.equal(members.status,200);
       assert.equal((await members.json()).members.length,5);
       const other=await fetch(url+'/workspaces/'+tuple.b2+'/branches/'+tuple.br2+'/access/roles',
         {headers:{Cookie:cookie}});
@@ -324,7 +324,7 @@ async function main(){
         method:'POST',headers:{Cookie:cookie,Origin:'https://erp-stage.drvotech.com',
           'Content-Type':'application/json'},body:JSON.stringify({roleId:tuple.viewerRole}),
       });
-      assert.equal(result.status,200,await result.text());
+      assert.equal(result.status,200);
       assert.equal((await result.json()).changed,true);
       // A fresh independent service is OFF unless BOTH feature flags are YES.
       delete process.env.DRVO_K5_ROLE_ADMIN_ENABLED;

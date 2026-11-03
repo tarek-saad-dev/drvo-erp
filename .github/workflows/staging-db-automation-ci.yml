@@ -1,0 +1,114 @@
+name: DRVO ERP — Staging Database Automation CI
+on:
+  pull_request:
+    paths:
+      - 'ops/staging/db-automation/**'
+      - 'tools/staging-db-automation/**'
+      - 'db/migrations/**'
+      - '.github/workflows/staging-db-migrate.yml'
+      - '.github/workflows/staging-db-automation-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'ops/staging/db-automation/**'
+      - 'tools/staging-db-automation/**'
+      - 'db/migrations/**'
+      - '.github/workflows/staging-db-migrate.yml'
+      - '.github/workflows/staging-db-automation-ci.yml'
+permissions:
+  contents: read
+jobs:
+  guarded-sql-migrator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate fixed host scripts and safe payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check ops/staging/db-automation/receive-sql.cjs
+          node --check ops/staging/db-automation/sql-bootstrap.cjs
+          node --check ops/staging/db-automation/build-payload.cjs
+          node --check tools/staging-db-automation/verify.cjs
+          bash -n ops/staging/db-automation/prepare-once.sh
+          bash -n ops/staging/db-automation/receive-sql.sh
+          npm ci --prefix apps/api --no-audit --no-fund
+          GITHUB_SHA="$(git rev-parse HEAD)" node ops/staging/db-automation/build-payload.cjs > "$RUNNER_TEMP/preview-migrations.json"
+          test -s "$RUNNER_TEMP/preview-migrations.json"
+      - name: Start localhost-only SQL Server with isolated restore storage
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo install -d -m 0777 /var/opt/mssql/data
+          test -z "$(find /var/opt/mssql/data -mindepth 1 -maxdepth 1 -print -quit)"
+          pw="DrvoDBAuto_$(openssl rand -hex 18)!"
+          echo "::add-mask::$pw"
+          echo "SQL_TEST_SA_PASSWORD=$pw" >> "$GITHUB_ENV"
+          docker run --detach --name drvo-db-auto-ci \
+            -e ACCEPT_EULA=Y \
+            -e MSSQL_PID=Developer \
+            -e MSSQL_SA_PASSWORD="$pw" \
+            -p 127.0.0.1:14337:1433 \
+            -v /var/opt/mssql/data:/var/opt/mssql/data \
+            mcr.microsoft.com/mssql/server:2022-latest
+      - name: Test SQL-only migrator with restricted SQL principal and restore
+        env:
+          DRVO_DB_CI_DISPOSABLE: 'YES'
+          DRVO_DB_CI_PORT: '14337'
+          NODE_PATH: ${{ github.workspace }}/apps/api/node_modules
+        run: node tools/staging-db-automation/verify.cjs
+      - name: Inspect disposable SQL logs on error
+        if: failure()
+        run: docker logs --tail 75 drvo-db-auto-ci || true
+      - name: Remove throwaway container
+        if: always()
+        run: docker rm -f drvo-db-auto-ci || true
+
+  root-bootstrap-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check operator bootstrap and restore proof syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n ops/staging/db-automation/prepare-once.sh
+          node --check ops/staging/db-automation/sql-bootstrap.cjs
+          node --check tools/staging-db-automation/verify-bootstrap-ci.cjs
+          npm ci --prefix apps/api --no-audit --no-fund
+      - name: Mount isolated SQL restore directory on the disposable runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo install -d -m 0777 /var/opt/mssql/data
+          sudo install -d -m 0755 /srv/drvo-erp
+          sudo ln -s "$GITHUB_WORKSPACE" /srv/drvo-erp/repo
+          pw="DrvoDbBootstrap_$(openssl rand -hex 16)!"
+          echo "::add-mask::$pw"
+          echo "SQL_TEST_SA_PASSWORD=$pw" >> "$GITHUB_ENV"
+          docker run --detach --name drvo-db-auto-bootstrap-ci \
+            -e ACCEPT_EULA=Y \
+            -e MSSQL_PID=Developer \
+            -e MSSQL_SA_PASSWORD="$pw" \
+            -p 127.0.0.1:1433:1433 \
+            -v /var/opt/mssql/data:/var/opt/mssql/data \
+            mcr.microsoft.com/mssql/server:2022-latest
+      - name: Execute exact root SQL bootstrap using throwaway SQL only
+        env:
+          DRVO_DB_CI_DISPOSABLE: 'YES'
+          NODE_PATH: ${{ github.workspace }}/apps/api/node_modules
+        run: sudo -E node tools/staging-db-automation/verify-bootstrap-ci.cjs
+      - name: Diagnose disposable SQL on failure
+        if: failure()
+        run: docker logs --tail 80 drvo-db-auto-bootstrap-ci || true
+      - name: Tear down isolated SQL container
+        if: always()
+        run: docker rm -f drvo-db-auto-bootstrap-ci || true

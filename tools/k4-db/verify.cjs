@@ -10,6 +10,7 @@ const sql = require('../../apps/api/node_modules/mssql');
 const { configFromEnv, connect, applyMigrations, readManifest, CI_DB } = require('./migrate.cjs');
 const { FoundationRepository } = require('../../apps/api/dist/data/foundation-repository');
 const { foundationSqlConfig } = require('../../apps/api/dist/data/foundation-connection');
+const { FoundationDatabaseService } = require('../../apps/api/dist/data/foundation-database.service');
 
 const cfg = configFromEnv();
 assert.equal(process.env.DRVO_K4_TARGET, 'ci');
@@ -223,6 +224,38 @@ async function main() {
           /SELECT permission|permission was denied|229/i.test(String(err.message)));
       } finally {
         await restricted.close();
+      }
+    });
+    await check('NestJS staging DB service refuses missing migrations and connects with read-only user', async () => {
+      const dbname = 'DRVO_ERP_STAGING'; // throwaway database inside disposable CI SQL only
+      const login = 'drvo_k4b_ci_app';
+      const password = 'DrvoCi!' + crypto.randomBytes(24).toString('hex');
+      await admin.query(`CREATE DATABASE [${dbname}]`);
+      await admin.query(`CREATE LOGIN [${login}] WITH PASSWORD=N'${password}', CHECK_POLICY=ON, CHECK_EXPIRATION=OFF`);
+      const stage = await connect({...cfg,database:dbname});
+      const saved = Object.fromEntries(['DRVO_SQL_ENABLED','DRVO_SQL_HOST','DRVO_SQL_PORT',
+        'DRVO_SQL_DATABASE','DRVO_SQL_USER','DRVO_SQL_PASSWORD'].map(k => [k,process.env[k]]));
+      try {
+        await stage.query(`CREATE USER [${login}] FOR LOGIN [${login}]; GRANT CONNECT TO [${login}]`);
+        Object.assign(process.env, {
+          DRVO_SQL_ENABLED:'YES', DRVO_SQL_HOST:'127.0.0.1', DRVO_SQL_PORT:'1433',
+          DRVO_SQL_DATABASE:dbname, DRVO_SQL_USER:login, DRVO_SQL_PASSWORD:password,
+        });
+        const before = new FoundationDatabaseService();
+        await assert.rejects(() => before.onModuleInit(), /staging SQL not ready/);
+        await applyMigrations(stage);
+        await stage.query(`GRANT SELECT ON OBJECT::core.SchemaMigration TO [${login}]`);
+        const db = new FoundationDatabaseService();
+        await db.onModuleInit();
+        assert.deepEqual(await db.checkReadiness(),{status:'ok',service:'drvo-api',database:'ready'});
+        await db.onModuleDestroy();
+        await assert.rejects(() => db.checkReadiness(), /DRVO SQL is not ready/);
+      } finally {
+        await stage.close();
+        for(const [key,value] of Object.entries(saved)){
+          if(value === undefined) delete process.env[key];
+          else process.env[key]=value;
+        }
       }
     });
     await check('backup and independent restore reproduce foundation schema/data', async () => {

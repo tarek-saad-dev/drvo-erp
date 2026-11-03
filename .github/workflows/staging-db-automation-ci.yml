@@ -36,6 +36,11 @@ jobs:
           node --check tools/staging-db-automation/verify.cjs
           bash -n ops/staging/db-automation/prepare-once.sh
           bash -n ops/staging/db-automation/receive-sql.sh
+          # Reproduce the VPS root shell's minimal PATH. useradd is often
+          # installed in /usr/sbin and must resolve BEFORE any provisioning.
+          installer_path="$(sed -n 's/^export PATH=//p' ops/staging/db-automation/prepare-once.sh)"
+          test -n "$installer_path"
+          env -i PATH="$installer_path" /bin/bash -c 'command -v useradd && command -v install && command -v ssh-keygen'
           npm ci --prefix apps/api --no-audit --no-fund
           GITHUB_SHA="$(git rev-parse HEAD)" node ops/staging/db-automation/build-payload.cjs > "$RUNNER_TEMP/preview-migrations.json"
           test -s "$RUNNER_TEMP/preview-migrations.json"

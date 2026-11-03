@@ -78,6 +78,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -89,6 +91,22 @@ jobs:
           node --check ops/staging/db-automation/sql-bootstrap.cjs
           node --check tools/staging-db-automation/verify-bootstrap-ci.cjs
           npm ci --prefix apps/api --no-audit --no-fund
+      - name: Verify historical bootstrap using checkout owner, not root Git
+        shell: bash
+        run: |
+          set -euo pipefail
+          baseline=72e5ce5b5326d8d9d060eba49c8fedc1543e942a
+          repo_owner="$(stat -c '%U' "$GITHUB_WORKSPACE")"
+          [[ "$repo_owner" != root ]] || { echo "CI checkout unexpectedly root-owned"; exit 1; }
+          sudo -u "$repo_owner" -H git -C "$GITHUB_WORKSPACE" cat-file -e \
+            "$baseline:ops/staging/db-automation/sql-bootstrap.cjs"
+          checked="$(sudo -u "$repo_owner" -H git -C "$GITHUB_WORKSPACE" show \
+            "$baseline:ops/staging/db-automation/sql-bootstrap.cjs" | sha256sum | cut -d' ' -f1)"
+          test "$checked" = "$(sudo -u "$repo_owner" -H git -C "$GITHUB_WORKSPACE" show \
+            "$baseline:ops/staging/db-automation/sql-bootstrap.cjs" | sha256sum | cut -d' ' -f1)"
+          grep -Fq 'sudo -u drvoerp -H git -C "$repo" cat-file -e' \
+            ops/staging/db-automation/prepare-once.sh
+          echo 'PASS: protected historical source works through the Git checkout owner'
       - name: Mount isolated SQL restore directory on the disposable runner
         shell: bash
         run: |

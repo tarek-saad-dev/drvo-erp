@@ -2,11 +2,12 @@
 // Non-root operator health check: never print SQL password or secret content.
 // Called only by the one-time installer, after the root-owned receiver is pinned.
 const assert=require('node:assert/strict');
+const os=require('node:os');
 const sql=require('mssql');
 const {readCredential}=require('./receive-sql.cjs');
 
 async function main(){
-  assert.equal(process.getuid?.(),Number(process.env.DRVO_EXPECT_DB_UID),
+  assert.equal(os.userInfo().username,'drvoerp-dbdeploy',
     'Expected the restricted drvoerp-dbdeploy user');
   const config=readCredential();
   const pool=new sql.ConnectionPool(config);

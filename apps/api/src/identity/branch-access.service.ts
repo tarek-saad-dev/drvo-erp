@@ -2,7 +2,7 @@ import {
   BadRequestException, Injectable, NotFoundException,
   ServiceUnavailableException,
 } from "@nestjs/common";
-import { randomUUID } from "node:crypto";
+import { createHash } from "node:crypto";
 import * as sql from "mssql";
 import { FoundationDatabaseService } from "../data/foundation-database.service";
 import type { Actor } from "./identity.service";
@@ -118,12 +118,14 @@ export class BranchAccessService {
     branchId: string,
     targetAccountId: string,
     requestedRoleId: string,
+    sessionToken: string,
   ): Promise<{ ok: true; changeId: string | null; changed: boolean }> {
     const pool = this.pool();
     validGuid(businessId);
     validGuid(branchId);
     validGuid(targetAccountId);
     validGuid(requestedRoleId);
+    const tokenHash = createHash("sha256").update(sessionToken).digest("hex");
     if (actor.mustChangePassword || actor.accountId.toLowerCase() === targetAccountId.toLowerCase()) {
       throw new NotFoundException();
     }
@@ -140,9 +142,14 @@ export class BranchAccessService {
         .input("br", sql.UniqueIdentifier, branchId)
         .input("actor", sql.UniqueIdentifier, actor.accountId)
         .input("version", sql.Int, actor.sessionVersion)
+        .input("tokenHash", sql.Char(64), tokenHash)
         .query(`
           SELECT TOP(1) ar.RoleId AS actorRole
           FROM core.Account a WITH (UPDLOCK,HOLDLOCK)
+          JOIN core.AuthSession s WITH (HOLDLOCK) ON s.TenantId=a.TenantId
+            AND s.AccountId=a.AccountId AND s.SessionVersion=a.SessionVersion
+            AND s.TokenHash=@tokenHash
+            AND s.RevokedAtUtc IS NULL AND s.ExpiresAtUtc>SYSUTCDATETIME()
           JOIN core.AccountCredential cr ON cr.TenantId=a.TenantId
             AND cr.AccountId=a.AccountId AND cr.MustChangePassword=0
           JOIN core.Tenant t ON t.TenantId=a.TenantId AND t.IsActive=1
@@ -227,7 +234,7 @@ export class BranchAccessService {
       const previous = target.recordset[0].oldRole as string | null;
       // Never let a delegated Manager demote or replace any Owner, including
       // a disabled Owner role. Such changes require separately approved flow.
-      if (String(target.recordset[0].oldCode ?? "").toUpperCase() === "OWNER") {
+      if (previous && !DELEGABLE_ROLES.includes(String(target.recordset[0].oldCode ?? "").toUpperCase() as typeof DELEGABLE_ROLES[number])) {
         throw new NotFoundException();
       }
       if (previous?.toLowerCase() === requestedRoleId.toLowerCase()) {
@@ -257,10 +264,10 @@ export class BranchAccessService {
             VALUES(@t,@b,@br,@target,@role)
           `);
       }
-      const change = randomUUID();
+
       // An atomic security audit and immediate target session revocation are
       // mandatory for each role change (no stale elevated permissions).
-      await tx.request()
+      const audit = await tx.request()
         .input("t", sql.UniqueIdentifier, actor.tenantId)
         .input("b", sql.UniqueIdentifier, businessId)
         .input("br", sql.UniqueIdentifier, branchId)
@@ -271,6 +278,7 @@ export class BranchAccessService {
         .query(`
           INSERT INTO core.BranchRoleChangeAudit
             (TenantId,BusinessId,BranchId,ActorAccountId,TargetAccountId,OldRoleId,NewRoleId)
+          OUTPUT INSERTED.ChangeId AS changeId
           VALUES (@t,@b,@br,@actor,@target,@old,@role);
           UPDATE core.Account SET SessionVersion=SessionVersion+1
           WHERE TenantId=@t AND AccountId=@target;
@@ -278,7 +286,7 @@ export class BranchAccessService {
           WHERE TenantId=@t AND AccountId=@target AND RevokedAtUtc IS NULL;
         `);
       await tx.commit();
-      return { ok: true, changeId: change, changed: true };
+      return { ok: true, changeId: String(audit.recordset[0]?.changeId), changed: true };
     } catch (error) {
       await tx.rollback().catch(() => {});
       throw error;

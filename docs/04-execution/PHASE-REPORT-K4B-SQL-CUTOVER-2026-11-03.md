@@ -1,7 +1,7 @@
 # DRVO ERP — K4B SQL Staging Cutover Implementation and CI Report
 
 **Date:** 2026-11-03  
-**Status:** **K4B code and disposable SQL proof COMPLETE; actual VPS SQL operator cutover NOT YET RUN**  
+**Status:** **K4B VPS SQL CUTOVER PASS (operator output verified 2026-11-03); production-data security/backup gates still open**  
 **Merged:** [PR #19](https://github.com/tarek-saad-dev/drvo-erp/pull/19), SHA `aa200158b6bc7aceef106ba8af8a102d7170c0b2`.
 
 ## Implemented
@@ -29,3 +29,21 @@ Admin login and password are entered hidden **locally** and are never sent to Gi
 
 ## Remaining full ERP gates
 Real end-user authentication, Role/Action authorization, activity/audit, data writes, and business APIs belong to K5; the core schema is populated with **zero customer records**. ADR-030 physical isolation and support/Owner decisions remain awaiting sign-off. Before customer data, restrict public Staging, configure off-host backup rotation/restore policy and monitoring. All old services stay untouched.
+
+## 2026-11-03 operator evidence — real VPS K4B cutover PASSED
+
+**Authoritative evidence:** the owner pasted complete local root-shell output. This section supersedes the earlier **not-yet-run** checkpoint above; ChatGPT did not directly connect to the VPS.
+
+- `/srv/drvo-erp/repo` fast-forwarded successfully from `bc3419c` to `07407c5`; the installed GitHub-managed API release contained the K4B database service.
+- Script explicitly announced `Current database: DRVO_ERP_STAGING only`, accepted the existing SQL administrator through a hidden interactive prompt.
+- `PASS: staging DB verified, no unrelated tables; size within bootstrap limit`.
+- Pre-migration COPY_ONLY/checksum backup created at `/var/opt/mssql/data/drvo_k4b_f2f2a4fa38c3_pre.bak`; independent restored database verified.
+- `PASS: K4 schema migration applied / replay verified`.
+- Existing `drvo_erp_stage_app` granted SELECT on exactly seven core K4 objects and verified unable to UPDATE or CREATE TABLE.
+- Post-migration checksum backup created at `/var/opt/mssql/data/drvo_k4b_f2f2a4fa38c3_post.bak`; independently restored and verified.
+- SQL script returned `K4B SQL STAGING CUTOVER: PASS`.
+- API-only systemd opt-in SQL connection enabled; both `GET /api/health` and `GET /api/health/db` succeeded with `{"status":"ok","service":"drvo-api","database":"ready"}` on the DB readiness endpoint. Frontend remained responsive.
+- Final script returned **`K4B VPS DATABASE + BACKEND CONNECTION: PASS`**; it reports no restart of Casher or other projects.
+- The server printed Node.js `DEP0123` TLS ServerName/IP deprecation warning. Not a failure; follow up TLS configuration and certificate validation.
+
+**Milestone decision:** K4 Database Foundation staging migration, on-host double restore rehearsal, limited runtime permissions, and actual NestJS SQL connectivity are **COMPLETE based on owner-reported command evidence**. Distinct follow-up gates remain: approved ADR-030 roles and scope policy, K5 real authentication/authorization and protected business APIs, access restrictions before real tenant data, off-host backup/rotation with RPO/RTO and monitoring. The Web/API still report `mode=scaffold` on their liveness endpoints; DB readiness is not business readiness.

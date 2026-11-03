@@ -131,9 +131,9 @@ async function main(){
       CHECK_POLICY=ON,CHECK_EXPIRATION=OFF`);
     admin=await open({...base,database:db});
     await check('forward-only 001/002/003 migrations and idempotent replay',async()=>{
-      assert.deepEqual((await applyMigrations(admin)).map(x=>x.status),
+      assert.deepEqual((await applyMigrations(admin,undefined,3)).map(x=>x.status),
         ['applied','applied','applied']);
-      assert.deepEqual((await applyMigrations(admin)).map(x=>x.status),
+      assert.deepEqual((await applyMigrations(admin,undefined,3)).map(x=>x.status),
         ['unchanged','unchanged','unchanged']);
     });
     await grantApp(admin);

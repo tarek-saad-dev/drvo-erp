@@ -1,0 +1,62 @@
+name: K5 Identity & RBAC SQL HTTP CI
+on:
+  pull_request:
+    paths:
+      - 'db/migrations/**'
+      - 'apps/api/src/identity/**'
+      - 'apps/api/src/data/foundation-database.service.ts'
+      - 'apps/api/src/app.module.ts'
+      - 'apps/api/test/identity.test.cjs'
+      - 'tools/k5-auth/**'
+      - 'tools/k4-db/migrate.cjs'
+      - '.github/workflows/k5-identity-rbac-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'db/migrations/**'
+      - 'apps/api/src/identity/**'
+      - 'tools/k5-auth/**'
+      - 'tools/k4-db/migrate.cjs'
+      - '.github/workflows/k5-identity-rbac-ci.yml'
+permissions:
+  contents: read
+jobs:
+  identity-security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate test harness syntax
+        run: node --check tools/k5-auth/verify.cjs
+      - name: Install locked NestJS API dependencies and build
+        run: |
+          npm ci --prefix apps/api --no-audit --no-fund
+          npm run test --prefix apps/api
+      - name: Start throwaway localhost SQL Server (never VPS)
+        shell: bash
+        run: |
+          set -euo pipefail
+          pass="DrvoK5_$(openssl rand -hex 16)!"
+          echo "::add-mask::$pass"
+          echo "SQL_TEST_SA_PASSWORD=$pass" >> "$GITHUB_ENV"
+          docker run --detach --name drvo-k5-isolated-sql \
+            -e ACCEPT_EULA=Y \
+            -e MSSQL_PID=Developer \
+            -e MSSQL_SA_PASSWORD="$pass" \
+            -p 127.0.0.1:14335:1433 \
+            -p 127.0.0.1:1433:1433 \
+            mcr.microsoft.com/mssql/server:2022-latest
+      - name: Run SQL Server, login, session and branch RBAC E2E
+        env:
+          K5_SQL_DISPOSABLE: 'YES'
+          K5_TEST_PORT: '14335'
+        run: node tools/k5-auth/verify.cjs
+      - name: Inspect disposable SQL container on failure
+        if: failure()
+        run: docker logs --tail 100 drvo-k5-isolated-sql || true
+      - name: Remove disposable SQL instance
+        if: always()
+        run: docker rm -f drvo-k5-isolated-sql || true

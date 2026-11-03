@@ -1,0 +1,58 @@
+name: K5B Scoped Role Administration SQL HTTP CI
+on:
+  pull_request:
+    paths:
+      - 'apps/api/src/identity/**'
+      - 'apps/api/src/app.module.ts'
+      - 'db/migrations/**'
+      - 'tools/k5b/**'
+      - '.github/workflows/k5b-role-admin-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/api/src/identity/**'
+      - 'apps/api/src/app.module.ts'
+      - 'db/migrations/**'
+      - 'tools/k5b/**'
+      - '.github/workflows/k5b-role-admin-ci.yml'
+permissions:
+  contents: read
+jobs:
+  real-sql-branch-rbac:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and run unit checks
+        run: |
+          npm ci --prefix apps/api --no-audit --no-fund
+          npm test --prefix apps/api
+          node --check tools/k5b/verify.cjs
+      - name: Start throwaway SQL Server with no VPS connection
+        shell: bash
+        run: |
+          set -euo pipefail
+          pass="K5B_DbCi_$(openssl rand -hex 16)!"
+          echo "::add-mask::$pass"
+          echo "SQL_TEST_SA_PASSWORD=$pass" >> "$GITHUB_ENV"
+          docker run --detach --name k5b-sql-only \
+            -e ACCEPT_EULA=Y \
+            -e MSSQL_PID=Developer \
+            -e MSSQL_SA_PASSWORD="$pass" \
+            -p 127.0.0.1:14336:1433 \
+            -p 127.0.0.1:1433:1433 \
+            mcr.microsoft.com/mssql/server:2022-latest
+      - name: Verify role delegation, audit, revocation and HTTP origin enforcement
+        env:
+          K5B_SQL_DISPOSABLE: 'YES'
+          K5B_TEST_PORT: '14336'
+        run: node tools/k5b/verify.cjs
+      - name: Inspect isolated SQL logs on failure
+        if: failure()
+        run: docker logs --tail 80 k5b-sql-only || true
+      - name: Destroy disposable SQL
+        if: always()
+        run: docker rm -f k5b-sql-only || true

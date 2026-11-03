@@ -3,8 +3,16 @@
 # No root SSH access, no sudoers, no changes to Casher/old staging/prod units.
 set -Eeuo pipefail
 umask 077
-export PATH=/usr/local/bin:/usr/bin:/bin
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 [[ "$EUID" == 0 && -t 0 ]] || { echo "Interactive root session on DRVO VPS required" >&2; exit 1; }
+# Ubuntu/Debian normally install useradd in /usr/sbin, absent from non-login
+# root shells that use a minimal PATH. Fail before provisioning anything.
+for required in useradd install chown chmod sudo node git curl ssh-keygen; do
+  command -v "$required" >/dev/null 2>&1 || {
+    echo "Missing installer prerequisite: $required. Check /usr/sbin or OS package" >&2
+    exit 1
+  }
+done
 
 repo=/srv/drvo-erp/repo
 bundle=/opt/drvo-erp-db-automation

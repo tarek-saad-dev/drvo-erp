@@ -212,6 +212,19 @@ async function main() {
       assert.equal((await update()).rowsAffected[0],1);
       assert.equal((await update()).rowsAffected[0],0);
     });
+    await check('CONNECT-only app SQL login cannot SELECT core data', async () => {
+      const login = 'drvo_k4_ci_restricted_app';
+      const pass = 'DrvoCI!' + crypto.randomBytes(24).toString('hex');
+      await admin.query(`CREATE LOGIN [${login}] WITH PASSWORD=N'${pass}', CHECK_POLICY=ON, CHECK_EXPIRATION=OFF`);
+      await pool.query(`CREATE USER [${login}] FOR LOGIN [${login}]; GRANT CONNECT TO [${login}]`);
+      const restricted = await connect({...cfg,user:login,password:pass});
+      try {
+        await assert.rejects(() => restricted.query('SELECT COUNT(*) AS cnt FROM core.Account'),(err) =>
+          /SELECT permission|permission was denied|229/i.test(String(err.message)));
+      } finally {
+        await restricted.close();
+      }
+    });
     await check('backup and independent restore reproduce foundation schema/data', async () => {
       await pool.close(); pool=undefined;
       const file='/var/opt/mssql/data/drvo_k4_disposable_backup.bak';

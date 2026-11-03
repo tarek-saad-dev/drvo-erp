@@ -104,11 +104,22 @@ else
   # The old bootstrap was installed from this verified main commit BEFORE the
   # SQL password failure. Only that exact known version may be reused.
   baseline=72e5ce5b5326d8d9d060eba49c8fedc1543e942a
-  cmp -s "$bundle/sql-bootstrap.cjs" \
-    <(git -C "$repo" show "$baseline:ops/staging/db-automation/sql-bootstrap.cjs") || {
-      echo "Installed SQL bootstrap is not the verified pre-failure version" >&2
-      exit 1
-    }
+  # The DRVO checkout is owned by 'drvoerp', NOT root. Git rejects a
+  # root-owned caller with 'dubious ownership' (correctly). Read historical
+  # source as the repo owner, never disable Git's safe.directory checks.
+  if ! sudo -u drvoerp -H git -C "$repo" cat-file -e \
+      "$baseline:ops/staging/db-automation/sql-bootstrap.cjs"; then
+    echo "Historical bootstrap commit inaccessible as repository owner" >&2
+    exit 1
+  fi
+  installed_sha="$(sha256sum "$bundle/sql-bootstrap.cjs" | cut -d' ' -f1)"
+  original_sha="$(sudo -u drvoerp -H git -C "$repo" show \
+      "$baseline:ops/staging/db-automation/sql-bootstrap.cjs" | sha256sum | cut -d' ' -f1)"
+  [[ "$installed_sha" == "$original_sha" ]] || {
+    echo "Installed SQL bootstrap is not the verified pre-failure version" >&2
+    exit 1
+  }
+  unset installed_sha original_sha
   echo "PASS: verified exact partial install from failed SQL administrator login"
 fi
 

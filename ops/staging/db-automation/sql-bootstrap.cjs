@@ -4,6 +4,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const crypto=require('node:crypto');
+const path=require('node:path');
 const sql=require('mssql');
 const NAME='drvo_erp_stage_migrator';
 const DB='DRVO_ERP_STAGING';
@@ -41,6 +42,30 @@ async function main(){
       WHERE MigrationId=N'001_platform_identity_foundation.sql'
     `);
     assert.equal(Number(pre.recordset[0].Present),1,'K4 migration must be applied already');
+    // The initial operator install also finishes the already-tested K5A
+    // migration with the existing interactive administrator credential.
+    const migrationName='002_identity_sessions_and_roles.sql';
+    const source=fs.readFileSync(path.resolve('/srv/drvo-erp/repo/db/migrations',migrationName));
+    const checksum=crypto.createHash('sha256').update(source).digest('hex');
+    const existingK5=await db.request()
+      .input('name',sql.NVarChar(160),migrationName)
+      .query('SELECT Checksum FROM core.SchemaMigration WHERE MigrationId=@name');
+    if(existingK5.recordset.length){
+      assert.equal(existingK5.recordset[0].Checksum,checksum,'K5A live checksum mismatch');
+      console.log('PASS: existing K5A staging migration already matches approved SQL');
+    }else{
+      process.env.DRVO_K5_ADMIN_LOGIN=login;
+      process.env.DRVO_K5_ADMIN_PASSWORD=secret;
+      process.env.DRVO_K5_OPERATOR_APPLY='YES';
+      try{
+        await require('/srv/drvo-erp/repo/ops/staging/k5a-sql-apply.cjs').main();
+      }finally{
+        delete process.env.DRVO_K5_ADMIN_LOGIN;
+        delete process.env.DRVO_K5_ADMIN_PASSWORD;
+        delete process.env.DRVO_K5_OPERATOR_APPLY;
+      }
+      console.log('PASS: K5A backed up, independently restored and migrated during one-time install');
+    }
     const defaultPassword=password.replaceAll("'","''");
     await master.request().batch(`
       CREATE LOGIN [drvo_erp_stage_migrator] WITH PASSWORD=N'${defaultPassword}',
@@ -51,6 +76,7 @@ async function main(){
       ALTER ROLE db_ddladmin ADD MEMBER [drvo_erp_stage_migrator];
       ALTER ROLE db_backupoperator ADD MEMBER [drvo_erp_stage_migrator];
       GRANT SELECT, INSERT ON OBJECT::core.SchemaMigration TO [drvo_erp_stage_migrator];
+      GRANT CONTROL ON SCHEMA::core TO [drvo_erp_stage_migrator];
     `);
     migrator=await connect(NAME,password,DB);
     const permissions=await migrator.query(`

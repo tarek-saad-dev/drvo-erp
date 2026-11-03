@@ -9,7 +9,7 @@ const SHA=/^[a-f0-9]{40}$/;
 const HASH=/^[a-f0-9]{64}$/;
 const NAME=/^([0-9]{3})_[a-z][a-z0-9_]*\.sql$/;
 const DB='DRVO_ERP_STAGING';
-const FILE='/etc/drvo-erp/staging-db-automation.env';
+const FILE='/etc/drvo-erp-db-automation/staging-db-automation.env';
 const MAX_INPUT=4*1024*1024;
 const BACKUP_DIR='/var/opt/mssql/data';
 

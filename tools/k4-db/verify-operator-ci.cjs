@@ -5,7 +5,6 @@ const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const sql = require('../../apps/api/node_modules/mssql');
-const { main } = require('../../ops/staging/k4b-sql-cutover.cjs');
 
 async function run() {
   assert.equal(process.getuid?.(), 0);
@@ -47,7 +46,8 @@ async function run() {
   process.env.DRVO_K4_ADMIN_LOGIN='sa';
   process.env.DRVO_K4_ADMIN_PASSWORD=process.env.SQL_TEST_SA_PASSWORD;
   try {
-    await main();
+    // Operator script snapshots env at module load, like a fresh VPS process.
+    await require('../../ops/staging/k4b-sql-cutover.cjs').main();
     console.log('K4B EXACT STAGING SQL OPERATOR SCRIPT ON DISPOSABLE CI: PASS');
   } finally {
     delete process.env.DRVO_K4B_EXECUTE;

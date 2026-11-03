@@ -6,6 +6,8 @@ on:
       - 'tools/k5d/**'
       - 'apps/api/src/identity/verification-crypto.ts'
       - 'apps/api/test/verification-crypto.test.cjs'
+      - 'apps/api/src/identity/verification-mailer.ts'
+      - 'apps/api/test/verification-mailer.test.cjs'
       - '.github/workflows/k5d-verified-onboarding-ci.yml'
   push:
     branches: [main]
@@ -14,6 +16,8 @@ on:
       - 'tools/k5d/**'
       - 'apps/api/src/identity/verification-crypto.ts'
       - 'apps/api/test/verification-crypto.test.cjs'
+      - 'apps/api/src/identity/verification-mailer.ts'
+      - 'apps/api/test/verification-mailer.test.cjs'
       - '.github/workflows/k5d-verified-onboarding-ci.yml'
 permissions:
   contents: read

@@ -169,7 +169,7 @@ async function main() {
         .query('SELECT RowVersion FROM core.Business WHERE BusinessId=@b')).recordset[0].RowVersion;
       const update = () => pool.request().input('b',sql.UniqueIdentifier,b1)
         .input('version',sql.VarBinary(8),v)
-        .query('UPDATE core.Business SET DisplayName=N'Alpha Updated' WHERE BusinessId=@b AND RowVersion=@version');
+        .query("UPDATE core.Business SET DisplayName=N'Alpha Updated' WHERE BusinessId=@b AND RowVersion=@version");
       assert.equal((await update()).rowsAffected[0],1);
       assert.equal((await update()).rowsAffected[0],0);
     });

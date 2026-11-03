@@ -11,8 +11,8 @@ async function main(){
     'Expected the restricted drvoerp-dbdeploy user');
   const config=readCredential();
   const pool=new sql.ConnectionPool(config);
-  await pool.connect();
   try{
+    await pool.connect();
     const r=await pool.query(`
       SELECT DB_NAME() AS [db], IS_ROLEMEMBER('db_ddladmin') AS [ddl],
         IS_ROLEMEMBER('db_backupoperator') AS [backup],
@@ -27,7 +27,7 @@ async function main(){
     const history=await pool.query('SELECT MigrationId FROM core.SchemaMigration');
     assert.ok(history.recordset.some(x=>x.MigrationId==='002_identity_sessions_and_roles.sql'));
     console.log('PASS: dedicated non-root SSH user can read SQL secret and access migrated DRVO staging');
-  }finally{await pool.close();}
+  }finally{await pool.close().catch(()=>{});}
 }
 if(require.main===module){
   main().catch(()=>{

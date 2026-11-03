@@ -8,7 +8,7 @@ const path=require('node:path');
 const sql=require('mssql');
 const NAME='drvo_erp_stage_migrator';
 const DB='DRVO_ERP_STAGING';
-const OUT='/etc/drvo-erp/staging-db-automation.env';
+const OUT='/etc/drvo-erp-db-automation/staging-db-automation.env';
 const BASE={server:'127.0.0.1',port:1433,connectionTimeout:5000,requestTimeout:30000,
   options:{encrypt:true,trustServerCertificate:true},pool:{min:0,max:2}};
 async function connect(user,password,database) {

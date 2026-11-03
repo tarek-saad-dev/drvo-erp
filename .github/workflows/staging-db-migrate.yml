@@ -1,0 +1,75 @@
+name: DRVO ERP — Staging SQL Migrations (Manual)
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_database:
+        description: 'Type DRVO_ERP_STAGING to authorize the migration'
+        type: string
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: drvo-erp-staging-database-migrations
+  cancel-in-progress: false
+jobs:
+  db-migrate:
+    if: github.ref == 'refs/heads/main' && inputs.confirm_database == 'DRVO_ERP_STAGING'
+    environment: staging-db
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify repository and database migration payload
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run verify
+          npm ci --prefix apps/api --no-audit --no-fund
+          npm test --prefix apps/api
+          node --check ops/staging/db-automation/build-payload.cjs
+          node --check ops/staging/db-automation/receive-sql.cjs
+          node ops/staging/db-automation/build-payload.cjs > "$RUNNER_TEMP/drvo-migrations.json"
+          test -s "$RUNNER_TEMP/drvo-migrations.json"
+          echo "Migration payload created for commit $GITHUB_SHA"
+      - name: Check database-only SSH credentials configured
+        env:
+          STAGE_HOST: ${{ secrets.DRVO_DB_STAGE_HOST }}
+          STAGE_USER: ${{ secrets.DRVO_DB_STAGE_USER }}
+          STAGE_KEY: ${{ secrets.DRVO_DB_STAGE_SSH_PRIVATE_KEY }}
+          STAGE_KNOWN_HOSTS: ${{ secrets.DRVO_DB_STAGE_KNOWN_HOSTS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ -n "$STAGE_HOST" && -n "$STAGE_USER" && -n "$STAGE_KEY" && -n "$STAGE_KNOWN_HOSTS" ]] || exit 1
+          [[ "$STAGE_USER" == "drvoerp-dbdeploy" ]] || { echo "Refusing unexpected SSH user" >&2; exit 1; }
+          [[ "$STAGE_HOST" == "187.77.83.120" ]] || { echo "Refusing unexpected VPS address" >&2; exit 1; }
+      - name: Run reviewed SQL-only migration via forced SSH command
+        env:
+          STAGE_HOST: ${{ secrets.DRVO_DB_STAGE_HOST }}
+          STAGE_USER: ${{ secrets.DRVO_DB_STAGE_USER }}
+          STAGE_KEY: ${{ secrets.DRVO_DB_STAGE_SSH_PRIVATE_KEY }}
+          STAGE_KNOWN_HOSTS: ${{ secrets.DRVO_DB_STAGE_KNOWN_HOSTS }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          key="$RUNNER_TEMP/drvo-db-stage-key"
+          hostfile="$RUNNER_TEMP/drvo-db-stage-known-hosts"
+          printf '%s\n' "$STAGE_KEY" > "$key"
+          printf '%s\n' "$STAGE_KNOWN_HOSTS" > "$hostfile"
+          chmod 600 "$key" "$hostfile"
+          ssh-keygen -y -f "$key" > /dev/null
+          ssh -T -i "$key" \
+            -o BatchMode=yes -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$hostfile" \
+            "$STAGE_USER@$STAGE_HOST" "migrate $GITHUB_SHA" \
+            < "$RUNNER_TEMP/drvo-migrations.json"
+      - name: Confirm migration runner result
+        run: echo "DRVO staging DB migration job completed for $GITHUB_SHA"

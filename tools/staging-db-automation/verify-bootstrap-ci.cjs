@@ -40,7 +40,7 @@ async function main(){
     fs.writeFileSync('/etc/drvo-erp/staging-sql.env',
       ['DRVO_SQL_HOST=127.0.0.1','DRVO_SQL_PORT=1433',
        'DRVO_SQL_DATABASE=DRVO_ERP_STAGING','DRVO_SQL_USER=drvo_erp_stage_app',
-       'DRVO_SQL_PASSWORD='+appPass,''].join('\\n'),
+       'DRVO_SQL_PASSWORD='+appPass,''].join('\n'),
       {mode:0o600});
     fs.chmodSync('/etc/drvo-erp/staging-sql.env',0o600);
 

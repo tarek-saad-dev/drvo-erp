@@ -69,9 +69,14 @@ check_pinned_source() {
   }
   actual="$(sha256sum "$installed" | cut -d' ' -f1)"
   expected="$(sudo -u drvoerp -H git -C "$repo" show "$baseline:$source" | sha256sum | cut -d' ' -f1)"
-  [[ "$actual" == "$expected" ]] || {
-    echo "Installed $source differs from the verified pre-failure version" >&2; exit 1;
-  }
+  if [[ "$actual" != "$expected" ]]; then
+    # Recovery may have previously moved the secret and pinned this exact
+    # currently reviewed main-branch receiver before a later smoke failure.
+    [[ "$mode" == resume-secret && -f "$repo/$source" &&
+       "$actual" == "$(sha256sum "$repo/$source" | cut -d' ' -f1)" ]] || {
+      echo "Installed $source differs from both approved recovery versions" >&2; exit 1;
+    }
+  fi
 }
 if [[ "$mode" == fresh ]]; then
   for item in "$bundle" "$sql_env" "$legacy_sql_env" "$secret_dir" "$key_dir" /usr/local/libexec/drvoerp-db-receiver; do
@@ -123,15 +128,27 @@ else
     }
     echo "PASS: verified exact partial install after failed SQL administrator login"
   else
-    [[ "$mode" == resume-secret &&
-       ! -e "$secret_dir" && ! -L "$secret_dir" &&
-       -f "$legacy_sql_env" && ! -L "$legacy_sql_env" ]] || {
-      echo "Secret-directory recovery state differs from the reported failure" >&2; exit 1;
-    }
+    [[ "$mode" == resume-secret ]] || exit 64
+    [[ ! -L "$secret_dir" ]] || { echo "Symlinked secret directory rejected" >&2; exit 1; }
     expected="0:$(id -g "$unix_user"):640"
-    [[ "$(stat -c '%u:%g:%a' "$legacy_sql_env")" == "$expected" ]] || {
-      echo "Existing SQL secret ownership or permissions changed" >&2; exit 1;
-    }
+    if [[ -f "$legacy_sql_env" && ! -L "$legacy_sql_env" &&
+          ! -e "$sql_env" && ! -L "$sql_env" ]]; then
+      [[ ! -e "$secret_dir" ||
+         "$(stat -c '%u:%g:%a' "$secret_dir")" == "0:$(id -g "$unix_user"):710" ]] || {
+        echo "Unexpected pre-existing dedicated secret directory" >&2; exit 1;
+      }
+      [[ "$(stat -c '%u:%g:%a' "$legacy_sql_env")" == "$expected" ]] || {
+        echo "Legacy SQL secret ownership or permissions changed" >&2; exit 1;
+      }
+    elif [[ ! -e "$legacy_sql_env" && ! -L "$legacy_sql_env" &&
+            -d "$secret_dir" && -f "$sql_env" && ! -L "$sql_env" ]]; then
+      [[ "$(stat -c '%u:%g:%a' "$secret_dir")" == "0:$(id -g "$unix_user"):710" &&
+         "$(stat -c '%u:%g:%a' "$sql_env")" == "$expected" ]] || {
+        echo "Migrated SQL secret ownership or permissions changed" >&2; exit 1;
+      }
+    else
+      echo "Secret-directory recovery state differs from the reported failure" >&2; exit 1;
+    fi
     echo "PASS: existing K5 SQL migration and root-owned secret verified; no SQL bootstrap replay"
   fi
 fi
@@ -179,10 +196,12 @@ else
   # K5 SQL migrations, SQL login and its password already succeeded.
   # Do not prompt for SQL admin, rerun K5 DDL or recreate any SQL principal.
   install -d -o root -g "$unix_user" -m 0710 "$secret_dir"
-  [[ ! -e "$sql_env" && ! -L "$sql_env" ]] || {
-    echo "Dedicated SQL secret already exists; refusing overwrite" >&2; exit 1;
-  }
-  mv -T -- "$legacy_sql_env" "$sql_env"
+  if [[ -f "$legacy_sql_env" && ! -L "$legacy_sql_env" ]]; then
+    [[ ! -e "$sql_env" && ! -L "$sql_env" ]] || {
+      echo "Dedicated SQL secret already exists; refusing overwrite" >&2; exit 1;
+    }
+    mv -T -- "$legacy_sql_env" "$sql_env"
+  fi
   install -o root -g root -m 0644 \
     "$repo/ops/staging/db-automation/receive-sql.cjs" "$bundle/receive-sql.cjs"
   install -o root -g root -m 0644 \

@@ -136,43 +136,69 @@ else
   fi
 fi
 
-# Validate the existing Admin credentials BEFORE touching any host state.
-echo "Target: DRVO_ERP_STAGING only. Enter the EXISTING SQL Admin locally."
-read -r -p "Existing SQL administrator login [sa]: " admin_login
-admin_login="${admin_login:-sa}"
-[[ "$admin_login" =~ ^[A-Za-z0-9_.-]{1,64}$ ]] || { echo "Invalid admin login" >&2; exit 1; }
-read -r -s -p "Existing SQL administrator password (hidden): " admin_pass
-echo
-[[ -n "$admin_pass" ]] || { echo "Admin password required" >&2; exit 1; }
-export DRVO_DB_ADMIN_LOGIN="$admin_login"
-export DRVO_DB_ADMIN_PASSWORD="$admin_pass"
-export DRVO_DB_BOOTSTRAP=YES
-unset admin_login admin_pass
-NODE_PATH=/srv/drvo-erp/deploy/current/api/node_modules \
-  node "$repo/ops/staging/db-automation/sql-bootstrap.cjs" --check-admin
+if [[ "$mode" != resume-secret ]]; then
+  # Fresh SQL provisioning only. Existing K5-success state needs NO admin login.
+  echo "Target: DRVO_ERP_STAGING only. Enter the EXISTING SQL Admin locally."
+  read -r -p "Existing SQL administrator login [sa]: " admin_login
+  admin_login="${admin_login:-sa}"
+  [[ "$admin_login" =~ ^[A-Za-z0-9_.-]{1,64}$ ]] || { echo "Invalid admin login" >&2; exit 1; }
+  read -r -s -p "Existing SQL administrator password (hidden): " admin_pass
+  echo
+  [[ -n "$admin_pass" ]] || { echo "Admin password required" >&2; exit 1; }
+  export DRVO_DB_ADMIN_LOGIN="$admin_login"
+  export DRVO_DB_ADMIN_PASSWORD="$admin_pass"
+  export DRVO_DB_BOOTSTRAP=YES
+  unset admin_login admin_pass
+  NODE_PATH=/srv/drvo-erp/deploy/current/api/node_modules \
+    node "$repo/ops/staging/db-automation/sql-bootstrap.cjs" --check-admin
 
-if [[ "$mode" == fresh ]]; then
-  useradd --system --user-group --create-home \
-    --home-dir /var/lib/drvoerp-dbdeploy --shell /bin/bash "$unix_user"
-  chmod 0700 /var/lib/drvoerp-dbdeploy
-  install -d -o root -g root -m 0755 "$bundle"
-  install -o root -g root -m 0644 "$repo/ops/staging/db-automation/receive-sql.cjs" "$bundle/receive-sql.cjs"
-  install -o root -g root -m 0644 "$repo/ops/staging/db-automation/sql-bootstrap.cjs" "$bundle/sql-bootstrap.cjs"
-  install -o root -g root -m 0755 "$repo/ops/staging/db-automation/receive-sql.sh" /usr/local/libexec/drvoerp-db-receiver
-
-  # Pin SQL driver deps into the root-owned immutable automation bundle.
-  cp -a /srv/drvo-erp/deploy/current/api/node_modules "$bundle/node_modules"
-  chown -R root:root "$bundle"
-  chmod -R go-w "$bundle"
+  if [[ "$mode" == fresh ]]; then
+    useradd --system --user-group --create-home \
+      --home-dir /var/lib/drvoerp-dbdeploy --shell /bin/bash "$unix_user"
+    chmod 0700 /var/lib/drvoerp-dbdeploy
+    install -d -o root -g root -m 0755 "$bundle"
+    cp -a /srv/drvo-erp/deploy/current/api/node_modules "$bundle/node_modules"
+    chown -R root:root "$bundle"
+    chmod -R go-w "$bundle"
+  fi
+  # Dedicated credential directory instead of opening the shared /etc/drvo-erp.
+  install -d -o root -g "$unix_user" -m 0710 "$secret_dir"
+  install -o root -g root -m 0644 \
+    "$repo/ops/staging/db-automation/receive-sql.cjs" "$bundle/receive-sql.cjs"
+  install -o root -g root -m 0644 \
+    "$repo/ops/staging/db-automation/sql-bootstrap.cjs" "$bundle/sql-bootstrap.cjs"
+  if [[ "$mode" == fresh ]]; then
+    install -o root -g root -m 0755 \
+      "$repo/ops/staging/db-automation/receive-sql.sh" \
+      /usr/local/libexec/drvoerp-db-receiver
+  fi
+  node -e "require('$bundle/node_modules/mssql')"
+  node "$bundle/sql-bootstrap.cjs"
+  unset DRVO_DB_ADMIN_LOGIN DRVO_DB_ADMIN_PASSWORD DRVO_DB_BOOTSTRAP
+else
+  # K5 SQL migrations, SQL login and its password already succeeded.
+  # Do not prompt for SQL admin, rerun K5 DDL or recreate any SQL principal.
+  install -d -o root -g "$unix_user" -m 0710 "$secret_dir"
+  [[ ! -e "$sql_env" && ! -L "$sql_env" ]] || {
+    echo "Dedicated SQL secret already exists; refusing overwrite" >&2; exit 1;
+  }
+  mv -T -- "$legacy_sql_env" "$sql_env"
+  install -o root -g root -m 0644 \
+    "$repo/ops/staging/db-automation/receive-sql.cjs" "$bundle/receive-sql.cjs"
+  install -o root -g root -m 0644 \
+    "$repo/ops/staging/db-automation/sql-bootstrap.cjs" "$bundle/sql-bootstrap.cjs"
+  echo "PASS: existing SQL secret moved to a dedicated directory; no SQL migration repeated"
 fi
-node -e "require('$bundle/node_modules/mssql')"
-node "$bundle/sql-bootstrap.cjs"
-unset DRVO_DB_ADMIN_LOGIN DRVO_DB_ADMIN_PASSWORD DRVO_DB_BOOTSTRAP
 
+[[ "$(stat -c '%u:%g:%a' "$secret_dir")" == "0:$(id -g "$unix_user"):710" ]] || {
+  echo "Dedicated SQL secret directory permissions are incorrect" >&2; exit 1;
+}
 chown root:drvoerp-dbdeploy "$sql_env"
 chmod 0640 "$sql_env"
-sudo -u drvoerp-dbdeploy -H node -e \
-  "require('fs').readFileSync('$sql_env','utf8'); console.log('PASS: DB SSH user can read only its scoped credential file')"
+install -o root -g root -m 0644 \
+  "$repo/ops/staging/db-automation/check-runtime.cjs" "$bundle/check-runtime.cjs"
+DRVO_EXPECT_DB_UID="$(id -u "$unix_user")" \
+  sudo -u "$unix_user" -H /usr/bin/node "$bundle/check-runtime.cjs"
 
 install -d -o root -g root -m 0700 "$key_dir"
 ssh-keygen -q -t ed25519 -N '' -C drvo-erp-staging-db -f "$key_dir/id_ed25519"
@@ -205,4 +231,4 @@ echo
 echo "GitHub secrets: DRVO_DB_STAGE_HOST=187.77.83.120;"
 echo "DRVO_DB_STAGE_USER=drvoerp-dbdeploy; DRVO_DB_STAGE_SSH_PRIVATE_KEY=the private key;"
 echo "DRVO_DB_STAGE_KNOWN_HOSTS=the known_hosts line above."
-echo "No database migrations were applied by this installation."
+echo "K5A migration state preserved; login/RBAC HTTP is still disabled."

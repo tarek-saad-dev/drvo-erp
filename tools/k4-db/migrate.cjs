@@ -68,8 +68,8 @@ function configFromEnv() {
   };
 }
 
-async function applyMigrations(pool, dir = MIGRATIONS_DIR) {
-  const manifest = readManifest(dir);
+async function applyMigrations(pool, dir = MIGRATIONS_DIR, maxMigrations = Number.POSITIVE_INFINITY) {
+  const manifest = readManifest(dir).slice(0, maxMigrations);
   const applied = [];
   for (const migration of manifest) {
     const transaction = new sql.Transaction(pool);

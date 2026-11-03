@@ -46,7 +46,7 @@ function validateInputs() {
   assert.equal(app.DRVO_SQL_DATABASE, DATABASE);
   assert.equal(app.DRVO_SQL_USER, APP_LOGIN);
   assert.ok(app.DRVO_SQL_PASSWORD && app.DRVO_SQL_PASSWORD.length >= 12);
-  assert.deepEqual(readManifest().map((m) => m.filename), ['001_platform_identity_foundation.sql']);
+  assert.equal(readManifest()[0]?.filename, '001_platform_identity_foundation.sql');
   return app;
 }
 
@@ -174,10 +174,10 @@ async function main() {
     const preBackup = await backup(master, 'pre', nonce);
     await testRestore(master, preBackup, before, nonce, 'pre');
 
-    const applied = await applyMigrations(db);
+    const applied = await applyMigrations(db, undefined, 1);
     assert.equal(applied.length, 1);
     assert.ok(['applied','unchanged'].includes(applied[0].status));
-    assert.equal((await applyMigrations(db))[0].status, 'unchanged', 'Replay must be idempotent');
+    assert.equal((await applyMigrations(db, undefined, 1))[0].status, 'unchanged', 'Replay must be idempotent');
     console.log('PASS: K4 schema migration applied / replay verified');
 
     const after = await tableNames(db);

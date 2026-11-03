@@ -1,7 +1,13 @@
 import { randomBytes, scrypt as scryptCallback, timingSafeEqual } from "node:crypto";
-import { promisify } from "node:util";
 
-const scrypt = promisify(scryptCallback);
+function derive(password: string, salt: Buffer): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    scryptCallback(password, salt, KEY_LENGTH, SCRYPT_OPTIONS, (error, value) => {
+      if (error) reject(error);
+      else resolve(value as Buffer);
+    });
+  });
+}
 export const K5_PASSWORD_ALGORITHM = "scrypt-v1";
 const KEY_LENGTH = 64;
 const SCRYPT_OPTIONS = { N: 32768, r: 8, p: 1, maxmem: 64 * 1024 * 1024 } as const;
@@ -19,7 +25,7 @@ export async function hashNewPassword(password: string):
   Promise<{ salt: Buffer; passwordHash: Buffer; algorithm: typeof K5_PASSWORD_ALGORITHM }> {
   validatePassword(password);
   const salt = randomBytes(32);
-  const passwordHash = await scrypt(password, salt, KEY_LENGTH, SCRYPT_OPTIONS) as Buffer;
+  const passwordHash = await derive(password, salt);
   return { salt, passwordHash, algorithm: K5_PASSWORD_ALGORITHM };
 }
 

@@ -34,6 +34,12 @@ export class FoundationDatabaseService implements OnModuleInit, OnModuleDestroy 
     }
   }
 
+  /** Internal-only pool handle for audited server-side repository services. */
+  getInternalPool(): sql.ConnectionPool {
+    if (!this.pool) throw new ServiceUnavailableException("DRVO SQL is not ready");
+    return this.pool;
+  }
+
   /** Non-sensitive readiness signal, not a sign that user authentication is live. */
   async checkReadiness(): Promise<{ readonly status: "ok"; readonly service: "drvo-api"; readonly database: "ready" }> {
     if (!this.enabled || !this.pool) throw new ServiceUnavailableException("DRVO SQL is not ready");

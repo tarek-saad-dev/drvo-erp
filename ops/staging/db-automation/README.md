@@ -87,6 +87,21 @@ DRVO STAGING DB AUTOMATION INSTALLED
 
 Only after that set the four GitHub environment secrets and run the workflow; never paste SQL credentials or SSH private keys into chat.
 
+## Recovery — `Cannot find module 'mssql'` under the DB deploy user
+
+If K5A, the SQL migration principal, and the dedicated SQL secret move all succeeded, but the installer stopped with `Cannot find module 'mssql'` when starting `/opt/drvo-erp-db-automation/check-runtime.cjs`, **do not repeat SQL bootstrap or change database credentials**.
+
+The original `cp -a` preserved permission bits from the API deployment `node_modules`, where some files/directories are root/deployment-account-only. The installer had previously checked module loadability only as root. The repaired installer now grants **read/traverse only** to group `drvoerp-dbdeploy` on the pinned root-owned `/opt/drvo-erp-db-automation/node_modules`; other users get no access. It then requires `mssql` as the actual restricted Unix user and performs a real database role/readiness test before generating SSH keys.
+
+After green CI + merge, from an interactive root shell:
+
+```bash
+sudo -u drvoerp -H git -C /srv/drvo-erp/repo pull --ff-only origin main
+sudo bash /srv/drvo-erp/repo/ops/staging/db-automation/prepare-once.sh --resume-after-secret-traversal-failure
+```
+
+The resume mode validates the existing root-owned SQL runner and migrated secret, **does not create any SQL login or execute migrations**, and continues SSH key setup after the restricted-user smoke check. If it refuses state validation, stop and inspect rather than deleting /opt files or modifying SQL users.
+
 ## Step 3 — Configure GitHub Environment and FOUR secrets
 
 Open:

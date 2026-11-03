@@ -1,0 +1,54 @@
+name: K5C Private UI Route Gates
+on:
+  pull_request:
+    paths:
+      - 'apps/web/**'
+      - 'apps/api/src/identity/**'
+      - '.github/workflows/k5c-private-ui-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/web/**'
+      - 'apps/api/src/identity/**'
+      - '.github/workflows/k5c-private-ui-ci.yml'
+permissions:
+  contents: read
+jobs:
+  private-routes-off-by-default:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Reproducible Next.js build and typecheck
+        run: |
+          npm ci --prefix apps/web --no-audit --no-fund
+          env -u DRVO_K5_WEB_ENABLED npm run build --prefix apps/web
+          npm run typecheck --prefix apps/web
+      - name: Smoke public preview while private auth remains 404
+        shell: bash
+        run: |
+          set -euo pipefail
+          env -u DRVO_K5_WEB_ENABLED npm run start --prefix apps/web \
+            > "$RUNNER_TEMP/k5c-web.log" 2>&1 &
+          pid="$!"
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 40); do
+            if curl -fsS -o /dev/null http://127.0.0.1:3100/; then break; fi
+            sleep 1
+          done
+          test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3100/)" = 200
+          for route in "/sign-in" "/change-password" \
+            "/workspace/11111111-1111-1111-1111-111111111111/22222222-2222-2222-2222-222222222222/access"; do
+            status="$(curl -sS -o /dev/null -w '%{http_code}' "http://127.0.0.1:3100$route")"
+            if [[ "$status" != 404 ]]; then
+              echo "FAIL: private K5C route leaked with HTTP $status: $route" >&2
+              exit 1
+            fi
+          done
+          echo "K5C PRIVATE WEB ROUTES DISABLED BY DEFAULT: PASS"
+      - name: Inspect Next.js logs after error
+        if: failure()
+        run: tail -n 80 "$RUNNER_TEMP/k5c-web.log" || true

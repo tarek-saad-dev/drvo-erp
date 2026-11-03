@@ -129,6 +129,28 @@ jobs:
           DRVO_DB_CI_DISPOSABLE: 'YES'
           NODE_PATH: ${{ github.workspace }}/apps/api/node_modules
         run: sudo -E node tools/staging-db-automation/verify-bootstrap-ci.cjs
+      - name: Verify dedicated secret is readable only by restricted Unix user
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check ops/staging/db-automation/check-runtime.cjs
+          sudo useradd --system --user-group --create-home \
+            --home-dir /var/lib/drvoerp-dbdeploy --shell /bin/bash drvoerp-dbdeploy
+          sudo chown root:drvoerp-dbdeploy /etc/drvo-erp-db-automation
+          sudo chmod 0710 /etc/drvo-erp-db-automation
+          sudo chown root:drvoerp-dbdeploy \
+            /etc/drvo-erp-db-automation/staging-db-automation.env
+          sudo chmod 0640 /etc/drvo-erp-db-automation/staging-db-automation.env
+          sudo -u drvoerp-dbdeploy -H /usr/bin/env \
+            NODE_PATH="$GITHUB_WORKSPACE/apps/api/node_modules" \
+            "$(command -v node)" \
+            "$GITHUB_WORKSPACE/ops/staging/db-automation/check-runtime.cjs"
+          # Nobody else may read the SQL migration secret, despite the
+          # dedicated group member being able to traverse its parent.
+          if sudo -u nobody test -r /etc/drvo-erp-db-automation/staging-db-automation.env; then
+            echo "ERROR: migration SQL secret is visible to an unrelated user"
+            exit 1
+          fi
       - name: Diagnose disposable SQL on failure
         if: failure()
         run: docker logs --tail 80 drvo-db-auto-bootstrap-ci || true

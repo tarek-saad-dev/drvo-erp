@@ -20,6 +20,9 @@ dropin="$dropdir/30-k4b-sql.conf"
 if [[ -e "$dropin" ]]; then
   echo "SQL service drop-in already exists; do not reinstall blindly" >&2; exit 1;
 fi
+[[ "$(sudo -u drvoerp -H git -C "$repo" branch --show-current)" == "main" ]] || {
+  echo "Expected the clean main checkout for DRVO ERP" >&2; exit 1;
+}
 [[ -z "$(sudo -u drvoerp -H git -C "$repo" status --porcelain)" ]] || {
   echo "DRVO ERP checkout has local changes; stop before pull" >&2; exit 1;
 }

@@ -17,7 +17,9 @@ done
 repo=/srv/drvo-erp/repo
 bundle=/opt/drvo-erp-db-automation
 unix_user=drvoerp-dbdeploy
-sql_env=/etc/drvo-erp/staging-db-automation.env
+legacy_sql_env=/etc/drvo-erp/staging-db-automation.env
+secret_dir=/etc/drvo-erp-db-automation
+sql_env="$secret_dir/staging-db-automation.env"
 key_dir=/root/drvo-erp-db-bootstrap
 [[ "$(sudo -u drvoerp -H git -C "$repo" branch --show-current)" == main ]] || {
   echo "DRVO source checkout must be on main" >&2; exit 1;
@@ -46,7 +48,8 @@ mode="${1:-}"
 case "$mode" in
   "") mode=fresh ;;
   --resume-after-admin-login-failure) mode=resume ;;
-  *) echo "Use no arguments or --resume-after-admin-login-failure" >&2; exit 64 ;;
+  --resume-after-secret-traversal-failure) mode=resume-secret ;;
+  *) echo "Use no arguments, --resume-after-admin-login-failure or --resume-after-secret-traversal-failure" >&2; exit 64 ;;
 esac
 [[ $# -le 1 ]] || { echo "Too many installer arguments" >&2; exit 64; }
 
@@ -55,32 +58,47 @@ node --check "$repo/ops/staging/db-automation/receive-sql.cjs"
 node --check "$repo/ops/staging/db-automation/sql-bootstrap.cjs"
 node --check "$repo/ops/staging/db-automation/build-payload.cjs"
 
+# Known partial states: (1) incorrect admin credentials, before SQL work;
+# (2) successful K5 migration + SQL bootstrap, but the shared root-private
+# /etc/drvo-erp directory blocked traversal by drvoerp-dbdeploy.
+baseline=72e5ce5b5326d8d9d060eba49c8fedc1543e942a
+check_pinned_source() {
+  local installed="$1" source="$2" actual expected
+  sudo -u drvoerp -H git -C "$repo" cat-file -e "$baseline:$source" || {
+    echo "Historical bootstrap code unavailable from repository owner" >&2; exit 1;
+  }
+  actual="$(sha256sum "$installed" | cut -d' ' -f1)"
+  expected="$(sudo -u drvoerp -H git -C "$repo" show "$baseline:$source" | sha256sum | cut -d' ' -f1)"
+  if [[ "$actual" != "$expected" ]]; then
+    # Recovery may have previously moved the secret and pinned this exact
+    # currently reviewed main-branch receiver before a later smoke failure.
+    [[ "$mode" == resume-secret && -f "$repo/$source" &&
+       "$actual" == "$(sha256sum "$repo/$source" | cut -d' ' -f1)" ]] || {
+      echo "Installed $source differs from both approved recovery versions" >&2; exit 1;
+    }
+  fi
+}
 if [[ "$mode" == fresh ]]; then
-  for item in "$bundle" "$sql_env" "$key_dir" /usr/local/libexec/drvoerp-db-receiver; do
+  for item in "$bundle" "$sql_env" "$legacy_sql_env" "$secret_dir" "$key_dir" /usr/local/libexec/drvoerp-db-receiver; do
     [[ ! -e "$item" && ! -L "$item" ]] || {
-      echo "Existing automation resource: $item (refusing overwrite)" >&2
-      exit 1
+      echo "Existing automation resource: $item (refusing overwrite)" >&2; exit 1;
     }
   done
   ! id "$unix_user" >/dev/null 2>&1 || {
-    echo "DB SSH user already exists; use the documented resume mode ONLY after a failed SQL login" >&2
-    exit 1
+    echo "DB SSH user already exists; use recovery only for a known partial install" >&2; exit 1;
   }
 else
-  # The previous run stopped while authenticating to master, BEFORE it could
-  # create a migrator SQL login, SQL env file, host key, or authorized SSH key.
-  [[ -d "$bundle" && ! -L "$bundle" &&
-     -d "$bundle/node_modules/mssql" &&
-     -f "$bundle/receive-sql.cjs" &&
-     -f "$bundle/sql-bootstrap.cjs" &&
-     -f /usr/local/libexec/drvoerp-db-receiver ]] || {
+  [[ -d "$bundle" && ! -L "$bundle" && -d "$bundle/node_modules/mssql" &&
+     -f "$bundle/receive-sql.cjs" && ! -L "$bundle/receive-sql.cjs" &&
+     -f "$bundle/sql-bootstrap.cjs" && ! -L "$bundle/sql-bootstrap.cjs" &&
+     -f /usr/local/libexec/drvoerp-db-receiver &&
+     ! -L /usr/local/libexec/drvoerp-db-receiver ]] || {
     echo "Known partial installer scaffold missing; refusing unsafe resume" >&2; exit 1;
   }
-  [[ ! -e "$sql_env" && ! -L "$sql_env" &&
-     ! -e "$key_dir" && ! -L "$key_dir" &&
-     ! -e "/var/lib/$unix_user/.ssh/authorized_keys" ]] || {
-    echo "SQL or SSH setup has progressed beyond a failed admin login; refusing resume" >&2
-    exit 1
+  [[ ! -e "$key_dir" && ! -L "$key_dir" &&
+     ! -e "/var/lib/$unix_user/.ssh/authorized_keys" &&
+     ! -L "/var/lib/$unix_user/.ssh/authorized_keys" ]] || {
+    echo "SSH setup has progressed beyond the supported partial install" >&2; exit 1;
   }
   [[ "$(getent passwd "$unix_user" | cut -d: -f6,7)" == "/var/lib/$unix_user:/bin/bash" &&
      "$(id -gn "$unix_user")" == "$unix_user" ]] || {
@@ -88,78 +106,117 @@ else
   }
   [[ "$(stat -c '%u:%g:%a' "$bundle")" == "0:0:755" &&
      "$(stat -c '%u:%g:%a' /usr/local/libexec/drvoerp-db-receiver)" == "0:0:755" ]] || {
-    echo "Existing receiver permissions changed; refusing resume" >&2; exit 1;
+    echo "Existing receiver ownership or permissions changed" >&2; exit 1;
   }
   [[ -z "$(find "$bundle" -xdev ! -user root -print -quit)" &&
      -z "$(find "$bundle" -xdev \( -type f -o -type d \) -perm /022 -print -quit)" ]] || {
-    echo "Existing runner content ownership/mode changed; refusing resume" >&2; exit 1;
-  }
-  cmp -s "$bundle/receive-sql.cjs" "$repo/ops/staging/db-automation/receive-sql.cjs" || {
-    echo "Installed SQL receiver has changed; refusing resume" >&2; exit 1;
+    echo "Existing runner content ownership/mode changed" >&2; exit 1;
   }
   cmp -s /usr/local/libexec/drvoerp-db-receiver \
     "$repo/ops/staging/db-automation/receive-sql.sh" || {
-      echo "Installed forced-command receiver differs; refusing resume" >&2; exit 1;
+      echo "Installed SSH forced command differs from verified source" >&2; exit 1;
     }
-  # The old bootstrap was installed from this verified main commit BEFORE the
-  # SQL password failure. Only that exact known version may be reused.
-  baseline=72e5ce5b5326d8d9d060eba49c8fedc1543e942a
-  # The DRVO checkout is owned by 'drvoerp', NOT root. Git rejects a
-  # root-owned caller with 'dubious ownership' (correctly). Read historical
-  # source as the repo owner, never disable Git's safe.directory checks.
-  if ! sudo -u drvoerp -H git -C "$repo" cat-file -e \
-      "$baseline:ops/staging/db-automation/sql-bootstrap.cjs"; then
-    echo "Historical bootstrap commit inaccessible as repository owner" >&2
-    exit 1
+  check_pinned_source "$bundle/receive-sql.cjs" \
+    ops/staging/db-automation/receive-sql.cjs
+  check_pinned_source "$bundle/sql-bootstrap.cjs" \
+    ops/staging/db-automation/sql-bootstrap.cjs
+  if [[ "$mode" == resume ]]; then
+    [[ ! -e "$sql_env" && ! -L "$sql_env" &&
+       ! -e "$legacy_sql_env" && ! -L "$legacy_sql_env" &&
+       ! -e "$secret_dir" && ! -L "$secret_dir" ]] || {
+      echo "Database bootstrap already created resources; use the correct recovery mode" >&2; exit 1;
+    }
+    echo "PASS: verified exact partial install after failed SQL administrator login"
+  else
+    [[ "$mode" == resume-secret ]] || exit 64
+    [[ ! -L "$secret_dir" ]] || { echo "Symlinked secret directory rejected" >&2; exit 1; }
+    expected="0:$(id -g "$unix_user"):640"
+    if [[ -f "$legacy_sql_env" && ! -L "$legacy_sql_env" &&
+          ! -e "$sql_env" && ! -L "$sql_env" ]]; then
+      [[ ! -e "$secret_dir" ||
+         "$(stat -c '%u:%g:%a' "$secret_dir")" == "0:$(id -g "$unix_user"):710" ]] || {
+        echo "Unexpected pre-existing dedicated secret directory" >&2; exit 1;
+      }
+      [[ "$(stat -c '%u:%g:%a' "$legacy_sql_env")" == "$expected" ]] || {
+        echo "Legacy SQL secret ownership or permissions changed" >&2; exit 1;
+      }
+    elif [[ ! -e "$legacy_sql_env" && ! -L "$legacy_sql_env" &&
+            -d "$secret_dir" && -f "$sql_env" && ! -L "$sql_env" ]]; then
+      [[ "$(stat -c '%u:%g:%a' "$secret_dir")" == "0:$(id -g "$unix_user"):710" &&
+         "$(stat -c '%u:%g:%a' "$sql_env")" == "$expected" ]] || {
+        echo "Migrated SQL secret ownership or permissions changed" >&2; exit 1;
+      }
+    else
+      echo "Secret-directory recovery state differs from the reported failure" >&2; exit 1;
+    fi
+    echo "PASS: existing K5 SQL migration and root-owned secret verified; no SQL bootstrap replay"
   fi
-  installed_sha="$(sha256sum "$bundle/sql-bootstrap.cjs" | cut -d' ' -f1)"
-  original_sha="$(sudo -u drvoerp -H git -C "$repo" show \
-      "$baseline:ops/staging/db-automation/sql-bootstrap.cjs" | sha256sum | cut -d' ' -f1)"
-  [[ "$installed_sha" == "$original_sha" ]] || {
-    echo "Installed SQL bootstrap is not the verified pre-failure version" >&2
-    exit 1
-  }
-  unset installed_sha original_sha
-  echo "PASS: verified exact partial install from failed SQL administrator login"
 fi
 
-# Validate the existing Admin credentials BEFORE touching any host state.
-echo "Target: DRVO_ERP_STAGING only. Enter the EXISTING SQL Admin locally."
-read -r -p "Existing SQL administrator login [sa]: " admin_login
-admin_login="${admin_login:-sa}"
-[[ "$admin_login" =~ ^[A-Za-z0-9_.-]{1,64}$ ]] || { echo "Invalid admin login" >&2; exit 1; }
-read -r -s -p "Existing SQL administrator password (hidden): " admin_pass
-echo
-[[ -n "$admin_pass" ]] || { echo "Admin password required" >&2; exit 1; }
-export DRVO_DB_ADMIN_LOGIN="$admin_login"
-export DRVO_DB_ADMIN_PASSWORD="$admin_pass"
-export DRVO_DB_BOOTSTRAP=YES
-unset admin_login admin_pass
-NODE_PATH=/srv/drvo-erp/deploy/current/api/node_modules \
-  node "$repo/ops/staging/db-automation/sql-bootstrap.cjs" --check-admin
+if [[ "$mode" != resume-secret ]]; then
+  # Fresh SQL provisioning only. Existing K5-success state needs NO admin login.
+  echo "Target: DRVO_ERP_STAGING only. Enter the EXISTING SQL Admin locally."
+  read -r -p "Existing SQL administrator login [sa]: " admin_login
+  admin_login="${admin_login:-sa}"
+  [[ "$admin_login" =~ ^[A-Za-z0-9_.-]{1,64}$ ]] || { echo "Invalid admin login" >&2; exit 1; }
+  read -r -s -p "Existing SQL administrator password (hidden): " admin_pass
+  echo
+  [[ -n "$admin_pass" ]] || { echo "Admin password required" >&2; exit 1; }
+  export DRVO_DB_ADMIN_LOGIN="$admin_login"
+  export DRVO_DB_ADMIN_PASSWORD="$admin_pass"
+  export DRVO_DB_BOOTSTRAP=YES
+  unset admin_login admin_pass
+  NODE_PATH=/srv/drvo-erp/deploy/current/api/node_modules \
+    node "$repo/ops/staging/db-automation/sql-bootstrap.cjs" --check-admin
 
-if [[ "$mode" == fresh ]]; then
-  useradd --system --user-group --create-home \
-    --home-dir /var/lib/drvoerp-dbdeploy --shell /bin/bash "$unix_user"
-  chmod 0700 /var/lib/drvoerp-dbdeploy
-  install -d -o root -g root -m 0755 "$bundle"
-  install -o root -g root -m 0644 "$repo/ops/staging/db-automation/receive-sql.cjs" "$bundle/receive-sql.cjs"
-  install -o root -g root -m 0644 "$repo/ops/staging/db-automation/sql-bootstrap.cjs" "$bundle/sql-bootstrap.cjs"
-  install -o root -g root -m 0755 "$repo/ops/staging/db-automation/receive-sql.sh" /usr/local/libexec/drvoerp-db-receiver
-
-  # Pin SQL driver deps into the root-owned immutable automation bundle.
-  cp -a /srv/drvo-erp/deploy/current/api/node_modules "$bundle/node_modules"
-  chown -R root:root "$bundle"
-  chmod -R go-w "$bundle"
+  if [[ "$mode" == fresh ]]; then
+    useradd --system --user-group --create-home \
+      --home-dir /var/lib/drvoerp-dbdeploy --shell /bin/bash "$unix_user"
+    chmod 0700 /var/lib/drvoerp-dbdeploy
+    install -d -o root -g root -m 0755 "$bundle"
+    cp -a /srv/drvo-erp/deploy/current/api/node_modules "$bundle/node_modules"
+    chown -R root:root "$bundle"
+    chmod -R go-w "$bundle"
+  fi
+  # Dedicated credential directory instead of opening the shared /etc/drvo-erp.
+  install -d -o root -g "$unix_user" -m 0710 "$secret_dir"
+  install -o root -g root -m 0644 \
+    "$repo/ops/staging/db-automation/receive-sql.cjs" "$bundle/receive-sql.cjs"
+  install -o root -g root -m 0644 \
+    "$repo/ops/staging/db-automation/sql-bootstrap.cjs" "$bundle/sql-bootstrap.cjs"
+  if [[ "$mode" == fresh ]]; then
+    install -o root -g root -m 0755 \
+      "$repo/ops/staging/db-automation/receive-sql.sh" \
+      /usr/local/libexec/drvoerp-db-receiver
+  fi
+  node -e "require('$bundle/node_modules/mssql')"
+  node "$bundle/sql-bootstrap.cjs"
+  unset DRVO_DB_ADMIN_LOGIN DRVO_DB_ADMIN_PASSWORD DRVO_DB_BOOTSTRAP
+else
+  # K5 SQL migrations, SQL login and its password already succeeded.
+  # Do not prompt for SQL admin, rerun K5 DDL or recreate any SQL principal.
+  install -d -o root -g "$unix_user" -m 0710 "$secret_dir"
+  if [[ -f "$legacy_sql_env" && ! -L "$legacy_sql_env" ]]; then
+    [[ ! -e "$sql_env" && ! -L "$sql_env" ]] || {
+      echo "Dedicated SQL secret already exists; refusing overwrite" >&2; exit 1;
+    }
+    mv -T -- "$legacy_sql_env" "$sql_env"
+  fi
+  install -o root -g root -m 0644 \
+    "$repo/ops/staging/db-automation/receive-sql.cjs" "$bundle/receive-sql.cjs"
+  install -o root -g root -m 0644 \
+    "$repo/ops/staging/db-automation/sql-bootstrap.cjs" "$bundle/sql-bootstrap.cjs"
+  echo "PASS: existing SQL secret moved to a dedicated directory; no SQL migration repeated"
 fi
-node -e "require('$bundle/node_modules/mssql')"
-node "$bundle/sql-bootstrap.cjs"
-unset DRVO_DB_ADMIN_LOGIN DRVO_DB_ADMIN_PASSWORD DRVO_DB_BOOTSTRAP
 
+[[ "$(stat -c '%u:%g:%a' "$secret_dir")" == "0:$(id -g "$unix_user"):710" ]] || {
+  echo "Dedicated SQL secret directory permissions are incorrect" >&2; exit 1;
+}
 chown root:drvoerp-dbdeploy "$sql_env"
 chmod 0640 "$sql_env"
-sudo -u drvoerp-dbdeploy -H node -e \
-  "require('fs').readFileSync('$sql_env','utf8'); console.log('PASS: DB SSH user can read only its scoped credential file')"
+install -o root -g root -m 0644 \
+  "$repo/ops/staging/db-automation/check-runtime.cjs" "$bundle/check-runtime.cjs"
+sudo -u "$unix_user" -H /usr/bin/node "$bundle/check-runtime.cjs"
 
 install -d -o root -g root -m 0700 "$key_dir"
 ssh-keygen -q -t ed25519 -N '' -C drvo-erp-staging-db -f "$key_dir/id_ed25519"
@@ -192,4 +249,4 @@ echo
 echo "GitHub secrets: DRVO_DB_STAGE_HOST=187.77.83.120;"
 echo "DRVO_DB_STAGE_USER=drvoerp-dbdeploy; DRVO_DB_STAGE_SSH_PRIVATE_KEY=the private key;"
 echo "DRVO_DB_STAGE_KNOWN_HOSTS=the known_hosts line above."
-echo "No database migrations were applied by this installation."
+echo "K5A migration state preserved; login/RBAC HTTP is still disabled."

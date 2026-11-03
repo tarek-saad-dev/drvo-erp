@@ -129,6 +129,41 @@ jobs:
           DRVO_DB_CI_DISPOSABLE: 'YES'
           NODE_PATH: ${{ github.workspace }}/apps/api/node_modules
         run: sudo -E node tools/staging-db-automation/verify-bootstrap-ci.cjs
+      - name: Verify dedicated secret is readable only by restricted Unix user
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check ops/staging/db-automation/check-runtime.cjs
+          sudo useradd --system --user-group --create-home \
+            --home-dir /var/lib/drvoerp-dbdeploy --shell /bin/bash drvoerp-dbdeploy
+          sudo chown root:drvoerp-dbdeploy /etc/drvo-erp-db-automation
+          sudo chmod 0710 /etc/drvo-erp-db-automation
+          sudo chown root:drvoerp-dbdeploy \
+            /etc/drvo-erp-db-automation/staging-db-automation.env
+          sudo chmod 0640 /etc/drvo-erp-db-automation/staging-db-automation.env
+          # The GitHub checkout lives under /home/runner (which may be
+          # private); mirror the production root-owned /opt runner instead.
+          sudo install -d -o root -g root -m 0755 /opt/drvo-erp-db-automation
+          sudo install -o root -g root -m 0644 \
+            ops/staging/db-automation/check-runtime.cjs \
+            /opt/drvo-erp-db-automation/check-runtime.cjs
+          sudo install -o root -g root -m 0644 \
+            ops/staging/db-automation/receive-sql.cjs \
+            /opt/drvo-erp-db-automation/receive-sql.cjs
+          sudo cp -a apps/api/node_modules /opt/drvo-erp-db-automation/node_modules
+          sudo chown -R root:root /opt/drvo-erp-db-automation
+          sudo chmod -R go-w /opt/drvo-erp-db-automation
+          echo "Verifying restricted SQL credential from pinned /opt receiver..."
+          timeout 35s sudo -n -u drvoerp-dbdeploy -H \
+            "$(command -v node)" \
+            /opt/drvo-erp-db-automation/check-runtime.cjs
+          echo "Restricted SQL credential verification completed"
+          # Nobody else may read the SQL migration secret, despite the
+          # dedicated group member being able to traverse its parent.
+          if sudo -u nobody test -r /etc/drvo-erp-db-automation/staging-db-automation.env; then
+            echo "ERROR: migration SQL secret is visible to an unrelated user"
+            exit 1
+          fi
       - name: Diagnose disposable SQL on failure
         if: failure()
         run: docker logs --tail 80 drvo-db-auto-bootstrap-ci || true

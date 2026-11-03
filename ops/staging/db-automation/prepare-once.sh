@@ -57,6 +57,7 @@ bash -n "$repo/ops/staging/db-automation/receive-sql.sh"
 node --check "$repo/ops/staging/db-automation/receive-sql.cjs"
 node --check "$repo/ops/staging/db-automation/sql-bootstrap.cjs"
 node --check "$repo/ops/staging/db-automation/build-payload.cjs"
+bash -n "$repo/ops/staging/db-automation/repair-module-access.sh"
 
 # Known partial states: (1) incorrect admin credentials, before SQL work;
 # (2) successful K5 migration + SQL bootstrap, but the shared root-private
@@ -214,6 +215,10 @@ fi
 }
 chown root:drvoerp-dbdeploy "$sql_env"
 chmod 0640 "$sql_env"
+# An npm dependency snapshot can inherit 0700 directories / 0600 files
+# from the deployment account. Repair only its root-owned /opt module tree.
+# This operation is safe to re-run after the SQL secret has been relocated.
+bash "$repo/ops/staging/db-automation/repair-module-access.sh"
 install -o root -g root -m 0644 \
   "$repo/ops/staging/db-automation/check-runtime.cjs" "$bundle/check-runtime.cjs"
 sudo -u "$unix_user" -H /usr/bin/node "$bundle/check-runtime.cjs"

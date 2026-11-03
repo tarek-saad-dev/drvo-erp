@@ -182,7 +182,7 @@ async function run(){
     });
     await check('invalid passwords fail and throttle by username',async()=>{
       for(let j=0;j<8;j++)await assert.rejects(()=>identity.login('nobody.k5','WrongPassword#234'),/Unauthorized/);
-      await assert.rejects(()=>identity.login('nobody.k5','WrongPassword#234'),/429|Too Many Requests/);
+      await assert.rejects(()=>identity.login('nobody.k5','WrongPassword#234'),(err)=>err?.getStatus?.()===429);
     });
     await check('runtime SQL has no DDL, broad write or other DB access',async()=>{
       const p=await client.query(`SELECT

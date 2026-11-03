@@ -40,31 +40,79 @@ curl -fsS --max-time 5 http://127.0.0.1:3311/api/health/db |
 [[ -f "$repo/db/migrations/002_identity_sessions_and_roles.sql" ]] || {
   echo "K5 migration source is missing" >&2; exit 1;
 }
-for item in "$bundle" "$sql_env" "$key_dir" /usr/local/libexec/drvoerp-db-receiver; do
-  [[ ! -e "$item" ]] || { echo "Existing automation resource: $item (refusing overwrite)" >&2; exit 1; }
-done
-! id "$unix_user" >/dev/null 2>&1 || { echo "DB SSH user exists; review manually" >&2; exit 1; }
+# A failed SQL login on the older installer already created this fixed OS
+# scaffold. Resume is opt-in and ONLY accepted when it matches that exact state.
+mode="${1:-}"
+case "$mode" in
+  "") mode=fresh ;;
+  --resume-after-admin-login-failure) mode=resume ;;
+  *) echo "Use no arguments or --resume-after-admin-login-failure" >&2; exit 64 ;;
+esac
+[[ $# -le 1 ]] || { echo "Too many installer arguments" >&2; exit 64; }
 
 bash -n "$repo/ops/staging/db-automation/receive-sql.sh"
 node --check "$repo/ops/staging/db-automation/receive-sql.cjs"
 node --check "$repo/ops/staging/db-automation/sql-bootstrap.cjs"
 node --check "$repo/ops/staging/db-automation/build-payload.cjs"
 
-useradd --system --user-group --create-home \
-  --home-dir /var/lib/drvoerp-dbdeploy --shell /bin/bash "$unix_user"
-chmod 0700 /var/lib/drvoerp-dbdeploy
-install -d -o root -g root -m 0755 "$bundle"
-install -o root -g root -m 0644 "$repo/ops/staging/db-automation/receive-sql.cjs" "$bundle/receive-sql.cjs"
-install -o root -g root -m 0644 "$repo/ops/staging/db-automation/sql-bootstrap.cjs" "$bundle/sql-bootstrap.cjs"
-install -o root -g root -m 0755 "$repo/ops/staging/db-automation/receive-sql.sh" /usr/local/libexec/drvoerp-db-receiver
+if [[ "$mode" == fresh ]]; then
+  for item in "$bundle" "$sql_env" "$key_dir" /usr/local/libexec/drvoerp-db-receiver; do
+    [[ ! -e "$item" && ! -L "$item" ]] || {
+      echo "Existing automation resource: $item (refusing overwrite)" >&2
+      exit 1
+    }
+  done
+  ! id "$unix_user" >/dev/null 2>&1 || {
+    echo "DB SSH user already exists; use the documented resume mode ONLY after a failed SQL login" >&2
+    exit 1
+  }
+else
+  # The previous run stopped while authenticating to master, BEFORE it could
+  # create a migrator SQL login, SQL env file, host key, or authorized SSH key.
+  [[ -d "$bundle" && ! -L "$bundle" &&
+     -d "$bundle/node_modules/mssql" &&
+     -f "$bundle/receive-sql.cjs" &&
+     -f "$bundle/sql-bootstrap.cjs" &&
+     -f /usr/local/libexec/drvoerp-db-receiver ]] || {
+    echo "Known partial installer scaffold missing; refusing unsafe resume" >&2; exit 1;
+  }
+  [[ ! -e "$sql_env" && ! -L "$sql_env" &&
+     ! -e "$key_dir" && ! -L "$key_dir" &&
+     ! -e "/var/lib/$unix_user/.ssh/authorized_keys" ]] || {
+    echo "SQL or SSH setup has progressed beyond a failed admin login; refusing resume" >&2
+    exit 1
+  }
+  [[ "$(getent passwd "$unix_user" | cut -d: -f6,7)" == "/var/lib/$unix_user:/bin/bash" &&
+     "$(id -gn "$unix_user")" == "$unix_user" ]] || {
+    echo "Unexpected DB user home, shell or group; refusing resume" >&2; exit 1;
+  }
+  [[ "$(stat -c '%u:%g:%a' "$bundle")" == "0:0:755" &&
+     "$(stat -c '%u:%g:%a' /usr/local/libexec/drvoerp-db-receiver)" == "0:0:755" ]] || {
+    echo "Existing receiver permissions changed; refusing resume" >&2; exit 1;
+  }
+  [[ -z "$(find "$bundle" -xdev ! -user root -print -quit)" &&
+     -z "$(find "$bundle" -xdev \( -type f -o -type d \) -perm /022 -print -quit)" ]] || {
+    echo "Existing runner content ownership/mode changed; refusing resume" >&2; exit 1;
+  }
+  cmp -s "$bundle/receive-sql.cjs" "$repo/ops/staging/db-automation/receive-sql.cjs" || {
+    echo "Installed SQL receiver has changed; refusing resume" >&2; exit 1;
+  }
+  cmp -s /usr/local/libexec/drvoerp-db-receiver \
+    "$repo/ops/staging/db-automation/receive-sql.sh" || {
+      echo "Installed forced-command receiver differs; refusing resume" >&2; exit 1;
+    }
+  # The old bootstrap was installed from this verified main commit BEFORE the
+  # SQL password failure. Only that exact known version may be reused.
+  baseline=72e5ce5b5326d8d9d060eba49c8fedc1543e942a
+  cmp -s "$bundle/sql-bootstrap.cjs" \
+    <(git -C "$repo" show "$baseline:ops/staging/db-automation/sql-bootstrap.cjs") || {
+      echo "Installed SQL bootstrap is not the verified pre-failure version" >&2
+      exit 1
+    }
+  echo "PASS: verified exact partial install from failed SQL administrator login"
+fi
 
-# Pin node_modules into a root-owned location instead of requiring code from a
-# mutable Git checkout at each privileged migration invocation.
-cp -a /srv/drvo-erp/deploy/current/api/node_modules "$bundle/node_modules"
-chown -R root:root "$bundle"
-chmod -R go-w "$bundle"
-node -e "require('$bundle/node_modules/mssql')"
-
+# Validate the existing Admin credentials BEFORE touching any host state.
 echo "Target: DRVO_ERP_STAGING only. Enter the EXISTING SQL Admin locally."
 read -r -p "Existing SQL administrator login [sa]: " admin_login
 admin_login="${admin_login:-sa}"
@@ -76,6 +124,24 @@ export DRVO_DB_ADMIN_LOGIN="$admin_login"
 export DRVO_DB_ADMIN_PASSWORD="$admin_pass"
 export DRVO_DB_BOOTSTRAP=YES
 unset admin_login admin_pass
+NODE_PATH=/srv/drvo-erp/deploy/current/api/node_modules \
+  node "$repo/ops/staging/db-automation/sql-bootstrap.cjs" --check-admin
+
+if [[ "$mode" == fresh ]]; then
+  useradd --system --user-group --create-home \
+    --home-dir /var/lib/drvoerp-dbdeploy --shell /bin/bash "$unix_user"
+  chmod 0700 /var/lib/drvoerp-dbdeploy
+  install -d -o root -g root -m 0755 "$bundle"
+  install -o root -g root -m 0644 "$repo/ops/staging/db-automation/receive-sql.cjs" "$bundle/receive-sql.cjs"
+  install -o root -g root -m 0644 "$repo/ops/staging/db-automation/sql-bootstrap.cjs" "$bundle/sql-bootstrap.cjs"
+  install -o root -g root -m 0755 "$repo/ops/staging/db-automation/receive-sql.sh" /usr/local/libexec/drvoerp-db-receiver
+
+  # Pin SQL driver deps into the root-owned immutable automation bundle.
+  cp -a /srv/drvo-erp/deploy/current/api/node_modules "$bundle/node_modules"
+  chown -R root:root "$bundle"
+  chmod -R go-w "$bundle"
+fi
+node -e "require('$bundle/node_modules/mssql')"
 node "$bundle/sql-bootstrap.cjs"
 unset DRVO_DB_ADMIN_LOGIN DRVO_DB_ADMIN_PASSWORD DRVO_DB_BOOTSTRAP
 

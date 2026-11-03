@@ -42,6 +42,23 @@ Its SQL secret stays **only** in `/etc/drvo-erp/staging-db-automation.env`, root
 The installer generates a unique SSH key temporarily in:
 `/root/drvo-erp-db-bootstrap/id_ed25519`.
 
+## Recovery — previously entered the wrong existing SQL Admin password
+
+If the old installer stopped **exactly** after printing `DRVO DB BOOTSTRAP FAILED: Login failed for user 'sa'.` and a second attempt says `Existing automation resource: /opt/drvo-erp-db-automation`, do **not** delete users, remove `/opt` directories, reset `sa`, or edit SQL Server configuration.
+
+The installer now has a dedicated **one-time resume mode**. It checks the existing Unix account, root-owned receiver and pinned code against the known initial deployment, and insists that **no** SQL credentials file, SSH key, or authorized SSH key has been installed yet. It also verifies the supplied SQL Admin login/password **before** making any new host or database changes.
+
+After this PR is merged and CI has succeeded, from the same root VPS console:
+
+```bash
+sudo -u drvoerp -H git -C /srv/drvo-erp/repo pull --ff-only origin main
+sudo bash /srv/drvo-erp/repo/ops/staging/db-automation/prepare-once.sh --resume-after-admin-login-failure
+```
+
+Enter the **existing SQL Administrator login and password used successfully in the earlier K4B cutover**. The suggested login `sa` is only a default, not a guarantee that it is the right administrator for this installation. If you do not know the credentials, confirm them from your existing local administrator/secret management process; never paste a password or private key into ChatGPT. Multiple failed attempts may trigger SQL account policy/lockout.
+
+If the installer refuses the resume due to a mismatched file, unexpected user/group/mode, or a previously created secret, **stop**. A different failure has left a different state and must be inspected before continuing. No cleanup command should be run by guesswork. Successful resume continues with the normal SSH-key and GitHub Environment setup in Steps 3–5 below.
+
 ## Step 3 — Configure GitHub Environment and FOUR secrets
 
 Open:

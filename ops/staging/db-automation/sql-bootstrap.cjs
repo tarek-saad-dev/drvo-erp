@@ -15,6 +15,29 @@ async function connect(user,password,database) {
   const pool=new sql.ConnectionPool({...BASE,user,password,database});
   await pool.connect();return pool;
 }
+/**
+ * Authenticates the CURRENT SQL administrator before provisioning OS users or
+ * files. This is read-only: it never creates SQL logins, migrations or backups.
+ */
+async function verifyExistingAdminLogin(){
+  assert.equal(process.getuid?.(),0,'Root operator required');
+  const login=process.env.DRVO_DB_ADMIN_LOGIN||'sa';
+  const password=process.env.DRVO_DB_ADMIN_PASSWORD;
+  assert.match(login,/^[a-zA-Z0-9_.-]{1,64}$/);
+  assert.ok(password && password.length>0,'Existing SQL admin password required');
+  let pool;
+  try {
+    pool=await connect(login,password,'master');
+    const check=await pool.request().query(
+      "SELECT DB_NAME() AS DatabaseName, DB_ID(N'DRVO_ERP_STAGING') AS StageDb"
+    );
+    assert.equal(check.recordset[0]?.DatabaseName,'master');
+    assert.ok(check.recordset[0]?.StageDb!=null,'DRVO staging database not found');
+    console.log('PASS: existing SQL administrator credentials accepted (read-only preflight)');
+  } finally {
+    await pool?.close().catch(()=>{});
+  }
+}
 async function main(){
   assert.equal(process.getuid?.(),0,'Only root may provision SQL migrator');
   assert.equal(process.env.DRVO_DB_BOOTSTRAP,'YES','Explicit bootstrap required');
@@ -113,10 +136,15 @@ async function main(){
   }
 }
 if(require.main===module){
-  main().catch(error=>{
+  const operation=process.argv[2];
+  const action=operation==='--check-admin' ? verifyExistingAdminLogin :
+    operation===undefined ? main : async()=>{
+      throw new Error('Unexpected bootstrap operation');
+    };
+  action().catch(error=>{
     console.error('DRVO DB BOOTSTRAP FAILED:',error instanceof Error?
       String(error.message).slice(0,250):'Unknown error');
     process.exitCode=1;
   });
 }
-module.exports={main};
+module.exports={main,verifyExistingAdminLogin};

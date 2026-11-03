@@ -44,6 +44,19 @@ async function main(){
       {mode:0o600});
     fs.chmodSync('/etc/drvo-erp/staging-sql.env',0o600);
 
+    // Regression: wrong SQL Admin password must be rejected in read-only
+    // preflight BEFORE any Unix/SQL migration principal is provisioned.
+    const {verifyExistingAdminLogin}=require('../../ops/staging/db-automation/sql-bootstrap.cjs');
+    process.env.DRVO_DB_ADMIN_LOGIN='sa';
+    process.env.DRVO_DB_ADMIN_PASSWORD='DrvoIncorrectCiPassword123!';
+    await assert.rejects(()=>verifyExistingAdminLogin(), /Login failed/i);
+    const noMigrator=await master.query(
+      "SELECT SUSER_ID(N'drvo_erp_stage_migrator') AS LoginId"
+    );
+    assert.equal(noMigrator.recordset[0].LoginId,null);
+    process.env.DRVO_DB_ADMIN_PASSWORD=password;
+    await verifyExistingAdminLogin();
+    console.log('PASS: incorrect Admin password is rejected before migration and valid existing Admin succeeds');
     process.env.DRVO_DB_BOOTSTRAP='YES';
     process.env.DRVO_DB_ADMIN_LOGIN='sa';
     process.env.DRVO_DB_ADMIN_PASSWORD=password;

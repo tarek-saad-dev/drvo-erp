@@ -36,7 +36,7 @@ export async function verifyPassword(
       !Buffer.isBuffer(salt) || salt.length !== 32 ||
       !Buffer.isBuffer(expectedHash) || expectedHash.length !== 64 ||
       typeof password !== "string" || password.length > 256) return false;
-  const computed = await scrypt(password, salt, KEY_LENGTH, SCRYPT_OPTIONS) as Buffer;
+  const computed = await derive(password, salt);
   return timingSafeEqual(computed, expectedHash);
 }
 

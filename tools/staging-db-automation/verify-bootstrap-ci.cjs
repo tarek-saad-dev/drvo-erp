@@ -26,14 +26,21 @@ async function main(){
     try{master=await open('sa',password,'master');await master.query('SELECT 1');break;}
     catch(e){await master?.close().catch(()=>{});if(i===44)throw e;await new Promise(r=>setTimeout(r,3000));}
   }
-  let stage,limited;
+  let stage,limited,testApp;
   try{
     await master.query('CREATE DATABASE [DRVO_ERP_STAGING]');
     stage=await open('sa',password,'DRVO_ERP_STAGING');
+    const appPass='DrvoStageCi!'+crypto.randomBytes(24).toString('hex');
+    await master.query(`CREATE LOGIN [drvo_erp_stage_app]
+      WITH PASSWORD=N'${appPass}',CHECK_POLICY=ON,CHECK_EXPIRATION=OFF`);
+    await stage.query(`CREATE USER [drvo_erp_stage_app] FOR LOGIN [drvo_erp_stage_app];
+      GRANT CONNECT TO [drvo_erp_stage_app]`);
     assert.deepEqual((await applyMigrations(stage,undefined,1)).map(x=>x.status),['applied']);
     fs.mkdirSync('/etc/drvo-erp',{recursive:true,mode:0o700});
     fs.writeFileSync('/etc/drvo-erp/staging-sql.env',
-      'DRVO_SQL_HOST=127.0.0.1\nDRVO_SQL_PORT=1433\nDRVO_SQL_DATABASE=DRVO_ERP_STAGING\n',
+      ['DRVO_SQL_HOST=127.0.0.1','DRVO_SQL_PORT=1433',
+       'DRVO_SQL_DATABASE=DRVO_ERP_STAGING','DRVO_SQL_USER=drvo_erp_stage_app',
+       'DRVO_SQL_PASSWORD='+appPass,''].join('\\n'),
       {mode:0o600});
     fs.chmodSync('/etc/drvo-erp/staging-sql.env',0o600);
 
@@ -73,6 +80,7 @@ async function main(){
     assert.equal(Number(permission.recordset[0].ok),1);
     console.log('DRVO DB BOOTSTRAP CI PASS: K5 backup/restores, DB-only migrator and core-schema grant');
   }finally{
+    await testApp?.close().catch(()=>{});
     await limited?.close().catch(()=>{});
     await stage?.close().catch(()=>{});
     await master?.close().catch(()=>{});

@@ -4,6 +4,8 @@ on:
     paths:
       - 'db/migrations/**'
       - 'tools/k4-db/**'
+      - 'ops/staging/k4b-*.sh'
+      - 'ops/staging/k4b-*.cjs'
       - 'apps/api/src/data/**'
       - '.github/workflows/k4-database-foundation-ci.yml'
   push:
@@ -30,6 +32,8 @@ jobs:
           set -euo pipefail
           node --check tools/k4-db/migrate.cjs
           node --check tools/k4-db/verify.cjs
+          node --check ops/staging/k4b-sql-cutover.cjs
+          bash -n ops/staging/k4b-enable-once.sh
       - name: Install pinned API dependencies
         run: npm ci --prefix apps/api --no-audit --no-fund
       - name: Build typed repository
@@ -46,6 +50,7 @@ jobs:
             -e MSSQL_PID=Developer \
             -e MSSQL_SA_PASSWORD="$pass" \
             -p 127.0.0.1:14334:1433 \
+            -p 127.0.0.1:1433:1433 \
             mcr.microsoft.com/mssql/server:2022-latest
       - name: Run tenant integrity / migration / SQL recovery tests
         env:

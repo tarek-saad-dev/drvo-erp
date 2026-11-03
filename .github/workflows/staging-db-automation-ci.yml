@@ -152,7 +152,11 @@ jobs:
             /opt/drvo-erp-db-automation/receive-sql.cjs
           sudo cp -a apps/api/node_modules /opt/drvo-erp-db-automation/node_modules
           sudo chown -R root:root /opt/drvo-erp-db-automation
+          # Reproduce production npm bundle with root-only module tree.
+          sudo chmod -R go-rwx /opt/drvo-erp-db-automation/node_modules
           sudo chmod -R go-w /opt/drvo-erp-db-automation
+          bash -n ops/staging/db-automation/repair-module-access.sh
+          sudo bash ops/staging/db-automation/repair-module-access.sh
           echo "Verifying restricted SQL credential from pinned /opt receiver..."
           timeout 35s sudo -n -u drvoerp-dbdeploy -H \
             "$(command -v node)" \

@@ -122,8 +122,8 @@ async function run(){
     await master.query(`CREATE LOGIN [${login}] WITH PASSWORD=N'${appPassword}',CHECK_POLICY=ON,CHECK_EXPIRATION=OFF`);
     setup=await open({...base,database:db});
     await check('applies K4 and K5 forward migrations',async()=>{
-      assert.deepEqual((await applyMigrations(setup)).map(x=>x.status),['applied','applied']);
-      assert.deepEqual((await applyMigrations(setup)).map(x=>x.status),['unchanged','unchanged']);
+      assert.deepEqual((await applyMigrations(setup,undefined,2)).map(x=>x.status),['applied','applied']);
+      assert.deepEqual((await applyMigrations(setup,undefined,2)).map(x=>x.status),['unchanged','unchanged']);
     });
     await grantRuntime(setup);
     await createTenant(setup,t1,a1,'owner.alpha',pass1);

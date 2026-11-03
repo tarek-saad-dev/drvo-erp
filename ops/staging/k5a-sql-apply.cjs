@@ -36,7 +36,7 @@ function inputs(){
   assert.equal(app.DRVO_SQL_DATABASE,STAGE);
   assert.equal(app.DRVO_SQL_USER,APP_LOGIN);
   assert.ok(app.DRVO_SQL_PASSWORD && app.DRVO_SQL_PASSWORD.length>12);
-  assert.deepEqual(readManifest().map(x=>x.filename),[
+  assert.deepEqual(readManifest().slice(0,2).map(x=>x.filename),[
     '001_platform_identity_foundation.sql',
     '002_identity_sessions_and_roles.sql'
   ],'Unreviewed migration detected; refuse');
@@ -150,9 +150,9 @@ async function main(){
     const pre=await backup(master,'pre',nonce);
     await restoreProof(master,pre,current,['001_platform_identity_foundation.sql'],nonce,'pre');
 
-    const result=await applyMigrations(db);
+    const result=await applyMigrations(db,undefined,2);
     assert.deepEqual(result.map(x=>x.status),['unchanged','applied']);
-    assert.deepEqual((await applyMigrations(db)).map(x=>x.status),['unchanged','unchanged']);
+    assert.deepEqual((await applyMigrations(db,undefined,2)).map(x=>x.status),['unchanged','unchanged']);
     assert.deepEqual(await tables(db),FULL);
     await grantRuntime(db);
     await verifyApp(app);

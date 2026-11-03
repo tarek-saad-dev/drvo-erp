@@ -22,6 +22,13 @@ key_dir=/root/drvo-erp-db-bootstrap
   echo "Managed DRVO ERP API dependencies not available" >&2; exit 1;
 }
 [[ -f /etc/drvo-erp/staging-sql.env ]] || { echo "K4 DB config missing" >&2; exit 1; }
+curl -fsS --max-time 5 http://127.0.0.1:3311/api/health/db |
+  grep -q '"database":"ready"' || {
+    echo "K4 DRVO API database readiness failed, refusing SQL bootstrap" >&2; exit 1;
+  }
+[[ -f "$repo/apps/api/node_modules/mssql/package.json" ]] || {
+  echo "K5A operator module requires installed API SQL driver in the clean checkout" >&2; exit 1;
+}
 [[ -f "$repo/db/migrations/002_identity_sessions_and_roles.sql" ]] || {
   echo "K5 migration source is missing" >&2; exit 1;
 }

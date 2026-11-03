@@ -17,7 +17,9 @@ done
 repo=/srv/drvo-erp/repo
 bundle=/opt/drvo-erp-db-automation
 unix_user=drvoerp-dbdeploy
-sql_env=/etc/drvo-erp/staging-db-automation.env
+legacy_sql_env=/etc/drvo-erp/staging-db-automation.env
+secret_dir=/etc/drvo-erp-db-automation
+sql_env="$secret_dir/staging-db-automation.env"
 key_dir=/root/drvo-erp-db-bootstrap
 [[ "$(sudo -u drvoerp -H git -C "$repo" branch --show-current)" == main ]] || {
   echo "DRVO source checkout must be on main" >&2; exit 1;
@@ -46,7 +48,8 @@ mode="${1:-}"
 case "$mode" in
   "") mode=fresh ;;
   --resume-after-admin-login-failure) mode=resume ;;
-  *) echo "Use no arguments or --resume-after-admin-login-failure" >&2; exit 64 ;;
+  --resume-after-secret-traversal-failure) mode=resume-secret ;;
+  *) echo "Use no arguments, --resume-after-admin-login-failure or --resume-after-secret-traversal-failure" >&2; exit 64 ;;
 esac
 [[ $# -le 1 ]] || { echo "Too many installer arguments" >&2; exit 64; }
 
@@ -56,7 +59,7 @@ node --check "$repo/ops/staging/db-automation/sql-bootstrap.cjs"
 node --check "$repo/ops/staging/db-automation/build-payload.cjs"
 
 if [[ "$mode" == fresh ]]; then
-  for item in "$bundle" "$sql_env" "$key_dir" /usr/local/libexec/drvoerp-db-receiver; do
+  for item in "$bundle" "$sql_env" "$legacy_sql_env" "$secret_dir" "$key_dir" /usr/local/libexec/drvoerp-db-receiver; do
     [[ ! -e "$item" && ! -L "$item" ]] || {
       echo "Existing automation resource: $item (refusing overwrite)" >&2
       exit 1

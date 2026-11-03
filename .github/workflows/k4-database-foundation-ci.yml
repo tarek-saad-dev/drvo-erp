@@ -1,0 +1,61 @@
+name: K4 SQL Server Foundation CI
+on:
+  pull_request:
+    paths:
+      - 'db/migrations/**'
+      - 'tools/k4-db/**'
+      - 'apps/api/src/data/**'
+      - '.github/workflows/k4-database-foundation-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'db/migrations/**'
+      - 'tools/k4-db/**'
+      - 'apps/api/src/data/**'
+      - '.github/workflows/k4-database-foundation-ci.yml'
+permissions:
+  contents: read
+jobs:
+  isolated-sqlserver-k4:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate migration tooling syntax and manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check tools/k4-db/migrate.cjs
+          node --check tools/k4-db/verify.cjs
+      - name: Install pinned API dependencies
+        run: npm ci --prefix apps/api --no-audit --no-fund
+      - name: Build typed repository
+        run: npm run build --prefix apps/api
+      - name: Start disposable SQL Server (localhost only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          pass="DrvoK4_$(openssl rand -hex 16)!"
+          echo "::add-mask::$pass"
+          echo "SQL_TEST_SA_PASSWORD=$pass" >> "$GITHUB_ENV"
+          docker run --detach --name drvo-k4-sql-disposable \
+            -e ACCEPT_EULA=Y \
+            -e MSSQL_PID=Developer \
+            -e MSSQL_SA_PASSWORD="$pass" \
+            -p 127.0.0.1:14334:1433 \
+            mcr.microsoft.com/mssql/server:2022-latest
+      - name: Run tenant integrity / migration / SQL recovery tests
+        env:
+          DRVO_K4_TARGET: ci
+          DRVO_K4_DISPOSABLE: 'YES'
+          SQL_TEST_PORT: '14334'
+        run: node tools/k4-db/verify.cjs
+      - name: Inspect container on failure
+        if: failure()
+        run: docker logs --tail 100 drvo-k4-sql-disposable || true
+      - name: Tear down disposable SQL Server
+        if: always()
+        run: docker rm -f drvo-k4-sql-disposable || true

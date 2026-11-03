@@ -67,3 +67,48 @@ jobs:
       - name: Remove throwaway container
         if: always()
         run: docker rm -f drvo-db-auto-ci || true
+
+  root-bootstrap-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check operator bootstrap and restore proof syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n ops/staging/db-automation/prepare-once.sh
+          node --check ops/staging/db-automation/sql-bootstrap.cjs
+          node --check tools/staging-db-automation/verify-bootstrap-ci.cjs
+          npm ci --prefix apps/api --no-audit --no-fund
+      - name: Mount isolated SQL restore directory on the disposable runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo install -d -m 0777 /var/opt/mssql/data
+          sudo install -d -m 0755 /srv/drvo-erp
+          sudo ln -s "$GITHUB_WORKSPACE" /srv/drvo-erp/repo
+          pw="DrvoDbBootstrap_$(openssl rand -hex 16)!"
+          echo "::add-mask::$pw"
+          echo "SQL_TEST_SA_PASSWORD=$pw" >> "$GITHUB_ENV"
+          docker run --detach --name drvo-db-auto-bootstrap-ci \
+            -e ACCEPT_EULA=Y \
+            -e MSSQL_PID=Developer \
+            -e MSSQL_SA_PASSWORD="$pw" \
+            -p 127.0.0.1:1433:1433 \
+            -v /var/opt/mssql/data:/var/opt/mssql/data \
+            mcr.microsoft.com/mssql/server:2022-latest
+      - name: Execute exact root SQL bootstrap using throwaway SQL only
+        env:
+          DRVO_DB_CI_DISPOSABLE: 'YES'
+          NODE_PATH: ${{ github.workspace }}/apps/api/node_modules
+        run: sudo -E node tools/staging-db-automation/verify-bootstrap-ci.cjs
+      - name: Diagnose disposable SQL on failure
+        if: failure()
+        run: docker logs --tail 80 drvo-db-auto-bootstrap-ci || true
+      - name: Tear down isolated SQL container
+        if: always()
+        run: docker rm -f drvo-db-auto-bootstrap-ci || true

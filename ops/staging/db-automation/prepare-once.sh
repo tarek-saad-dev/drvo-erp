@@ -197,8 +197,7 @@ chown root:drvoerp-dbdeploy "$sql_env"
 chmod 0640 "$sql_env"
 install -o root -g root -m 0644 \
   "$repo/ops/staging/db-automation/check-runtime.cjs" "$bundle/check-runtime.cjs"
-DRVO_EXPECT_DB_UID="$(id -u "$unix_user")" \
-  sudo -u "$unix_user" -H /usr/bin/node "$bundle/check-runtime.cjs"
+sudo -u "$unix_user" -H /usr/bin/node "$bundle/check-runtime.cjs"
 
 install -d -o root -g root -m 0700 "$key_dir"
 ssh-keygen -q -t ed25519 -N '' -C drvo-erp-staging-db -f "$key_dir/id_ed25519"

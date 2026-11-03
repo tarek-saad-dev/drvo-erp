@@ -57,6 +57,7 @@ async function main(){
     process.env.DRVO_DB_ADMIN_PASSWORD=password;
     await verifyExistingAdminLogin();
     console.log('PASS: incorrect Admin password is rejected before migration and valid existing Admin succeeds');
+    fs.mkdirSync('/etc/drvo-erp-db-automation',{recursive:true,mode:0o710});
     process.env.DRVO_DB_BOOTSTRAP='YES';
     process.env.DRVO_DB_ADMIN_LOGIN='sa';
     process.env.DRVO_DB_ADMIN_PASSWORD=password;
@@ -67,7 +68,6 @@ async function main(){
       delete process.env.DRVO_DB_ADMIN_LOGIN;
       delete process.env.DRVO_DB_ADMIN_PASSWORD;
     }
-    fs.mkdirSync('/etc/drvo-erp-db-automation',{recursive:true,mode:0o710});
     const secret=fs.readFileSync('/etc/drvo-erp-db-automation/staging-db-automation.env','utf8');
     const loginPass=secret.match(/^SQL_PASSWORD=(.+)$/m)?.[1];
     assert.ok(loginPass?.length>=12);

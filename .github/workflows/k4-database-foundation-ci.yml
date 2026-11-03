@@ -13,6 +13,8 @@ on:
     paths:
       - 'db/migrations/**'
       - 'tools/k4-db/**'
+      - 'ops/staging/k4b-*.sh'
+      - 'ops/staging/k4b-*.cjs'
       - 'apps/api/src/data/**'
       - '.github/workflows/k4-database-foundation-ci.yml'
 permissions:

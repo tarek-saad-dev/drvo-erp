@@ -58,32 +58,42 @@ node --check "$repo/ops/staging/db-automation/receive-sql.cjs"
 node --check "$repo/ops/staging/db-automation/sql-bootstrap.cjs"
 node --check "$repo/ops/staging/db-automation/build-payload.cjs"
 
+# Known partial states: (1) incorrect admin credentials, before SQL work;
+# (2) successful K5 migration + SQL bootstrap, but the shared root-private
+# /etc/drvo-erp directory blocked traversal by drvoerp-dbdeploy.
+baseline=72e5ce5b5326d8d9d060eba49c8fedc1543e942a
+check_pinned_source() {
+  local installed="$1" source="$2" actual expected
+  sudo -u drvoerp -H git -C "$repo" cat-file -e "$baseline:$source" || {
+    echo "Historical bootstrap code unavailable from repository owner" >&2; exit 1;
+  }
+  actual="$(sha256sum "$installed" | cut -d' ' -f1)"
+  expected="$(sudo -u drvoerp -H git -C "$repo" show "$baseline:$source" | sha256sum | cut -d' ' -f1)"
+  [[ "$actual" == "$expected" ]] || {
+    echo "Installed $source differs from the verified pre-failure version" >&2; exit 1;
+  }
+}
 if [[ "$mode" == fresh ]]; then
   for item in "$bundle" "$sql_env" "$legacy_sql_env" "$secret_dir" "$key_dir" /usr/local/libexec/drvoerp-db-receiver; do
     [[ ! -e "$item" && ! -L "$item" ]] || {
-      echo "Existing automation resource: $item (refusing overwrite)" >&2
-      exit 1
+      echo "Existing automation resource: $item (refusing overwrite)" >&2; exit 1;
     }
   done
   ! id "$unix_user" >/dev/null 2>&1 || {
-    echo "DB SSH user already exists; use the documented resume mode ONLY after a failed SQL login" >&2
-    exit 1
+    echo "DB SSH user already exists; use recovery only for a known partial install" >&2; exit 1;
   }
 else
-  # The previous run stopped while authenticating to master, BEFORE it could
-  # create a migrator SQL login, SQL env file, host key, or authorized SSH key.
-  [[ -d "$bundle" && ! -L "$bundle" &&
-     -d "$bundle/node_modules/mssql" &&
-     -f "$bundle/receive-sql.cjs" &&
-     -f "$bundle/sql-bootstrap.cjs" &&
-     -f /usr/local/libexec/drvoerp-db-receiver ]] || {
+  [[ -d "$bundle" && ! -L "$bundle" && -d "$bundle/node_modules/mssql" &&
+     -f "$bundle/receive-sql.cjs" && ! -L "$bundle/receive-sql.cjs" &&
+     -f "$bundle/sql-bootstrap.cjs" && ! -L "$bundle/sql-bootstrap.cjs" &&
+     -f /usr/local/libexec/drvoerp-db-receiver &&
+     ! -L /usr/local/libexec/drvoerp-db-receiver ]] || {
     echo "Known partial installer scaffold missing; refusing unsafe resume" >&2; exit 1;
   }
-  [[ ! -e "$sql_env" && ! -L "$sql_env" &&
-     ! -e "$key_dir" && ! -L "$key_dir" &&
-     ! -e "/var/lib/$unix_user/.ssh/authorized_keys" ]] || {
-    echo "SQL or SSH setup has progressed beyond a failed admin login; refusing resume" >&2
-    exit 1
+  [[ ! -e "$key_dir" && ! -L "$key_dir" &&
+     ! -e "/var/lib/$unix_user/.ssh/authorized_keys" &&
+     ! -L "/var/lib/$unix_user/.ssh/authorized_keys" ]] || {
+    echo "SSH setup has progressed beyond the supported partial install" >&2; exit 1;
   }
   [[ "$(getent passwd "$unix_user" | cut -d: -f6,7)" == "/var/lib/$unix_user:/bin/bash" &&
      "$(id -gn "$unix_user")" == "$unix_user" ]] || {
@@ -91,39 +101,39 @@ else
   }
   [[ "$(stat -c '%u:%g:%a' "$bundle")" == "0:0:755" &&
      "$(stat -c '%u:%g:%a' /usr/local/libexec/drvoerp-db-receiver)" == "0:0:755" ]] || {
-    echo "Existing receiver permissions changed; refusing resume" >&2; exit 1;
+    echo "Existing receiver ownership or permissions changed" >&2; exit 1;
   }
   [[ -z "$(find "$bundle" -xdev ! -user root -print -quit)" &&
      -z "$(find "$bundle" -xdev \( -type f -o -type d \) -perm /022 -print -quit)" ]] || {
-    echo "Existing runner content ownership/mode changed; refusing resume" >&2; exit 1;
-  }
-  cmp -s "$bundle/receive-sql.cjs" "$repo/ops/staging/db-automation/receive-sql.cjs" || {
-    echo "Installed SQL receiver has changed; refusing resume" >&2; exit 1;
+    echo "Existing runner content ownership/mode changed" >&2; exit 1;
   }
   cmp -s /usr/local/libexec/drvoerp-db-receiver \
     "$repo/ops/staging/db-automation/receive-sql.sh" || {
-      echo "Installed forced-command receiver differs; refusing resume" >&2; exit 1;
+      echo "Installed SSH forced command differs from verified source" >&2; exit 1;
     }
-  # The old bootstrap was installed from this verified main commit BEFORE the
-  # SQL password failure. Only that exact known version may be reused.
-  baseline=72e5ce5b5326d8d9d060eba49c8fedc1543e942a
-  # The DRVO checkout is owned by 'drvoerp', NOT root. Git rejects a
-  # root-owned caller with 'dubious ownership' (correctly). Read historical
-  # source as the repo owner, never disable Git's safe.directory checks.
-  if ! sudo -u drvoerp -H git -C "$repo" cat-file -e \
-      "$baseline:ops/staging/db-automation/sql-bootstrap.cjs"; then
-    echo "Historical bootstrap commit inaccessible as repository owner" >&2
-    exit 1
+  check_pinned_source "$bundle/receive-sql.cjs" \
+    ops/staging/db-automation/receive-sql.cjs
+  check_pinned_source "$bundle/sql-bootstrap.cjs" \
+    ops/staging/db-automation/sql-bootstrap.cjs
+  if [[ "$mode" == resume ]]; then
+    [[ ! -e "$sql_env" && ! -L "$sql_env" &&
+       ! -e "$legacy_sql_env" && ! -L "$legacy_sql_env" &&
+       ! -e "$secret_dir" && ! -L "$secret_dir" ]] || {
+      echo "Database bootstrap already created resources; use the correct recovery mode" >&2; exit 1;
+    }
+    echo "PASS: verified exact partial install after failed SQL administrator login"
+  else
+    [[ "$mode" == resume-secret &&
+       ! -e "$secret_dir" && ! -L "$secret_dir" &&
+       -f "$legacy_sql_env" && ! -L "$legacy_sql_env" ]] || {
+      echo "Secret-directory recovery state differs from the reported failure" >&2; exit 1;
+    }
+    expected="0:$(id -g "$unix_user"):640"
+    [[ "$(stat -c '%u:%g:%a' "$legacy_sql_env")" == "$expected" ]] || {
+      echo "Existing SQL secret ownership or permissions changed" >&2; exit 1;
+    }
+    echo "PASS: existing K5 SQL migration and root-owned secret verified; no SQL bootstrap replay"
   fi
-  installed_sha="$(sha256sum "$bundle/sql-bootstrap.cjs" | cut -d' ' -f1)"
-  original_sha="$(sudo -u drvoerp -H git -C "$repo" show \
-      "$baseline:ops/staging/db-automation/sql-bootstrap.cjs" | sha256sum | cut -d' ' -f1)"
-  [[ "$installed_sha" == "$original_sha" ]] || {
-    echo "Installed SQL bootstrap is not the verified pre-failure version" >&2
-    exit 1
-  }
-  unset installed_sha original_sha
-  echo "PASS: verified exact partial install from failed SQL administrator login"
 fi
 
 # Validate the existing Admin credentials BEFORE touching any host state.

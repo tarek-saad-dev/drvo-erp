@@ -4,6 +4,8 @@ on:
     paths:
       - 'db/migrations/**'
       - 'tools/k4-db/**'
+      - 'ops/staging/k4b-*.sh'
+      - 'ops/staging/k4b-*.cjs'
       - 'apps/api/src/data/**'
       - '.github/workflows/k4-database-foundation-ci.yml'
   push:
@@ -11,6 +13,8 @@ on:
     paths:
       - 'db/migrations/**'
       - 'tools/k4-db/**'
+      - 'ops/staging/k4b-*.sh'
+      - 'ops/staging/k4b-*.cjs'
       - 'apps/api/src/data/**'
       - '.github/workflows/k4-database-foundation-ci.yml'
 permissions:
@@ -30,6 +34,9 @@ jobs:
           set -euo pipefail
           node --check tools/k4-db/migrate.cjs
           node --check tools/k4-db/verify.cjs
+          node --check ops/staging/k4b-sql-cutover.cjs
+          node --check tools/k4-db/verify-operator-ci.cjs
+          bash -n ops/staging/k4b-enable-once.sh
       - name: Install pinned API dependencies
         run: npm ci --prefix apps/api --no-audit --no-fund
       - name: Build typed repository
@@ -38,6 +45,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # The throwaway runner volume makes SQL backup/restore paths real
+          # without ever accessing the user's VPS disks.
+          sudo install -d -m 0777 /var/opt/mssql/data
+          test -z "$(find /var/opt/mssql/data -mindepth 1 -maxdepth 1 -print -quit)"
           pass="DrvoK4_$(openssl rand -hex 16)!"
           echo "::add-mask::$pass"
           echo "SQL_TEST_SA_PASSWORD=$pass" >> "$GITHUB_ENV"
@@ -46,6 +57,8 @@ jobs:
             -e MSSQL_PID=Developer \
             -e MSSQL_SA_PASSWORD="$pass" \
             -p 127.0.0.1:14334:1433 \
+            -p 127.0.0.1:1433:1433 \
+            -v /var/opt/mssql/data:/var/opt/mssql/data \
             mcr.microsoft.com/mssql/server:2022-latest
       - name: Run tenant integrity / migration / SQL recovery tests
         env:
@@ -53,6 +66,12 @@ jobs:
           DRVO_K4_DISPOSABLE: 'YES'
           SQL_TEST_PORT: '14334'
         run: node tools/k4-db/verify.cjs
+      - name: Run exact guarded K4B operator SQL script on disposable CI only
+        env:
+          DRVO_K4_TARGET: ci
+          DRVO_K4_DISPOSABLE: 'YES'
+          SQL_TEST_PORT: '14334'
+        run: sudo -E node tools/k4-db/verify-operator-ci.cjs
       - name: Inspect container on failure
         if: failure()
         run: docker logs --tail 100 drvo-k4-sql-disposable || true

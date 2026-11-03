@@ -141,10 +141,12 @@ jobs:
           sudo chown root:drvoerp-dbdeploy \
             /etc/drvo-erp-db-automation/staging-db-automation.env
           sudo chmod 0640 /etc/drvo-erp-db-automation/staging-db-automation.env
-          sudo -u drvoerp-dbdeploy -H /usr/bin/env \
+          echo "Verifying restricted SQL credential from non-root account..."
+          timeout 35s sudo -n -u drvoerp-dbdeploy -H /usr/bin/env \
             NODE_PATH="$GITHUB_WORKSPACE/apps/api/node_modules" \
             "$(command -v node)" \
             "$GITHUB_WORKSPACE/ops/staging/db-automation/check-runtime.cjs"
+          echo "Restricted SQL credential verification completed"
           # Nobody else may read the SQL migration secret, despite the
           # dedicated group member being able to traverse its parent.
           if sudo -u nobody test -r /etc/drvo-erp-db-automation/staging-db-automation.env; then

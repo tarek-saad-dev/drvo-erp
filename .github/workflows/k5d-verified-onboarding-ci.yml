@@ -4,12 +4,16 @@ on:
     paths:
       - 'db/migrations/**'
       - 'tools/k5d/**'
+      - 'apps/api/src/identity/verification-crypto.ts'
+      - 'apps/api/test/verification-crypto.test.cjs'
       - '.github/workflows/k5d-verified-onboarding-ci.yml'
   push:
     branches: [main]
     paths:
       - 'db/migrations/**'
       - 'tools/k5d/**'
+      - 'apps/api/src/identity/verification-crypto.ts'
+      - 'apps/api/test/verification-crypto.test.cjs'
       - '.github/workflows/k5d-verified-onboarding-ci.yml'
 permissions:
   contents: read

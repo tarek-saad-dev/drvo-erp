@@ -58,11 +58,11 @@ async function main() {
       assert.throws(() => foundationSqlConfig({...good,DRVO_SQL_USER:'sa'}),/not explicitly configured/);
     });
     await check('transactional checksummed migration applies', async () => {
-      const first = await applyMigrations(pool);
+      const first = await applyMigrations(pool, undefined, 1);
       assert.deepEqual(first.map((x) => x.status), ['applied']);
     });
     await check('immutable migration replay is a no-op', async () => {
-      const second = await applyMigrations(pool);
+      const second = await applyMigrations(pool, undefined, 1);
       assert.deepEqual(second.map((x) => x.status), ['unchanged']);
     });
     await check('source edit triggers checksum drift (without replaying SQL)', async () => {
@@ -72,7 +72,7 @@ async function main() {
         fs.writeFileSync(path.join(dir, name), readManifest()[0].content + '\n-- modified'); 
         await assert.rejects(() => applyMigrations(pool, dir), /Checksum drift/);
       } finally { fs.rmSync(dir, { recursive: true, force: true }); }
-      assert.deepEqual((await applyMigrations(pool)).map((x) => x.status), ['unchanged']);
+      assert.deepEqual((await applyMigrations(pool, undefined, 1)).map((x) => x.status), ['unchanged']);
     });
     await check('failed forward migration rolls back all its DDL', async () => {
       const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'drvo-k4-fail-'));
@@ -243,7 +243,7 @@ async function main() {
         });
         const before = new FoundationDatabaseService();
         await assert.rejects(() => before.onModuleInit(), /staging SQL not ready/);
-        await applyMigrations(stage);
+        await applyMigrations(stage, undefined, 1);
         await stage.query(`GRANT SELECT ON OBJECT::core.SchemaMigration TO [${login}]`);
         const db = new FoundationDatabaseService();
         await db.onModuleInit();

@@ -50,6 +50,22 @@ export class IdentityController {
     };
   }
 
+  @Get("workspaces")
+  async workspaces(
+    @Req() req: IncomingMessage,
+    @Res({ passthrough: true }) res: ServerResponse,
+  ): Promise<{ workspaces: Array<{
+    tenantId: string;
+    businessId: string;
+    businessName: string;
+    branchId: string;
+    branchName: string;
+  }> }> {
+    res.setHeader("Cache-Control", "no-store");
+    const actor = await this.identity.actorFromToken(parseCookie(req));
+    return { workspaces: await this.identity.listAuthorizedWorkspaces(actor) };
+  }
+
   @Post("logout")
   @HttpCode(200)
   async logout(

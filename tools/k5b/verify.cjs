@@ -190,6 +190,14 @@ async function main(){
       await rejected(()=>access.listMembers(manager.actor,tuple.b2,tuple.br2));
       await rejected(()=>access.listMembers(manager.actor,tuple.b,tuple.brOther));
     });
+    await check('workspace navigation derives only active Branch read permissions',async()=>{
+      const ownerWorkspaces=await identity.listAuthorizedWorkspaces(owner.actor);
+      assert.equal(ownerWorkspaces.length,1);
+      assert.equal(ownerWorkspaces[0].businessId.toLowerCase(),tuple.b);
+      assert.equal(ownerWorkspaces[0].branchId.toLowerCase(),tuple.br);
+      assert.equal((await identity.listAuthorizedWorkspaces(manager.actor)).length,1);
+      assert.equal((await identity.listAuthorizedWorkspaces(lead.actor)).length,0);
+    });
     await check('prevent user from granting themselves a role',async()=>{
       await rejected(()=>access.assignExistingMemberRole(manager.actor,tuple.b,tuple.br,
         tuple.manager,tuple.ownerRole,manager.token));
@@ -297,6 +305,11 @@ async function main(){
     assert.ok(cookie);
     await check('HTTP branch access refuses missing session, wrong Tenant/Branch and extra body fields',async()=>{
       const api=url+'/workspaces/'+tuple.b+'/branches/'+tuple.br+'/access';
+      const available=await fetch(url+'/auth/workspaces',{headers:{Cookie:cookie}});
+      assert.equal(available.status,200);
+      const availableData=await available.json();
+      assert.equal(availableData.workspaces.length,1);
+      assert.equal(availableData.workspaces[0].businessId.toLowerCase(),tuple.b);
       const noCookie=await fetch(api+'/members');
       assert.equal(noCookie.status,401);
       const members=await fetch(api+'/members',{headers:{Cookie:cookie}});

@@ -247,6 +247,56 @@ export class IdentityService {
     }
   }
 
+  /**
+   * Navigation is derived entirely from the currently active SQL memberships,
+   * BranchRole and RolePermission. Client-supplied tenant/workspace IDs are
+   * never trusted to discover the user's available workspaces.
+   */
+  async listAuthorizedWorkspaces(actor: Actor): Promise<Array<{
+    tenantId: string;
+    businessId: string;
+    businessName: string;
+    branchId: string;
+    branchName: string;
+  }>> {
+    if (actor.mustChangePassword) throw new UnauthorizedException("Password change required");
+    const pool = this.pool();
+    const r = await pool.request()
+      .input("t", sql.UniqueIdentifier, actor.tenantId)
+      .input("a", sql.UniqueIdentifier, actor.accountId)
+      .input("version", sql.Int, actor.sessionVersion)
+      .query(`
+        SELECT CONVERT(VARCHAR(36),b.TenantId) AS tenantId,
+          CONVERT(VARCHAR(36),b.BusinessId) AS businessId,
+          b.DisplayName AS businessName,
+          CONVERT(VARCHAR(36),br.BranchId) AS branchId,
+          br.DisplayName AS branchName
+        FROM core.Account a
+        JOIN core.Tenant t ON t.TenantId=a.TenantId AND t.IsActive=1
+        JOIN core.BusinessMembership bm ON bm.TenantId=a.TenantId
+          AND bm.AccountId=a.AccountId AND bm.IsActive=1
+        JOIN core.Business b ON b.TenantId=bm.TenantId
+          AND b.BusinessId=bm.BusinessId AND b.IsActive=1
+        JOIN core.BranchAssignment ba ON ba.TenantId=b.TenantId
+          AND ba.BusinessId=b.BusinessId AND ba.AccountId=a.AccountId
+          AND ba.IsActive=1
+        JOIN core.Branch br ON br.TenantId=ba.TenantId
+          AND br.BusinessId=ba.BusinessId AND br.BranchId=ba.BranchId AND br.IsActive=1
+        JOIN core.BranchRole ar ON ar.TenantId=ba.TenantId
+          AND ar.BusinessId=ba.BusinessId AND ar.BranchId=ba.BranchId
+          AND ar.AccountId=ba.AccountId AND ar.IsActive=1
+        JOIN core.BusinessRole ro ON ro.TenantId=ar.TenantId
+          AND ro.BusinessId=ar.BusinessId AND ro.RoleId=ar.RoleId AND ro.IsActive=1
+        JOIN core.RolePermission p ON p.TenantId=ro.TenantId
+          AND p.BusinessId=ro.BusinessId AND p.RoleId=ro.RoleId
+          AND p.ActionCode='branch.read'
+        WHERE a.TenantId=@t AND a.AccountId=@a
+          AND a.SessionVersion=@version AND a.IsActive=1
+        ORDER BY b.DisplayName,br.DisplayName
+      `);
+    return r.recordset;
+  }
+
   async readAuthorizedBranch(
     actor: Actor, businessId: string, branchId: string, action: string,
   ): Promise<AuthorizedBranch> {

@@ -29,7 +29,7 @@ const adminPassword = process.env.DRVO_K4_ADMIN_PASSWORD;
 function validateInputs() {
   assert.equal(process.getuid?.(), 0, 'This one-time operator command must run as root');
   assert.match(adminName, /^[a-zA-Z0-9_.-]{1,64}$/);
-  assert.ok(adminPassword && adminPassword.length >= 12, 'Enter existing SQL admin password via hidden prompt');
+  assert.ok(adminPassword && adminPassword.length > 0, 'Enter existing SQL admin password via hidden prompt');
   assert.equal(process.env.DRVO_K4B_EXECUTE, 'YES', 'Explicit one-time operator intent required');
   const stat = fs.lstatSync(ENV_FILE);
   assert.ok(stat.isFile() && !stat.isSymbolicLink() && stat.uid === 0);

@@ -81,7 +81,7 @@ async function main() {
 
     const t1 = crypto.randomUUID(), t2 = crypto.randomUUID();
     const b1 = crypto.randomUUID(), b2 = crypto.randomUUID(), b3 = crypto.randomUUID();
-    const br1 = crypto.randomUUID(), br2 = crypto.randomUUID();
+    const br1 = crypto.randomUUID(), br2 = crypto.randomUUID(), br3 = crypto.randomUUID();
     const a1 = crypto.randomUUID(), a2 = crypto.randomUUID();
     async function tenant(t,name) {
       await pool.request().input('t',sql.UniqueIdentifier,t).input('name',sql.NVarChar(160),name)
@@ -114,7 +114,7 @@ async function main() {
     }
     await tenant(t1,'Tenant Alpha'); await tenant(t2,'Tenant Beta');
     await business(t1,b1,'Alpha'); await business(t1,b3,'Alpha Second'); await business(t2,b2,'Beta');
-    await branch(t1,b1,br1,'Front'); await branch(t2,b2,br2,'Other');
+    await branch(t1,b1,br1,'Front'); await branch(t2,b2,br2,'Other'); await branch(t1,b3,br3,'Other Business');
     await account(t1,a1,'alpha.staff'); await account(t2,a2,'beta.staff');
     await membership(t1,b1,a1); await membership(t2,b2,a2);
     await assignment(t1,b1,br1,a1); await assignment(t2,b2,br2,a2);
@@ -124,7 +124,7 @@ async function main() {
     await check('composite FK rejects account Membership in other Tenant', () =>
       throwsFk(() => membership(t1,b1,a2), 'account tenant must match Business tenant'));
     await check('composite FK rejects assignment into another Business without Membership', () =>
-      throwsFk(() => assignment(t1,b3,crypto.randomUUID(),a1), 'assignment branch must match Business'));
+      throwsFk(() => assignment(t1,b3,br3,a1), 'assignment membership must match Business'));
     await check('case-insensitive usernames are globally unique', async () => {
       await assert.rejects(() => account(t2,crypto.randomUUID(),'ALPHA.STAFF'), (err) =>
         /UNIQUE|duplicate|2601|2627/i.test(String(err.message)));
@@ -155,6 +155,32 @@ async function main() {
       assert.equal((await repo.listActiveAssignedBranches({ accountId:a1,sessionVersion:1 },b1)).length,0);
       await pool.request().input('br',sql.UniqueIdentifier,br1)
         .query('UPDATE core.BranchAssignment SET IsActive=1 WHERE BranchId=@br');
+    });
+    await check('inactive Tenant denies structural branch visibility', async () => {
+      await pool.request().input('t',sql.UniqueIdentifier,t1)
+        .query('UPDATE core.Tenant SET IsActive=0 WHERE TenantId=@t');
+      assert.equal((await repo.listActiveAssignedBranches({ accountId:a1,sessionVersion:1 },b1)).length,0);
+      await pool.request().input('t',sql.UniqueIdentifier,t1)
+        .query('UPDATE core.Tenant SET IsActive=1 WHERE TenantId=@t');
+    });
+    await check('inactive Business denies structural branch visibility', async () => {
+      await pool.request().input('b',sql.UniqueIdentifier,b1)
+        .query('UPDATE core.Business SET IsActive=0 WHERE BusinessId=@b');
+      assert.equal((await repo.listActiveAssignedBranches({ accountId:a1,sessionVersion:1 },b1)).length,0);
+      await pool.request().input('b',sql.UniqueIdentifier,b1)
+        .query('UPDATE core.Business SET IsActive=1 WHERE BusinessId=@b');
+    });
+    await check('inactive Branch denies structural branch visibility', async () => {
+      await pool.request().input('br',sql.UniqueIdentifier,br1)
+        .query('UPDATE core.Branch SET IsActive=0 WHERE BranchId=@br');
+      assert.equal((await repo.listActiveAssignedBranches({ accountId:a1,sessionVersion:1 },b1)).length,0);
+      await pool.request().input('br',sql.UniqueIdentifier,br1)
+        .query('UPDATE core.Branch SET IsActive=1 WHERE BranchId=@br');
+    });
+    await check('malformed actor, scope or session fails closed before SQL lookup', async () => {
+      assert.deepEqual(await repo.listActiveAssignedBranches({accountId:'not-a-uuid',sessionVersion:1},b1),[]);
+      assert.deepEqual(await repo.listActiveAssignedBranches({accountId:a1,sessionVersion:0},b1),[]);
+      assert.deepEqual(await repo.listActiveAssignedBranches({accountId:a1,sessionVersion:1},'bad-business'),[]);
     });
     await check('session-version mismatch and disabled Account deny reads', async () => {
       assert.equal((await repo.listActiveAssignedBranches({ accountId:a1,sessionVersion:2 },b1)).length,0);

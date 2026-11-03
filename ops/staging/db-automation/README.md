@@ -37,7 +37,7 @@ Next it creates **only two new identities**, completely separate from the app ru
 - Linux SSH account: `drvoerp-dbdeploy` with SSH `authorized_keys` forced command, no sudo permissions.
 - SQL Server login: `drvo_erp_stage_migrator` in **`DRVO_ERP_STAGING` only**, with `db_ddladmin`, `db_backupoperator`, migration-history access, and `CONTROL ON SCHEMA::core` so future reviewed core-schema migrations can grant the app narrowly-scoped permissions. This principal is DDL-powerful within the isolated staging database, but not `sysadmin`, `dbcreator` or `db_owner`.
 
-Its SQL secret stays **only** in `/etc/drvo-erp/staging-db-automation.env`, root-owned and group-read-only `0640` for the specific SSH user. The existing `/etc/drvo-erp/staging-sql.env` stays unchanged. `DRVO_K5_AUTH_ENABLED` stays OFF.
+Its SQL secret stays **only** in `/etc/drvo-erp-db-automation/staging-db-automation.env`, root-owned and group-read-only `0640` for the specific SSH user, inside an isolated directory `root:drvoerp-dbdeploy 0710`. The existing `/etc/drvo-erp/staging-sql.env` stays unchanged. `DRVO_K5_AUTH_ENABLED` stays OFF.
 
 The installer generates a unique SSH key temporarily in:
 `/root/drvo-erp-db-bootstrap/id_ed25519`.
@@ -58,6 +58,34 @@ sudo bash /srv/drvo-erp/repo/ops/staging/db-automation/prepare-once.sh --resume-
 Enter the **existing SQL Administrator login and password used successfully in the earlier K4B cutover**. The suggested login `sa` is only a default, not a guarantee that it is the right administrator for this installation. If you do not know the credentials, confirm them from your existing local administrator/secret management process; never paste a password or private key into ChatGPT. Multiple failed attempts may trigger SQL account policy/lockout.
 
 If the installer refuses the resume due to a mismatched file, unexpected user/group/mode, or a previously created secret, **stop**. A different failure has left a different state and must be inspected before continuing. No cleanup command should be run by guesswork. Successful resume continues with the normal SSH-key and GitHub Environment setup in Steps 3–5 below.
+
+## Recovery — K5A and SQL login succeeded, but SQL secret read failed (EACCES)
+
+If the installer already displayed `K5A SQL STAGING MIGRATION: PASS`, `PASS: new SQL migration principal limited to database DDL + backup`, then stopped at `EACCES: permission denied, open '/etc/drvo-erp/staging-db-automation.env'`, the **SQL migration and login already succeeded**. Do not rerun SQL bootstrap, reset SQL passwords, delete Unix accounts, `chmod 755 /etc/drvo-erp`, or remove old SQL backup files.
+
+The cause is that the shared root-private `/etc/drvo-erp` directory blocks traversal by `drvoerp-dbdeploy`, even though the file was created with owner `root`, group `drvoerp-dbdeploy`, mode `0640`.
+
+A dedicated root-owned directory `/etc/drvo-erp-db-automation` with group `drvoerp-dbdeploy` and mode `0710` fixes this without weakening the existing application secrets directory. The SQL secret itself remains `root:drvoerp-dbdeploy 0640`. The installed forced-command SQL receiver now reads the dedicated file.
+
+After the fix PR has passed CI and merged, run **only**:
+
+```bash
+sudo -u drvoerp -H git -C /srv/drvo-erp/repo pull --ff-only origin main
+sudo bash /srv/drvo-erp/repo/ops/staging/db-automation/prepare-once.sh --resume-after-secret-traversal-failure
+```
+
+The recovery validates the existing root-pinned runner, Unix account and SQL secret before modifying anything. It moves the already-generated SQL secret into the dedicated directory without changing its contents, re-pins reviewed receiver code, confirms access and SQL roles **as the non-root SSH account**, and completes SSH key generation. **It does not prompt for SQL Admin, create another SQL login, replay K5A, or run backups again.** If the secret was already moved by an interrupted recovery, the same mode can continue after checking ownership and file permissions.
+
+Expected:
+
+```text
+PASS: existing K5 SQL migration and root-owned secret verified; no SQL bootstrap replay
+PASS: existing SQL secret moved to a dedicated directory; no SQL migration repeated
+PASS: dedicated non-root SSH user can read SQL secret and access migrated DRVO staging
+DRVO STAGING DB AUTOMATION INSTALLED
+```
+
+Only after that set the four GitHub environment secrets and run the workflow; never paste SQL credentials or SSH private keys into chat.
 
 ## Step 3 — Configure GitHub Environment and FOUR secrets
 

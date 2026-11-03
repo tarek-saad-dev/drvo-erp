@@ -1,6 +1,6 @@
 import {
   Injectable, NotFoundException, ServiceUnavailableException,
-  TooManyRequestsException, UnauthorizedException,
+  HttpException, UnauthorizedException,
 } from "@nestjs/common";
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import * as sql from "mssql";
@@ -110,7 +110,7 @@ export class IdentityService {
     const key = hash("k5-login-name:" + normalized);
     if (await this.isUsernameThrottled(pool, key)) {
       await dummyPasswordCheck(password);
-      throw new TooManyRequestsException("Please try again later");
+      throw new HttpException("Please try again later", 429);
     }
 
     const r = await pool.request()

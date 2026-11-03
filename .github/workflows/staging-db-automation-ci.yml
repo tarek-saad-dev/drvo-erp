@@ -155,6 +155,11 @@ jobs:
           # Reproduce production npm bundle with root-only module tree.
           sudo chmod -R go-rwx /opt/drvo-erp-db-automation/node_modules
           sudo chmod -R go-w /opt/drvo-erp-db-automation
+          # The real VPS has /usr/bin/node. Hosted GitHub runners can keep
+          # setup-node only in the tool-cache PATH; emulate the VPS path.
+          if [[ ! -x /usr/bin/node ]]; then
+            sudo ln -s "$(command -v node)" /usr/bin/node
+          fi
           bash -n ops/staging/db-automation/repair-module-access.sh
           sudo bash ops/staging/db-automation/repair-module-access.sh
           echo "Verifying restricted SQL credential from pinned /opt receiver..."

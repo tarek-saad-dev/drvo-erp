@@ -9,6 +9,7 @@ const os = require('node:os');
 const sql = require('../../apps/api/node_modules/mssql');
 const { configFromEnv, connect, applyMigrations, readManifest, CI_DB } = require('./migrate.cjs');
 const { FoundationRepository } = require('../../apps/api/dist/data/foundation-repository');
+const { foundationSqlConfig } = require('../../apps/api/dist/data/foundation-connection');
 
 const cfg = configFromEnv();
 assert.equal(process.env.DRVO_K4_TARGET, 'ci');
@@ -43,6 +44,18 @@ async function main() {
     await admin.query(`IF DB_ID(N'${CI_DB}') IS NULL CREATE DATABASE [${CI_DB}]`);
     pool = await connect(cfg);
 
+    await check('runtime SQL config refuses missing flag and foreign DB target', async () => {
+      assert.throws(() => foundationSqlConfig({}), /not explicitly configured/);
+      const good = {
+        DRVO_SQL_ENABLED: 'YES', DRVO_SQL_HOST: '127.0.0.1',
+        DRVO_SQL_DATABASE: 'DRVO_ERP_STAGING', DRVO_SQL_PORT: '1433',
+        DRVO_SQL_USER: 'drvo_erp_stage_app', DRVO_SQL_PASSWORD: 'ExampleTestSecret1234567!',
+      };
+      assert.equal(foundationSqlConfig(good).database, 'DRVO_ERP_STAGING');
+      assert.throws(() => foundationSqlConfig({...good,DRVO_SQL_DATABASE:'Casher'}),/not explicitly configured/);
+      assert.throws(() => foundationSqlConfig({...good,DRVO_SQL_HOST:'example.org'}),/not explicitly configured/);
+      assert.throws(() => foundationSqlConfig({...good,DRVO_SQL_USER:'sa'}),/not explicitly configured/);
+    });
     await check('transactional checksummed migration applies', async () => {
       const first = await applyMigrations(pool);
       assert.deepEqual(first.map((x) => x.status), ['applied']);

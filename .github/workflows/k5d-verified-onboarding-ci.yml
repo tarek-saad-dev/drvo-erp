@@ -7,6 +7,7 @@ on:
       - 'apps/api/src/identity/verification-crypto.ts'
       - 'apps/api/test/verification-crypto.test.cjs'
       - 'apps/api/src/identity/verification-mailer.ts'
+      - 'apps/api/src/identity/owner-bootstrap.ts'
       - 'apps/api/test/verification-mailer.test.cjs'
       - '.github/workflows/k5d-verified-onboarding-ci.yml'
   push:
@@ -34,6 +35,7 @@ jobs:
         run: |
           set -euo pipefail
           node --check tools/k5d/verify.cjs
+          node --check tools/k5d/verify-owner-bootstrap.cjs
           npm ci --prefix apps/api --no-audit --no-fund
           npm test --prefix apps/api
       - name: Start disposable SQL Server 2022
@@ -53,7 +55,9 @@ jobs:
         env:
           K5D_SQL_DISPOSABLE: 'YES'
           K5D_TEST_PORT: '14338'
-        run: node tools/k5d/verify.cjs
+        run: |
+          node tools/k5d/verify.cjs
+          node tools/k5d/verify-owner-bootstrap.cjs
       - name: Show SQL log on failure only
         if: failure()
         run: docker logs --tail 80 drvo-k5d-ci || true

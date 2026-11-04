@@ -142,3 +142,84 @@ export async function issueOperatorApprovedOwner(
     throw error;
   }
 }
+
+
+const GUID_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+export type OperatorOwnerRevocation = {
+  approvalId: string;
+  email: string;
+  operatorId: string;
+  reasonCode: "MAIL_FAILED" | "REISSUE" | "OPERATOR_REVOKE";
+};
+
+/**
+ * Root-only operator recovery path for an UNSPENT approval. Revoking an
+ * approval is NOT deleting an existing Owner or granting any new access.
+ * The first-Owner claim procedure and this path both lock the approval
+ * in SERIALIZABLE transactions, so a claim and revoke cannot both win.
+ */
+export async function revokeOperatorApprovedOwner(
+  pool: sql.ConnectionPool,
+  input: OperatorOwnerRevocation,
+  hmacSecret: string,
+): Promise<{ revoked: true }> {
+  if (!input || typeof input !== "object" ||
+      !GUID_ID.test(input.approvalId) ||
+      !OPERATOR.test(input.operatorId) ||
+      !["MAIL_FAILED", "REISSUE", "OPERATOR_REVOKE"].includes(input.reasonCode)) {
+    throw new Error("Invalid operator revocation details");
+  }
+  const secret=loadVerificationSecret(hmacSecret);
+  const normalizedEmail=normalizeVerificationEmail(input.email);
+  const emailHash=verificationEmailDigest(normalizedEmail,secret);
+  const operatorHash=createHmac("sha256",secret)
+    .update("drvo-erp:k5d:operator-id\\0" + input.operatorId.toLowerCase())
+    .digest("hex");
+
+  const tx=new sql.Transaction(pool);
+  await tx.begin(sql.ISOLATION_LEVEL.SERIALIZABLE);
+  try {
+    // The explicit ApprovalId AND email binding is a second operator
+    // confirmation. No API account can invoke this internal function.
+    const r=await tx.request()
+      .input("approvalId",sql.UniqueIdentifier,input.approvalId)
+      .input("emailHash",sql.Char(64),emailHash)
+      .query(`
+        SELECT ApprovedAtUtc AS approvedAt
+        FROM core.OwnerBootstrapApproval WITH (UPDLOCK,HOLDLOCK)
+        WHERE ApprovalId=@approvalId AND ApprovedEmailHash=@emailHash
+          AND RevokedAtUtc IS NULL AND ConsumedAtUtc IS NULL
+      `);
+    if (r.recordset.length !== 1) throw new Error("Approval cannot be revoked");
+    const approvedAt=r.recordset[0].approvedAt as Date;
+    await tx.request()
+      .input("approvalId",sql.UniqueIdentifier,input.approvalId)
+      .input("emailHash",sql.Char(64),emailHash)
+      .input("approvedAt",sql.DateTime2(3),approvedAt)
+      .input("operatorHash",sql.Char(64),operatorHash)
+      .input("reason",sql.VarChar(24),input.reasonCode)
+      .query(`
+        UPDATE core.OwnerBootstrapApproval
+          SET RevokedAtUtc=SYSUTCDATETIME()
+          WHERE ApprovalId=@approvalId AND ApprovedEmailHash=@emailHash
+            AND RevokedAtUtc IS NULL AND ConsumedAtUtc IS NULL;
+        IF @@ROWCOUNT<>1 THROW 51170,'Approval already used or revoked',1;
+
+        UPDATE core.EmailVerificationChallenge
+          SET ConsumedAtUtc=SYSUTCDATETIME()
+          WHERE EmailHash=@emailHash AND Purpose='OWNER_BOOTSTRAP'
+            AND CreatedAtUtc>=@approvedAt AND ConsumedAtUtc IS NULL;
+
+        INSERT INTO core.OwnerApprovalRevocationAudit
+          (ApprovalId,OperatorHash,ReasonCode)
+          VALUES(@approvalId,@operatorHash,@reason);
+        INSERT INTO core.SecurityAudit(TenantId,AccountId,EventCode)
+          VALUES(NULL,NULL,'owner.approval.revoked');
+      `);
+    await tx.commit();
+    return {revoked:true};
+  } catch(error) {
+    await tx.rollback().catch(()=>{});
+    throw error;
+  }
+}

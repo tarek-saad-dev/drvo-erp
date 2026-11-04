@@ -150,10 +150,7 @@ async function run() {
          (SELECT COUNT(*) FROM core.OwnerBootstrapApproval
            WHERE ApprovalId=@approval AND ConsumedAtUtc IS NOT NULL
              AND ConsumedAccountId=@a AND ConsumedTenantId=@t) approved
-      `
-        .replace('@challenge','\' '+primary.challengeId+' \''.trim())
-        .replace('@approval','\' '+primary.approvalId+' \''.trim())
-      );
+      `);
     assert.equal(roleCheck.recordset[0].roles,4);
     assert.equal(roleCheck.recordset[0].permissions,7);
     assert.equal(roleCheck.recordset[0].assigned,'OWNER');

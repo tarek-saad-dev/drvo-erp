@@ -173,7 +173,7 @@ export async function revokeOperatorApprovedOwner(
   const normalizedEmail=normalizeVerificationEmail(input.email);
   const emailHash=verificationEmailDigest(normalizedEmail,secret);
   const operatorHash=createHmac("sha256",secret)
-    .update("drvo-erp:k5d:operator-id\\0" + input.operatorId.toLowerCase())
+    .update("drvo-erp:k5d:operator-id\0" + input.operatorId.toLowerCase())
     .digest("hex");
 
   const tx=new sql.Transaction(pool);

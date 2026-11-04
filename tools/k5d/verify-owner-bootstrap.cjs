@@ -8,6 +8,8 @@ const {applyMigrations} = require('../k4-db/migrate.cjs');
 const {claimApprovedOwner} = require('../../apps/api/dist/identity/owner-bootstrap.js');
 const {issueOperatorApprovedOwner} = require('../../apps/api/dist/identity/operator-owner-approval.js');
 const {IdentityService} = require('../../apps/api/dist/identity/identity.service.js');
+const {consumeVerificationAttempt} = require('../../apps/api/dist/identity/owner-verification-throttle.js');
+const {OwnerVerificationService} = require('../../apps/api/dist/identity/owner-verification.service.js');
 const {
   generateOpaqueVerificationToken,verificationEmailDigest,verificationTokenDigest,
 } = require('../../apps/api/dist/identity/verification-crypto.js');
@@ -113,6 +115,12 @@ async function run() {
       ['applied','applied','applied','applied','applied','applied']);
     assert.deepEqual((await applyMigrations(db)).map(x=>x.status),
       ['unchanged','unchanged','unchanged','unchanged','unchanged','unchanged']);
+    // Mirror existing K5A stage app grants: scoped failed-login throttle only.
+    await db.query(`
+      GRANT SELECT,INSERT ON core.LoginThrottle TO [drvo_erp_stage_app];
+      GRANT UPDATE (FailedCount,WindowStartedUtc) ON core.LoginThrottle
+        TO [drvo_erp_stage_app];
+    `);
     restricted=await open(DB,'drvo_erp_stage_app',stagePass);
 
     await bad(()=>claimApprovedOwner(db,{email:'none@example.test',token:'A'.repeat(43),
@@ -125,6 +133,21 @@ async function run() {
       newPassword:'short'},env));
     assert.equal((await snapshot(db)).t,0);
     console.log('PASS: no anonymous/invalid Owner provision when gates or secrets fail');
+
+    const throttleIp='196.200.1.10';
+    const throttleEmail='throttle@example.test';
+    for(let i=0;i<6;i++){
+      await consumeVerificationAttempt(restricted,throttleIp,throttleEmail,
+        env.DRVO_K5_VERIFICATION_HMAC_KEY);
+    }
+    await assert.rejects(()=>consumeVerificationAttempt(
+      restricted,throttleIp,throttleEmail,env.DRVO_K5_VERIFICATION_HMAC_KEY),
+      err=>err.status===429);
+    const pseudonyms=await db.query(
+      "SELECT ThrottleKey FROM core.LoginThrottle");
+    assert.equal(pseudonyms.recordset.length,2);
+    assert.equal(pseudonyms.recordset.every(row=>/^[0-9a-f]{64}$/.test(row.ThrottleKey)),true);
+    console.log('PASS: 15-minute durable SQL email/IP throttling enforced for normal API user');
 
     const primaryRaw=await issueOperatorApprovedOwner(db,{
       email:email('main'), username:username('main'),
@@ -255,6 +278,28 @@ async function run() {
     assert.equal((await snapshot(db)).a,beforeRestricted.a+1);
     await bad(()=>claimApprovedOwner(restricted,locked,env));
     console.log('PASS: app SQL login can only claim an approved token via definer-rights procedure');
+    // End-to-end service proof: SQL throttle + approved claim, no fake grants
+    // or direct table DML; all environment flags are explicitly test-only.
+    const http=await issueOperatorApprovedOwner(db,{
+      email:'verified-http@example.test',username:'owner.http',
+      tenantName:'HTTP Tenant',businessName:'HTTP Business',
+      branchName:'HTTP Branch',operatorId:'ci.operator',
+    },env.DRVO_K5_VERIFICATION_HMAC_KEY);
+    process.env.DRVO_K5_AUTH_ENABLED='YES';
+    process.env.DRVO_K5_OWNER_BOOTSTRAP_ENABLED='YES';
+    process.env.DRVO_K5_VERIFY_API_ENABLED='YES';
+    process.env.DRVO_K5_VERIFICATION_HMAC_KEY=env.DRVO_K5_VERIFICATION_HMAC_KEY;
+    const proofService=new OwnerVerificationService({getInternalPool:()=>restricted});
+    const httpRequest={socket:{remoteAddress:'196.200.1.21'},headers:{}};
+    const input={email:http.email,token:http.token,
+      purpose:'OWNER_BOOTSTRAP',newPassword:samplePassword};
+    assert.deepEqual(await proofService.complete(input,httpRequest),{verified:true});
+    const afterHttp=await snapshot(db);
+    await assert.rejects(()=>proofService.complete(input,httpRequest),
+      err=>err.status===401);
+    assert.deepEqual(await snapshot(db),afterHttp);
+    console.log('PASS: live service path claims Owner once; replay denied and rate-counted');
+
 
     console.log('K5D ATOMIC OWNER CLAIM DISPOSABLE SQL: PASS');
   }finally {

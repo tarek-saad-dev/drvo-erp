@@ -60,3 +60,21 @@
 /* Verification flow remains behind two independent server-side flags. */
 .k5-verify-link{display:inline-flex;align-items:center;justify-content:center;max-width:280px;min-height:47px;padding:10px 17px;margin-top:25px;border-radius:12px;background:var(--accent);color:#102320;font-weight:700;text-decoration:none}
 .k5-verify-link:focus-visible{outline:3px solid #fff;outline-offset:3px}
+
+/* K5 workspace selection: limited to active SQL-authorized scopes. */
+.k5-head-actions a{color:var(--text);text-decoration:none;border:1px solid var(--stroke);border-radius:10px;padding:10px 14px}
+.k5-workspaces-group{margin:8px 0 32px}
+.k5-workspaces-heading{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin:0 0 16px}
+.k5-workspaces-heading h2{font-size:22px;font-weight:700;margin:0}
+.k5-workspaces-heading>span{font-size:12px;color:var(--muted)}
+.k5-workspaces-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.k5-workspace-choice{min-height:165px;text-align:right;display:flex;flex-direction:column;align-items:flex-start;padding:22px;border-radius:18px;border:1px solid var(--stroke);background:#1b222a;color:var(--text);cursor:pointer;font:inherit;transition:border-color .15s,transform .15s}
+.k5-workspace-choice:hover,.k5-workspace-choice:focus-visible{border-color:var(--accent)}
+.k5-workspace-choice:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.k5-workspace-choice strong{font-size:20px;line-height:1.4;margin:12px 0 20px}
+.k5-choice-eyebrow{font-size:10px;color:var(--accent);font-weight:750;letter-spacing:.1em;direction:ltr}
+.k5-choice-action{margin-top:auto;color:var(--muted);font-size:12px}
+.k5-workspaces-empty,.k5-workspace-intro{padding:30px;max-width:850px}
+.k5-workspace-intro h2{font-size:23px;margin:17px 0}
+@media(max-width:720px){.k5-workspaces-grid{grid-template-columns:1fr}.k5-workspace-choice{min-height:145px}}
+@media(prefers-reduced-motion:reduce){.k5-workspace-choice{transition:none}}

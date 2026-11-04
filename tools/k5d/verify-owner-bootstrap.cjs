@@ -9,6 +9,7 @@ const {claimApprovedOwner} = require('../../apps/api/dist/identity/owner-bootstr
 const {issueOperatorApprovedOwner} = require('../../apps/api/dist/identity/operator-owner-approval.js');
 const {IdentityService} = require('../../apps/api/dist/identity/identity.service.js');
 const {consumeVerificationAttempt} = require('../../apps/api/dist/identity/owner-verification-throttle.js');
+const {OwnerVerificationService} = require('../../apps/api/dist/identity/owner-verification.service.js');
 const {
   generateOpaqueVerificationToken,verificationEmailDigest,verificationTokenDigest,
 } = require('../../apps/api/dist/identity/verification-crypto.js');
@@ -277,6 +278,28 @@ async function run() {
     assert.equal((await snapshot(db)).a,beforeRestricted.a+1);
     await bad(()=>claimApprovedOwner(restricted,locked,env));
     console.log('PASS: app SQL login can only claim an approved token via definer-rights procedure');
+    // End-to-end service proof: SQL throttle + approved claim, no fake grants
+    // or direct table DML; all environment flags are explicitly test-only.
+    const http=await issueOperatorApprovedOwner(db,{
+      email:'verified-http@example.test',username:'owner.http',
+      tenantName:'HTTP Tenant',businessName:'HTTP Business',
+      branchName:'HTTP Branch',operatorId:'ci.operator',
+    },env.DRVO_K5_VERIFICATION_HMAC_KEY);
+    process.env.DRVO_K5_AUTH_ENABLED='YES';
+    process.env.DRVO_K5_OWNER_BOOTSTRAP_ENABLED='YES';
+    process.env.DRVO_K5_VERIFY_API_ENABLED='YES';
+    process.env.DRVO_K5_VERIFICATION_HMAC_KEY=env.DRVO_K5_VERIFICATION_HMAC_KEY;
+    const proofService=new OwnerVerificationService({getInternalPool:()=>restricted});
+    const httpRequest={socket:{remoteAddress:'196.200.1.21'},headers:{}};
+    const input={email:http.email,token:http.token,
+      purpose:'OWNER_BOOTSTRAP',newPassword:samplePassword};
+    assert.deepEqual(await proofService.complete(input,httpRequest),{verified:true});
+    const afterHttp=await snapshot(db);
+    await assert.rejects(()=>proofService.complete(input,httpRequest),
+      err=>err.status===401);
+    assert.deepEqual(await snapshot(db),afterHttp);
+    console.log('PASS: live service path claims Owner once; replay denied and rate-counted');
+
 
     console.log('K5D ATOMIC OWNER CLAIM DISPOSABLE SQL: PASS');
   }finally {

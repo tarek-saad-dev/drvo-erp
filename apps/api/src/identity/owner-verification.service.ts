@@ -4,6 +4,7 @@ import {
 import type { IncomingMessage } from "node:http";
 import { FoundationDatabaseService } from "../data/foundation-database.service";
 import { claimApprovedOwner } from "./owner-bootstrap";
+import { BranchInvitationService } from "./branch-invitation.service";
 import { normalizeVerificationEmail } from "./verification-crypto";
 import {
   consumeVerificationAttempt, trustedClientAddress,
@@ -16,11 +17,13 @@ function invalidProof(): never {
 
 @Injectable()
 export class OwnerVerificationService {
-  constructor(private readonly database: FoundationDatabaseService) {}
+  constructor(
+    private readonly database: FoundationDatabaseService,
+    private readonly invitations: BranchInvitationService,
+  ) {}
 
   async complete(input: unknown, request: IncomingMessage): Promise<{ verified: true }> {
     if (process.env.DRVO_K5_VERIFY_API_ENABLED !== "YES" ||
-        process.env.DRVO_K5_OWNER_BOOTSTRAP_ENABLED !== "YES" ||
         process.env.DRVO_K5_AUTH_ENABLED !== "YES") {
       throw new ServiceUnavailableException("Verification not enabled");
     }
@@ -39,22 +42,35 @@ export class OwnerVerificationService {
       pool, ip, email, process.env.DRVO_K5_VERIFICATION_HMAC_KEY,
     );
 
+    const purpose = body.purpose;
+    if (purpose === "ACCOUNT_INVITE") {
+      if (process.env.DRVO_K5_INVITATIONS_ENABLED !== "YES") {
+        throw new ServiceUnavailableException("Invitations not enabled");
+      }
+      if (Object.keys(body).length !== 5 ||
+          typeof body.token !== "string" || !email ||
+          typeof body.newPassword !== "string" ||
+          typeof body.username !== "string") invalidProof();
+      return this.invitations.accept({
+        email,token:body.token,username:body.username,
+        newPassword:body.newPassword,
+      });
+    }
+
+    if (purpose !== "OWNER_BOOTSTRAP" ||
+        process.env.DRVO_K5_OWNER_BOOTSTRAP_ENABLED !== "YES") {
+      throw new ServiceUnavailableException("Owner bootstrap not enabled");
+    }
     if (Object.keys(body).length !== 4 ||
         typeof body.token !== "string" ||
-        typeof body.purpose !== "string" ||
-        body.purpose !== "OWNER_BOOTSTRAP" ||
         !email || typeof body.newPassword !== "string" ||
         body.newPassword.length < 12 || body.newPassword.length > 256) {
       invalidProof();
     }
 
-    // The existing restricted SQL procedure re-checks current, unexpired,
-    // operator-approved email proof inside one SERIALIZABLE transaction.
-    // No Actor/Tenant/Role is inferred from any client-supplied field.
+    // Only an approved Owner can be provisioned; no client-created Tenant.
     await claimApprovedOwner(pool, {
-      email,
-      token: body.token,
-      newPassword: body.newPassword,
+      email, token:body.token,newPassword:body.newPassword,
     }, process.env);
     return { verified: true };
   }

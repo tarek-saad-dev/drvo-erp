@@ -85,3 +85,45 @@ test('invitation mailer remains disabled by default',async()=>{
     else process.env.DRVO_K5_INVITATIONS_ENABLED=old;
   }
 });
+
+test('invitation listing and revocation are both off by default',async()=>{
+  const db={getInternalPool(){throw Error('SQL must never be opened')}};
+  const service=new BranchInvitationService(db);
+  const oldAuth=process.env.DRVO_K5_AUTH_ENABLED;
+  const oldInvite=process.env.DRVO_K5_INVITATIONS_ENABLED;
+  try{
+    delete process.env.DRVO_K5_INVITATIONS_ENABLED;
+    process.env.DRVO_K5_AUTH_ENABLED='YES';
+    await assert.rejects(()=>service.list(actor,token,business,branch),/not enabled/);
+    await assert.rejects(()=>service.revoke(actor,token,business,branch,role),/not enabled/);
+  }finally{
+    if(oldInvite===undefined)delete process.env.DRVO_K5_INVITATIONS_ENABLED;
+    else process.env.DRVO_K5_INVITATIONS_ENABLED=oldInvite;
+    if(oldAuth===undefined)delete process.env.DRVO_K5_AUTH_ENABLED;
+    else process.env.DRVO_K5_AUTH_ENABLED=oldAuth;
+  }
+});
+
+test('invitation revocation route forbids foreign origin and unexpected payload',async()=>{
+  const old=process.env.DRVO_K5_ORIGIN;
+  const svc={
+    list:async()=>({invitations:[]}),
+    revoke:async()=>({revoked:true}),
+  };
+  const controller=new BranchInvitationController({actorFromToken:async()=>actor},svc);
+  const req={headers:{cookie:'__Host-drvo-session='+token}};
+  const res={setHeader(){}};
+  try{
+    process.env.DRVO_K5_ORIGIN='https://erp-stage.drvotech.com';
+    await assert.rejects(()=>controller.revoke(
+      'https://wrong.test',req,res,business,branch,role,{}));
+    await assert.rejects(()=>controller.revoke(
+      'https://erp-stage.drvotech.com',req,res,business,branch,role,{roleId:role}));
+    assert.deepEqual(await controller.list(req,res,business,branch),{invitations:[]});
+    assert.deepEqual(await controller.revoke(
+      'https://erp-stage.drvotech.com',req,res,business,branch,role,{}),{revoked:true});
+  }finally{
+    if(old===undefined)delete process.env.DRVO_K5_ORIGIN;
+    else process.env.DRVO_K5_ORIGIN=old;
+  }
+});

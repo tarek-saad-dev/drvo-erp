@@ -1,63 +1,134 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { parseVerificationFragment } from "./verification-fragment";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { parseVerificationFragment, type VerificationLink } from "./verification-fragment";
 
-type Status = "pending" | "verified" | "invalid" | "unavailable";
+type Status = "opening" | "ready" | "submitting" | "verified" |
+  "invalid" | "unavailable" | "limited";
 
 export default function VerifyEmailClient() {
-  const started = useRef(false);
-  const [status, setStatus] = useState<Status>("pending");
+  const initialized = useRef(false);
+  // The bearer token lives only in this transient ref; NEVER store it in
+  // React state, localStorage, cookies, a query string, URL or telemetry.
+  const bearer = useRef<VerificationLink | null>(null);
+  const busy = useRef(false);
+  const [status, setStatus] = useState<Status>("opening");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (started.current) return; // React Strict Mode must not redeem twice.
-    started.current = true;
-
-    // Clear the fragment synchronously before any fetch, route change, or
-    // browser event is dispatched. Do not retain the raw token in React state.
+    if (initialized.current) return;
+    initialized.current = true;
+    // Immediately clear fragment before rendering any form or sending a
+    // request. Browser history and HTTP referrers will not retain the token.
     const fragment = window.location.hash;
     window.history.replaceState(null, "", window.location.pathname + window.location.search);
-    const payload = parseVerificationFragment(fragment);
-    if (!payload) {
+    const link = parseVerificationFragment(fragment);
+    if (!link || link.purpose !== "OWNER_BOOTSTRAP") {
       setStatus("invalid");
       return;
     }
+    bearer.current = link;
+    setStatus("ready");
+  }, []);
 
-    // The route is feature-gated and may only be enabled after the backend
-    // implements atomic single-use redemption and approved identity binding.
-    void fetch("/api/auth/verify-email", {
-      method: "POST",
-      credentials: "same-origin",
-      cache: "no-store",
-      referrerPolicy: "no-referrer",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    }).then(async response => {
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (busy.current || !bearer.current || status !== "ready") return;
+    if (password.length < 12 || password.length > 256) {
+      setError("كلمة المرور لازم تكون من 12 إلى 256 حرف.");
+      return;
+    }
+    if (password !== confirm) {
+      setError("تأكيد كلمة المرور مش مطابق.");
+      return;
+    }
+    if (!email.trim()) {
+      setError("ادخل البريد الإلكتروني اللي وصلك عليه رابط التأكيد.");
+      return;
+    }
+    busy.current = true;
+    setError("");
+    setStatus("submitting");
+    try {
+      const response = await fetch("/api/auth/verify-email", {
+        method: "POST",
+        credentials: "same-origin",
+        cache: "no-store",
+        referrerPolicy: "no-referrer",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token: bearer.current.token,
+          purpose: "OWNER_BOOTSTRAP",
+          email: email.trim(),
+          newPassword: password,
+        }),
+      });
+      if (response.status === 429) {
+        setStatus("limited");
+        return;
+      }
       if (!response.ok) {
-        setStatus("unavailable");
+        setStatus(response.status === 503 ? "unavailable" : "invalid");
         return;
       }
       const data: unknown = await response.json();
-      setStatus(data !== null && typeof data === "object" &&
-        (data as Record<string, unknown>).verified === true ? "verified" : "unavailable");
-    }).catch(() => setStatus("unavailable"));
-  }, []);
+      if (!data || typeof data !== "object" ||
+          (data as Record<string, unknown>).verified !== true) {
+        setStatus("unavailable");
+        return;
+      }
+      bearer.current = null;
+      setPassword("");
+      setConfirm("");
+      setEmail("");
+      setStatus("verified");
+    } catch {
+      setStatus("unavailable");
+    } finally {
+      busy.current = false;
+      setPassword("");
+      setConfirm("");
+    }
+  }
 
-  return (
-    <main className="k5-shell k5-standalone">
-      <section className="k5-login" aria-live="polite" aria-busy={status === "pending"}>
-        <div className="k5-brand"><span className="brandmark">D</span> DRVO <b>ERP</b></div>
-        <span className="k5-eyebrow">SECURE EMAIL VERIFICATION</span>
-        <h1>تأكيد البريد الإلكتروني</h1>
-        {status === "pending" && <p className="k5-muted" role="status">جاري التحقق من صلاحية رابط التأكيد…</p>}
-        {status === "invalid" && <p className="k5-error" role="alert">رابط التأكيد غير صالح. اطلب رابطًا جديدًا من الإدارة.</p>}
-        {status === "unavailable" && <p className="k5-error" role="alert">تعذر تأكيد البريد الإلكتروني. قد يكون الرابط منتهيًا أو مستخدمًا، أو الخدمة غير متاحة حاليًا. تواصل مع الإدارة.</p>}
-        {status === "verified" && <>
-          <p className="k5-notice" role="status">تم تأكيد بريدك الإلكتروني بنجاح.</p>
-          <a className="k5-verify-link" href="/sign-in">الانتقال لتسجيل الدخول</a>
-        </>}
-        <p className="k5-footnote">لأمان حسابك، رابط التأكيد يستخدم مرة واحدة ولا يظهر في سجل المتصفح بعد فتحه.</p>
-      </section>
-    </main>
-  );
+  return <main className="k5-shell k5-standalone">
+    <section className="k5-login" aria-labelledby="k5-verify-title" aria-live="polite">
+      <div className="k5-brand"><span className="brandmark">D</span> DRVO <b>ERP</b></div>
+      <span className="k5-eyebrow">SECURE OWNER VERIFICATION</span>
+      <h1 id="k5-verify-title">تأكيد حساب المالك</h1>
+      {status === "opening" && <p className="k5-muted" role="status">جاري قراءة رابط التأكيد…</p>}
+      {status === "ready" || status === "submitting" ? <>
+        <p className="k5-muted">لاستكمال الحساب المعتمد من الإدارة، أكد بريدك وحدد كلمة مرور قوية. الرابط صالح للاستخدام مرة واحدة فقط.</p>
+        <form className="k5-form" onSubmit={e => { void submit(e); }}>
+          <label htmlFor="owner-email">البريد الإلكتروني المعتمد</label>
+          <input id="owner-email" type="email" name="email" autoComplete="email"
+            dir="ltr" maxLength={254} required
+            value={email} onChange={e => setEmail(e.target.value)} />
+          <label htmlFor="owner-pass">كلمة المرور الجديدة (12 حرف على الأقل)</label>
+          <input id="owner-pass" type="password" name="new-password"
+            autoComplete="new-password" minLength={12} maxLength={256} required
+            value={password} onChange={e => setPassword(e.target.value)} />
+          <label htmlFor="owner-confirm">تأكيد كلمة المرور</label>
+          <input id="owner-confirm" type="password" name="confirm-password"
+            autoComplete="new-password" minLength={12} maxLength={256} required
+            value={confirm} onChange={e => setConfirm(e.target.value)} />
+          {error && <p className="k5-error" role="alert">{error}</p>}
+          <button type="submit" disabled={status === "submitting"}>
+            {status === "submitting" ? "جاري تأكيد الحساب…" : "تأكيد البريد وإنشاء الحساب"}
+          </button>
+        </form>
+      </> : null}
+      {status === "invalid" && <p className="k5-error" role="alert">الرابط غير صالح أو منتهي أو مستخدم من قبل. اطلب اعتمادًا أو رابطًا جديدًا من الإدارة.</p>}
+      {status === "limited" && <p className="k5-error" role="alert">تم تجاوز عدد محاولات التأكيد. حاول مرة أخرى بعد مرور 15 دقيقة.</p>}
+      {status === "unavailable" && <p className="k5-error" role="alert">تعذر تأكيد الحساب حاليًا. حاول فتح رابط التأكيد مرة أخرى أو تواصل مع الإدارة.</p>}
+      {status === "verified" && <>
+        <p className="k5-notice" role="status">تم تأكيد بريدك وإنشاء حسابك المعتمد بنجاح.</p>
+        <a className="k5-verify-link" href="/sign-in">الانتقال لتسجيل الدخول</a>
+      </>}
+      <p className="k5-footnote">التفعيل لأصحاب الحسابات المعتمدة فقط. مش متاح تسجيل أي حساب جديد بدون اعتماد الإدارة.</p>
+    </section>
+  </main>;
 }

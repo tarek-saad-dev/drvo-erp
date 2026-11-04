@@ -9,7 +9,7 @@ type Status = "opening" | "ready" | "submitting" | "verified" |
 export default function VerifyEmailClient() {
   const initialized = useRef(false);
   // The bearer token lives only in this transient ref; NEVER store it in
-  // React state, localStorage, cookies, a query string, URL or telemetry.
+  // React state, persistent browser storage, cookies, a URL or telemetry.
   const bearer = useRef<VerificationLink | null>(null);
   const busy = useRef(false);
   const [status, setStatus] = useState<Status>("opening");

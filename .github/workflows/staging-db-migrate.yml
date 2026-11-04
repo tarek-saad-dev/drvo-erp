@@ -12,8 +12,28 @@ concurrency:
   group: drvo-erp-staging-database-migrations
   cancel-in-progress: false
 jobs:
+  confirm-staging-target:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Explicitly validate main branch and exact staging database
+        shell: bash
+        env:
+          REQUESTED_DATABASE: ${{ inputs.confirm_database }}
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF" != "refs/heads/main" ]]; then
+            echo "::error::Select the main branch before starting Staging SQL migrations."
+            exit 1
+          fi
+          if [[ "$REQUESTED_DATABASE" != "DRVO_ERP_STAGING" ]]; then
+            echo "::error::Type DRVO_ERP_STAGING exactly in confirm_database (uppercase, no extra spaces)."
+            exit 1
+          fi
+          echo "PASS: manual SQL migration explicitly approved for DRVO_ERP_STAGING on main."
+
   db-migrate:
-    if: github.ref == 'refs/heads/main' && inputs.confirm_database == 'DRVO_ERP_STAGING'
+    needs: confirm-staging-target
     environment: staging-db
     runs-on: ubuntu-latest
     timeout-minutes: 25

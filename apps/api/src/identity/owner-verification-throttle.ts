@@ -1,7 +1,7 @@
 import { createHmac } from "node:crypto";
 import { isIP } from "node:net";
 import type { IncomingMessage } from "node:http";
-import { TooManyRequestsException, ServiceUnavailableException } from "@nestjs/common";
+import { HttpException, ServiceUnavailableException } from "@nestjs/common";
 import * as sql from "mssql";
 import { loadVerificationSecret } from "./verification-crypto";
 
@@ -87,10 +87,10 @@ export async function consumeVerificationAttempt(
       if (Number(result.recordset[0]?.attempts ?? 999) > counter.max) blocked = true;
     }
     await tx.commit();
-    if (blocked) throw new TooManyRequestsException("Please try again later");
+    if (blocked) throw new HttpException("Please try again later", 429);
   } catch (err) {
     await tx.rollback().catch(() => {});
-    if (err instanceof TooManyRequestsException) throw err;
+    if (err instanceof HttpException && err.getStatus() === 429) throw err;
     throw new ServiceUnavailableException("Verification unavailable");
   }
 }

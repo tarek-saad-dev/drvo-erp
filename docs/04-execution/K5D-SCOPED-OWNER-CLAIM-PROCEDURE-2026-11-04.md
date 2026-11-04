@@ -9,7 +9,7 @@ violate DRVO's SQL default-deny model. This slice replaces direct app DML
 with a single reviewed `core.ClaimApprovedOwner` procedure.
 
 - SQL `005_owner_bootstrap_claim_permission.sql` creates
-  `core.ClaimApprovedOwner` with `EXECUTE AS OWNER`. The procedure alone
+  `core.ClaimApprovedOwner` with `EXECUTE AS SELF` (the fixed, scoped SQL migration creator). The procedure alone
   performs a SERIALIZABLE, single-use transaction against already operator-
   approved `OwnerBootstrapApproval` and valid, purpose-scoped and unexpired
   `EmailVerificationChallenge` rows.

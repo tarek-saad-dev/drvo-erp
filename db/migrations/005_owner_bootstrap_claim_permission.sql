@@ -2,6 +2,8 @@
 -- No public registration, no challenge or approval creation, no email delivery.
 -- The ordinary app principal receives EXECUTE on ONLY this procedure, not
 -- SELECT/INSERT/UPDATE on Owner approvals/challenges/tenants/accounts.
+-- EXECUTE AS SELF binds the reviewed scoped migration creator, not dbo.
+-- The restricted migrator must possess CONTROL ON SCHEMA::core.
 -- Must remain feature-gated OFF in the application until formal security signoff.
 EXEC(N'CREATE OR ALTER PROCEDURE core.ClaimApprovedOwner
   @EmailHash CHAR(64),
@@ -16,7 +18,7 @@ EXEC(N'CREATE OR ALTER PROCEDURE core.ClaimApprovedOwner
   @ViewerRoleId UNIQUEIDENTIFIER,
   @Salt VARBINARY(32),
   @PasswordHash VARBINARY(64)
-WITH EXECUTE AS OWNER
+WITH EXECUTE AS SELF
 AS
 BEGIN
   SET NOCOUNT ON;

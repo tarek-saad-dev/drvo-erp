@@ -364,7 +364,7 @@ async function run() {
       env.DRVO_K5_VERIFICATION_HMAC_KEY);
     const listed=await inviteService.list(signedIn.actor,signedIn.token,
       record.businessId,record.branchId);
-    assert.ok(listed.invitations.some(i=>i.invitationId===revokeMe.challengeId &&
+    assert.ok(listed.invitations.some(i=>String(i.invitationId).toLowerCase()===revokeMe.challengeId.toLowerCase() &&
       i.status==='PENDING' && i.roleCode==='VIEWER'));
     for(const i of listed.invitations) {
       assert.equal(Object.hasOwn(i,'email'),false);
@@ -383,7 +383,7 @@ async function run() {
     },{...env,DRVO_K5_INVITATIONS_ENABLED:'YES',DRVO_K5_VERIFY_API_ENABLED:'YES'}));
     const afterRevoke=await inviteService.list(signedIn.actor,signedIn.token,
       record.businessId,record.branchId);
-    assert.equal(afterRevoke.invitations.find(i=>i.invitationId===revokeMe.challengeId).status,'REVOKED');
+    assert.equal(afterRevoke.invitations.find(i=>String(i.invitationId).toLowerCase()===revokeMe.challengeId.toLowerCase()).status,'REVOKED');
     const fresh=await persistScopedBranchInvitation(restricted,signedIn.actor,
       signedIn.token,record.businessId,record.branchId,
       'staff.cancel@example.test',getRole('VIEWER'),

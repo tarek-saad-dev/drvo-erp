@@ -133,6 +133,8 @@ async function run() {
       .input('b',sql.UniqueIdentifier,record.businessId)
       .input('br',sql.UniqueIdentifier,record.branchId)
       .input('a',sql.UniqueIdentifier,record.accountId)
+      .input('challenge',sql.UniqueIdentifier,primary.challengeId)
+      .input('approval',sql.UniqueIdentifier,primary.approvalId)
       .query(`
         SELECT (SELECT COUNT(*) FROM core.BusinessRole
           WHERE TenantId=@t AND BusinessId=@b) roles,

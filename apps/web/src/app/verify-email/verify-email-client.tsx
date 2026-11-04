@@ -13,6 +13,8 @@ export default function VerifyEmailClient() {
   const bearer = useRef<VerificationLink | null>(null);
   const busy = useRef(false);
   const [status, setStatus] = useState<Status>("opening");
+  const [invite, setInvite] = useState(false);
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -26,11 +28,12 @@ export default function VerifyEmailClient() {
     const fragment = window.location.hash;
     window.history.replaceState(null, "", window.location.pathname + window.location.search);
     const link = parseVerificationFragment(fragment);
-    if (!link || link.purpose !== "OWNER_BOOTSTRAP") {
+    if (!link) {
       setStatus("invalid");
       return;
     }
     bearer.current = link;
+    setInvite(link.purpose === "ACCOUNT_INVITE");
     setStatus("ready");
   }, []);
 
@@ -43,6 +46,10 @@ export default function VerifyEmailClient() {
     }
     if (password !== confirm) {
       setError("تأكيد كلمة المرور مش مطابق.");
+      return;
+    }
+    if (invite && !/^[a-zA-Z0-9._-]{3,80}$/.test(username.trim())) {
+      setError("اسم المستخدم لازم يكون من 3 إلى 80 حرف إنجليزي أو رقم.");
       return;
     }
     if (!email.trim()) {
@@ -61,8 +68,9 @@ export default function VerifyEmailClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           token: bearer.current.token,
-          purpose: "OWNER_BOOTSTRAP",
+          purpose: bearer.current.purpose,
           email: email.trim(),
+          ...(invite ? { username: username.trim().toLowerCase() } : {}),
           newPassword: password,
         }),
       });
@@ -84,6 +92,7 @@ export default function VerifyEmailClient() {
       setPassword("");
       setConfirm("");
       setEmail("");
+      setUsername("");
       setStatus("verified");
     } catch {
       setStatus("unavailable");
@@ -98,15 +107,23 @@ export default function VerifyEmailClient() {
     <section className="k5-login" aria-labelledby="k5-verify-title" aria-live="polite">
       <div className="k5-brand"><span className="brandmark">D</span> DRVO <b>ERP</b></div>
       <span className="k5-eyebrow">SECURE OWNER VERIFICATION</span>
-      <h1 id="k5-verify-title">تأكيد حساب المالك</h1>
+      <h1 id="k5-verify-title">{invite ? "تفعيل دعوة الموظف" : "تأكيد حساب المالك"}</h1>
       {status === "opening" && <p className="k5-muted" role="status">جاري قراءة رابط التأكيد…</p>}
       {status === "ready" || status === "submitting" ? <>
-        <p className="k5-muted">لاستكمال الحساب المعتمد من الإدارة، أكد بريدك وحدد كلمة مرور قوية. الرابط صالح للاستخدام مرة واحدة فقط.</p>
+        <p className="k5-muted">{invite
+          ? "تمت دعوتك للانضمام لفرع محدد. أكد بريدك وحدد اسم المستخدم وكلمة مرور قوية."
+          : "لاستكمال الحساب المعتمد من الإدارة، أكد بريدك وحدد كلمة مرور قوية."} الرابط صالح للاستخدام مرة واحدة فقط.</p>
         <form className="k5-form" onSubmit={e => { void submit(e); }}>
           <label htmlFor="owner-email">البريد الإلكتروني المعتمد</label>
           <input id="owner-email" type="email" name="email" autoComplete="email"
             dir="ltr" maxLength={254} required
             value={email} onChange={e => setEmail(e.target.value)} />
+          {invite && <>
+            <label htmlFor="invite-username">اسم المستخدم</label>
+            <input id="invite-username" name="username" autoComplete="username"
+              dir="ltr" minLength={3} maxLength={80} required
+              value={username} onChange={e => setUsername(e.target.value)} />
+          </>}
           <label htmlFor="owner-pass">كلمة المرور الجديدة (12 حرف على الأقل)</label>
           <input id="owner-pass" type="password" name="new-password"
             autoComplete="new-password" minLength={12} maxLength={256} required
@@ -125,10 +142,10 @@ export default function VerifyEmailClient() {
       {status === "limited" && <p className="k5-error" role="alert">تم تجاوز عدد محاولات التأكيد. حاول مرة أخرى بعد مرور 15 دقيقة.</p>}
       {status === "unavailable" && <p className="k5-error" role="alert">تعذر تأكيد الحساب حاليًا. حاول فتح رابط التأكيد مرة أخرى أو تواصل مع الإدارة.</p>}
       {status === "verified" && <>
-        <p className="k5-notice" role="status">تم تأكيد بريدك وإنشاء حسابك المعتمد بنجاح.</p>
+        <p className="k5-notice" role="status">{invite ? "تم تفعيل حساب الموظف بنجاح." : "تم تأكيد بريدك وإنشاء حسابك المعتمد بنجاح."}</p>
         <a className="k5-verify-link" href="/sign-in">الانتقال لتسجيل الدخول</a>
       </>}
-      <p className="k5-footnote">التفعيل لأصحاب الحسابات المعتمدة فقط. مش متاح تسجيل أي حساب جديد بدون اعتماد الإدارة.</p>
+      <p className="k5-footnote">التفعيل لأصحاب الحسابات المعتمدة أو الدعوات المصرّح بها فقط. مش متاح تسجيل عام.</p>
     </section>
   </main>;
 }

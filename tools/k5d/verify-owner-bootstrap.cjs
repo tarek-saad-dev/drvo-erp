@@ -6,7 +6,7 @@ const {randomBytes,randomUUID} = require('node:crypto');
 const sql = require('../../apps/api/node_modules/mssql');
 const {applyMigrations} = require('../k4-db/migrate.cjs');
 const {claimApprovedOwner} = require('../../apps/api/dist/identity/owner-bootstrap.js');
-const {issueOperatorApprovedOwner} = require('../../apps/api/dist/identity/operator-owner-approval.js');
+const {issueOperatorApprovedOwner,revokeOperatorApprovedOwner} = require('../../apps/api/dist/identity/operator-owner-approval.js');
 const {IdentityService} = require('../../apps/api/dist/identity/identity.service.js');
 const {consumeVerificationAttempt} = require('../../apps/api/dist/identity/owner-verification-throttle.js');
 const {OwnerVerificationService} = require('../../apps/api/dist/identity/owner-verification.service.js');
@@ -113,9 +113,9 @@ async function run() {
     await db.query(`CREATE USER [drvo_erp_stage_app]
       FOR LOGIN [drvo_erp_stage_app];GRANT CONNECT TO [drvo_erp_stage_app]`);
     assert.deepEqual((await applyMigrations(db)).map(x=>x.status),
-      ['applied','applied','applied','applied','applied','applied','applied','applied']);
+      ['applied','applied','applied','applied','applied','applied','applied','applied','applied']);
     assert.deepEqual((await applyMigrations(db)).map(x=>x.status),
-      ['unchanged','unchanged','unchanged','unchanged','unchanged','unchanged','unchanged','unchanged']);
+      ['unchanged','unchanged','unchanged','unchanged','unchanged','unchanged','unchanged','unchanged','unchanged']);
     // Mirror existing K5A stage app grants: scoped failed-login throttle only.
     await db.query(`
       GRANT SELECT,INSERT ON core.LoginThrottle TO [drvo_erp_stage_app];
@@ -397,6 +397,55 @@ async function run() {
     await bad(()=>restricted.query('SELECT TOP(1) * FROM core.AccountInvitation'));
     console.log('PASS: scoped invite list has no PII, revocation is one-time and blocks bearer');
 
+
+    // Operator recovery is allowed only for UNSPENT approvals; it revokes
+    // old tokens transactionally so a failed email can be safely re-issued.
+    const doomed=await issueOperatorApprovedOwner(db,{
+      email:'retry-owner@example.test',username:'owner.retry',
+      tenantName:'Retry Tenant',businessName:'Retry Business',
+      branchName:'Retry Branch',operatorId:'ci.operator',
+    },env.DRVO_K5_VERIFICATION_HMAC_KEY);
+    const revocation={approvalId:doomed.approvalId,email:doomed.email,
+      operatorId:'ci.operator',reasonCode:'MAIL_FAILED'};
+    await bad(()=>revokeOperatorApprovedOwner(restricted,revocation,
+      env.DRVO_K5_VERIFICATION_HMAC_KEY));
+    await bad(()=>revokeOperatorApprovedOwner(db,
+      {...revocation,email:'wrong@example.test'},env.DRVO_K5_VERIFICATION_HMAC_KEY));
+    assert.deepEqual(await revokeOperatorApprovedOwner(db,revocation,
+      env.DRVO_K5_VERIFICATION_HMAC_KEY),{revoked:true});
+    await bad(()=>revokeOperatorApprovedOwner(db,revocation,
+      env.DRVO_K5_VERIFICATION_HMAC_KEY));
+    const revokeAudit=await db.request()
+      .input('id',sql.UniqueIdentifier,doomed.approvalId)
+      .query(`SELECT r.ReasonCode AS reason,r.OperatorHash AS operatorHash,
+        CASE WHEN a.RevokedAtUtc IS NULL THEN 0 ELSE 1 END AS revoked,
+        CASE WHEN c.ConsumedAtUtc IS NULL THEN 0 ELSE 1 END AS consumed
+        FROM core.OwnerApprovalRevocationAudit r
+        JOIN core.OwnerBootstrapApproval a ON a.ApprovalId=r.ApprovalId
+        JOIN core.EmailVerificationChallenge c ON c.EmailHash=a.ApprovedEmailHash
+          AND c.Purpose='OWNER_BOOTSTRAP'
+        WHERE r.ApprovalId=@id`);
+    assert.equal(revokeAudit.recordset[0].reason,'MAIL_FAILED');
+    assert.equal(revokeAudit.recordset[0].revoked,1);
+    assert.equal(revokeAudit.recordset[0].consumed,1);
+    assert.match(revokeAudit.recordset[0].operatorHash,/^[0-9a-f]{64}$/);
+    await bad(()=>claimApprovedOwner(restricted,{
+      email:doomed.email,token:doomed.token,newPassword:samplePassword,
+    },env));
+    const freshOwner=await issueOperatorApprovedOwner(db,{
+      email:doomed.email,username:'owner.retry',
+      tenantName:'Retry Tenant',businessName:'Retry Business',
+      branchName:'Retry Branch',operatorId:'ci.operator',
+    },env.DRVO_K5_VERIFICATION_HMAC_KEY);
+    assert.notEqual(freshOwner.token,doomed.token);
+    await claimApprovedOwner(restricted,{
+      email:freshOwner.email,token:freshOwner.token,newPassword:samplePassword,
+    },env);
+    await bad(()=>revokeOperatorApprovedOwner(db,{
+      approvalId:freshOwner.approvalId,email:freshOwner.email,
+      operatorId:'ci.operator',reasonCode:'OPERATOR_REVOKE',
+    },env.DRVO_K5_VERIFICATION_HMAC_KEY));
+    console.log('PASS: operator-only revocation voids old proof, permits new issue, never cancels claimed Owner');
 
     console.log('K5D ATOMIC OWNER CLAIM DISPOSABLE SQL: PASS');
   }finally {

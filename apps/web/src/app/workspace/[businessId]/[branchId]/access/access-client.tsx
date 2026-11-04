@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type Role = {
   roleId: string;
@@ -140,6 +141,7 @@ export default function AccessClient({
     <header className="k5-workspace-header">
       <div className="k5-brand"><span className="brandmark">D</span> DRVO <b>ERP</b></div>
       <div className="k5-head-actions">
+        <Link href="/workspaces">كل الفروع</Link>
         {viewer && <span>{viewer.username}</span>}
         <button type="button" onClick={() => { void logout(); }}>تسجيل خروج</button>
       </div>
@@ -162,7 +164,7 @@ export default function AccessClient({
         aria-current={ws.businessId === businessId && ws.branchId === branchId ? "page" : undefined}
         className={ws.businessId === businessId && ws.branchId === branchId ? "selected" : ""}
         onClick={() => router.push("/workspace/" + encodeURIComponent(ws.businessId) +
-          "/" + encodeURIComponent(ws.branchId) + "/access")}>
+          "/" + encodeURIComponent(ws.branchId))}>
         {ws.businessName} · {ws.branchName}
       </button>)}
     </nav>}

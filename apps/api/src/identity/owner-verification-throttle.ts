@@ -55,8 +55,13 @@ export async function consumeVerificationAttempt(
   keySource: string | undefined,
 ): Promise<void> {
   if (!address) throw new ServiceUnavailableException("Verification unavailable");
-  const secret = loadVerificationSecret(keySource);
-  const counters = verificationThrottleKeys(address, normalizedEmail, secret);
+  let counters: Array<{ key: string; max: number }>;
+  try {
+    const secret = loadVerificationSecret(keySource);
+    counters = verificationThrottleKeys(address, normalizedEmail, secret);
+  } catch {
+    throw new ServiceUnavailableException("Verification unavailable");
+  }
   const tx = new sql.Transaction(pool);
   await tx.begin(sql.ISOLATION_LEVEL.SERIALIZABLE);
   try {

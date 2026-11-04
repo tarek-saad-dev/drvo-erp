@@ -10,7 +10,7 @@ const {issueOperatorApprovedOwner} = require('../../apps/api/dist/identity/opera
 const {IdentityService} = require('../../apps/api/dist/identity/identity.service.js');
 const {consumeVerificationAttempt} = require('../../apps/api/dist/identity/owner-verification-throttle.js');
 const {OwnerVerificationService} = require('../../apps/api/dist/identity/owner-verification.service.js');
-const {persistScopedBranchInvitation,acceptScopedBranchInvitation} = require('../../apps/api/dist/identity/branch-invitation.service.js');
+const {persistScopedBranchInvitation,acceptScopedBranchInvitation,BranchInvitationService} = require('../../apps/api/dist/identity/branch-invitation.service.js');
 const {
   generateOpaqueVerificationToken,verificationEmailDigest,verificationTokenDigest,
 } = require('../../apps/api/dist/identity/verification-crypto.js');
@@ -113,9 +113,9 @@ async function run() {
     await db.query(`CREATE USER [drvo_erp_stage_app]
       FOR LOGIN [drvo_erp_stage_app];GRANT CONNECT TO [drvo_erp_stage_app]`);
     assert.deepEqual((await applyMigrations(db)).map(x=>x.status),
-      ['applied','applied','applied','applied','applied','applied','applied']);
+      ['applied','applied','applied','applied','applied','applied','applied','applied']);
     assert.deepEqual((await applyMigrations(db)).map(x=>x.status),
-      ['unchanged','unchanged','unchanged','unchanged','unchanged','unchanged','unchanged']);
+      ['unchanged','unchanged','unchanged','unchanged','unchanged','unchanged','unchanged','unchanged']);
     // Mirror existing K5A stage app grants: scoped failed-login throttle only.
     await db.query(`
       GRANT SELECT,INSERT ON core.LoginThrottle TO [drvo_erp_stage_app];
@@ -353,6 +353,50 @@ async function run() {
     assert.equal(employeeRole.recordset[0].code,'STAFF');
     await bad(()=>restricted.query('SELECT TOP(1) * FROM core.AccountInvitation'));
     console.log('PASS: branch-scoped Staff invitation accepted once, Owner escalation and cross-branch denied');
+
+    // Revocation must be tenant/branch scoped, atomic and immediately block
+    // the already issued bearer token (including previously sent emails).
+    process.env.DRVO_K5_INVITATIONS_ENABLED='YES';
+    const inviteService=new BranchInvitationService({getInternalPool:()=>restricted});
+    const revokeMe=await persistScopedBranchInvitation(restricted,signedIn.actor,
+      signedIn.token,record.businessId,record.branchId,
+      'staff.cancel@example.test',getRole('VIEWER'),
+      env.DRVO_K5_VERIFICATION_HMAC_KEY);
+    const listed=await inviteService.list(signedIn.actor,signedIn.token,
+      record.businessId,record.branchId);
+    assert.ok(listed.invitations.some(i=>String(i.invitationId).toLowerCase()===revokeMe.challengeId.toLowerCase() &&
+      i.status==='PENDING' && i.roleCode==='VIEWER'));
+    for(const i of listed.invitations) {
+      assert.equal(Object.hasOwn(i,'email'),false);
+      assert.equal(Object.hasOwn(i,'token'),false);
+      assert.equal(Object.hasOwn(i,'invitedEmailHash'),false);
+    }
+    await bad(()=>inviteService.revoke(signedIn.actor,signedIn.token,
+      randomUUID(),record.branchId,revokeMe.challengeId));
+    assert.deepEqual(await inviteService.revoke(signedIn.actor,signedIn.token,
+      record.businessId,record.branchId,revokeMe.challengeId),{revoked:true});
+    await bad(()=>inviteService.revoke(signedIn.actor,signedIn.token,
+      record.businessId,record.branchId,revokeMe.challengeId));
+    await bad(()=>acceptScopedBranchInvitation(restricted,{
+      email:revokeMe.email,token:revokeMe.token,username:'revoke.deny',
+      newPassword:samplePassword,
+    },{...env,DRVO_K5_INVITATIONS_ENABLED:'YES',DRVO_K5_VERIFY_API_ENABLED:'YES'}));
+    const afterRevoke=await inviteService.list(signedIn.actor,signedIn.token,
+      record.businessId,record.branchId);
+    assert.equal(afterRevoke.invitations.find(i=>String(i.invitationId).toLowerCase()===revokeMe.challengeId.toLowerCase()).status,'REVOKED');
+    const fresh=await persistScopedBranchInvitation(restricted,signedIn.actor,
+      signedIn.token,record.businessId,record.branchId,
+      'staff.cancel@example.test',getRole('VIEWER'),
+      env.DRVO_K5_VERIFICATION_HMAC_KEY);
+    assert.notEqual(fresh.token,revokeMe.token);
+    assert.notEqual(fresh.challengeId,revokeMe.challengeId);
+    const beforeRejected=await snapshot(db);
+    await bad(()=>inviteService.revoke(employeeLogin.actor,employeeLogin.token,
+      record.businessId,record.branchId,fresh.challengeId));
+    assert.deepEqual(await snapshot(db),beforeRejected);
+    await bad(()=>restricted.query('SELECT TOP(1) * FROM core.AccountInvitation'));
+    console.log('PASS: scoped invite list has no PII, revocation is one-time and blocks bearer');
+
 
     console.log('K5D ATOMIC OWNER CLAIM DISPOSABLE SQL: PASS');
   }finally {

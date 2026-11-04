@@ -105,6 +105,23 @@ export async function acceptScopedBranchInvitation(
   } catch {invalidInvite();}
 }
 
+
+export type InvitationMetadata = {
+  invitationId:string;
+  roleId:string;
+  roleCode:string;
+  issuedAtUtc:Date;
+  expiresAtUtc:Date;
+  status:"PENDING"|"EXPIRED"|"REVOKED"|"ACCEPTED";
+};
+
+function scopedSession(actor:Actor,token:string,businessId:string,branchId:string):string {
+  if (actor.mustChangePassword || !GUID.test(actor.tenantId) ||
+      !GUID.test(actor.accountId) || !GUID.test(businessId) ||
+      !GUID.test(branchId) || !SESSION.test(token)) invalidInvite();
+  return createHash("sha256").update(token).digest("hex");
+}
+
 @Injectable()
 export class BranchInvitationService {
   constructor(private readonly database:FoundationDatabaseService) {}
@@ -123,6 +140,50 @@ export class BranchInvitationService {
       email,roleId,process.env.DRVO_K5_VERIFICATION_HMAC_KEY);
     await new VerificationMailer().send(notice);
     return {accepted:true};
+  }
+
+  private invitationPool():sql.ConnectionPool {
+    if (process.env.DRVO_K5_INVITATIONS_ENABLED!=="YES" ||
+        process.env.DRVO_K5_AUTH_ENABLED!=="YES") {
+      throw new ServiceUnavailableException("Invitations are not enabled");
+    }
+    return this.database.getInternalPool();
+  }
+
+  async list(actor:Actor,sessionToken:string,businessId:string,branchId:string):
+    Promise<{invitations:InvitationMetadata[]}> {
+    const pool=this.invitationPool();
+    const sessionHash=scopedSession(actor,sessionToken,businessId,branchId);
+    try {
+      const result=await pool.request()
+        .input("TenantId",sql.UniqueIdentifier,actor.tenantId)
+        .input("BusinessId",sql.UniqueIdentifier,businessId)
+        .input("BranchId",sql.UniqueIdentifier,branchId)
+        .input("ActorAccountId",sql.UniqueIdentifier,actor.accountId)
+        .input("SessionVersion",sql.Int,actor.sessionVersion)
+        .input("SessionTokenHash",sql.Char(64),sessionHash)
+        .execute("core.ListBranchInvitations");
+      return {invitations:result.recordset as InvitationMetadata[]};
+    } catch {invalidInvite();}
+  }
+
+  async revoke(actor:Actor,sessionToken:string,businessId:string,branchId:string,
+    invitationId:string):Promise<{revoked:true}> {
+    const pool=this.invitationPool();
+    const sessionHash=scopedSession(actor,sessionToken,businessId,branchId);
+    if (!GUID.test(invitationId)) invalidInvite();
+    try {
+      await pool.request()
+        .input("TenantId",sql.UniqueIdentifier,actor.tenantId)
+        .input("BusinessId",sql.UniqueIdentifier,businessId)
+        .input("BranchId",sql.UniqueIdentifier,branchId)
+        .input("ActorAccountId",sql.UniqueIdentifier,actor.accountId)
+        .input("SessionVersion",sql.Int,actor.sessionVersion)
+        .input("SessionTokenHash",sql.Char(64),sessionHash)
+        .input("InvitationId",sql.UniqueIdentifier,invitationId)
+        .execute("core.RevokeBranchInvitation");
+      return {revoked:true};
+    } catch {invalidInvite();}
   }
 
   async accept(input:{

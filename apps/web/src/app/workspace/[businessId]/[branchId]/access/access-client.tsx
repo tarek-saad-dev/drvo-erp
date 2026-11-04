@@ -23,6 +23,14 @@ type Workspace = {
   branchId: string;
   branchName: string;
 };
+type Invitation = {
+  invitationId: string;
+  roleId: string;
+  roleCode: string;
+  issuedAtUtc: string;
+  expiresAtUtc: string;
+  status: "PENDING" | "EXPIRED" | "REVOKED" | "ACCEPTED";
+};
 type Viewer = {
   accountId: string;
   username: string;
@@ -48,16 +56,20 @@ export default function AccessClient({
   const [inviteRoleId, setInviteRoleId] = useState("");
   const [inviting, setInviting] = useState(false);
   const [inviteResult, setInviteResult] = useState("");
+  const [invites, setInvites] = useState<Invitation[]>([]);
+  const [invitesEnabled, setInvitesEnabled] = useState(false);
+  const [revoking, setRevoking] = useState<string | null>(null);
 
   const root = "/api/workspaces/" + encodeURIComponent(businessId) +
     "/branches/" + encodeURIComponent(branchId) + "/access";
 
   const reload = useCallback(async () => {
-    const [me, ws, roleReply, memberReply] = await Promise.all([
+    const [me, ws, roleReply, memberReply, inviteReply] = await Promise.all([
       fetch("/api/auth/me", { credentials: "same-origin", cache: "no-store" }),
       fetch("/api/auth/workspaces", { credentials: "same-origin", cache: "no-store" }),
       fetch(root + "/roles", { credentials: "same-origin", cache: "no-store" }),
       fetch(root + "/members", { credentials: "same-origin", cache: "no-store" }),
+      fetch(root + "/invitations", { credentials: "same-origin", cache: "no-store" }),
     ]);
     if (me.status === 401 || ws.status === 401 ||
         roleReply.status === 401 || memberReply.status === 401) {
@@ -76,6 +88,14 @@ export default function AccessClient({
     setWorkspaces(wsData.workspaces);
     setRoles(rolesData.roles);
     setMembers(membersData.members);
+    if (inviteReply.ok) {
+      const inviteData = await inviteReply.json() as { invitations: Invitation[] };
+      setInvites(Array.isArray(inviteData.invitations) ? inviteData.invitations : []);
+      setInvitesEnabled(true);
+    } else {
+      setInvites([]);
+      setInvitesEnabled(false);
+    }
     setProposed({});
     setError("");
   }, [root, router]);
@@ -145,10 +165,38 @@ export default function AccessClient({
       setInviteEmail("");
       setInviteRoleId("");
       setInviteResult("تم قبول الدعوة للإرسال. لازم الموظف يفعّلها من رابط الإيميل.");
+      await reload();
     } catch {
       setInviteResult("تعذر الاتصال بخدمة الدعوات.");
     } finally {
       setInviting(false);
+    }
+  }
+
+  async function revokeInvitation(invitationId: string) {
+    if (revoking || !invitesEnabled) return;
+    setRevoking(invitationId);
+    setInviteResult("");
+    try {
+      const reply = await fetch(root + "/invitations/" +
+        encodeURIComponent(invitationId) + "/revoke", {
+        method: "POST",
+        credentials: "same-origin",
+        cache: "no-store",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      if (reply.status === 401) { router.replace("/sign-in"); return; }
+      if (!reply.ok) {
+        setInviteResult("تعذر إلغاء الدعوة. ربما تم قبولها أو فقدت صلاحية الإدارة.");
+        return;
+      }
+      await reload();
+      setInviteResult("تم إلغاء الرابط السابق. لإعادة الدعوة، اكتب الإيميل وأرسل دعوة جديدة.");
+    } catch {
+      setInviteResult("تعذر الاتصال بخدمة إلغاء الدعوة.");
+    } finally {
+      setRevoking(null);
     }
   }
 
@@ -200,7 +248,7 @@ export default function AccessClient({
     </nav>}
 
     {error && <p className="k5-error" role="alert">{error}</p>}
-    {!loading && !error && availableRoles.length > 0 && <section className="k5-admin-card k5-invite-card">
+    {!loading && !error && invitesEnabled && availableRoles.length > 0 && <section className="k5-admin-card k5-invite-card">
       <h2>دعوة موظف جديد</h2>
       <p className="k5-muted">ادعُ موظفًا ببريده الإلكتروني وحدد دوره في الفرع الحالي فقط. إرسال الدعوة يتطلب صلاحية إدارة الأدوار وتفعيل خدمة الإيميل.</p>
       <form className="k5-invite-form" onSubmit={e => { void sendInvitation(e); }}>
@@ -221,6 +269,32 @@ export default function AccessClient({
         </button>
       </form>
       {inviteResult && <p role="status" className="k5-footnote">{inviteResult}</p>}
+      {invites.length > 0 && <div className="k5-table-wrap">
+        <table className="k5-table">
+          <thead><tr>
+            <th>الدعوة</th><th>الدور</th><th>الحالة</th>
+            <th>تاريخ الإصدار</th><th>الإجراء</th>
+          </tr></thead>
+          <tbody>{invites.map(invite => <tr key={invite.invitationId}>
+            <td dir="ltr" title={invite.invitationId}>
+              {invite.invitationId.slice(0, 8)}…
+            </td>
+            <td>{invite.roleCode}</td>
+            <td>{invite.status === "PENDING" ? "معلّقة" :
+              invite.status === "ACCEPTED" ? "تم التفعيل" :
+              invite.status === "EXPIRED" ? "منتهية" : "ملغاة"}</td>
+            <td>{new Date(invite.issuedAtUtc).toLocaleString("ar-EG", {
+              timeZone:"Africa/Cairo",dateStyle:"short",timeStyle:"short",
+            })}</td>
+            <td><button type="button" className="k5-save"
+              disabled={(invite.status !== "PENDING" && invite.status !== "EXPIRED") || revoking !== null}
+              onClick={() => { void revokeInvitation(invite.invitationId); }}>
+              {revoking === invite.invitationId ? "جاري الإلغاء…" : "إلغاء الدعوة"}
+            </button></td>
+          </tr>)}</tbody>
+        </table>
+      </div>}
+      <p className="k5-footnote">لأمان الموظفين، الإيميلات والروابط لا تظهر في القائمة. بعد إلغاء دعوة، يمكن إرسال رابط جديد للإيميل من النموذج.</p>
     </section>}
 
     {notice && <p className="k5-notice" role="status">{notice}</p>}

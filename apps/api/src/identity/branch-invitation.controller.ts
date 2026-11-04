@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Headers, HttpCode, Param, Post, Req, Res,
+  Body, Controller, Get, Headers, HttpCode, Param, Post, Req, Res,
   UnauthorizedException,
 } from "@nestjs/common";
 import type { IncomingMessage, ServerResponse } from "node:http";
@@ -46,4 +46,40 @@ export class BranchInvitationController {
     return this.service.issue(
       actor,token!,businessId,branchId,payload.email,payload.roleId);
   }
+
+  @Get("invitations")
+  async list(
+    @Req() request:IncomingMessage,
+    @Res({passthrough:true}) response:ServerResponse,
+    @Param("businessId") businessId:string,
+    @Param("branchId") branchId:string,
+  ) {
+    response.setHeader("Cache-Control","no-store");
+    const token=extractSessionCookie(request.headers.cookie);
+    const actor=await this.identity.actorFromToken(token);
+    return this.service.list(actor,token!,businessId,branchId);
+  }
+
+  @Post("invitations/:invitationId/revoke")
+  @HttpCode(200)
+  async revoke(
+    @Headers("origin") origin:string|undefined,
+    @Req() request:IncomingMessage,
+    @Res({passthrough:true}) response:ServerResponse,
+    @Param("businessId") businessId:string,
+    @Param("branchId") branchId:string,
+    @Param("invitationId") invitationId:string,
+    @Body() body:unknown,
+  ) {
+    response.setHeader("Cache-Control","no-store");
+    strictOrigin(origin);
+    if (body!==undefined && (body===null || typeof body!=="object" ||
+        Array.isArray(body) || Object.keys(body).length!==0)) {
+      throw new UnauthorizedException("Invalid invitation request");
+    }
+    const token=extractSessionCookie(request.headers.cookie);
+    const actor=await this.identity.actorFromToken(token);
+    return this.service.revoke(actor,token!,businessId,branchId,invitationId);
+  }
+
 }

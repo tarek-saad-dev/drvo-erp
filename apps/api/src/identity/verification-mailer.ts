@@ -50,9 +50,10 @@ export class VerificationMailer {
       ? "DRVO ERP — Verify your Owner email"
       : "DRVO ERP — Verify your invitation";
     // Put token in a hash fragment so it is NOT sent with normal HTTP URL
-    // requests to the Next.js server. The eventual page must clear the hash
-    // immediately and POST the token to a single-use, rate-limited API.
-    const link = origin + "/verify-email#token=" + encodeURIComponent(input.token);
+    // requests to the Next.js server. The gated receiver page clears the hash before POST, but the one-time,
+    // rate-limited API and atomic SQL consumption are NOT implemented yet.
+    const link = origin + "/verify-email#token=" + encodeURIComponent(input.token) +
+      "&purpose=" + encodeURIComponent(input.purpose);
     const message = "A DRVO ERP verification was requested. Open this link only if " +
       "you expected it:\n" + link + "\n\nThis link is single-use and expires " +
       "according to your verification challenge. If you did not request this, ignore it.";

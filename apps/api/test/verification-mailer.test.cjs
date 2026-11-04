@@ -77,7 +77,7 @@ test('provider request uses fixed API endpoint, normalized address and idempoten
     const mail=JSON.parse(sent[0].init.body);
     assert.equal(mail.from,'notices@drvotech.com');
     assert.deepEqual(mail.to,['recipient@example.com']);
-    assert.equal(mail.text.includes('/verify-email#token='+input.token),true);
+    assert.equal(mail.text.includes('/verify-email#token='+input.token+'&purpose='+input.purpose),true);
     assert.equal(mail.text.includes('/verify-email?token='),false);
     assert.equal('html' in mail,false);
   }finally{reset();}

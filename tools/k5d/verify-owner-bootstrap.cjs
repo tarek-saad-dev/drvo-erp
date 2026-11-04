@@ -10,6 +10,7 @@ const {issueOperatorApprovedOwner} = require('../../apps/api/dist/identity/opera
 const {IdentityService} = require('../../apps/api/dist/identity/identity.service.js');
 const {consumeVerificationAttempt} = require('../../apps/api/dist/identity/owner-verification-throttle.js');
 const {OwnerVerificationService} = require('../../apps/api/dist/identity/owner-verification.service.js');
+const {persistScopedBranchInvitation,acceptScopedBranchInvitation} = require('../../apps/api/dist/identity/branch-invitation.service.js');
 const {
   generateOpaqueVerificationToken,verificationEmailDigest,verificationTokenDigest,
 } = require('../../apps/api/dist/identity/verification-crypto.js');
@@ -112,9 +113,9 @@ async function run() {
     await db.query(`CREATE USER [drvo_erp_stage_app]
       FOR LOGIN [drvo_erp_stage_app];GRANT CONNECT TO [drvo_erp_stage_app]`);
     assert.deepEqual((await applyMigrations(db)).map(x=>x.status),
-      ['applied','applied','applied','applied','applied','applied']);
+      ['applied','applied','applied','applied','applied','applied','applied']);
     assert.deepEqual((await applyMigrations(db)).map(x=>x.status),
-      ['unchanged','unchanged','unchanged','unchanged','unchanged','unchanged']);
+      ['unchanged','unchanged','unchanged','unchanged','unchanged','unchanged','unchanged']);
     // Mirror existing K5A stage app grants: scoped failed-login throttle only.
     await db.query(`
       GRANT SELECT,INSERT ON core.LoginThrottle TO [drvo_erp_stage_app];
@@ -300,6 +301,58 @@ async function run() {
     assert.deepEqual(await snapshot(db),afterHttp);
     console.log('PASS: live service path claims Owner once; replay denied and rate-counted');
 
+
+    // Existing Owner is the ONLY actor permitted to invite a new Staff account.
+    const ownerAuth=new IdentityService({getInternalPool:()=>db});
+    const signedIn=await ownerAuth.login('owner.main',samplePassword);
+    const roles=await db.request()
+      .input('t',sql.UniqueIdentifier,record.tenantId)
+      .input('b',sql.UniqueIdentifier,record.businessId)
+      .query(`SELECT CONVERT(VARCHAR(36),RoleId) AS id,RoleCode AS code
+        FROM core.BusinessRole WHERE TenantId=@t AND BusinessId=@b`);
+    const getRole=code=>roles.recordset.find(x=>x.code===code).id;
+    await bad(()=>persistScopedBranchInvitation(restricted,signedIn.actor,
+      signedIn.token,record.businessId,record.branchId,
+      'blocked-owner@example.test',getRole('OWNER'),env.DRVO_K5_VERIFICATION_HMAC_KEY));
+    await bad(()=>persistScopedBranchInvitation(restricted,signedIn.actor,
+      signedIn.token,randomUUID(),record.branchId,
+      'blocked-foreign@example.test',getRole('STAFF'),env.DRVO_K5_VERIFICATION_HMAC_KEY));
+    const invited=await persistScopedBranchInvitation(restricted,signedIn.actor,
+      signedIn.token,record.businessId,record.branchId,
+      'staff.new@example.test',getRole('STAFF'),
+      env.DRVO_K5_VERIFICATION_HMAC_KEY);
+    assert.equal(invited.purpose,'ACCOUNT_INVITE');
+    assert.equal(await db.request().input('id',sql.UniqueIdentifier,invited.challengeId)
+      .query('SELECT COUNT(*) AS n FROM core.AccountInvitation WHERE InvitationId=@id')
+      .then(r=>r.recordset[0].n),1);
+    const acceptance={
+      email:invited.email,token:invited.token,username:'staff.new',
+      newPassword:samplePassword,
+    };
+    const initialInvites=await snapshot(db);
+    const accepted=await acceptScopedBranchInvitation(restricted,acceptance,{
+      ...env,DRVO_K5_INVITATIONS_ENABLED:'YES',DRVO_K5_VERIFY_API_ENABLED:'YES',
+    });
+    assert.deepEqual(accepted,{verified:true});
+    assert.equal((await snapshot(db)).a,initialInvites.a+1);
+    await bad(()=>acceptScopedBranchInvitation(restricted,acceptance,{
+      ...env,DRVO_K5_INVITATIONS_ENABLED:'YES',DRVO_K5_VERIFY_API_ENABLED:'YES',
+    }));
+    const employeeLogin=await ownerAuth.login('staff.new',samplePassword);
+    const employeeScopes=await ownerAuth.listAuthorizedWorkspaces(employeeLogin.actor);
+    assert.equal(employeeScopes.length,1);
+    assert.equal(employeeScopes[0].branchId.toLowerCase(),record.branchId.toLowerCase());
+    const employeeRole=await db.request()
+      .input('t',sql.UniqueIdentifier,record.tenantId)
+      .input('b',sql.UniqueIdentifier,record.businessId)
+      .input('a',sql.UniqueIdentifier,employeeLogin.actor.accountId)
+      .query(`SELECT r.RoleCode AS code FROM core.BranchRole br
+        JOIN core.BusinessRole r ON r.TenantId=br.TenantId
+          AND r.BusinessId=br.BusinessId AND r.RoleId=br.RoleId
+        WHERE br.TenantId=@t AND br.BusinessId=@b AND br.AccountId=@a`);
+    assert.equal(employeeRole.recordset[0].code,'STAFF');
+    await bad(()=>restricted.query('SELECT TOP(1) * FROM core.AccountInvitation'));
+    console.log('PASS: branch-scoped Staff invitation accepted once, Owner escalation and cross-branch denied');
 
     console.log('K5D ATOMIC OWNER CLAIM DISPOSABLE SQL: PASS');
   }finally {

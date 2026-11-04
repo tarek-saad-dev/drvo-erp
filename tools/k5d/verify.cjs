@@ -37,9 +37,9 @@ async function run(){
   try {
     await master.query('CREATE DATABASE [DRVO_ERP_STAGING]');
     db=await open('DRVO_ERP_STAGING');
-    assert.deepEqual((await applyMigrations(db)).map(x=>x.status),
+    assert.deepEqual((await applyMigrations(db,undefined,4)).map(x=>x.status),
       ['applied','applied','applied','applied']);
-    assert.deepEqual((await applyMigrations(db)).map(x=>x.status),
+    assert.deepEqual((await applyMigrations(db,undefined,4)).map(x=>x.status),
       ['unchanged','unchanged','unchanged','unchanged']);
     console.log('PASS: forward-only 001-004 apply and checksum replay');
 

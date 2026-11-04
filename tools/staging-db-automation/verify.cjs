@@ -63,12 +63,20 @@ async function main(){
       ALTER ROLE db_ddladmin ADD MEMBER [${LOGIN}];
       ALTER ROLE db_backupoperator ADD MEMBER [${LOGIN}];
       GRANT SELECT,INSERT ON OBJECT::core.SchemaMigration TO [${LOGIN}];
+      GRANT CONTROL ON SCHEMA::core TO [${LOGIN}];
     `);
     restricted=await connect(LOGIN,pass,DB);
     const result=await run(restricted,payload.migrations,SHA);
     assert.ok(result.pending>=1);
     assert.ok(result.backupFile?.startsWith('/var/opt/mssql/data/drvo_erp_stage_auto_'));
     console.log('PASS: restricted SQL login runs backup then forward-only migrations');
+    const ownerClaim=await admin.query(`
+      SELECT USER_NAME(execute_as_principal_id) AS executor
+      FROM sys.sql_modules WHERE object_id=OBJECT_ID(N'core.ClaimApprovedOwner')
+    `);
+    assert.equal(ownerClaim.recordset[0]?.executor,LOGIN,
+      'Owner claim procedure must run as scoped migrator, never dbo/sysadmin');
+    console.log('PASS: Owner claim SQL executor is restricted DB migration identity');
 
     const check=await admin.query(`SELECT COUNT(*) AS n FROM core.SchemaMigration`);
     assert.equal(check.recordset[0].n,payload.migrations.length);

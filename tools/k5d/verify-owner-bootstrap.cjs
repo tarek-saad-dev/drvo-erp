@@ -103,12 +103,17 @@ async function run() {
   try {
     await master.query('CREATE DATABASE ['+DB+']');
     db=await open(DB);
+    const stagePass='K5Dci_'+randomBytes(24).toString('hex')+'!';
+    await master.query(`CREATE LOGIN [drvo_erp_stage_app]
+      WITH PASSWORD=N'${stagePass}',CHECK_POLICY=ON,CHECK_EXPIRATION=OFF`);
+    await db.query(`CREATE USER [drvo_erp_stage_app]
+      FOR LOGIN [drvo_erp_stage_app];GRANT CONNECT TO [drvo_erp_stage_app]`);
     assert.deepEqual((await applyMigrations(db)).map(x=>x.status),
-      ['applied','applied','applied','applied']);
+      ['applied','applied','applied','applied','applied']);
     assert.deepEqual((await applyMigrations(db)).map(x=>x.status),
-      ['unchanged','unchanged','unchanged','unchanged']);
+      ['unchanged','unchanged','unchanged','unchanged','unchanged']);
+    restricted=await open(DB,'drvo_erp_stage_app',stagePass);
 
-    const noDb={ getInternalPool(){throw Error('unreachable')} };
     await bad(()=>claimApprovedOwner(db,{email:'none@example.test',token:'A'.repeat(43),
       newPassword:samplePassword},{...env,DRVO_K5_OWNER_BOOTSTRAP_ENABLED:'NO'}));
     await bad(()=>claimApprovedOwner(db,{email:'none@example.test',token:'A'.repeat(43),
@@ -121,7 +126,7 @@ async function run() {
     console.log('PASS: no anonymous/invalid Owner provision when gates or secrets fail');
 
     const primary=await issue(db,'main');
-    const record=await claimApprovedOwner(db,primary,env);
+    const record=await claimApprovedOwner(restricted,primary,env);
     for(const field of ['tenantId','businessId','branchId','accountId'])
       assert.match(record[field],/^[0-9a-f-]{36}$/i);
     let counts=await snapshot(db);
@@ -215,18 +220,20 @@ async function run() {
     assert.equal((await snapshot(db)).a,2);
     console.log('PASS: competing redemption creates one and only one Owner');
 
-    const login='k5d_claim_ci_app';
-    const pass='K5Dci_'+randomBytes(24).toString('hex')+'!';
-    await master.query(`CREATE LOGIN [k5d_claim_ci_app]
-      WITH PASSWORD=N'${pass}',CHECK_POLICY=ON,CHECK_EXPIRATION=OFF`);
-    await db.query(`CREATE USER [k5d_claim_ci_app]
-      FOR LOGIN [k5d_claim_ci_app];GRANT CONNECT TO [k5d_claim_ci_app]`);
-    restricted=await open(DB,login,pass);
+    // Restricted principal has only EXECUTE on the reviewed procedure, NOT
+    // onboarding approval/challenge SELECT/UPDATE or Tenant/Account INSERT.
+    await bad(()=>restricted.query('SELECT TOP(1) * FROM core.OwnerBootstrapApproval'));
+    await bad(()=>restricted.query('SELECT TOP(1) * FROM core.EmailVerificationChallenge'));
+    await bad(()=>restricted.query('SELECT TOP(1) * FROM core.VerifiedAccountEmail'));
+    await bad(()=>restricted.request().input('t',sql.UniqueIdentifier,randomUUID())
+      .query("INSERT INTO core.Tenant(TenantId,DisplayName) VALUES(@t,N'No permission')"));
     const locked=await issue(db,'restricted');
     const beforeRestricted=await snapshot(db);
+    const signedClaim=await claimApprovedOwner(restricted,locked,env);
+    assert.equal(typeof signedClaim.accountId,'string');
+    assert.equal((await snapshot(db)).a,beforeRestricted.a+1);
     await bad(()=>claimApprovedOwner(restricted,locked,env));
-    assert.deepEqual(await snapshot(db),beforeRestricted);
-    console.log('PASS: normal application SQL principal cannot bypass approval grants');
+    console.log('PASS: app SQL login can only claim an approved token via definer-rights procedure');
 
     console.log('K5D ATOMIC OWNER CLAIM DISPOSABLE SQL: PASS');
   }finally {

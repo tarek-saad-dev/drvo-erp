@@ -27,6 +27,7 @@ jobs:
           npm ci --prefix apps/web --no-audit --no-fund
           env -u DRVO_K5_WEB_ENABLED npm run build --prefix apps/web
           npm run typecheck --prefix apps/web
+          node --test apps/web/test/verification-fragment.test.cjs
       - name: Smoke public preview while private auth remains 404
         shell: bash
         run: |

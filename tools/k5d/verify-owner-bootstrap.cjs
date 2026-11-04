@@ -6,6 +6,7 @@ const {randomBytes,randomUUID} = require('node:crypto');
 const sql = require('../../apps/api/node_modules/mssql');
 const {applyMigrations} = require('../k4-db/migrate.cjs');
 const {claimApprovedOwner} = require('../../apps/api/dist/identity/owner-bootstrap.js');
+const {issueOperatorApprovedOwner} = require('../../apps/api/dist/identity/operator-owner-approval.js');
 const {IdentityService} = require('../../apps/api/dist/identity/identity.service.js');
 const {
   generateOpaqueVerificationToken,verificationEmailDigest,verificationTokenDigest,
@@ -109,9 +110,9 @@ async function run() {
     await db.query(`CREATE USER [drvo_erp_stage_app]
       FOR LOGIN [drvo_erp_stage_app];GRANT CONNECT TO [drvo_erp_stage_app]`);
     assert.deepEqual((await applyMigrations(db)).map(x=>x.status),
-      ['applied','applied','applied','applied','applied']);
+      ['applied','applied','applied','applied','applied','applied']);
     assert.deepEqual((await applyMigrations(db)).map(x=>x.status),
-      ['unchanged','unchanged','unchanged','unchanged','unchanged']);
+      ['unchanged','unchanged','unchanged','unchanged','unchanged','unchanged']);
     restricted=await open(DB,'drvo_erp_stage_app',stagePass);
 
     await bad(()=>claimApprovedOwner(db,{email:'none@example.test',token:'A'.repeat(43),
@@ -125,7 +126,21 @@ async function run() {
     assert.equal((await snapshot(db)).t,0);
     console.log('PASS: no anonymous/invalid Owner provision when gates or secrets fail');
 
-    const primary=await issue(db,'main');
+    const primaryRaw=await issueOperatorApprovedOwner(db,{
+      email:email('main'), username:username('main'),
+      tenantName:'Test Tenant',businessName:'Test Business',branchName:'Gleem',
+      operatorId:'ci.operator',
+    },env.DRVO_K5_VERIFICATION_HMAC_KEY);
+    const primary={...primaryRaw,newPassword:samplePassword};
+    const opAudit=await db.request()
+      .input('id',sql.UniqueIdentifier,primary.approvalId)
+      .query('SELECT OperatorHash FROM core.OwnerApprovalOperatorAudit WHERE ApprovalId=@id');
+    assert.match(opAudit.recordset[0].OperatorHash,/^[0-9a-f]{64}$/);
+    await bad(()=>issueOperatorApprovedOwner(db,{
+      email:email('main'),username:username('main'),
+      tenantName:'New',businessName:'New',branchName:'New',operatorId:'ci.operator',
+    },env.DRVO_K5_VERIFICATION_HMAC_KEY));
+    console.log('PASS: real audited operator approval and email challenge, duplicates denied');
     const record=await claimApprovedOwner(restricted,primary,env);
     for(const field of ['tenantId','businessId','branchId','accountId'])
       assert.match(record[field],/^[0-9a-f-]{36}$/i);
@@ -223,6 +238,12 @@ async function run() {
     // Restricted principal has only EXECUTE on the reviewed procedure, NOT
     // onboarding approval/challenge SELECT/UPDATE or Tenant/Account INSERT.
     await bad(()=>restricted.query('SELECT TOP(1) * FROM core.OwnerBootstrapApproval'));
+    await bad(()=>restricted.query('SELECT TOP(1) * FROM core.OwnerApprovalOperatorAudit'));
+    await bad(()=>issueOperatorApprovedOwner(restricted,{
+      email:'stranger@example.test',username:'stranger',
+      tenantName:'Denied',businessName:'Denied',branchName:'Denied',
+      operatorId:'ci.operator',
+    },env.DRVO_K5_VERIFICATION_HMAC_KEY));
     await bad(()=>restricted.query('SELECT TOP(1) * FROM core.EmailVerificationChallenge'));
     await bad(()=>restricted.query('SELECT TOP(1) * FROM core.VerifiedAccountEmail'));
     await bad(()=>restricted.request().input('t',sql.UniqueIdentifier,randomUUID())

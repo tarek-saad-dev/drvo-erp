@@ -56,8 +56,8 @@ export default function SignInClient() {
         setError("الحساب نشط، لكنه غير مرتبط بفرع مسموح له بالدخول. تواصل مع الإدارة.");
         return;
       }
-      router.replace("/workspace/" + encodeURIComponent(workspace.businessId) +
-        "/" + encodeURIComponent(workspace.branchId) + "/access");
+      // Do not send every user to role management; Staff may not have users.read.
+      router.replace("/workspaces");
     } catch {
       setError("تعذر الاتصال بالخادم. حاول مرة أخرى.");
     } finally {

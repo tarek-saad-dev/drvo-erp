@@ -44,6 +44,10 @@ export default function AccessClient({
   const [submitting, setSubmitting] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRoleId, setInviteRoleId] = useState("");
+  const [inviting, setInviting] = useState(false);
+  const [inviteResult, setInviteResult] = useState("");
 
   const root = "/api/workspaces/" + encodeURIComponent(businessId) +
     "/branches/" + encodeURIComponent(branchId) + "/access";
@@ -122,6 +126,32 @@ export default function AccessClient({
     }
   }
 
+  async function sendInvitation(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (inviting || !inviteEmail.trim() || !inviteRoleId) return;
+    setInviting(true);
+    setInviteResult("");
+    try {
+      const reply=await fetch(root + "/invitations", {
+        method:"POST",credentials:"same-origin",cache:"no-store",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({email:inviteEmail.trim(),roleId:inviteRoleId}),
+      });
+      if (reply.status===401) {router.replace("/sign-in");return;}
+      if (!reply.ok) {
+        setInviteResult("تعذر إرسال الدعوة. راجع الدور وصلاحياتك أو تواصل مع الإدارة.");
+        return;
+      }
+      setInviteEmail("");
+      setInviteRoleId("");
+      setInviteResult("تم قبول الدعوة للإرسال. لازم الموظف يفعّلها من رابط الإيميل.");
+    } catch {
+      setInviteResult("تعذر الاتصال بخدمة الدعوات.");
+    } finally {
+      setInviting(false);
+    }
+  }
+
   async function logout() {
     try {
       await fetch("/api/auth/logout", {
@@ -170,6 +200,29 @@ export default function AccessClient({
     </nav>}
 
     {error && <p className="k5-error" role="alert">{error}</p>}
+    {!loading && !error && availableRoles.length > 0 && <section className="k5-admin-card k5-invite-card">
+      <h2>دعوة موظف جديد</h2>
+      <p className="k5-muted">ادعُ موظفًا ببريده الإلكتروني وحدد دوره في الفرع الحالي فقط. إرسال الدعوة يتطلب صلاحية إدارة الأدوار وتفعيل خدمة الإيميل.</p>
+      <form className="k5-invite-form" onSubmit={e => { void sendInvitation(e); }}>
+        <label htmlFor="invite-email">بريد الموظف</label>
+        <input id="invite-email" type="email" dir="ltr" maxLength={254}
+          autoComplete="off" required value={inviteEmail}
+          onChange={e => setInviteEmail(e.target.value)} placeholder="staff@example.com" />
+        <label htmlFor="invite-role">الدور</label>
+        <select id="invite-role" required value={inviteRoleId}
+          onChange={e => setInviteRoleId(e.target.value)}>
+          <option value="">اختر دور الموظف</option>
+          {availableRoles.map(role => <option key={role.roleId} value={role.roleId}>
+            {role.displayName}
+          </option>)}
+        </select>
+        <button type="submit" className="k5-save" disabled={inviting || !inviteRoleId}>
+          {inviting ? "جاري الإرسال…" : "إرسال الدعوة"}
+        </button>
+      </form>
+      {inviteResult && <p role="status" className="k5-footnote">{inviteResult}</p>}
+    </section>}
+
     {notice && <p className="k5-notice" role="status">{notice}</p>}
     {loading ? <div className="k5-table-state">جاري تحميل الصلاحيات…</div> :
       <section className="k5-admin-card" aria-labelledby="k5-members-title">

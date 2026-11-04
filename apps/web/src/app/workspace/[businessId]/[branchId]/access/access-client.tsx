@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -126,7 +126,7 @@ export default function AccessClient({
     }
   }
 
-  async function sendInvitation(event: React.FormEvent<HTMLFormElement>) {
+  async function sendInvitation(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (inviting || !inviteEmail.trim() || !inviteRoleId) return;
     setInviting(true);

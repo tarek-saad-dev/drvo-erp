@@ -11,12 +11,12 @@ This code is a **server-side-only** transactional email adapter, not a live acco
   - `DRVO_K5_FROM_EMAIL` from an independently verified sender domain
   - `DRVO_K5_ORIGIN` fixed public HTTPS host.
 - The adapter normalizes recipient email, validates a 43-character cryptographic challenge token + UUID challenge ID + allowed purpose, sends plain text only, uses `Idempotency-Key: drvo-k5d-<challengeId>`, enforces 10s timeout, and emits generic errors without leaking API keys, provider payloads or bearer tokens.
-- Token goes in the URL **fragment** `/verify-email#token=...` (not ordinary HTTP request query), but that route is not yet implemented. The future browser UI must clear the fragment on first paint, POST to the verified-email endpoint and never load third-party scripts before clearing it.
+- Token goes in the URL **fragment** `/verify-email#token=...` (not ordinary HTTP request query), and a purpose parameter. The gated browser UI has been added in PR #34, clears the fragment before posting and loads no third-party scripts; **the one-time verification backend endpoint still does not exist**, so leave mail and UI disabled.
 - Adapter purpose support is deliberately limited to `OWNER_BOOTSTRAP` and `ACCOUNT_INVITE`. Password recovery remains separate until a reviewed recovery policy is implemented.
 
 ## MUST NOT turn it on yet
 
-The project still lacks an operator-approved first Owner provisioning service, email challenge issuance/consumption SQL transactions, verified receiver page, IP+username delivery and brute-force rate limiting, outgoing domain configuration, abuse monitoring, recovery rotation and test account workflow. It is not safe to send these links until those components exist. All feature flags and stage API customer auth remain OFF.
+The project still lacks an operator-approved first Owner provisioning service, email challenge issuance/consumption SQL transactions, verification receiver backend, IP+username delivery and brute-force rate limiting, outgoing domain configuration, abuse monitoring, recovery rotation and test account workflow. It is not safe to send these links until those components exist. All feature flags and stage API customer auth remain OFF.
 
 ## Proof
 

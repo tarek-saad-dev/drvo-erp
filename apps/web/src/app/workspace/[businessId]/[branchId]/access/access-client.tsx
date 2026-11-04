@@ -287,7 +287,7 @@ export default function AccessClient({
               timeZone:"Africa/Cairo",dateStyle:"short",timeStyle:"short",
             })}</td>
             <td><button type="button" className="k5-save"
-              disabled={invite.status !== "PENDING" || revoking !== null}
+              disabled={(invite.status !== "PENDING" && invite.status !== "EXPIRED") || revoking !== null}
               onClick={() => { void revokeInvitation(invite.invitationId); }}>
               {revoking === invite.invitationId ? "جاري الإلغاء…" : "إلغاء الدعوة"}
             </button></td>

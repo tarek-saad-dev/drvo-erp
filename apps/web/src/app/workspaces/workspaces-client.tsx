@@ -3,41 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-type Workspace = {
-  tenantId: string;
-  businessId: string;
-  businessName: string;
-  branchId: string;
-  branchName: string;
-};
+import { groupsFromAuthorizedWorkspaces, type BusinessGroup } from "./authorized-workspaces";
+
 type Viewer = { username: string; mustChangePassword: boolean };
-type BusinessGroup = { tenantId: string; id: string; name: string; branches: Workspace[] };
-
-const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-function groupsFromAuthorizedWorkspaces(value: unknown): BusinessGroup[] {
-  if (!Array.isArray(value)) return [];
-  const grouped = new Map<string, BusinessGroup>();
-  for (const row of value) {
-    if (!row || typeof row !== "object") continue;
-    const ws = row as Record<string, unknown>;
-    if (typeof ws.tenantId !== "string" || !GUID.test(ws.tenantId) ||
-        typeof ws.businessId !== "string" || !GUID.test(ws.businessId) ||
-        typeof ws.branchId !== "string" || !GUID.test(ws.branchId) ||
-        typeof ws.businessName !== "string" || typeof ws.branchName !== "string") continue;
-    const key = ws.tenantId + ":" + ws.businessId;
-    let group = grouped.get(key);
-    if (!group) {
-      group = { tenantId: ws.tenantId, id: ws.businessId,
-        name: ws.businessName, branches: [] };
-      grouped.set(key, group);
-    }
-    if (!group.branches.some(b => b.branchId === ws.branchId)) {
-      group.branches.push(ws as Workspace);
-    }
-  }
-  return Array.from(grouped.values());
-}
 
 export default function WorkspacesClient() {
   const router = useRouter();

@@ -1,5 +1,9 @@
 # DRVO ERP documentation index
 
+
+> **2026-11-10 — SALON-FIRST MARKETING DIRECTION:** [DRVO ERP Salon-first GTM V1](01-product/GO-TO-MARKET-SALONS-V1.md) records the founder-approved market focus under the unchanged DRVO ERP master brand. Concrete campaigns, budgets, targets and sales offers are proposals requiring separate readiness/owner approval. Marketing-only; no customer-facing feature readiness or deployment is implied.
+
+
 > **ENGINEERING CHECKPOINT — 2026-11-01:** [PR #4 — K0 non-production TypeScript scaffold](https://github.com/tarek-saad-dev/drvo-erp/pull/4) merged to `main`. Pure scope/Module fixtures compile and have passing unit tests; CI passed on the PR head. API/Web/Worker are **inert boundaries**, not running Next.js/NestJS applications or a usable ERP. [K0-SCAFFOLD.md](../K0-SCAFFOLD.md) describes exact limitations; ADR-030/031/032 and actual SQL Server data/finance correctness remain OPEN. Read older 'docs-only' snapshots below as historical records.
 
 > **CURRENT PLATFORM STATUS — 2026-10-31:** [Core Constitution V1](00-start-here/DRVO-CORE-ARCHITECTURE-CONSTITUTION.md) and [ADR-033 through ADR-037](05-decisions/DECISIONS.md) are **founder-approved architectural direction**. [Lean Kernel](05-decisions/ADR-037-LEAN-PLATFORM-KERNEL-BOUNDARY.md) separates universal platform governance from Business-domain data and workflows. The [Universal Master Architecture Map](02-architecture/DRVO-UNIVERSAL-ERP-ARCHITECTURE-MASTER-MAP-V1.md) and Kernel 01–04 are **working responsibility maps**, not implemented or ratified technical architecture. [Foundation Closure and New-Industry Gates](04-execution/FOUNDATION-CLOSURE-AND-NEW-INDUSTRY-READINESS-GATES.md) explicitly mark **F0 approved; F1 documented for review; F2 technical readiness OPEN**. ADR-030/031/032 remain PROPOSED. No code, SQL, runtime tests or Production authorization.

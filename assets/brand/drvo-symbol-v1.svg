@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500">
+<path d="M84 85 H230 C347 85 422 162 422 248 C422 344 352 415 233 415 H84 Z M163 158 V341 H230 C302 341 342 303 342 248 C342 190 301 158 230 158 Z" fill="#74536E" fill-rule="evenodd"/>
+<rect x="190" y="268" width="26" height="57" rx="6" fill="#74536E"/>
+<rect x="229" y="235" width="26" height="90" rx="6" fill="#74536E"/>
+<rect x="268" y="208" width="26" height="117" rx="6" fill="#74536E"/>
+<path d="M75 388 C163 406 310 409 399 326 L419 347 C343 432 216 451 75 423 Z" fill="#1A7B80"/>
+</svg>

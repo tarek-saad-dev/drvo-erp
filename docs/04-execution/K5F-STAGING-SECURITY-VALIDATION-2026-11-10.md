@@ -14,7 +14,7 @@
 
 ## K5F code hardening (this PR; CI and review required)
 
-- `tools/k5d/check-staging-readiness.cjs`: keep operator-only, read-only, no secret output, no SQL writes. Validate the **exact** set of nine migration records and block on unknown/duplicate history. For each of six confidential onboarding tables, query `HAS_PERMS_BY_NAME` as the **actual runtime SQL login** for `SELECT`, `INSERT`, `UPDATE`, `DELETE`, `ALTER`, `CONTROL`. Any positive, NULL or missing permission result blocks. Independently require `SELECT TOP (0)` to raise expected permission denial. Required audited procedure EXECUTE checks remain. Prefer the deployed, packaged `mssql` dependency when running on the VPS; use checkout dependency in disposable CI.
+- `tools/k5d/check-staging-readiness.cjs`: keep operator-only, read-only, no secret output, no SQL writes. Validate the **exact** set of nine migration records and block on unknown/duplicate history. For each of six confidential onboarding tables, query `HAS_PERMS_BY_NAME` as the **actual runtime SQL login** for `SELECT`, `INSERT`, `UPDATE`, `DELETE`, `ALTER`, `CONTROL`. Any positive, NULL or missing permission result blocks. Independently require `SELECT TOP (0)` to raise expected permission denial. Required audited procedure EXECUTE checks remain. **Root execution is blocked unless the checker runs from an independently root-owned, immutable-for-operators bundle** with root-owned SQL dependencies and the checker content matching the reviewed checkout. Non-root CI loads the checkout dependency; root must never execute from a mutable deploy/repo dependency path.
 - `tools/k5d/check-staging-readiness.test.cjs`: negative coverage of all six prohibited direct privileges, unknown metadata, existing config/flags/secret/target tests.
 - **Impact:** no schema, API routes, accounts, migrations, mail delivery or business modules changed. A failure in the stronger SQL test is an intentional **fail-closed operational blocker**, not permission to broaden `drvo_erp_stage_app`. Review any unexpected grants before acting.
 - **Rollback:** revert the proposed checker/test and doc commits. Does not roll back a database or service; never loosen SQL runtime rights to force PASS.
@@ -31,18 +31,31 @@ Only a trusted administrator on the **new DRVO ERP VPS** should run these. **Nev
    sudo test -r /srv/drvo-erp/deploy/current/release.sha && sudo cat /srv/drvo-erp/deploy/current/release.sha
    ```
    Review that the two SHAs match the verified `main` deploy run; if not, **stop**. Do not reconfigure or restart unrelated systems.
-2. **Run hardened root-only local preflight** with the same exact reviewed SHA; do not substitute a guessed value or bypass a BLOCK:
+2. **Create a root-owned operator execution bundle BEFORE running root Node.** Direct `sudo node /srv/drvo-erp/repo/tools/k5d/check-staging-readiness.cjs` is now **intentionally BLOCKED**, as is loading mutable `deploy/current` dependencies as root. After independently comparing the exact expected SHA and inspecting `tools/k5d/check-staging-readiness.cjs` and the `apps/api/package-lock.json` dependencies, on the trusted VPS root console (first installation ONLY):
    ```bash
-   cd /srv/drvo-erp/repo
-   sudo node tools/k5d/check-staging-readiness.cjs --expected-sha=REPLACE_WITH_VERIFIED_40_HEX_MAIN_SHA
+   # Stop if a bundle already exists; upgrade/rotation needs separate review.
+   sudo test ! -e /usr/local/libexec/drvo-erp-k5f
+   sudo install -d -o root -g root -m 0750 /usr/local/libexec/drvo-erp-k5f
+   sudo cp -a /srv/drvo-erp/deploy/current/api/node_modules /usr/local/libexec/drvo-erp-k5f/
+   sudo chown -R root:root /usr/local/libexec/drvo-erp-k5f
+   sudo chmod -R go-w /usr/local/libexec/drvo-erp-k5f
+   sudo install -o root -g root -m 0500 \
+     /srv/drvo-erp/repo/tools/k5d/check-staging-readiness.cjs \
+     /usr/local/libexec/drvo-erp-k5f/check-staging-readiness.cjs
+   ```
+   Confirm trusted root ownership, no group/other write permissions and no links escaping the approved operator bundle. Do not alter the shared `/usr/local` owner or permissions to force PASS. For a subsequent PR/release, stop and explicitly review/refresh the root-owned operator bundle, preserving dependency provenance; never run outdated checker code against a new SHA.
+3. **Run hardened root-only local preflight** from the audited bundle with the *same exact reviewed SHA*; do not substitute a guessed value or bypass a BLOCK:
+   ```bash
+   sudo node /usr/local/libexec/drvo-erp-k5f/check-staging-readiness.cjs \
+     --expected-sha=REPLACE_WITH_VERIFIED_40_HEX_MAIN_SHA
    ```
    Check only `PASS/BLOCK` labels and exit code. The tool reads protected env, `/proc`, live loopback health and read-only SQL privilege metadata. It does NOT validate external DNS or sender deliverability.
-3. **Nginx + Origin + real client IP** (independent trusted-console inspection): run `sudo nginx -t`, review only the `erp-stage.drvotech.com` server block and its effective included files, verify `proxy_pass` to **127.0.0.1:3311** for `/api`, `proxy_set_header X-Real-IP $remote_addr;` (overwrites untrusted client input), and a reviewed Host/Origin/TLS policy. Confirm API 3311, Web 3310 and staging SQL are loopback/internal-only as appropriate using `sudo ss -ltnp`; do **not** change shared SQL Server or other vhosts to make the check pass. Verify any proxy/CDN layer explicitly; `$remote_addr` is only a true client IP if the upstream trust chain is correct.
-4. **Access restriction:** inspect current staging vhost exposure and apply a separately reviewed **vhost-only** IP allowlist or equivalent authentication gate before enabling real auth. Static public preview can remain public only while no private account/employee data or enabled auth flows exist. Do not edit existing Cashier/Clinic/AutoResponse vhosts.
-5. **Resend:** inspect the sender domain and DNS verification status in the provider dashboard and authorized synthetic test mailbox **without pasting API keys**. An API-key-format check is NOT proof that mail is accepted, delivered or inbox-visible. Confirm Sender and `DRVO_K5_ORIGIN` privately and independently.
-6. **Secrets + SQL:** verify root-owned protected files (expected `0600` operator, `0640` max migrator), service credentials are not exposed in code/release/logs, API/operator 256-bit HMAC matches using the checker only, distinct migrator/app principals, and no unreviewed grants. No `ALTER ROLE`, SQL `GRANT`, privilege expansion or secret printing to resolve a failed check.
-7. **Backup and restore:** verify an encrypted **off-host** backup and retention policy. Restore independently to an isolated, owner-approved **new DRVO-only test target** with a separate database name; record validated integrity, RPO/RTO and cleanup. Do not issue `RESTORE DATABASE` against `DRVO_ERP_STAGING` or any Cashier/other production database. The staging COPY_ONLY job is not restore proof.
-8. **Flags and observation:** confirm checker says all API/Web K5 flags OFF. `curl -sS -o /dev/null -w '%{http_code}\\n' https://erp-stage.drvotech.com/sign-in` and `/verify-email` must show a disabled private UI before activation. Do not submit POST tokens or login from public networks at this stage.
+4. **Nginx + Origin + real client IP** (independent trusted-console inspection): run `sudo nginx -t`, review only the `erp-stage.drvotech.com` server block and its effective included files, verify `proxy_pass` to **127.0.0.1:3311** for `/api`, `proxy_set_header X-Real-IP $remote_addr;` (overwrites untrusted client input), and a reviewed Host/Origin/TLS policy. Confirm API 3311, Web 3310 and staging SQL are loopback/internal-only as appropriate using `sudo ss -ltnp`; do **not** change shared SQL Server or other vhosts to make the check pass. Verify any proxy/CDN layer explicitly; `$remote_addr` is only a true client IP if the upstream trust chain is correct.
+5. **Access restriction:** inspect current staging vhost exposure and apply a separately reviewed **vhost-only** IP allowlist or equivalent authentication gate before enabling real auth. Static public preview can remain public only while no private account/employee data or enabled auth flows exist. Do not edit existing Cashier/Clinic/AutoResponse vhosts.
+6. **Resend:** inspect the sender domain and DNS verification status in the provider dashboard and authorized synthetic test mailbox **without pasting API keys**. An API-key-format check is NOT proof that mail is accepted, delivered or inbox-visible. Confirm Sender and `DRVO_K5_ORIGIN` privately and independently.
+7. **Secrets + SQL:** verify root-owned protected files (expected `0600` operator, `0640` max migrator), service credentials are not exposed in code/release/logs, API/operator 256-bit HMAC matches using the checker only, distinct migrator/app principals, and no unreviewed grants. No `ALTER ROLE`, SQL `GRANT`, privilege expansion or secret printing to resolve a failed check.
+8. **Backup and restore:** verify an encrypted **off-host** backup and retention policy. Restore independently to an isolated, owner-approved **new DRVO-only test target** with a separate database name; record validated integrity, RPO/RTO and cleanup. Do not issue `RESTORE DATABASE` against `DRVO_ERP_STAGING` or any Cashier/other production database. The staging COPY_ONLY job is not restore proof.
+9. **Flags and observation:** confirm checker says all API/Web K5 flags OFF. `curl -sS -o /dev/null -w '%{http_code}\\n' https://erp-stage.drvotech.com/sign-in` and `/verify-email` must show a disabled private UI before activation. Do not submit POST tokens or login from public networks at this stage.
 
 **If any prerequisite fails:** record only the failing check label and non-secret relevant configuration diagnosis; leave all flags OFF. No real onboarding is authorized by completing the checklist.
 

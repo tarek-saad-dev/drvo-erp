@@ -1,5 +1,21 @@
 # Project changelog
 
+## 2026-11-10 — K5F operator VPS transcript and safe bundle remediation (PR-only)
+
+- Operator-supplied VPS log: checkout and managed deployment at `dba53acace2db2005a44d1a3103394a257bed40d`, API/Web active, `nginx -t` syntax OK with warnings (not proxy/security signoff).
+- Root bundle used unmerged `main` checker and aborted on repo-relative `mssql` dependency `MODULE_NOT_FOUND` **before any K5E/K5F readiness check**; no live verification, accounts, mail, SQL writes or flag changes evidenced.
+- Updated K5F instructions with fail-fast operator bundle replacement, hash/dependency/ownership review and a real 40-hex expected SHA after new merge/deploy; Git `safe.directory` trust is scoped to the one fixed read-only revision query.
+- **PR #46 remains open, all staging activation and K5 closure remain BLOCKED** pending independent review and operational evidence.
+
+
+## 2026-11-10 — K5F privilege-validation hardening and live E2E gate (proposed PR)
+
+- Rechecked `main` (`dba53acace2db2005a44d1a3103394a257bed40d`) and successful staging workflow [#42713547571](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/42713547571); migrations 001–009 remain backed by previously verified manual [SQL run #41973725981](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/41973725981).
+- Extended the K5E **read-only** checker: exact nine migration IDs only, real runtime SQL account **denies direct SELECT/INSERT/UPDATE/DELETE/ALTER/CONTROL** on six onboarding tables, fails closed on inaccessible privilege metadata, require an audited, root-owned operator bundle for privileged execution (no root loading mutable checkout/deploy dependencies).
+- Added focused negative tests and an operational K5F runbook with 12-case synthetic real Owner/Staff E2E acceptance matrix, staging restriction / Resend sender / trusted IP / offsite restore gates, evidence/rollback requirements.
+- **PR code CI, refreshed staging deploy, VPS preflight, live email/Owner/Staff E2E, restore and founder/security acceptance remain PENDING.** No auth feature flags, SQL rights, database, existing Cashier/Clinic system or public signup changed by this branch. K5 remains OPEN; ADR-030 remains PROPOSED.
+
+
 ## 2026-11-10 — K5E local staging readiness audit (proposed PR, no activation)
 
 - Independently verified the authorized SQL migration run #41973725981: COPY_ONLY backup, 006–009 applied, 001–005 unchanged and **9/9 migrations** on DRVO_ERP_STAGING; existing Staging code deploy #41876109076 succeeded.

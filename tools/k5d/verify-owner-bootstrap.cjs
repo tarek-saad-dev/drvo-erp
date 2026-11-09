@@ -5,6 +5,9 @@ const assert = require('node:assert/strict');
 const {randomBytes,randomUUID} = require('node:crypto');
 const sql = require('../../apps/api/node_modules/mssql');
 const {applyMigrations} = require('../k4-db/migrate.cjs');
+const {
+  PRIVATE_TABLES,NO_DIRECT_TABLE_PERMISSIONS,noDirectTablePermissions,
+}=require('./check-staging-readiness.cjs');
 const {claimApprovedOwner} = require('../../apps/api/dist/identity/owner-bootstrap.js');
 const {issueOperatorApprovedOwner,revokeOperatorApprovedOwner} = require('../../apps/api/dist/identity/operator-owner-approval.js');
 const {IdentityService} = require('../../apps/api/dist/identity/identity.service.js');
@@ -123,6 +126,31 @@ async function run() {
         TO [drvo_erp_stage_app];
     `);
     restricted=await open(DB,'drvo_erp_stage_app',stagePass);
+
+    // K5F: real SQL 2022 metadata proof under the restricted application login.
+    // The checker must reject unexpected direct grants as well as denied SELECT.
+    const permissionRow=async(table)=>{
+      const result=await restricted.request()
+        .input('object',sql.NVarChar(256),table)
+        .query(`SELECT ${NO_DIRECT_TABLE_PERMISSIONS.map(permission=>
+          `HAS_PERMS_BY_NAME(@object,'OBJECT','${permission}') AS [${permission}]`
+        ).join(', ')}`);
+      return result.recordset[0];
+    };
+    for(const table of PRIVATE_TABLES){
+      assert.equal(noDirectTablePermissions(await permissionRow(table)),true,
+        'Unexpected onboarding table permission: '+table);
+      await bad(()=>restricted.query('SELECT TOP(0) * FROM '+table));
+    }
+    // Temporary grant detection in disposable CI DB only; rollback immediately.
+    await db.query('GRANT INSERT ON core.OwnerBootstrapApproval TO [drvo_erp_stage_app]');
+    assert.equal(noDirectTablePermissions(
+      await permissionRow('core.OwnerBootstrapApproval')),false);
+    await db.query('REVOKE INSERT ON core.OwnerBootstrapApproval FROM [drvo_erp_stage_app]');
+    assert.equal(noDirectTablePermissions(
+      await permissionRow('core.OwnerBootstrapApproval')),true);
+    console.log('PASS: K5F SQL metadata detects unexpected DML grants on private tables');
+
 
     await bad(()=>claimApprovedOwner(db,{email:'none@example.test',token:'A'.repeat(43),
       newPassword:samplePassword},{...env,DRVO_K5_OWNER_BOOTSTRAP_ENABLED:'NO'}));

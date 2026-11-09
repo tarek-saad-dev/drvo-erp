@@ -4,10 +4,42 @@
 // Does not claim DNS, Nginx, offsite backup or external security review are complete.
 const fs=require('node:fs');
 const {execFileSync}=require('node:child_process');
-const {timingSafeEqual}=require('node:crypto');
-const sql=require('../../apps/api/node_modules/mssql');
-
+const {timingSafeEqual,createHash}=require('node:crypto');
 const REPO='/srv/drvo-erp/repo';
+// A root process must NEVER load executable dependencies from a mutable
+// drvoerp/deploy-controlled release or checkout. Install a reviewed root-owned
+// operator bundle as documented in K5F; CI runs non-root from the checkout.
+const ROOT_BUNDLE='/usr/local/libexec/drvo-erp-k5f';
+function rootBundleSafe() {
+  try {
+    const rootFile=ROOT_BUNDLE+'/check-staging-readiness.cjs';
+    if(fs.realpathSync(__filename)!==rootFile)return false;
+    for(const [name,type] of [
+      ['/usr','directory'],
+      ['/usr/local','directory'],
+      ['/usr/local/libexec','directory'],
+      [ROOT_BUNDLE,'directory'],
+      [rootFile,'file'],
+      [ROOT_BUNDLE+'/node_modules','directory'],
+      [ROOT_BUNDLE+'/node_modules/mssql','directory'],
+    ]) {
+      const item=fs.lstatSync(name);
+      if(item.uid!==0 || (item.mode&0o022)!==0 ||
+        (type==='file'?!item.isFile():!item.isDirectory()))return false;
+    }
+    if(!fs.realpathSync(ROOT_BUNDLE+'/node_modules/mssql')
+      .startsWith(ROOT_BUNDLE+'/node_modules/'))return false;
+    const sha=content=>createHash('sha256').update(content).digest('hex');
+    return sha(fs.readFileSync(rootFile))===
+      sha(fs.readFileSync(REPO+'/tools/k5d/check-staging-readiness.cjs'));
+  } catch { return false; }
+}
+if(process.getuid?.()===0 && !rootBundleSafe()) {
+  throw Error('BLOCK: reviewed root-owned K5F operator bundle required');
+}
+const sql=require(process.getuid?.()===0
+  ? ROOT_BUNDLE+'/node_modules/mssql'
+  : '../../apps/api/node_modules/mssql');
 const RELEASE='/srv/drvo-erp/deploy/current';
 const OPERATOR='/etc/drvo-erp/k5d-operator.env';
 const MIGRATOR='/etc/drvo-erp-db-automation/staging-db-automation.env';
@@ -28,6 +60,13 @@ const PRIVATE_TABLES=[
   'core.OwnerApprovalRevocationAudit','core.EmailVerificationChallenge',
   'core.AccountInvitation','core.VerifiedAccountEmail',
 ];
+const NO_DIRECT_TABLE_PERMISSIONS=[
+  'SELECT','INSERT','UPDATE','DELETE','ALTER','CONTROL',
+];
+function noDirectTablePermissions(row) {
+  return !!row && NO_DIRECT_TABLE_PERMISSIONS.every(permission =>
+    row[permission] === 0);
+}
 const PUBLIC_PROCEDURES=[
   'core.ClaimApprovedOwner','core.IssueBranchInvitation',
   'core.AcceptBranchInvitation','core.ListBranchInvitations',
@@ -149,7 +188,9 @@ async function auditDatabase(migrator,api) {
       throw Error('wrong database');
     }
     const actual=new Set(migrations.recordset.map(x=>x.MigrationId));
-    if(!MIGRATIONS.every(x=>actual.has(x)))throw Error('migration gap');
+    if(actual.size!==MIGRATIONS.length ||
+       migrations.recordset.length!==MIGRATIONS.length ||
+       !MIGRATIONS.every(x=>actual.has(x)))throw Error('migration drift');
     app=await new sql.ConnectionPool(dbConfig(
       api.DRVO_SQL_USER,api.DRVO_SQL_PASSWORD)).connect();
     const principal=await app.request().query(
@@ -159,6 +200,17 @@ async function auditDatabase(migrator,api) {
       throw Error('wrong runtime account');
     }
     for(const name of PRIVATE_TABLES){
+      // A denied SELECT does not prove INSERT/UPDATE/DELETE are also denied.
+      // This metadata probe is strictly read-only; reject NULL / unexpected
+      // permission results rather than treating them as a safe denial.
+      const access=await app.request()
+        .input('object',sql.NVarChar(256),name)
+        .query(`SELECT ${NO_DIRECT_TABLE_PERMISSIONS.map(permission =>
+          `HAS_PERMS_BY_NAME(@object,'OBJECT','${permission}') AS [${permission}]`
+        ).join(', ')}`);
+      if(!noDirectTablePermissions(access.recordset[0])){
+        throw Error('direct onboarding table privileges detected');
+      }
       try{
         await app.request().query('SELECT TOP (0) * FROM '+name);
       }catch(error){
@@ -222,7 +274,11 @@ async function main(args=process.argv.slice(2)) {
     }
   } else failed=true;
   await check('reviewed checkout and managed deployed commit match requested SHA',()=>{
-    const head=execFileSync('/usr/bin/git',['-C',REPO,'rev-parse','HEAD'],{
+    // This root-owned checker only performs a read-only rev-parse on one
+    // fixed repo. Scope Git's safe.directory exception to THIS command rather
+    // than modifying root or system git configuration.
+    const head=execFileSync('/usr/bin/git',
+      ['-c','safe.directory='+REPO,'-C',REPO,'rev-parse','HEAD'],{
       encoding:'utf8',timeout:4000,stdio:['ignore','pipe','ignore'],
     }).trim().toLowerCase();
     const resolved=fs.realpathSync(RELEASE);
@@ -233,7 +289,7 @@ async function main(args=process.argv.slice(2)) {
   if(operator&&api&&web&&migrator){
     const checks=readinessChecks(operator,api,web,migrator);
     if(checks.every(x=>x[1])){
-      await check('nine SQL migrations and least-privilege runtime tables/procedures',
+      await check('exact SQL migrations and zero direct onboarding DML privileges',
         ()=>auditDatabase(migrator,api));
     }else{
       failed=true;
@@ -267,7 +323,8 @@ if(require.main===module) {
   });
 }
 module.exports={
-  MIGRATIONS,PRIVATE_TABLES,PUBLIC_PROCEDURES,parseEnv,
+  MIGRATIONS,PRIVATE_TABLES,NO_DIRECT_TABLE_PERMISSIONS,PUBLIC_PROCEDURES,parseEnv,
+  noDirectTablePermissions,rootBundleSafe,
   sameSecret,readinessChecks,dbConfig,protectedEnv,processEnvFor,
   auditDatabase,main,
 };

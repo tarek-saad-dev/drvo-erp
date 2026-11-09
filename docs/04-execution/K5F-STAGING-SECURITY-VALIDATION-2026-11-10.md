@@ -12,6 +12,14 @@
 - K5E root-only checker has **no VPS execution evidence**. Authentication, verification, private Web, role admin and invitations must stay OFF pending acceptance.
 - ADR-003 accepted tenancy direction and ADR-037 accepted lean Kernel; [ADR-030](../05-decisions/ADR-030-TENANT-ISOLATION-ENFORCEMENT.md) remains **PROPOSED**. No implicit acceptance of RLS or cross-boundary technical choices.
 
+## 2026-11-10 operator-provided VPS transcript — partial evidence, NOT preflight pass
+
+The operator supplied a non-secret console transcript. `sudo -u drvoerp git pull --ff-only origin main` completed to `dba53acace2db2005a44d1a3103394a257bed40d`, matching `/srv/drvo-erp/deploy/current/release.sha`. Both `drvoerp-api.service` and `drvoerp-web.service` reported `active`; `nginx -t` returned syntax/configuration success **with warnings** (including deprecated HTTP/2 directives and site-wide OCSP warnings). None of these results validates the exact trusted proxy header behavior, public access guard or feature flags.
+
+**BLOCKED attempt:** the operator installed `/usr/local/libexec/drvo-erp-k5f` from **current `main`**, before PR #46 merged, then invoked it with a literal SHA placeholder. Node aborted during module resolution with `Cannot find module '../../apps/api/node_modules/mssql'`. This is the **old K5E checker**, which requires a checkout-relative dependency. It did not run any of the readiness checks. It did **not** prove anything about SQL privileges, HMAC, sender domain or authentication. PR #46 is still Open at this checkpoint. Do not move/copy any private environment or credentials as a workaround.
+
+**Recovery gate:** do not execute the old bundle again or widen permissions. After review, successful PR merge, a newly verified deploy matching the new `main` SHA, and independent inspection of the operator dependencies, replace **only** the root-owned K5F bundle using the guarded refresh procedure below. The old bundle can remain unused until then. The `--expected-sha` argument must be a *real 40-character* verified `main` SHA, never the uppercase placeholder.
+
 ## K5F code hardening (this PR; CI and review required)
 
 - `tools/k5d/check-staging-readiness.cjs`: keep operator-only, read-only, no secret output, no SQL writes. Validate the **exact** set of nine migration records and block on unknown/duplicate history. For each of six confidential onboarding tables, query `HAS_PERMS_BY_NAME` as the **actual runtime SQL login** for `SELECT`, `INSERT`, `UPDATE`, `DELETE`, `ALTER`, `CONTROL`. Any positive, NULL or missing permission result blocks. Independently require `SELECT TOP (0)` to raise expected permission denial. Required audited procedure EXECUTE checks remain. **Root execution is blocked unless the checker runs from an independently root-owned, immutable-for-operators bundle** with root-owned SQL dependencies and the checker content matching the reviewed checkout. Non-root CI loads the checkout dependency; root must never execute from a mutable deploy/repo dependency path.
@@ -43,7 +51,38 @@ Only a trusted administrator on the **new DRVO ERP VPS** should run these. **Nev
      /srv/drvo-erp/repo/tools/k5d/check-staging-readiness.cjs \
      /usr/local/libexec/drvo-erp-k5f/check-staging-readiness.cjs
    ```
-   Confirm trusted root ownership, no group/other write permissions and no links escaping the approved operator bundle. Do not alter the shared `/usr/local` owner or permissions to force PASS. For a subsequent PR/release, stop and explicitly review/refresh the root-owned operator bundle, preserving dependency provenance; never run outdated checker code against a new SHA.
+   Confirm trusted root ownership, no group/other write permissions and no links escaping the approved operator bundle. Do not alter the shared `/usr/local` owner or permissions to force PASS. Never run outdated checker code against a new SHA.
+
+   **Existing stale bundle, as in the operator transcript:** the above first-install `test ! -e` MUST fail. Once the new PR is merged and deployed and the artifacts independently reviewed, safely stage a replacement *without deleting the old version or touching any service*:
+   ```bash
+   sudo test -d /usr/local/libexec/drvo-erp-k5f
+   sudo test ! -e /usr/local/libexec/drvo-erp-k5f-pre46
+   sudo test ! -e /usr/local/libexec/drvo-erp-k5f-next
+   sudo install -d -o root -g root -m 0750 /usr/local/libexec/drvo-erp-k5f-next
+   sudo cp -a /srv/drvo-erp/deploy/current/api/node_modules \
+     /usr/local/libexec/drvo-erp-k5f-next/
+   sudo chown -R root:root /usr/local/libexec/drvo-erp-k5f-next
+   sudo chmod -R go-w /usr/local/libexec/drvo-erp-k5f-next
+   sudo install -o root -g root -m 0500 \
+     /srv/drvo-erp/repo/tools/k5d/check-staging-readiness.cjs \
+     /usr/local/libexec/drvo-erp-k5f-next/check-staging-readiness.cjs
+
+   # Inspect ownership, unexpected symlinks and dependency provenance FIRST.
+   sudo find /usr/local/libexec/drvo-erp-k5f-next -type l -print
+   sudo stat -c '%U:%G %a %n' \
+     /usr/local/libexec/drvo-erp-k5f-next \
+     /usr/local/libexec/drvo-erp-k5f-next/check-staging-readiness.cjs
+   sudo sha256sum \
+     /usr/local/libexec/drvo-erp-k5f-next/check-staging-readiness.cjs \
+     /srv/drvo-erp/repo/tools/k5d/check-staging-readiness.cjs
+
+   # ONLY after trusted manual review and matching hash:
+   sudo mv -T /usr/local/libexec/drvo-erp-k5f \
+     /usr/local/libexec/drvo-erp-k5f-pre46
+   sudo mv -T /usr/local/libexec/drvo-erp-k5f-next \
+     /usr/local/libexec/drvo-erp-k5f
+   ```
+   The temporary `-next` bundle should not be executed, and `-pre46` is **not** to be run as root. Do not remove either bundle automatically. If any source/permission/hash/expected deploy check fails, stop and investigate; never force a pass.
 3. **Run hardened root-only local preflight** from the audited bundle with the *same exact reviewed SHA*; do not substitute a guessed value or bypass a BLOCK:
    ```bash
    sudo node /usr/local/libexec/drvo-erp-k5f/check-staging-readiness.cjs \

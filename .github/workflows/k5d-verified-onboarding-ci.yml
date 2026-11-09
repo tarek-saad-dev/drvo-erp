@@ -36,8 +36,10 @@ jobs:
           set -euo pipefail
           node --check tools/k5d/verify.cjs
           node --check tools/k5d/verify-owner-bootstrap.cjs
+          node --check tools/k5d/check-staging-readiness.cjs
           npm ci --prefix apps/api --no-audit --no-fund
           npm test --prefix apps/api
+          node --test tools/k5d/check-staging-readiness.test.cjs
       - name: Start disposable SQL Server 2022
         shell: bash
         run: |

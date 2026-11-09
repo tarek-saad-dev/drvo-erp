@@ -41,33 +41,39 @@ Only a trusted administrator on the **new DRVO ERP VPS** should run these. **Nev
    Review that the two SHAs match the verified `main` deploy run; if not, **stop**. Do not reconfigure or restart unrelated systems.
 2. **Create a root-owned operator execution bundle BEFORE running root Node.** Direct `sudo node /srv/drvo-erp/repo/tools/k5d/check-staging-readiness.cjs` is now **intentionally BLOCKED**, as is loading mutable `deploy/current` dependencies as root. After independently comparing the exact expected SHA and inspecting `tools/k5d/check-staging-readiness.cjs` and the `apps/api/package-lock.json` dependencies, on the trusted VPS root console (first installation ONLY):
    ```bash
-   # Stop if a bundle already exists; upgrade/rotation needs separate review.
-   sudo test ! -e /usr/local/libexec/drvo-erp-k5f
-   sudo install -d -o root -g root -m 0750 /usr/local/libexec/drvo-erp-k5f
-   sudo cp -a /srv/drvo-erp/deploy/current/api/node_modules /usr/local/libexec/drvo-erp-k5f/
-   sudo chown -R root:root /usr/local/libexec/drvo-erp-k5f
-   sudo chmod -R go-w /usr/local/libexec/drvo-erp-k5f
-   sudo install -o root -g root -m 0500 \
+   # Run as ONE guarded command. Abort on any failed precondition.
+   sudo bash -euo pipefail <<'K5F_FIRST_INSTALL'
+   test ! -e /usr/local/libexec/drvo-erp-k5f
+   install -d -o root -g root -m 0750 /usr/local/libexec/drvo-erp-k5f
+   cp -a /srv/drvo-erp/deploy/current/api/node_modules /usr/local/libexec/drvo-erp-k5f/
+   chown -R root:root /usr/local/libexec/drvo-erp-k5f
+   chmod -R go-w /usr/local/libexec/drvo-erp-k5f
+   install -o root -g root -m 0500 \
      /srv/drvo-erp/repo/tools/k5d/check-staging-readiness.cjs \
      /usr/local/libexec/drvo-erp-k5f/check-staging-readiness.cjs
+   K5F_FIRST_INSTALL
    ```
    Confirm trusted root ownership, no group/other write permissions and no links escaping the approved operator bundle. Do not alter the shared `/usr/local` owner or permissions to force PASS. Never run outdated checker code against a new SHA.
 
    **Existing stale bundle, as in the operator transcript:** the above first-install `test ! -e` MUST fail. Once the new PR is merged and deployed and the artifacts independently reviewed, safely stage a replacement *without deleting the old version or touching any service*:
    ```bash
-   sudo test -d /usr/local/libexec/drvo-erp-k5f
-   sudo test ! -e /usr/local/libexec/drvo-erp-k5f-pre46
-   sudo test ! -e /usr/local/libexec/drvo-erp-k5f-next
-   sudo install -d -o root -g root -m 0750 /usr/local/libexec/drvo-erp-k5f-next
-   sudo cp -a /srv/drvo-erp/deploy/current/api/node_modules \
+   # First stage a root-owned replacement; stop on ALL failed preconditions.
+   sudo bash -euo pipefail <<'K5F_STAGE_REFRESH'
+   test -d /usr/local/libexec/drvo-erp-k5f
+   test ! -L /usr/local/libexec/drvo-erp-k5f
+   test ! -e /usr/local/libexec/drvo-erp-k5f-pre46
+   test ! -e /usr/local/libexec/drvo-erp-k5f-next
+   install -d -o root -g root -m 0750 /usr/local/libexec/drvo-erp-k5f-next
+   cp -a /srv/drvo-erp/deploy/current/api/node_modules \
      /usr/local/libexec/drvo-erp-k5f-next/
-   sudo chown -R root:root /usr/local/libexec/drvo-erp-k5f-next
-   sudo chmod -R go-w /usr/local/libexec/drvo-erp-k5f-next
-   sudo install -o root -g root -m 0500 \
+   chown -R root:root /usr/local/libexec/drvo-erp-k5f-next
+   chmod -R go-w /usr/local/libexec/drvo-erp-k5f-next
+   install -o root -g root -m 0500 \
      /srv/drvo-erp/repo/tools/k5d/check-staging-readiness.cjs \
      /usr/local/libexec/drvo-erp-k5f-next/check-staging-readiness.cjs
+   K5F_STAGE_REFRESH
 
-   # Inspect ownership, unexpected symlinks and dependency provenance FIRST.
+   # READ-ONLY manual inspection. Check ALL links and dependency provenance.
    sudo find /usr/local/libexec/drvo-erp-k5f-next -type l -print
    sudo stat -c '%U:%G %a %n' \
      /usr/local/libexec/drvo-erp-k5f-next \
@@ -75,12 +81,20 @@ Only a trusted administrator on the **new DRVO ERP VPS** should run these. **Nev
    sudo sha256sum \
      /usr/local/libexec/drvo-erp-k5f-next/check-staging-readiness.cjs \
      /srv/drvo-erp/repo/tools/k5d/check-staging-readiness.cjs
-
-   # ONLY after trusted manual review and matching hash:
-   sudo mv -T /usr/local/libexec/drvo-erp-k5f \
+   ```
+   **Stop here for independent manual review of the output.** Only if the source SHA, release SHA, script hashes, ownership, all dependency paths, and symlink inventory are acceptable, perform the two **fixed-path moves** in one guarded root command:
+   ```bash
+   sudo bash -euo pipefail <<'K5F_ACTIVATE_REVIEWED_BUNDLE'
+   test -d /usr/local/libexec/drvo-erp-k5f
+   test -d /usr/local/libexec/drvo-erp-k5f-next
+   test ! -L /usr/local/libexec/drvo-erp-k5f
+   test ! -L /usr/local/libexec/drvo-erp-k5f-next
+   test ! -e /usr/local/libexec/drvo-erp-k5f-pre46
+   mv -T /usr/local/libexec/drvo-erp-k5f \
      /usr/local/libexec/drvo-erp-k5f-pre46
-   sudo mv -T /usr/local/libexec/drvo-erp-k5f-next \
+   mv -T /usr/local/libexec/drvo-erp-k5f-next \
      /usr/local/libexec/drvo-erp-k5f
+   K5F_ACTIVATE_REVIEWED_BUNDLE
    ```
    The temporary `-next` bundle should not be executed, and `-pre46` is **not** to be run as root. Do not remove either bundle automatically. If any source/permission/hash/expected deploy check fails, stop and investigate; never force a pass.
 3. **Run hardened root-only local preflight** from the audited bundle with the *same exact reviewed SHA*; do not substitute a guessed value or bypass a BLOCK:

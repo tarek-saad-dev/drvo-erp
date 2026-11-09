@@ -1,5 +1,15 @@
 # Project changelog
 
+
+## 2026-11-10 — Salon-first GTM positioning documented (review draft)
+
+- Founder approved focusing first DRVO ERP marketing on barber/salon businesses while preserving the multi-industry **DRVO ERP** master brand and architecture.
+- Added [Salon-first GTM V1](../01-product/GO-TO-MARKET-SALONS-V1.md) with buyer personas, differentiation hypotheses, discovery funnel, 90-day content/outreach plan, proposed KPIs and marketing truth gates.
+- Cross-linked product documentation, execution roadmap and current state. **No change to Salon commercial V1 scope, industry sequence, price approvals or code.**
+- **Documentation-only draft PR:** no advertising spend, consented leads, runtime testing, infrastructure activation, deployments or product release performed.
+
+
+
 ## 2026-11-10 — K5E local staging readiness audit (proposed PR, no activation)
 
 - Independently verified the authorized SQL migration run #41973725981: COPY_ONLY backup, 006–009 applied, 001–005 unchanged and **9/9 migrations** on DRVO_ERP_STAGING; existing Staging code deploy #41876109076 succeeded.

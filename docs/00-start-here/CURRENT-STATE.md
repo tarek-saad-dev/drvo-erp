@@ -1,5 +1,9 @@
 # Current state
 
+
+> **2026-11-10 MARKETING POSITIONING (DOCS-ONLY PROPOSED PR):** The founder has approved a **salon-first market focus** under the unchanged DRVO ERP multi-industry master brand. [Salon-first GTM V1](../01-product/GO-TO-MARKET-SALONS-V1.md) sets out discovery, channels, campaign copy, candidate metrics and product-truth gates; execution details remain proposals. **No live customer product, public onboarding, lead capture, ad spend, pricing or commercial launch is enabled by this plan.** This note does not supersede engineering verification below or independently attest the live status of PR #44.
+
+
 > **LATEST VERIFIED — 2026-11-10 K5E STAGING READINESS CHECK PROPOSED (NO PUBLIC ACTIVATION):** The separately authorized manual SQL run [#41973725981](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/41973725981) **actually applied migrations 006–009** after a validated COPY_ONLY backup: `DRVO DB MIGRATION PASS: 4 applied; 9 total`. The latest preceding Staging Deploy [#41876109076](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/41876109076) succeeded at `3c07f817192b6240dd6123b47c0f36e910a045e8`. A new **root-only, read-only** K5E pre-activation tool is proposed in [K5E readiness runbook](../04-execution/K5E-STAGING-ONBOARDING-READINESS-2026-11-10.md), checking 9 SQL migration records, live service env, HMAC/mail configuration, disabled K5 flags, DB permissions, revision and private route gates without sending mail or writing SQL. **Do not infer that a verified sender, protected HMAC secret, offsite restore, live Owner/Staff E2E or real staging feature activation exists. K5 remains OPERATIONALLY OPEN.** Older "migration pending" notes below are historical, not current database state.
 
 

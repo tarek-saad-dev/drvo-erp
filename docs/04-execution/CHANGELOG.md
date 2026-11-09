@@ -1,5 +1,11 @@
 # Project changelog
 
+## 2026-11-10 — DRVO ERP founder-approved corporate logo (no deployment)
+
+- Founder explicitly accepted the logo from the bilingual visual reference board: D with ascending pillars and Teal undersweep, plus Primary, On-Dark and Monochrome variants. No later V2 alternative accepted.
+- Added ADR-038, logo-usage guidelines and original SVG redraws for horizontal, stacked and standalone symbols in light/dark/monochrome treatments; updated ADR-024 cross-reference, decision register, roadmap and current-state governance note.
+- **Identity approval only**; visual reference and output paths need optical review. No ERP code, schema, social account publication, trademark clearance, database or deployment changes.
+
 ## 2026-11-10 — K5F operator VPS transcript and safe bundle remediation (PR-only)
 
 - Operator-supplied VPS log: checkout and managed deployment at `dba53acace2db2005a44d1a3103394a257bed40d`, API/Web active, `nginx -t` syntax OK with warnings (not proxy/security signoff).

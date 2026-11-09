@@ -4,14 +4,39 @@
 // Does not claim DNS, Nginx, offsite backup or external security review are complete.
 const fs=require('node:fs');
 const {execFileSync}=require('node:child_process');
-const {timingSafeEqual}=require('node:crypto');
-// Prefer the exact deployed, self-contained SQL client on the VPS. The repo
-// checkout does not necessarily have node_modules installed after CI deploy.
-const shippedSql='/srv/drvo-erp/deploy/current/api/node_modules/mssql';
-const sql=require(fs.existsSync(shippedSql)
-  ? shippedSql : '../../apps/api/node_modules/mssql');
-
+const {timingSafeEqual,createHash}=require('node:crypto');
 const REPO='/srv/drvo-erp/repo';
+// A root process must NEVER load executable dependencies from a mutable
+// drvoerp/deploy-controlled release or checkout. Install a reviewed root-owned
+// operator bundle as documented in K5F; CI runs non-root from the checkout.
+const ROOT_BUNDLE='/usr/local/libexec/drvo-erp-k5f';
+function rootBundleSafe() {
+  try {
+    const rootFile=ROOT_BUNDLE+'/check-staging-readiness.cjs';
+    if(fs.realpathSync(__filename)!==rootFile)return false;
+    for(const [name,type] of [
+      [ROOT_BUNDLE,'directory'],
+      [rootFile,'file'],
+      [ROOT_BUNDLE+'/node_modules','directory'],
+      [ROOT_BUNDLE+'/node_modules/mssql','directory'],
+    ]) {
+      const item=fs.lstatSync(name);
+      if(item.uid!==0 || (item.mode&0o022)!==0 ||
+        (type==='file'?!item.isFile():!item.isDirectory()))return false;
+    }
+    if(!fs.realpathSync(ROOT_BUNDLE+'/node_modules/mssql')
+      .startsWith(ROOT_BUNDLE+'/node_modules/'))return false;
+    const sha=content=>createHash('sha256').update(content).digest('hex');
+    return sha(fs.readFileSync(rootFile))===
+      sha(fs.readFileSync(REPO+'/tools/k5d/check-staging-readiness.cjs'));
+  } catch { return false; }
+}
+if(process.getuid?.()===0 && !rootBundleSafe()) {
+  throw Error('BLOCK: reviewed root-owned K5F operator bundle required');
+}
+const sql=require(process.getuid?.()===0
+  ? ROOT_BUNDLE+'/node_modules/mssql'
+  : '../../apps/api/node_modules/mssql');
 const RELEASE='/srv/drvo-erp/deploy/current';
 const OPERATOR='/etc/drvo-erp/k5d-operator.env';
 const MIGRATOR='/etc/drvo-erp-db-automation/staging-db-automation.env';

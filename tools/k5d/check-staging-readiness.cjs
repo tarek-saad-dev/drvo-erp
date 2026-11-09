@@ -5,7 +5,11 @@
 const fs=require('node:fs');
 const {execFileSync}=require('node:child_process');
 const {timingSafeEqual}=require('node:crypto');
-const sql=require('../../apps/api/node_modules/mssql');
+// Prefer the exact deployed, self-contained SQL client on the VPS. The repo
+// checkout does not necessarily have node_modules installed after CI deploy.
+const shippedSql='/srv/drvo-erp/deploy/current/api/node_modules/mssql';
+const sql=require(fs.existsSync(shippedSql)
+  ? shippedSql : '../../apps/api/node_modules/mssql');
 
 const REPO='/srv/drvo-erp/repo';
 const RELEASE='/srv/drvo-erp/deploy/current';
@@ -28,6 +32,13 @@ const PRIVATE_TABLES=[
   'core.OwnerApprovalRevocationAudit','core.EmailVerificationChallenge',
   'core.AccountInvitation','core.VerifiedAccountEmail',
 ];
+const NO_DIRECT_TABLE_PERMISSIONS=[
+  'SELECT','INSERT','UPDATE','DELETE','ALTER','CONTROL',
+];
+function noDirectTablePermissions(row) {
+  return !!row && NO_DIRECT_TABLE_PERMISSIONS.every(permission =>
+    row[permission] === 0);
+}
 const PUBLIC_PROCEDURES=[
   'core.ClaimApprovedOwner','core.IssueBranchInvitation',
   'core.AcceptBranchInvitation','core.ListBranchInvitations',
@@ -149,7 +160,9 @@ async function auditDatabase(migrator,api) {
       throw Error('wrong database');
     }
     const actual=new Set(migrations.recordset.map(x=>x.MigrationId));
-    if(!MIGRATIONS.every(x=>actual.has(x)))throw Error('migration gap');
+    if(actual.size!==MIGRATIONS.length ||
+       migrations.recordset.length!==MIGRATIONS.length ||
+       !MIGRATIONS.every(x=>actual.has(x)))throw Error('migration drift');
     app=await new sql.ConnectionPool(dbConfig(
       api.DRVO_SQL_USER,api.DRVO_SQL_PASSWORD)).connect();
     const principal=await app.request().query(
@@ -159,6 +172,17 @@ async function auditDatabase(migrator,api) {
       throw Error('wrong runtime account');
     }
     for(const name of PRIVATE_TABLES){
+      // A denied SELECT does not prove INSERT/UPDATE/DELETE are also denied.
+      // This metadata probe is strictly read-only; reject NULL / unexpected
+      // permission results rather than treating them as a safe denial.
+      const access=await app.request()
+        .input('object',sql.NVarChar(256),name)
+        .query(`SELECT ${NO_DIRECT_TABLE_PERMISSIONS.map(permission =>
+          `HAS_PERMS_BY_NAME(@object,'OBJECT','${permission}') AS [${permission}]`
+        ).join(', ')}`);
+      if(!noDirectTablePermissions(access.recordset[0])){
+        throw Error('direct onboarding table privileges detected');
+      }
       try{
         await app.request().query('SELECT TOP (0) * FROM '+name);
       }catch(error){
@@ -233,7 +257,7 @@ async function main(args=process.argv.slice(2)) {
   if(operator&&api&&web&&migrator){
     const checks=readinessChecks(operator,api,web,migrator);
     if(checks.every(x=>x[1])){
-      await check('nine SQL migrations and least-privilege runtime tables/procedures',
+      await check('exact SQL migrations and zero direct onboarding DML privileges',
         ()=>auditDatabase(migrator,api));
     }else{
       failed=true;
@@ -267,7 +291,8 @@ if(require.main===module) {
   });
 }
 module.exports={
-  MIGRATIONS,PRIVATE_TABLES,PUBLIC_PROCEDURES,parseEnv,
+  MIGRATIONS,PRIVATE_TABLES,NO_DIRECT_TABLE_PERMISSIONS,PUBLIC_PROCEDURES,parseEnv,
+  noDirectTablePermissions,
   sameSecret,readinessChecks,dbConfig,protectedEnv,processEnvFor,
   auditDatabase,main,
 };

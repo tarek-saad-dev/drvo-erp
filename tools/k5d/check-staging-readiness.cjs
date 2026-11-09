@@ -15,6 +15,9 @@ function rootBundleSafe() {
     const rootFile=ROOT_BUNDLE+'/check-staging-readiness.cjs';
     if(fs.realpathSync(__filename)!==rootFile)return false;
     for(const [name,type] of [
+      ['/usr','directory'],
+      ['/usr/local','directory'],
+      ['/usr/local/libexec','directory'],
       [ROOT_BUNDLE,'directory'],
       [rootFile,'file'],
       [ROOT_BUNDLE+'/node_modules','directory'],
@@ -317,7 +320,7 @@ if(require.main===module) {
 }
 module.exports={
   MIGRATIONS,PRIVATE_TABLES,NO_DIRECT_TABLE_PERMISSIONS,PUBLIC_PROCEDURES,parseEnv,
-  noDirectTablePermissions,
+  noDirectTablePermissions,rootBundleSafe,
   sameSecret,readinessChecks,dbConfig,protectedEnv,processEnvFor,
   auditDatabase,main,
 };

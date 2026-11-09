@@ -9,6 +9,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'ops/staging/**'
+      - 'tools/k5d/**'
       - '.github/workflows/staging-deploy.yml'
 permissions:
   contents: read

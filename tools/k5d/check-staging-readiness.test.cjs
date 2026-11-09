@@ -3,7 +3,7 @@ const test=require('node:test');
 const assert=require('node:assert/strict');
 const {
   MIGRATIONS,PRIVATE_TABLES,NO_DIRECT_TABLE_PERMISSIONS,PUBLIC_PROCEDURES,parseEnv,
-  noDirectTablePermissions,
+  noDirectTablePermissions,rootBundleSafe,
   sameSecret,readinessChecks,dbConfig,
 }=require('./check-staging-readiness.cjs');
 
@@ -109,4 +109,8 @@ test('runtime onboarding tables must deny ALL direct DML and control, not just S
   }
   assert.equal(noDirectTablePermissions(null),false);
   assert.equal(noDirectTablePermissions({}),false);
+});
+
+test('root execution cannot trust the mutable checkout as its operator bundle',()=>{
+  assert.equal(rootBundleSafe(),false);
 });

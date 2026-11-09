@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-10 — K5F privilege-validation hardening and live E2E gate (proposed PR)
+
+- Rechecked `main` (`dba53acace2db2005a44d1a3103394a257bed40d`) and successful staging workflow [#42713547571](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/42713547571); migrations 001–009 remain backed by previously verified manual [SQL run #41973725981](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/41973725981).
+- Extended the K5E **read-only** checker: exact nine migration IDs only, real runtime SQL account **denies direct SELECT/INSERT/UPDATE/DELETE/ALTER/CONTROL** on six onboarding tables, fails closed on inaccessible privilege metadata, fallback to deployed SQL driver where repo dependencies are not installed.
+- Added focused negative tests and an operational K5F runbook with 12-case synthetic real Owner/Staff E2E acceptance matrix, staging restriction / Resend sender / trusted IP / offsite restore gates, evidence/rollback requirements.
+- **PR code CI, refreshed staging deploy, VPS preflight, live email/Owner/Staff E2E, restore and founder/security acceptance remain PENDING.** No auth feature flags, SQL rights, database, existing Cashier/Clinic system or public signup changed by this branch. K5 remains OPEN; ADR-030 remains PROPOSED.
+
+
 ## 2026-11-10 — K5E local staging readiness audit (proposed PR, no activation)
 
 - Independently verified the authorized SQL migration run #41973725981: COPY_ONLY backup, 006–009 applied, 001–005 unchanged and **9/9 migrations** on DRVO_ERP_STAGING; existing Staging code deploy #41876109076 succeeded.

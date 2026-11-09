@@ -1,5 +1,9 @@
 # Roadmap
 
+
+> **2026-11-10 — Founder-approved salon-first GTM direction (marketing planning only):** Keep DRVO ERP as the multi-industry master brand and focus first marketing/discovery on barber salons, prioritizing multi-branch owner/operators. [Salon-first GTM V1](../01-product/GO-TO-MARKET-SALONS-V1.md) contains **proposed** 90-day channel experiments, messaging and targets. This does **not** change the Salon V1 commercial-release gate, Clinic-second sequencing or initial Egypt-and-Gulf commercial market intent. No customer-ready offering, live trial, paid campaign, pricing or release date is authorized.
+
+
 > **2026-11-10 implementation checkpoint:** Staging K0–K5D code and migration 001–009 are verified deployed/applied (Staging Deploy [#41876109076](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/41876109076), manual SQL run [#41973725981](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/41973725981)). **K5 operational acceptance is still OPEN.** K5E adds a read-only operator readiness gate for live protected secrets, runtime permissions, disabled feature flags and deployed SHA; sender verification, Nginx source IP trust, offsite restore and approved synthetic Owner/Staff E2E remain manual/security gates. Next after K5 signoff is Platform Kernel Module Registry/Activation prototype followed by SaaS Commercial Core, then comprehensive Salon Business Modules. This current checkpoint supersedes the historical "Not started" status labels below as evidence of *specific foundation slices only*; it does not claim functional ERP modules exist. [K5E details](K5E-STAGING-ONBOARDING-READINESS-2026-11-10.md).
 
 

@@ -274,7 +274,11 @@ async function main(args=process.argv.slice(2)) {
     }
   } else failed=true;
   await check('reviewed checkout and managed deployed commit match requested SHA',()=>{
-    const head=execFileSync('/usr/bin/git',['-C',REPO,'rev-parse','HEAD'],{
+    // This root-owned checker only performs a read-only rev-parse on one
+    // fixed repo. Scope Git's safe.directory exception to THIS command rather
+    // than modifying root or system git configuration.
+    const head=execFileSync('/usr/bin/git',
+      ['-c','safe.directory='+REPO,'-C',REPO,'rev-parse','HEAD'],{
       encoding:'utf8',timeout:4000,stdio:['ignore','pipe','ignore'],
     }).trim().toLowerCase();
     const resolved=fs.realpathSync(RELEASE);

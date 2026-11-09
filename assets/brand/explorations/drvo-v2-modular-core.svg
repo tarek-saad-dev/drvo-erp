@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 340" width="1120" height="340">
+<title>DRVO ERP logo concept</title>
+<g><g transform="translate(30 20)"><path d="M50 32H137Q148 32 148 43V78H99Q92 78 92 86V137H48V44Q48 32 50 32Z" fill="#74536E"/><path d="M163 32H205Q219 32 219 46V137H175V89Q175 78 164 78H156V43Q156 32 163 32Z" fill="#1A7B80"/><path d="M48 152H92V201Q92 209 100 209H148V253H61Q48 253 48 240Z" fill="#553E53"/><path d="M175 152H219V240Q219 253 206 253H163Q155 253 155 244V209H166Q175 209 175 199Z" fill="#74536E"/><rect x="113" y="114" width="41" height="41" rx="10" fill="#1A7B80" transform="rotate(45 133.5 134.5)"/></g></g>
+<text x="324" y="198" font-family="Inter Display, Inter, Arial, sans-serif" font-size="122" font-weight="800" letter-spacing="-7" fill="#553E53">DRVO</text><path d="M710 100V218" stroke="#E6E1E8" stroke-width="3" /><text x="747" y="193" font-family="Inter Display, Inter, Arial, sans-serif" font-size="72" font-weight="600" letter-spacing="5" fill="#74536E">ERP</text>
+</svg>

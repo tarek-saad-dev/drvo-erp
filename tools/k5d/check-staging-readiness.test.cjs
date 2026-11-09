@@ -2,7 +2,8 @@
 const test=require('node:test');
 const assert=require('node:assert/strict');
 const {
-  MIGRATIONS,PRIVATE_TABLES,PUBLIC_PROCEDURES,parseEnv,
+  MIGRATIONS,PRIVATE_TABLES,NO_DIRECT_TABLE_PERMISSIONS,PUBLIC_PROCEDURES,parseEnv,
+  noDirectTablePermissions,
   sameSecret,readinessChecks,dbConfig,
 }=require('./check-staging-readiness.cjs');
 
@@ -93,4 +94,19 @@ test('strict separate SQL staging principal required and no production DB is acc
   assert.equal(config.database,'DRVO_ERP_STAGING');
   assert.equal(config.options.encrypt,true);
   assert.equal(config.user,'drvo_erp_stage_app');
+});
+
+test('runtime onboarding tables must deny ALL direct DML and control, not just SELECT',()=>{
+  const denied=Object.fromEntries(NO_DIRECT_TABLE_PERMISSIONS.map(p=>[p,0]));
+  assert.equal(noDirectTablePermissions(denied),true);
+  for(const permission of NO_DIRECT_TABLE_PERMISSIONS){
+    assert.equal(noDirectTablePermissions({...denied,[permission]:1}),false,
+      permission+' grant must block readiness');
+    assert.equal(noDirectTablePermissions({...denied,[permission]:null}),false,
+      permission+' NULL metadata must fail closed');
+    const missing={...denied};delete missing[permission];
+    assert.equal(noDirectTablePermissions(missing),false);
+  }
+  assert.equal(noDirectTablePermissions(null),false);
+  assert.equal(noDirectTablePermissions({}),false);
 });

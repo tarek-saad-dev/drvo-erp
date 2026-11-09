@@ -29,13 +29,14 @@ It verifies:
 
 ## Operator procedure (not executed by the assistant)
 
-**SECURITY UPDATE:** The root-owned operator bundle installation and dependency review in [K5F](K5F-STAGING-SECURITY-VALIDATION-2026-11-10.md) are mandatory BEFORE the command below. Direct root execution from `/srv/drvo-erp/repo` is intentionally blocked by K5F; do not fall back to the old command.\n\nFirst verify the PR is reviewed/merged, the dedicated Staging Deploy for the final `main` SHA succeeded, and your **local checked-out repo** matches it. On the VPS's trusted root console:
+**SECURITY UPDATE:** The root-owned operator bundle installation and dependency review in [K5F](K5F-STAGING-SECURITY-VALIDATION-2026-11-10.md) are mandatory BEFORE the command below. Direct root execution from `/srv/drvo-erp/repo` is intentionally blocked by K5F; do not fall back to the old command. 
+
+First verify the PR is reviewed/merged, the dedicated Staging Deploy for the final `main` SHA succeeded, and your **local checked-out repo** matches it. On the VPS's trusted root console:
 
 ```bash
 sudo -u drvoerp -H git -C /srv/drvo-erp/repo pull --ff-only origin main
-cd /srv/drvo-erp/repo
-git rev-parse HEAD
-sudo node /usr/local/libexec/drvo-erp-k5f/check-staging-readiness.cjs --expected-sha=<copy-the-verified-40-character-main-sha>
+sudo -u drvoerp -H git -C /srv/drvo-erp/repo rev-parse HEAD
+sudo node /usr/local/libexec/drvo-erp-k5f/check-staging-readiness.cjs --expected-sha=REPLACE_WITH_VERIFIED_40_HEX_MAIN_SHA
 ```
 
 The `--expected-sha` argument is **not secret**. Replace the placeholder only with the reviewed GitHub commit. The command does **not** synchronize Git automatically or perform deployments; if it reports a mismatch, inspect both revision histories rather than bypassing the check.

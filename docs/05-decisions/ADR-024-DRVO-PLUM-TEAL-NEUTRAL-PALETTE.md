@@ -61,3 +61,8 @@ See [Design Tokens](../02-architecture/DRVO-DESIGN-TOKENS-AND-COMPONENTS.md), [U
 ## Clarification / founder-approved Business palette customization — ADR-026 (2026-10-29)
 
 The accepted Plum/Teal/Neutrals palette is the **DRVO platform default, original brand baseline and safe fallback**, NOT an unchangeable color mandate for each customer Business. The founder subsequently approved **validated per-Business palette and typography customization**; resolve safe Business brand tokens through centralized Theme Engine, retaining protected success/warning/error/pending semantics and readable text. The older rule against arbitrary *per-industry* replacement remains: a solution preset must not bypass contrast or status safety. Do not treat a customer palette as a separate complete product UI library. Exact algorithm and Theme Settings screens are draft. See [ADR-026](ADR-026-BUSINESS-THEMES-AND-CENTRAL-TYPOGRAPHY.md).
+
+
+## 2026-11-10 founder-approved corporate logo addendum — ADR-038
+
+The earlier statement that final logo geometry was unapproved is historical. **The founder has now explicitly accepted the specific D + ascending bars + Teal underside sweep logo and its Primary/On-Dark/Monochrome variations**, as pictured in the founder-supplied DRVO ERP bilingual Brand Identity reference. See [ADR-038](ADR-038-DRVO-MASTER-LOGO-AND-VARIATIONS.md). This does **not** approve unrelated UI screen layouts, product-wide fonts, sample social-account metrics or public feature availability.

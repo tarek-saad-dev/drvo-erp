@@ -10,6 +10,13 @@
 
 > **2026-11-01 development sequencing update:** The non-production K0 TypeScript scaffold is merged; K1 Next.js/NestJS runtimes are being built and tested. **SaaS Commercial Core moves immediately after Platform Kernel**, before full Salon Business Modules: minimum DRVO plans/subscriptions, audited commercial grants, Business-scoped entitlements and activation, and onboarding/Industry Starter. Business Catalog/POS work may overlap with commercial work, but must obey entitlement contracts. Do not confuse *SaaS billing* with customer Business Accounting. Later advanced marketplace/online gateways can follow full V1. ADR-030/031/032 technical sign-off, SQL Server spike and security/financial tests remain separate gates. This note takes precedence over earlier phase numbers below but does not reduce the approved Salon V1 commercial scope or authorize Production.
 
+## Corporate brand / market readiness (2026-11-10)
+
+- **Founder-approved corporate DRVO ERP logo and pictured variants** are recorded under [ADR-038](../05-decisions/ADR-038-DRVO-MASTER-LOGO-AND-VARIATIONS.md); use one parent multi-industry brand.
+- Salon is the **initial marketing segment**; do not replace master logo with Salon symbols. Clinics remain second planned vertical pending validation.
+- Remaining marketing deliverables before public activation: exact logo export QA, trademark checks, company account handles/ownership, reviewed social cover templates, landing-page truthfulness, early adopter/lead workflow.
+- **Product staging K5 operational acceptance and commercial feature readiness remain independent and OPEN.**
+
 ## Commercial industry sequence (founder-approved)
 
 1. **Barber salons** — first real pilot at **Cut Salon**.

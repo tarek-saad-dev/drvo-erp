@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-10 — K5E local staging readiness audit (proposed PR, no activation)
+
+- Independently verified the authorized SQL migration run #41973725981: COPY_ONLY backup, 006–009 applied, 001–005 unchanged and **9/9 migrations** on DRVO_ERP_STAGING; existing Staging code deploy #41876109076 succeeded.
+- Added a root-only **read-only** operator checker for deployed SHA, protected API/Web/operator environment (no secret values printed), consistent 256-bit HMAC, Resend configuration shape, all K5 flags OFF, 9 migration records, least-privilege restricted-app DB, local health and private-route gate.
+- Added negative unit tests and dedicated K5D CI wiring, plus Staging Deploy path tracking for K5 operator tooling changes.
+- **NO email was sent, no users provisioned, no feature flag enabled, no SQL migration/DDL issued by this tool.** Full Nginx trust, sender-domain, offsite restore and multi-Tenant real E2E gates remain OPEN.
+
+
 ## 2026-10-28 — POS state machine / shift lifecycle design drafts
 
 - Confirmed single distinct opener; 10% opening commission on after-discount before-tax service price; automatic refund reversal.

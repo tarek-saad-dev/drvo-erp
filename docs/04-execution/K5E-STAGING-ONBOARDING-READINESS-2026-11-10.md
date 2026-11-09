@@ -1,5 +1,8 @@
 # K5E — Read-only Staging Onboarding Readiness Gate
 
+> **K5F follow-up checkpoint — 2026-11-10:** K5E PR #44 is merged and the exact `main` revision `dba53acace2db2005a44d1a3103394a257bed40d` has a verified successful [Staging Deploy #42713547571](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/42713547571). The earlier `3c07f...` deploy remains historical. A [proposed K5F patch](K5F-STAGING-SECURITY-VALIDATION-2026-11-10.md) strengthens direct SQL permission denials on six onboarding tables and adds a synthetic E2E acceptance runbook; **neither K5E nor K5F has a verified VPS checker run or live activation at this checkpoint**. K5 remains OPEN; all public K5 flags OFF.
+
+
 **Recorded:** 2026-11-10. **Status:** implemented as a proposed operator check; **not a customer-access approval**.
 
 ## Verified baseline (not inferred from earlier documentation)

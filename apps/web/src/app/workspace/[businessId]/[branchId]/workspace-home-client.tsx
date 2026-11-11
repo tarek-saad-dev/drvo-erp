@@ -17,6 +17,7 @@ export default function WorkspaceHomeClient({businessId, branchId}: {
   const [businessName, setBusinessName] = useState("");
   const [canManageMembers, setCanManageMembers] = useState(false);
   const [canViewCatalog, setCanViewCatalog] = useState(false);
+  const [canViewCustomers, setCanViewCustomers] = useState(false);
   const [account, setAccount] = useState<Account | null>(null);
   const [status, setStatus] = useState<"loading"|"ready"|"denied"|"error">("loading");
 
@@ -69,6 +70,9 @@ export default function WorkspaceHomeClient({businessId, branchId}: {
         const catalogResult=await fetch(base + "/catalog", {credentials:"same-origin",cache:"no-store"});
         if (!live) return;
         setCanViewCatalog(catalogResult.ok);
+        const customersResult=await fetch(base + "/customers", {credentials:"same-origin",cache:"no-store"});
+        if (!live) return;
+        setCanViewCustomers(customersResult.ok);
         setStatus("ready");
       } catch {
         if (live) setStatus("error");
@@ -104,6 +108,10 @@ export default function WorkspaceHomeClient({businessId, branchId}: {
         {canViewCatalog && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/catalog"} className="k5-verify-link">
           المنتجات والخدمات
+        </Link>}
+        {canViewCustomers && <Link href={"/workspace/" + encodeURIComponent(businessId) +
+          "/" + encodeURIComponent(branchId) + "/customers"} className="k5-verify-link">
+          العملاء
         </Link>}
         {canManageMembers && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/access"} className="k5-verify-link">

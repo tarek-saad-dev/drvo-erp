@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-11-11 — K6B candidate Module Registry (stacked review PR)
+
+- Added pure internal Kernel candidate Module registry snapshot with defensive normalization, stable fixture versions, immutable copied metadata and read-only selection previews; negative tests cover input drift, cycles, missing dependencies, overlapping edges and incompatible selections.
+- Added decision-ready status/gap table for ADR-030 and ADR-032; **neither ADR is accepted** and no runtime activation is authorized.
+- No new SQL/API/Web/permissions/mail/flags/VPS changes. Depends on the K6A fixture preview PR #50. See [K6B decision gate](K6B-CANDIDATE-REGISTRY-DECISION-GATE-2026-11-11.md).
+
+
 ## 2026-11-11 — K6A fixture-only Module Preview (draft PR)
 
 - Added deterministic read-only dependency preview prototype on existing Kernel fixture planner, with prerequisites/selected/existing labels, negative validation and regression tests.

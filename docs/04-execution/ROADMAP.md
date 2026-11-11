@@ -1,5 +1,7 @@
 # Roadmap
 
+> **2026-11-11 ACCELERATION WORKSTREAM (non-prod, review only):** While operational K5 stays BLOCKED/open, prepare parallel bounded development in a review branch: first pure, read-only [K6A Module Preview spike](K6A-READONLY-MODULE-PREVIEW-2026-11-11.md); then separately approve ADR-030/032 and deliver the actual secured Module Registry/Business activation vertical slice. After platform scope/activation authorization, implement SaaS Commercial Core and shared Catalog/Customers/Booking slices for the Salon-first pilot. **Prototype != approved K6 Runtime; no activation, production, flags or customer operations authorized by this line.**
+
 > **2026-11-10 K5F gate (proposed branch; NOT K5 closure):** K5E now has a verified successful code deploy at [#42713547571](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/42713547571) for `dba53acace2db2005a44d1a3103394a257bed40d`, and prior manual SQL 001–009 proof remains valid. K5F adds stronger **read-only** runtime SQL permission checks and the [staged 12-case synthetic onboarding acceptance matrix](K5F-STAGING-SECURITY-VALIDATION-2026-11-10.md). Complete PR CI/review → reviewed SHA deploy → VPS checker proof → Nginx trusted IP + Origin/staging access restriction → Resend domain and inbox validation → offsite restore → **explicitly authorized** synthetic 2-Tenant/2-Branch Owner/Staff E2E + audit → security/ADR-030 signoff before declaring K5 CLOSED. Auth/Invitations/Web flags OFF until approved. **K6 runtime implementation not authorized by this checkpoint.**
 
 

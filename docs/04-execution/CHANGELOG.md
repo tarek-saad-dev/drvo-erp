@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-11-11 — K6A fixture-only Module Preview (draft PR)
+
+- Added deterministic read-only dependency preview prototype on existing Kernel fixture planner, with prerequisites/selected/existing labels, negative validation and regression tests.
+- No API, SQL, paid activation, release registry, operator credentials, UI, new server permissions, email, feature flags or deployment changes. K5 remains OPEN; ADR-030 and ADR-032 remain PROPOSED.
+- See [K6A prototype and acceptance checklist](K6A-READONLY-MODULE-PREVIEW-2026-11-11.md). Verify PR-head CI before any merge; experimental code does not constitute K6 runtime approval.
+
+
 ## 2026-11-10 — DRVO ERP founder-approved corporate logo (no deployment)
 
 - Founder explicitly accepted the logo from the bilingual visual reference board: D with ascending pillars and Teal undersweep, plus Primary, On-Dark and Monochrome variants. No later V2 alternative accepted.

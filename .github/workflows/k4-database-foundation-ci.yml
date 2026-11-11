@@ -71,7 +71,11 @@ jobs:
           DRVO_K4_TARGET: ci
           DRVO_K4_DISPOSABLE: 'YES'
           SQL_TEST_PORT: '14334'
-        run: sudo -E node tools/k4-db/verify-operator-ci.cjs
+        run: |
+          sudo -n env GITHUB_ACTIONS=true DRVO_K4_TARGET=ci \
+            DRVO_K4_DISPOSABLE=YES SQL_TEST_PORT=14334 \
+            SQL_TEST_SA_PASSWORD="$SQL_TEST_SA_PASSWORD" \
+            "$(command -v node)" tools/k4-db/verify-operator-ci.cjs
       - name: Inspect container on failure
         if: failure()
         run: docker logs --tail 100 drvo-k4-sql-disposable || true

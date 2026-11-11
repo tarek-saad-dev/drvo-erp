@@ -2,6 +2,7 @@
 -- Forward-only definition for separate, explicit database migration approval.
 -- NO seed, activation, entitlement, pricing, customer/Owner or public authorization.
 -- The app runtime has EXECUTE-only access to the tightly scoped procedure.
+-- Same-owner, static SQL ownership chaining avoids privileged EXECUTE AS OWNER.
 CREATE TABLE core.BusinessModuleCandidate (
   TenantId UNIQUEIDENTIFIER NOT NULL,
   BusinessId UNIQUEIDENTIFIER NOT NULL,
@@ -33,7 +34,6 @@ CREATE PROCEDURE core.ReadBusinessModuleCandidates
   @AccountId UNIQUEIDENTIFIER,
   @SessionVersion INT,
   @TokenHash CHAR(64)
-WITH EXECUTE AS OWNER
 AS
 BEGIN
   SET NOCOUNT ON;

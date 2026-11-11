@@ -73,11 +73,14 @@ export class BookingService {
  async list(actor:Actor,token:string,businessId:string,branchId:string):Promise<BookingRead>{
   const result=await this.execute(this.scope(actor,token,businessId,branchId),
    "core.ReadBranchBooking");
-  const resources=(result.recordsets?.[0]??[]).map(row=>({
+  // mssql declares recordsets as indexed-or-named; these two SELECTs
+  // deliberately return ordered sets from a fixed internal stored procedure.
+  const sets=result.recordsets as Array<Array<Record<string,unknown>>>;
+  const resources=(sets[0]??[]).map((row:Record<string,unknown>)=>({
    resourceId:String(row.resourceId),displayName:String(row.displayName),
    kind:String(row.kind),isActive:Boolean(row.isActive),
   }));
-  const appointments=(result.recordsets?.[1]??[]).map(row=>({
+  const appointments=(sets[1]??[]).map((row:Record<string,unknown>)=>({
    bookingId:String(row.bookingId),customerId:String(row.customerId),
    offeringId:String(row.offeringId),resourceId:String(row.resourceId),
    customerName:String(row.customerName),offeringName:String(row.offeringName),

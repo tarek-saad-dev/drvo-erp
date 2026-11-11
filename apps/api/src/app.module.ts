@@ -12,12 +12,14 @@ import { OwnerVerificationController } from "./identity/owner-verification.contr
 import { OwnerVerificationService } from "./identity/owner-verification.service";
 import { BranchInvitationService } from "./identity/branch-invitation.service";
 import { BranchInvitationController } from "./identity/branch-invitation.controller";
+import { ModuleCandidatesController } from "./modules/module-candidates.controller";
+import { ModuleCandidatesService } from "./modules/module-candidates.service";
 
 @Module({
   controllers: [HealthController, DatabaseHealthController, K3ScopeProofController,
     IdentityController, AuthorizedBranchController, BranchAccessController,
-    OwnerVerificationController, BranchInvitationController],
+    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController],
   providers: [FoundationDatabaseService, K3ScopeProofRepository, IdentityService, BranchAccessService,
-    OwnerVerificationService, BranchInvitationService],
+    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService],
 })
 export class AppModule {}

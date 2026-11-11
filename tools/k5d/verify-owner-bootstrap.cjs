@@ -115,9 +115,9 @@ async function run() {
       WITH PASSWORD=N'${stagePass}',CHECK_POLICY=ON,CHECK_EXPIRATION=OFF`);
     await db.query(`CREATE USER [drvo_erp_stage_app]
       FOR LOGIN [drvo_erp_stage_app];GRANT CONNECT TO [drvo_erp_stage_app]`);
-    assert.deepEqual((await applyMigrations(db)).map(x=>x.status),
+    assert.deepEqual((await applyMigrations(db,undefined,9)).map(x=>x.status),
       ['applied','applied','applied','applied','applied','applied','applied','applied','applied']);
-    assert.deepEqual((await applyMigrations(db)).map(x=>x.status),
+    assert.deepEqual((await applyMigrations(db,undefined,9)).map(x=>x.status),
       ['unchanged','unchanged','unchanged','unchanged','unchanged','unchanged','unchanged','unchanged','unchanged']);
     // Mirror existing K5A stage app grants: scoped failed-login throttle only.
     await db.query(`

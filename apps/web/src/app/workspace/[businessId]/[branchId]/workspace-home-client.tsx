@@ -16,6 +16,7 @@ export default function WorkspaceHomeClient({businessId, branchId}: {
   const [branch, setBranch] = useState<Branch | null>(null);
   const [businessName, setBusinessName] = useState("");
   const [canManageMembers, setCanManageMembers] = useState(false);
+  const [canViewCatalog, setCanViewCatalog] = useState(false);
   const [account, setAccount] = useState<Account | null>(null);
   const [status, setStatus] = useState<"loading"|"ready"|"denied"|"error">("loading");
 
@@ -65,6 +66,9 @@ export default function WorkspaceHomeClient({businessId, branchId}: {
         });
         if (!live) return;
         setCanManageMembers(roleResult.ok);
+        const catalogResult=await fetch(base + "/catalog", {credentials:"same-origin",cache:"no-store"});
+        if (!live) return;
+        setCanViewCatalog(catalogResult.ok);
         setStatus("ready");
       } catch {
         if (live) setStatus("error");
@@ -97,6 +101,10 @@ export default function WorkspaceHomeClient({businessId, branchId}: {
         <span className="k5-eyebrow">PLATFORM FOUNDATION</span>
         <h2>مساحة العمل جاهزة للربط بالموديولات</h2>
         <p className="k5-muted">المبيعات والمخزون والحسابات والموظفون هتظهر هنا بعد اكتمال الموديولات وتفعيلها. الوصول للفرع محمي بالصلاحيات الحالية.</p>
+        {canViewCatalog && <Link href={"/workspace/" + encodeURIComponent(businessId) +
+          "/" + encodeURIComponent(branchId) + "/catalog"} className="k5-verify-link">
+          المنتجات والخدمات
+        </Link>}
         {canManageMembers && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/access"} className="k5-verify-link">
           إدارة أعضاء وصلاحيات الفرع

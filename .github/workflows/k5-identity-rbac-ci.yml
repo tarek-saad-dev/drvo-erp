@@ -103,7 +103,10 @@ jobs:
         env:
           K5_SQL_DISPOSABLE: 'YES'
           K5_TEST_PORT: '14335'
-        run: sudo -E node tools/k5-auth/verify-operator-ci.cjs
+        run: |
+          sudo -n env GITHUB_ACTIONS=true K5_SQL_DISPOSABLE=YES \
+            K5_TEST_PORT=14335 SQL_TEST_SA_PASSWORD="$SQL_TEST_SA_PASSWORD" \
+            "$(command -v node)" tools/k5-auth/verify-operator-ci.cjs
       - name: Inspect disposable SQL on failure
         if: failure()
         run: docker logs --tail 100 drvo-k5-operator-disposable || true

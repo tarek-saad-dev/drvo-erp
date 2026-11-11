@@ -1,6 +1,6 @@
 # ADR-032 — Business-Scoped Module Activation, Immutable Bundle Approval & Version Contract
 
-> **2026-11-12 REVIEW PACKET — NOT ACCEPTED:** [Founder/Billing/Security ACT-01–ACT-07 decision packet](../04-execution/ADR-032-FOUNDER-DECISION-PACKET-2026-11-12.md) converts this proposed ADR into explicit choices for approval. Catalog/Customers/Booking engineering authorization is NOT activation authorization; status remains PROPOSED until founder + billing/security decisions are recorded.
+> **2026-11-12 REVIEW PACKET — NOT ACCEPTED:** [Founder/Billing/Security ACT-01–ACT-07 decision packet](../04-execution/ADR-032-FOUNDER-DECISION-PACKET-2026-11-12.md) converts this proposed ADR into explicit V1 choices for approval and links the [SaaS Commercial Core staged engineering plan](../04-execution/SAAS-COMMERCIAL-CORE-ENGINEERING-GATES-2026-11-12.md). Catalog/Customers/Booking engineering authorization is NOT activation authorization; status remains PROPOSED until founder + billing/security decisions are recorded.
 
 **Date:** 2026-10-30  
 **Status:** **PROPOSED / NEEDS FOUNDER + BILLING + ARCHITECTURE SIGN-OFF**, NOT ACCEPTED OR IMPLEMENTED.

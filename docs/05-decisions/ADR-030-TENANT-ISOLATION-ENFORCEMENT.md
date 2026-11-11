@@ -1,7 +1,7 @@
-# ADR-030 — Tenant/Business/Branch Isolation Enforcement Contract (Proposed)
+# ADR-030 — Tenant/Business/Branch Isolation Enforcement Contract
 
 **Date:** 2026-10-30
-**Status:** **PROPOSED — AWAITING FOUNDER AND SECURITY/ARCHITECTURE SIGN-OFF.** Approval to study/document Tenant Isolation is NOT approval of specific SQL/RLS implementation.
+**Status:** **FOUNDER-ACCEPTED BASELINE (2026-11-11)** — trusted server-side Tenant/Business/Branch scope, Allow-only / Default Deny, scoped SQL predicates with parent/child referential integrity, and negative Tenant isolation tests. **Physical RLS choice, extra privilege policies and full implementation/security acceptance remain OPEN.** This is not an approval to apply migrations to VPS, activate public auth, or claim enterprise security certification.
 **Priority:** **P0 pre-code blocker FND-01/FND-10.**
 **Related:** ADR-029 [Founder's Three Pillars](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md); approved Identity Allow-only Default Deny; accepted Tenancy hierarchy; proposed [Isolation Contract](../02-architecture/TENANT-BUSINESS-BRANCH-ISOLATION-CONTRACT.md) and [40-Test Negative Matrix](../02-architecture/TENANT-ISOLATION-NEGATIVE-TEST-MATRIX.md).
 
@@ -14,7 +14,7 @@ A shared SQL Server and one Modular Monolith serve unrelated Tenants and multipl
 - V1 one shared SQL Server, later pools/dedicated tenant placements only based on evidence.
 - ADR-015/016/029 require per-Business Module activation, full dependency/price consent and reusable scalable platform.
 
-## Proposed implementation-neutral ruling for review
+## Accepted implementation-neutral baseline (2026-11-11)
 1. Every protected command/query/event/report/file read is bound to a **trusted authenticated/service execution context** containing immutable Tenant and validated Business/Branch scope; no client-supplied scope grants permissions.
 2. Every data owner declares **scope class** and applies an authorization intersection (identity + active membership + action Allow + resource ancestry + module entitlement as needed + sensitivity policy); omission and stale revocation fail closed.
 3. SQL schema enforces Tenant/Business/Branch parent-child and cross-owned FK referential consistency, while domain/repository methods restrict operations to authorized scoped predicates. Globally unique IDs do **not** authorize by themselves.
@@ -22,7 +22,7 @@ A shared SQL Server and one Modular Monolith serve unrelated Tenants and multipl
 5. Safe cross-Branch transfers and Tenant-level read-only consolidation are distinct authorized domain workflows, not implicit unscoped joins.
 6. Future Tenant placement and enterprise migration preserve ownership, audit, idempotency, money and data recovery without requiring separate industry codebases.
 
-These are **recommendations for security sign-off**, not an accepted SQL schema, RLS selection or completed implementation.
+**Founder accepted these six implementation-neutral invariants as the baseline on 2026-11-11.** This does NOT approve a universal SQL schema, RLS, unrestricted Support access, exact worker/event mechanics or completed isolation evidence. K6C may implement a narrow, tested, opt-in read-only Business candidate-list slice on a review branch.
 
 ## Alternatives that require explicit choice
 - **Physical FK layout:** composite scoped FK/unique constraints versus alternate SQL designs with equivalent isolation proofs. Candidate composite Tenant/Business/Branch keys are recommended for review; performance/index costs must be measured.
@@ -31,12 +31,14 @@ These are **recommendations for security sign-off**, not an accepted SQL schema,
 - **Async jobs and revocation:** permission snapshot vs current access for user-requested exports, distinguishing previously committed irreversible financial obligations from newly requested work.
 - **Future multi-pool placement:** architectural routing seam now, actual deployment only with measured scale/regulatory triggers.
 
-## P0 acceptance before coding/production
-- Explicitly approve the key enforcement choices and permission matrix, resource table ownership and event/worker/cache contract.
-- Execute the [Negative Matrix](../02-architecture/TENANT-ISOLATION-NEGATIVE-TEST-MATRIX.md) **after** separate founder authorization for implementation/tests; document all failures and independently review.
+## Remaining P0 acceptance before production/customer activation
+- Baseline server-side scope, Default Deny, SQL scoped predicates/FKs and negative tests: **FOUNDER ACCEPTED on 2026-11-11**. Per-domain ownership/permission matrix and worker/event/cache/support policies still need review.
+- K6C code and SQL/HTTP negative tests were separately authorized on 2026-11-11 for **this narrow read-only slice**. The broader [Negative Matrix](../02-architecture/TENANT-ISOLATION-NEGATIVE-TEST-MATRIX.md) still needs execution per applicable module and independent security review.
 - No “secure,” “isolated,” “enterprise-ready” certification from a document alone.
 
-## Founder decision requested (not presumed)
-Approve the **baseline enforcement architecture**: trusted server-side scope + default-deny RBAC + owner-scoped repository/SQL predicates + parent/child referential integrity + all non-HTTP boundaries + negative tests; then review physical composite FK and optional SQL Server RLS specifically. This ADR should change to ACCEPTED only after explicit founder confirmation.
+## Founder acceptance and remaining decisions
+**Founder approved the baseline on 2026-11-11**, explicitly: trusted server-issued Tenant/Business/Branch scope, Default Deny, scoped SQL predicates plus referential integrity and negative isolation tests. This also authorizes **K6C read-only Business Module Registry implementation on a GitHub branch/PR** — no public authentication enablement and no VPS SQL migration.
 
-**Status at 2026-10-30:** awaiting approval; no code, SQL migration, tests, VPS activity or production changes.
+**Still requires separate acceptance:** SQL Server RLS decision and pooled-connection testing, privileged Support/break-glass, final cross-Business report grants, background task/revocation policy, exact per-domain resources and broader Tenant Isolation Matrix. ADR-032 for paid activation and ADR-031 for financial truth remain separate proposals. **No customer data, launch approval or staging K5 closeout follows from the baseline.**
+
+**History:** 2026-10-30 status was PROPOSED. **2026-11-11:** narrow baseline ACCEPTED by founder; implementation/CI results must be recorded separately. No VPS migration, live feature activation, real Tenant creation or production security sign-off authorized.

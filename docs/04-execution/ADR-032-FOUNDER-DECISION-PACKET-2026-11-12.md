@@ -42,3 +42,38 @@
 - [ ] No public K5 auth, VPS migrations, real customer access or paid activation until operational sign-off.
 
 **Relationship to ongoing development:** Catalog/Customers/Booking may be engineered behind disabled flags with private, currently scoped SQL/API/UI. **They are not automatically commercially activated**. Never treat the K6C candidate list or test fixtures as released rights.
+
+
+---
+
+## 2026-11-12 — Founder-ready **V1 proposal**, after Booking PR #58 merged
+
+**Evidence update (not release approval):** source-only Shared Catalog #55, Customers #57 and Booking #58 are merged into `main`. Booking's latest PR CI proved scope and two concurrent same-resource booking attempts in disposable SQL. None of migrations **010–013** is approved for VPS; existing K5F operational checker expects 001–009. GitHub code deploy success does not imply commercial activation or customer use.
+
+### Exact decisions requested (recommended V1 policy — NOT APPROVED)
+
+| Decision | Recommended founder choice | What must be proven before changing status |
+| --- | --- | --- |
+| ACT-01 | **Business-scoped; reviewed platform release first.** Release Registry must use signed/reviewed deployed version + validated jurisdiction/industry compatibility; the K6C candidate list alone is NOT a released catalog | Release evidence, versioned compatibility check, default deny |
+| ACT-02 | **One immutable complete bundle preview, one approval.** Include every transitive Required dependency and line-item applicable price, tax treatment, currency, recurrence, expiry, limits and explicitly chosen Optional items. If a value isn't approved/known, **do not label it an exact billable quote** | Finance-approved price/tax/rounding policy; immutable quote hash; stale/expired plan gets new consent |
+| ACT-03 | **No auto-paid activation from screenshots.** V1 can use manual collection **only after** a separate DRVO billing operator verifies evidence and an approved audit/reconciliation policy. Before that: status PENDING; no paid entitlement or activation. No automatic free trial, self-asserted admin grant or gateway payment claimed | Document acceptable payment evidence, independent verifier, dispute/refund/correction/retention policy. Finance owner signoff required |
+| ACT-04 | **Per-Business revision/CAS + idempotency.** Same key+same approved payload is repeatable; same key with different payload rejected; concurrent graph mutations serialize per Business, not per Tenant or platform | Disposable SQL concurrency proof; failure/retry/compensation tests |
+| ACT-05 | **Strict ACTIVE truth.** Release deployed + eligible + same Business configuration valid + all Required dependencies ready + verified current entitlement + session/RBAC; visibility never an access grant | Failure-state truth table, outage/expiry/recovery tests, role revocation after preview |
+| ACT-06 | **Paid approvals: Business Owner only in first V1** (explicit valid Business membership and action), with separately authorized DRVO billing verifier; no Manager delegation until permission matrix is reviewed and explicitly approved | Negative Branch-only Manager tests, scope checks at commit, dual-control audit. This is a new recommendation, not an existing founder rule |
+| ACT-07 | **Block prerequisite disable** while any dependent active. A materially priced upgrade gets a new bundle quote/consent. After expiry, preserve historical business records and mandatory obligations; any read-only access policy is a separate consent/privacy/security decision | Dependency downgrade, retention, read/archive access and recovery matrix |
+
+**Questions to close outside the platform code:** actual Egypt Salon Starter module list and mandatory finance controls, which Modules carry charges, per-Business tax/currency/proration and cancellation/refund policy, quote validity window, operator proof/retention rules, paid entitlement limits (seats/branches), release compatibility matrices, and optional Manager delegation. **No hard-coded price, required module list or tax rate is approved by this document.**
+
+### Product vs Kernel financial separation
+
+- **DRVO SaaS commercial billing:** quote, subscription charge, manual payment confirmation, refund/credit and entitlement evidence for using DRVO Modules. Its source of financial truth belongs to the **DRVO commercial owner**, not Salon POS or the Lean Kernel's identity tables.
+- **Customer Business sales:** salon service sales, receivables, tender claims, cash, inventory costs, commissions and financial journal belong to **Business-domain** POS/Treasury/Accounting Modules. **ADR-031 is still PROPOSED**; do not use SaaS activation to silently decide first journal posting or mark customer invoices paid.
+- **Kernel:** checks only trusted scope, valid reviewed release/eligibility, activation state, current entitlement and role/action in each API/workflow. It **does not** determine payment settlement, compute tax or change a merchant's ledger.
+
+### One approval action versus engineering/operations approvals
+
+A founder may approve **ACT-01–ACT-07 as a product/architecture V1 baseline** with stated exceptions, but that **does not** approve prices, actual money collection, entitlements/Activation API implementation, migrations, Public Auth, VPS work, or real users. Require separate finance/security review and a specifically authorized engineering PR for any mutation path. Existing business product policies in ADR-007/015/016 remain unchanged.
+
+**Suggested single decision record:** “أوافق على توصيات ACT-01 إلى ACT-07 كـ ADR-032 V1 Baseline فقط: التفعيل لكل Business، Owner فقط للاعتماد المدفوع، عرض الباقة وسعرها كاملين وموافقة واحدة، PENDING قبل تحقق مالي مستقل، CAS+Idempotency، Default Deny، ومنع إيقاف Required Dependencies؛ وأبقي التسعير والضرائب والتحصيل والتفويض والصلاحيات الدقيقة وVPS Migration/Public Auth لموافقات منفصلة.” Do NOT record as accepted until founder actually says so.
+
+**Next engineering sequence after approval:** [SaaS Commercial Core guarded delivery plan](SAAS-COMMERCIAL-CORE-ENGINEERING-GATES-2026-11-12.md). In the meantime, develop only code-free review plans and isolated tests; do not grant entitlements or emit paid invoices.

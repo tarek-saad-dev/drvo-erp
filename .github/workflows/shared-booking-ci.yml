@@ -1,0 +1,63 @@
+name: Shared Booking SQL API HTTP CI
+on:
+  pull_request:
+    paths:
+      - 'apps/api/src/booking/**'
+      - 'apps/api/src/app.module.ts'
+      - 'apps/api/test/booking.test.cjs'
+      - 'apps/web/src/app/workspace/**'
+      - 'db/migrations/**'
+      - 'tools/booking/**'
+      - '.github/workflows/shared-booking-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/api/src/booking/**'
+      - 'apps/api/src/app.module.ts'
+      - 'apps/api/test/booking.test.cjs'
+      - 'apps/web/src/app/workspace/**'
+      - 'db/migrations/**'
+      - 'tools/booking/**'
+      - '.github/workflows/shared-booking-ci.yml'
+permissions:
+  contents: read
+jobs:
+  booking-sql-http:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build API, run unit tests and validate Booking test script
+        run: |
+          set -euo pipefail
+          npm ci --prefix apps/api --no-audit --no-fund
+          npm test --prefix apps/api
+          node --check tools/booking/verify.cjs
+      - name: Start disposable localhost SQL Server 2022
+        shell: bash
+        run: |
+          set -euo pipefail
+          pw="DrvoBookingCi_$(openssl rand -hex 18)!"
+          echo "::add-mask::$pw"
+          echo "SQL_TEST_SA_PASSWORD=$pw" >> "$GITHUB_ENV"
+          docker run --detach --name drvo-booking-ci \
+            -e ACCEPT_EULA=Y \
+            -e MSSQL_PID=Developer \
+            -e MSSQL_SA_PASSWORD="$pw" \
+            -p 127.0.0.1:14342:1433 \
+            -p 127.0.0.1:1433:1433 \
+            mcr.microsoft.com/mssql/server:2022-latest
+      - name: Prove scoped Booking SQL, real HTTP, overlap and concurrent inserts
+        env:
+          BOOKING_SQL_DISPOSABLE: 'YES'
+          BOOKING_TEST_PORT: '14342'
+        run: node tools/booking/verify.cjs
+      - name: Show disposable SQL diagnostics on failure
+        if: failure()
+        run: docker logs --tail 70 drvo-booking-ci || true
+      - name: Destroy disposable SQL
+        if: always()
+        run: docker rm -f drvo-booking-ci || true

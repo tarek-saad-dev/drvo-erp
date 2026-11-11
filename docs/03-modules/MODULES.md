@@ -14,7 +14,7 @@ This is a **planned scope map**, not a statement that modules are fully availabl
 | Salon Extension | Barber assignment, commissions, booking/queue links | Planned |
 | Retail Extension | Barcodes, units and stock-selling workflows | Planned |
 | Inventory | Stock movements, purchasing basics | Planned |
-| Booking / Queue | Appointments, resources, completion | Planned |
+| Booking / Queue | Appointments, resources, completion | **First BOOKED-only read/create slice on PR; no cancellation/completion; not deployed** |
 | HR / Payroll | Employees, attendance, compensation | Planned |
 | Finance | Cash control, reporting, eventual accounting | Planned |
 | SaaS Billing | Subscriptions, plans, entitlements, admin control | Planned |

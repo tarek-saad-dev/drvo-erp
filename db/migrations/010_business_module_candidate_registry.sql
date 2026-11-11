@@ -37,6 +37,11 @@ WITH EXECUTE AS OWNER
 AS
 BEGIN
   SET NOCOUNT ON;
+  -- Hold authorization joins stable until the candidate rows are read.
+  -- Reset isolation on BOTH success/failure to avoid pooled-session leakage.
+  BEGIN TRY
+    SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+    BEGIN TRANSACTION;
   -- All caller identity data comes from a previously verified server session.
   -- Recheck the *same* live session and active branch permission atomically
   -- with the read, against persisted SQL memberships, never client scope claims.
@@ -87,6 +92,14 @@ BEGIN
     AND b.BusinessId=c.BusinessId AND b.IsActive=1
   WHERE c.TenantId=@TenantId AND c.BusinessId=@BusinessId
   ORDER BY c.ModuleKey;
+    COMMIT TRANSACTION;
+    SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+  END TRY
+  BEGIN CATCH
+    IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+    SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+    THROW;
+  END CATCH
 END
 ');
 

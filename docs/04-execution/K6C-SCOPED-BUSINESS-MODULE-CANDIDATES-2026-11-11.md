@@ -20,7 +20,7 @@ Reuses the **existing K5 authenticated session** and active Branch membership/RB
 
 ## SQL and permissions (proposal only)
 
-- `db/migrations/010_business_module_candidate_registry.sql`: additive `core.BusinessModuleCandidate` keyed by `(TenantId, BusinessId, ModuleKey)` with a composite FK to `core.Business`, no prefilled data; a query-only, owner-executed procedure with current-session RBAC checks.
+- `db/migrations/010_business_module_candidate_registry.sql`: additive `core.BusinessModuleCandidate` keyed by `(TenantId, BusinessId, ModuleKey)` with a composite FK to `core.Business`, no prefilled data; a query-only procedure with **static same-owner SQL ownership chaining** (no caller impersonation) with current-session RBAC checks.
 - The existing staging app principal `drvo_erp_stage_app` gets **EXECUTE on the fixed scoped procedure ONLY**, with explicit direct SELECT/INSERT/UPDATE/DELETE DENY on the table. The migration does not grant ownership, public login or unscoped catalog reads.
 - **Not authorized for VPS execution**. The old K5F root-owned readiness checker expects **exactly migrations 001–009**, so applying 010 before a separately reviewed K5F checker/runtime-bundle update would make K5F readiness fail. Do **not** run any staging DB migration workflow for this PR or use a manual SQL tool on the VPS.
 - The K5D historical onboarding CI was explicitly pinned to its own 001–009 migration subset to keep old security assertions stable while the new K6C isolated SQL test applies 001–010 in **disposable CI only**.
@@ -44,4 +44,4 @@ Reuses the **existing K5 authenticated session** and active Branch membership/RB
 - **Changed areas:** `apps/api/src/modules`, AppModule provider/controller wiring, `db/migrations/010...`, `apps/api/test`, `tools/k6c`, K6C CI workflow, historical K5D test pin and synchronized ADR/roadmap/state/changelog/docs.
 - **No deployment requested:** no flags, real emails, accounts or SQL migrations on VPS; CI operates only on an isolated GitHub runner. GitHub merge may trigger a staging *code* deploy workflow; it is not schema approval or public activation.
 - **Rollback before migration:** revert PR; no data rollback. **After future authorized migration**: forward-only corrective migration plan and independent backup/restore review required; never silently drop candidate records.
-- **Next decisions:** security review of EXECUTE AS OWNER procedure and isolation test coverage; evaluate deferred RLS/pool isolation. Obtain separate ADR-032 approval before actual module activation, entitlements, prices or Business-selected configuration.
+- **Next decisions:** security review of static SQL ownership chaining and no owner impersonation and isolation test coverage; evaluate deferred RLS/pool isolation. Obtain separate ADR-032 approval before actual module activation, entitlements, prices or Business-selected configuration.

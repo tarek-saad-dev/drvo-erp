@@ -1,0 +1,62 @@
+name: Shared Customers SQL API HTTP CI
+on:
+  pull_request:
+    paths:
+      - 'apps/api/src/customers/**'
+      - 'apps/api/src/app.module.ts'
+      - 'apps/api/test/customers.test.cjs'
+      - 'apps/web/src/app/workspace/**'
+      - 'db/migrations/**'
+      - 'tools/customers/**'
+      - '.github/workflows/shared-customers-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/api/src/customers/**'
+      - 'apps/api/src/app.module.ts'
+      - 'apps/api/test/customers.test.cjs'
+      - 'apps/web/src/app/workspace/**'
+      - 'db/migrations/**'
+      - 'tools/customers/**'
+      - '.github/workflows/shared-customers-ci.yml'
+permissions:
+  contents: read
+jobs:
+  customers-sql-http:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compile API and verify unit tests
+        run: |
+          set -euo pipefail
+          npm ci --prefix apps/api --no-audit --no-fund
+          npm test --prefix apps/api
+          node --check tools/customers/verify.cjs
+      - name: Start local disposable SQL Server
+        shell: bash
+        run: |
+          set -euo pipefail
+          pw="DrvoCustomersCi_$(openssl rand -hex 18)!"
+          echo "::add-mask::$pw"
+          echo "SQL_TEST_SA_PASSWORD=$pw" >> "$GITHUB_ENV"
+          docker run --detach --name drvo-customers-ci \
+            -e ACCEPT_EULA=Y -e MSSQL_PID=Developer \
+            -e MSSQL_SA_PASSWORD="$pw" \
+            -p 127.0.0.1:14341:1433 \
+            -p 127.0.0.1:1433:1433 \
+            mcr.microsoft.com/mssql/server:2022-latest
+      - name: Verify scoped Customer reads/writes and negative Tenant/Business/Branch SQL HTTP cases
+        env:
+          CUSTOMERS_SQL_DISPOSABLE: 'YES'
+          CUSTOMERS_TEST_PORT: '14341'
+        run: node tools/customers/verify.cjs
+      - name: Show SQL logs only on failure
+        if: failure()
+        run: docker logs --tail 75 drvo-customers-ci || true
+      - name: Cleanup disposable SQL
+        if: always()
+        run: docker rm -f drvo-customers-ci || true

@@ -9,7 +9,7 @@ This is a **planned scope map**, not a statement that modules are fully availabl
 |---|---|---|
 | Platform / Identity | Auth, membership, roles, tenants, businesses, branches | Planned |
 | Catalog | Products/services, categories, pricing | **Initial create/list slice in review PR; not activated/deployed** |
-| Customers | Customer profiles and relationships | Planned |
+| Customers | Customer profiles and relationships | **Initial create/list contact slice on stacked PR; not activated/deployed** |
 | POS Core | Sales, line items, discount, tax, payment flow, refunds, session | Planned |
 | Salon Extension | Barber assignment, commissions, booking/queue links | Planned |
 | Retail Extension | Barcodes, units and stock-selling workflows | Planned |

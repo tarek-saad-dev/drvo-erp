@@ -197,6 +197,12 @@ async function main(){
       await hasSqlError(()=>makeCandidate(admin,x.t1,x.b3,'Wrong','Wrong'),547);
     });
     await pass('runtime principal has EXECUTE but no direct table access',async()=>{
+      const procedure=await admin.query(
+        "SELECT execute_as_principal_id AS impersonates FROM sys.sql_modules "+
+        "WHERE object_id=OBJECT_ID(N'core.ReadBusinessModuleCandidates')");
+      assert.equal(procedure.recordset.length,1);
+      assert.equal(procedure.recordset[0].impersonates,null,
+        'procedure must not impersonate dbo or elevated principal');
       app=await open({...base,database:db,user:appUser,password:appPass});
       const perms=await app.query(
         "SELECT HAS_PERMS_BY_NAME('core.BusinessModuleCandidate','OBJECT','SELECT') AS sel,"+

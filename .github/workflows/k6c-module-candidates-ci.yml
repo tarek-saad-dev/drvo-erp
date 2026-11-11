@@ -1,0 +1,61 @@
+name: K6C Scoped Business Module Candidates SQL HTTP CI
+on:
+  pull_request:
+    paths:
+      - 'apps/api/src/modules/**'
+      - 'apps/api/src/app.module.ts'
+      - 'apps/api/test/module-candidates.test.cjs'
+      - 'db/migrations/**'
+      - 'tools/k6c/**'
+      - '.github/workflows/k6c-module-candidates-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/api/src/modules/**'
+      - 'apps/api/src/app.module.ts'
+      - 'apps/api/test/module-candidates.test.cjs'
+      - 'db/migrations/**'
+      - 'tools/k6c/**'
+      - '.github/workflows/k6c-module-candidates-ci.yml'
+permissions:
+  contents: read
+jobs:
+  tenant-isolation-sql-http:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compile and unit test API (includes K6C gate checks)
+        run: |
+          set -euo pipefail
+          npm ci --prefix apps/api --no-audit --no-fund
+          npm test --prefix apps/api
+          node --check tools/k6c/verify.cjs
+      - name: Start disposable localhost SQL Server 2022
+        shell: bash
+        run: |
+          set -euo pipefail
+          pass="DrvoK6C_Ci_$(openssl rand -hex 18)!"
+          echo "::add-mask::$pass"
+          echo "SQL_TEST_SA_PASSWORD=$pass" >> "$GITHUB_ENV"
+          docker run --detach --name drvo-k6c-ci \
+            -e ACCEPT_EULA=Y \
+            -e MSSQL_PID=Developer \
+            -e MSSQL_SA_PASSWORD="$pass" \
+            -p 127.0.0.1:14339:1433 \
+            -p 127.0.0.1:1433:1433 \
+            mcr.microsoft.com/mssql/server:2022-latest
+      - name: Verify scoped SQL, EXECUTE-only permissions and real NestJS HTTP isolation
+        env:
+          K6C_SQL_DISPOSABLE: 'YES'
+          K6C_TEST_PORT: '14339'
+        run: node tools/k6c/verify.cjs
+      - name: Diagnose SQL failures only
+        if: failure()
+        run: docker logs --tail 70 drvo-k6c-ci || true
+      - name: Destroy disposable database container
+        if: always()
+        run: docker rm -f drvo-k6c-ci || true

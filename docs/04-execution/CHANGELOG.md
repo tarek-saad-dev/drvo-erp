@@ -3,7 +3,7 @@
 ## 2026-11-11 — ADR-030 Baseline accepted; K6C read-only candidates PR
 
 - Founder explicitly accepted trusted server-side Tenant/Business/Branch scope, Default Deny, scoped SQL ancestry/predicates and negative isolation tests for a **narrow K6C review-only slice**; SQL RLS/future worker/support policies remain open, and ADR-032 activation remains proposed.
-- Added feature-branch SQL migration 010 for empty Business-scoped candidate metadata and EXECUTE-only stored procedure; API route with K5 session + K6C read flag both disabled by default; new unit and disposable SQL+Nest HTTP negative isolation CI.
+- Added feature-branch SQL migration 010 for empty Business-scoped candidate metadata and EXECUTE-only stored procedure; API route with K5 session + K6C read flag both disabled by default; new unit and disposable SQL+Nest HTTP negative isolation CI. The procedure uses same-owner static SQL ownership chaining (not EXECUTE AS OWNER) so the restricted SQL migrator can apply it; CI operator proofs pass explicit disposable-only environment variables under hardened sudo.
 - Pinned K5D historical onboarding test to its 001–009 set. **No SQL migration on VPS**: the old K5F readiness checker assumes exactly 9 migrations and requires reviewed upgrade before any 010 deploy. No customers, emails, feature activation, published Module releases, prices or entitlements.
 - Source and verification checklist: [K6C report](K6C-SCOPED-BUSINESS-MODULE-CANDIDATES-2026-11-11.md). PR test/deploy results are not implied until independently verified.
 

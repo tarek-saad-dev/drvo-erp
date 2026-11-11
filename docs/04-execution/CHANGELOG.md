@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-11-12 — Shared Customers v0 (stacked PR, review only)
+
+- Business-owned Customer contacts (name, optional E.164 phone), composite SQL isolation FK, idempotent create/list read model, K5 session+customers.read/manage authorizations rechecked inside scoped SQL transaction; app principal has EXECUTE only.
+- Private RTL Customers page, authorized Workspace navigation, unit tests and synthetic disposable SQL+HTTP negative isolation tests. No clinical records, CRM campaign, customer onboarding or legacy imports.
+- No VPS migration 012 (or 010/011), public auth or feature enable. [Customers Core](../03-modules/CUSTOMERS-CORE-V1.md) · [Execution](CUSTOMERS-SLICE-2026-11-12.md).
+
+
 ## 2026-11-12 — Shared Catalog initial product slice (feature PR; CI required)
 
 - Added generic Business-owned Categories and SERVICE/PRODUCT Offerings with integer list price + currency, optional service duration, composite SQL scope/FKs, idempotent scoped create/list SQL procedures and denied direct app SQL table access.

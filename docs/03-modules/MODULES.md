@@ -3,12 +3,12 @@
 > **NORTH STAR ADR-029:** Modules are reusable platform capabilities supporting ANY investigated industry and businesses from tiny to huge. The valid minimum Business setup must not be artificially bloated; independent Domain Modules are justified by genuine aggregates/lifecycles. **Adding Modules does not automatically scale SQL/operations** — every major module design must pass [Architecture Fitness Gates](../02-architecture/UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md). [Founder Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md).
 
 
-This is a **planned scope map**, not a statement that modules exist in code.
+This is a **planned scope map**, not a statement that modules are fully available to customers. **2026-11-12:** a narrow Shared Catalog create/list SQL/API/private UI vertical slice is implemented on a **review branch**, with SQL 011 not deployed/approved; edit/archive, variants, commerce and full V1 remain unfinished. See [Catalog Core V1](CATALOG-CORE-V1.md).
 
 | Module | Scope | Status |
 |---|---|---|
 | Platform / Identity | Auth, membership, roles, tenants, businesses, branches | Planned |
-| Catalog | Products/services, categories, pricing | Planned |
+| Catalog | Products/services, categories, pricing | **Initial create/list slice in review PR; not activated/deployed** |
 | Customers | Customer profiles and relationships | Planned |
 | POS Core | Sales, line items, discount, tax, payment flow, refunds, session | Planned |
 | Salon Extension | Barber assignment, commissions, booking/queue links | Planned |

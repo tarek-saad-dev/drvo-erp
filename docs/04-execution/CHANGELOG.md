@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-12 — Shared Catalog initial product slice (feature PR; CI required)
+
+- Added generic Business-owned Categories and SERVICE/PRODUCT Offerings with integer list price + currency, optional service duration, composite SQL scope/FKs, idempotent scoped create/list SQL procedures and denied direct app SQL table access.
+- Added gated NestJS Catalog API (existing K5 HttpOnly session, exact catalog.read/manage permission, no forged scope, same-origin write), private RTL Next.js Catalog workspace and conditional entry.
+- Added unit tests, disposable SQL+Nest HTTP isolation CI and domain/rollout docs. No approved Catalog edit/archive, financial posting or paid Module activation.
+- SQL migration 011 **CI-only; never authorized for VPS**, 010 similarly held; public auth and Catalog API/Web feature flags remain OFF. [Catalog contract](../03-modules/CATALOG-CORE-V1.md) · [Rollout constraints](SHARED-CATALOG-IMPLEMENTATION-2026-11-12.md).
+
+
 ## 2026-11-11 — ADR-030 Baseline accepted; K6C read-only candidates PR
 
 - Founder explicitly accepted trusted server-side Tenant/Business/Branch scope, Default Deny, scoped SQL ancestry/predicates and negative isolation tests for a **narrow K6C review-only slice**; SQL RLS/future worker/support policies remain open, and ADR-032 activation remains proposed.

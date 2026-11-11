@@ -128,7 +128,10 @@ jobs:
         env:
           DRVO_DB_CI_DISPOSABLE: 'YES'
           NODE_PATH: ${{ github.workspace }}/apps/api/node_modules
-        run: sudo -E node tools/staging-db-automation/verify-bootstrap-ci.cjs
+        run: |
+          sudo -n env GITHUB_ACTIONS=true DRVO_DB_CI_DISPOSABLE=YES \
+            SQL_TEST_SA_PASSWORD="$SQL_TEST_SA_PASSWORD" NODE_PATH="$NODE_PATH" \
+            "$(command -v node)" tools/staging-db-automation/verify-bootstrap-ci.cjs
       - name: Verify dedicated secret is readable only by restricted Unix user
         shell: bash
         run: |

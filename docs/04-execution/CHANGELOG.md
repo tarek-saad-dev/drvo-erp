@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-12 — First shared Booking Core vertical slice (PR, not deployed)
+
+- Added Branch-owned Resources (person/chair/room/equipment) and BOOKED-only Appointment records referencing scoped Customers and Catalog SERVICE IDs via composite FKs; stored UTC interval using Catalog service duration at creation.
+- Added scoped K5-authenticated Booking read/create endpoints, `booking.read/manage` SQL runtime checks, transactional resource-row lock against overlapping or concurrent appointments, idempotent retry, and default-OFF Booking feature flags.
+- Added private RTL Booking workspace, conditional authorized App entry, strict unit checks and disposable SQL+real HTTP isolation/concurrent double-booking CI.
+- **No SQL 013 (nor 010–012) on VPS, no public auth/booking flags, no real data or customer self-service.** Booking is an initial Module slice only; cancellation, hours/HR shifts and real Salon operations remain planned. [Core contract](../03-modules/BOOKING-CORE-V1.md) · [CI and review](BOOKING-SLICE-2026-11-12.md).
+
+
 ## 2026-11-12 — Shared Customers v0 (stacked PR, review only)
 
 - Business-owned Customer contacts (name, optional E.164 phone), composite SQL isolation FK, idempotent create/list read model, K5 session+customers.read/manage authorizations rechecked inside scoped SQL transaction; app principal has EXECUTE only.

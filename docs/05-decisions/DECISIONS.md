@@ -45,7 +45,7 @@ Accepted directions are **not implemented features**.
 
 | ADR-029 | Founder architecture mission: national ERP platform, any-industry extensibility, micro-to-enterprise functional and technical scale | Accepted foundational guardrails | [ADR-029](ADR-029-THREE-PILLAR-UNIVERSAL-ERP-ARCHITECTURE.md) |
 
-| ADR-030 | Enforce Tenant/Business/Branch isolation through trusted scopes, scoped data, workers and exports | **PROPOSED — founder/security sign-off pending** | [ADR-030](ADR-030-TENANT-ISOLATION-ENFORCEMENT.md) |
+| ADR-030 | Enforce Tenant/Business/Branch isolation through trusted scopes, scoped data, workers and exports | **FOUNDER-ACCEPTED BASELINE (2026-11-11); RLS + broader policies still OPEN** | [ADR-030](ADR-030-TENANT-ISOLATION-ENFORCEMENT.md) |
 
 | ADR-031 | First POS sale + mandatory Accounting journal atomic A vs durable pending B; separated tender/stock/commission truth | **PROPOSED — founder/finance/architecture choice pending** | [ADR-031](ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md) |
 
@@ -63,7 +63,7 @@ Accepted directions are **not implemented features**.
 
 | ADR-038 | DRVO ERP master corporate D logo and pictured primary/on-dark/monochrome variations; multi-industry parent identity | **ACCEPTED — founder (2026-11-10)** | [ADR-038](ADR-038-DRVO-MASTER-LOGO-AND-VARIATIONS.md) |
 
-**Foundation Constitution CONST-01..04:** all four accepted through ADR-033..036; [V1 Final Foundation Review](../02-architecture/CORE-CONSTITUTION-V1-FINAL-FOUNDATION-REVIEW.md) marks stable design direction only. ADR-030..032 remain proposed; no implementation authorized.
+**Foundation Constitution CONST-01..04:** all four accepted through ADR-033..036; [V1 Final Foundation Review](../02-architecture/CORE-CONSTITUTION-V1-FINAL-FOUNDATION-REVIEW.md) marks stable design direction only. ADR-030 baseline accepted on 2026-11-11 for trusted scope, Default Deny, scoped SQL/referential integrity and negative tests; **RLS/broader security signoff remain open**. ADR-031/032 remain proposed; K6C code/test-only authorization does not permit VPS SQL migrations or public auth activation.
 
 **Product launch and pilot decisions** are recorded in [Product Discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md) and [Roadmap](../04-execution/ROADMAP.md).
 

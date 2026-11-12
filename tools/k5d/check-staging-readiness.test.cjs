@@ -2,7 +2,7 @@
 const test=require('node:test');
 const assert=require('node:assert/strict');
 const {
-  MIGRATIONS,PRIVATE_TABLES,NO_DIRECT_TABLE_PERMISSIONS,PUBLIC_PROCEDURES,parseEnv,
+  MIGRATIONS,PRIVATE_TABLES,NO_DIRECT_TABLE_PERMISSIONS,PUBLIC_PROCEDURES,API_GATES,WEB_GATES,parseEnv,
   noDirectTablePermissions,rootBundleSafe,
   sameSecret,readinessChecks,dbConfig,
 }=require('./check-staging-readiness.cjs');
@@ -65,17 +65,31 @@ test('both missing and divergent HMAC fail closed and never compare secret text'
   assert.ok(badLabels(mockOperator,{...mockApi,
     DRVO_K5_VERIFICATION_HMAC_KEY:'bd'.repeat(32)}).some(x=>x.includes('verification secret')));
 });
-test('the public API + Web feature flags must remain closed',()=>{
-  for(const gate of ['DRVO_K5_AUTH_ENABLED','DRVO_K5_OWNER_BOOTSTRAP_ENABLED',
+test('every currently implemented K5 + Catalog + Customers + Booking + POS gate stays OFF',()=>{
+  assert.deepEqual(API_GATES,[
+    'DRVO_K5_AUTH_ENABLED','DRVO_K5_OWNER_BOOTSTRAP_ENABLED',
     'DRVO_K5_VERIFY_API_ENABLED','DRVO_K5_INVITATIONS_ENABLED',
-    'DRVO_K5_ROLE_ADMIN_ENABLED']){
+    'DRVO_K5_ROLE_ADMIN_ENABLED','DRVO_CATALOG_ENABLED',
+    'DRVO_CUSTOMERS_ENABLED','DRVO_BOOKING_ENABLED',
+    'DRVO_POS_PREVIEW_ENABLED','DRVO_POS_DRAFTS_ENABLED',
+  ]);
+  assert.deepEqual(WEB_GATES,[
+    'DRVO_K5_WEB_ENABLED','DRVO_K5_VERIFY_UI_ENABLED',
+    'DRVO_CATALOG_WEB_ENABLED','DRVO_CUSTOMERS_WEB_ENABLED',
+    'DRVO_BOOKING_WEB_ENABLED','DRVO_POS_PREVIEW_WEB_ENABLED',
+    'DRVO_POS_DRAFTS_WEB_ENABLED',
+  ]);
+  for(const gate of API_GATES){
     assert.ok(badLabels(mockOperator,{...mockApi,[gate]:'YES'})
       .some(x=>x.includes('flags remain OFF')),gate);
   }
-  for(const gate of ['DRVO_K5_WEB_ENABLED','DRVO_K5_VERIFY_UI_ENABLED']){
+  for(const gate of WEB_GATES){
     assert.ok(badLabels(mockOperator,mockApi,{...mockWeb,[gate]:'YES'})
       .some(x=>x.includes('flags remain OFF')),gate);
   }
+  assert.deepEqual(badLabels(mockOperator,
+    {...mockApi,DRVO_POS_DRAFTS_ENABLED:'NO'},
+    {...mockWeb,DRVO_POS_DRAFTS_WEB_ENABLED:'NO'}),[]);
 });
 test('malformed provider config, drifted origin, missing nginx trust fail',()=>{
   assert.ok(badLabels({...mockOperator,DRVO_K5_RESEND_API_KEY:'bad'}).length);

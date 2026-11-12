@@ -1,5 +1,11 @@
 # Project changelog
 
+## 2026-11-12 — K5F-2 + ADR-031 decision evidence merged checkpoint
+
+- Merged PR #66 (read-only K5F API/Web 17-flag safety check, local source migration 001–014 hash report and negative tests) and PR #67 (synthetic first-GL Option A/B truth test and Founder/Finance decision packet). CI K0/K1/K5D PASS as applicable.
+- Staging **code-only** SSH receiver deployment for #66 merge SHA succeeded: [GitHub Actions #43208411618](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43208411618). No SQL VPS migration, root-owned K5F bundle refresh/execution, off-host backup restoration, customer auth activation, financial posting or accepted ADR-031/032 follows from this CI/deploy result.
+
+
 ## 2026-11-12 — ADR-031 first-journal Founder/Finance review packet (not accepted)
 
 - Added test-only synthetic 32-combination atomic-A/async-B first GL truth matrix, independent Treasury tender evidence assertions and unexpected-input negative cases.

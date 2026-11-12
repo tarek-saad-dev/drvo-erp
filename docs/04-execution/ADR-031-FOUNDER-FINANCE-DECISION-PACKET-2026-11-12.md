@@ -1,6 +1,6 @@
 # ADR-031 — Founder / Finance first-journal decision packet (2026-11-12)
 
-**Status: PROPOSED; NO FINANCE OR FOUNDER ACCEPTANCE RECORDED.** Engineering owner instructed to prepare ADR-031 in parallel with staging-readiness hardening. This document and test-only evidence do **not** change ADR-031's status, invoice/GL policy, tax treatment, SQL, runtime API, payment providers, or existing POS DRAFT-only flags. [ADR-031 proposal](../05-decisions/ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md) · [Financial Account Mapping](../02-architecture/FINANCIAL-ACCOUNT-MAPPING-AND-CLOSE-GATES-DESIGN.md).
+**Status: PR #67 MERGED; ADR-031 still PROPOSED; NO FINANCE OR FOUNDER ACCEPTANCE RECORDED.** Engineering owner instructed to prepare ADR-031 in parallel with staging-readiness hardening. This document and test-only evidence do **not** change ADR-031's status, invoice/GL policy, tax treatment, SQL, runtime API, payment providers, or existing POS DRAFT-only flags. [ADR-031 proposal](../05-decisions/ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md) · [Financial Account Mapping](../02-architecture/FINANCIAL-ACCOUNT-MAPPING-AND-CLOSE-GATES-DESIGN.md).
 
 ## Architecture impact before implementation
 

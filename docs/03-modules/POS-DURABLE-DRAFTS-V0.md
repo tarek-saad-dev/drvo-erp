@@ -1,6 +1,6 @@
 # Shared POS Core — persisted DRAFT-only V0
 
-**Status (2026-11-12): GitHub PR / CI-only SQL 014; NOT customer activated, NOT Sale/Accounting.** This is the first **durable, nonposting** POS document slice, following [PL-1 preview](POS-PREVIEW-CORE-V0.md). ADR-031 First-GL and ADR-032 paid module activation remain PROPOSED.
+**Status (2026-11-12): code merged in main via PR #64; SQL 014 remains CI-only and NOT authorized on VPS. Not customer activated and not Sale/Accounting.** This is the first **durable, nonposting** POS document slice, following [PL-1 preview](POS-PREVIEW-CORE-V0.md). ADR-031 First-GL and ADR-032 paid module activation remain PROPOSED.
 
 ## Ownership and data
 

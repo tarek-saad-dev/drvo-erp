@@ -1,6 +1,6 @@
 # K5F-3 — Post-migration isolated restore rehearsal (2026-11-12)
 
-**Status: DISPOSABLE CI REVIEW ONLY — NO VPS DISASTER RECOVERY OR STAGING SQL APPROVAL.** This follows [K5F-2](K5F2-STAGING-ACTIVATION-READINESS-2026-11-12.md). K5F operational acceptance is still OPEN; ADR-032 commercial activation and ADR-031 financial posting remain PROPOSED.
+**Status: PR #69 MERGED with K0/K1 and staging database automation SQL/restore CI successful. DISPOSABLE CI EVIDENCE ONLY — NO VPS DISASTER RECOVERY OR STAGING SQL APPROVAL.** This follows [K5F-2](K5F2-STAGING-ACTIVATION-READINESS-2026-11-12.md). K5F operational acceptance is still OPEN; ADR-032 commercial activation and ADR-031 financial posting remain PROPOSED.
 
 ## Architecture impact (before implementation)
 

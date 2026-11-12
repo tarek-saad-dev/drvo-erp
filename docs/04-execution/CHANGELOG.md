@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-12 — CU-1 Cashier pinned-source executable parity (review PR)
+
+- Added unmodified test-only pinned Cashier BusinessDay/Payroll pure TS source snapshots and Git blob identity checks, executing original functions isolated from any legacy SQL/PII.
+- Compared supported day-reconciliation decisions to independent DRVO characterization, intentionally rejected invalid ISO dates and captured golden payroll proration/retro impact cases; not HR production parity.
+- No migration, live Cashier change, source DB access, Customer import or runtime dependencies. [CU-1 audit](CASHIER-PINNED-SOURCE-PARITY-2026-11-12.md).
+
+
+
 ## 2026-11-12 — PL-1 POS nonposting checkout-preview feature PR
 
 - Added private feature-gated Shared POS preview API and RTL temporary cart; server refreshes authorized Catalog prices and computes minor-unit list-price subtotal without persistence or posted status.

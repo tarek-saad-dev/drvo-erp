@@ -1,5 +1,9 @@
 # Roadmap
 
+> **2026-11-12 CU-1 PINNED CASHIER SOURCE PARITY PR:** [CU-1 source-provenance and test packet](CASHIER-PINNED-SOURCE-PARITY-2026-11-12.md) checks original Cashier BusinessDay and Payroll TS via exact Git blob snapshots and isolated test execution. BusinessDay candidate matches valid cases, invalid dates deliberately reject; payroll results are baseline observations only. CU-2 synthetic scoped legacy-ID mapping is next, CU-3 domain-owned adapted pure functions after review. No runtime legacy dependency or live data.
+
+
+
 > **2026-11-12 PL-1 NONPOSTING POS PREVIEW (PR):** [POS Preview bounded implementation](POS-NONPOSTING-PREVIEW-2026-11-12.md) builds optional private ephemeral cart with fresh scoped Catalog pricing and disposable SQL/HTTP negative tests, without a durable Draft, payment, GL, tax or any POSTED sale. Next PL-1b versioned POS-owned drafts with distinct RBAC after review; PL-2 choose ADR-031; PL-3 financially posted sale only after sign-off. K5F, ADR-032 and SQL VPS/flags unchanged.
 
 

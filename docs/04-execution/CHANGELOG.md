@@ -1,5 +1,11 @@
 # Project changelog
 
+## 2026-11-12 — First interactive Salon Demo merged and staging receiver accepted code
+
+- Merged [PR #72](https://github.com/tarek-saad-dev/drvo-erp/pull/72): public mock-only `/demo/salon` with responsive RTL dashboard, Booking conflict/status workflows, and in-memory DRAFT-only POS cart, plus homepage CTA.
+- Exact PR head and main CI: K0/K1, Web demo Next build/unit/HTTP smoke, K5C protected routes 404, Staging artifact PASS as recorded. [Staging Deploy #43246246321](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43246246321) SUCCESS: SSH receiver accepted `38d5c1866104a4d6254c29ad46350f008b76ecc3`. **No external public URL HTTP verification**, SQL migrations, K5/Auth/Module flags, real Booking/Payments, PII, Ledger or customer readiness.
+
+
 ## 2026-11-12 — Demo-S1 public synthetic interactive salon UX (review PR)
 
 - Added isolated Next `/demo/salon` with branded RTL dashboard, synthetic seeded schedules and conflict-checked booking transitions, and in-browser POS service cart/saved DRAFT-only state. Added public homepage demo CTA and dedicated Next build/HTTP/private-auth-negative CI.

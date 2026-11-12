@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-11-12 — K5F-3 SQL restore + Finance Option A mechanics merged
+
+- Merged PR #69: existing staging automation disposable CI now performs an independent post-014 backup/restore into a fresh CI DB and verifies 001–014 checksums, POS draft tables/foreign keys and stored procedures; guarded migrator and root-bootstrap-proof CI succeeded.
+- Merged PR #70: isolated SQL finance mechanics proof with injected rollback, cross-Business/Tenant synthetic source denial, immutable request hash, single source Sale+journal+Outbox effect under concurrent replay. Financial policy and actual runtime posting remain unimplemented.
+- **No VPS SQL, actual off-host restore, K5F root-owned operator execution, Public Auth, real CoA/VAT/AR, financial POSTED endpoint or ADR-031/032 sign-off.** See [K5F-3](K5F3-POST-MIGRATION-ISOLATED-RESTORE-2026-11-12.md) and [F-1a](FINANCE-F1A-OPTION-A-ATOMIC-SQL-PROBE-2026-11-12.md).
+
+
 ## 2026-11-12 — F-1a Option A disposable SQL transaction proof (review PR)
 
 - Added an isolated SQL2022 source Sale + first balanced synthetic GL + Outbox transaction proof with SERIALIZABLE lock, exact replay, branch/tenant source boundary, rollback and concurrent idempotency cases; no production tables, API or migrations.

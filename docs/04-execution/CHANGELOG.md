@@ -1,5 +1,11 @@
 # Project changelog
 
+## 2026-11-12 — K5F-2 read-only staging activation readiness (review PR)
+
+- Strengthened K5F operator checker to fail closed when Catalog/Customers/Booking/POS API or Web feature flags are enabled before authorization; preserves exact 001–009 migration baseline and root-owned operator bundle requirement.
+- Added CI-only SQL source manifest checker (001–014), negative history/target/drift tests, and explicit not-authorized report; **no SQL migration, credentials, Backup/Restore execution, Public Auth, VPS or module activation**. [Execution packet](K5F2-STAGING-ACTIVATION-READINESS-2026-11-12.md).
+
+
 ## 2026-11-12 — Mainline consolidation: PL-1b + CU-2 merged
 
 - PR #64 merged scoped durable DRAFT-only SQL 014, API/UI and disposable SQL+HTTP 20-case proof; PR #63 merged synthetic-only Cashier mapping and passed K0/K1. Earlier PL-0/PL-1/CU-0/CU-1 PRs #59–#62 are merged.

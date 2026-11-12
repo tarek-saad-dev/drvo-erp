@@ -1,5 +1,9 @@
 # Current state
 
+> **2026-11-12 CASHIER REUSE AUDIT BRANCH (NO PRODUCTION PORT):** [Pinned source audit](../04-execution/CASHIER-REUSE-AUDIT-2026-11-12.md) maps Cashier rules to future DRVO Shared Core/Salon Extensions, documents accept/adapt/reject criteria and adds test-only Business Day characterization fixtures. No Cashier production data/code integration, no DRVO runtime module, no live parity/performance claim. ADR-031/032 and K5F are OPEN; SQL 010–013 CI-only and public flags OFF. Branch/PR CI and merge must be verified independently.
+
+
+
 > **2026-11-12 POS→LEDGER PREPARATION BRANCH (NO POSTING):** Founder requested parallel readiness for first shared POS→Ledger slice and Cashier reuse audit. [POS→Ledger gate](../04-execution/POS-LEDGER-EXECUTION-GATE-2026-11-12.md) defines module ownership, ADR-031 A/B evidence and a test-only synthetic classifier; no real POS, GL, SQL or API is activated. ADR-031 remains PROPOSED; K5F OPEN, ADR-032 PROPOSED, SQL 010–013 CI-only, all public flags OFF. Branch/PR tests and merge must be verified independently.
 
 

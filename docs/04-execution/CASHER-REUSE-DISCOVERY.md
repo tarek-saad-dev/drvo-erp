@@ -1,4 +1,7 @@
 # Cashier repo reuse evaluation — desktop review
+
+> **2026-11-12 follow-up:** [First pinned characterization audit and candidate matrix](CASHIER-REUSE-AUDIT-2026-11-12.md) supplements this older desktop sampling. No production code moved and no executed cross-repo parity yet.
+
 Date: 2026-10-29
 Status: READ-ONLY code inspection only. No code moved or run.
 

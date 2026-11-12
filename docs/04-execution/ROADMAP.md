@@ -1,5 +1,9 @@
 # Roadmap
 
+> **2026-11-12 CASHIER REUSE WORKSTREAM OPEN (REVIEW ONLY):** [Pinned Cashier audit](CASHIER-REUSE-AUDIT-2026-11-12.md) creates evidence-based candidate matrix and executable test-only Business Day characterization. Next CU-1 cross-repo source-head parity/fixtures, CU-2 synthetic scoped identity mapping, CU-3 domain-owned adaptation after business policy review. No legacy DB/credentials, no Cashier live changes, no DRVO financial posting or VPS activation. Parallel POS→Ledger decisions depend on ADR-031.
+
+
+
 > **2026-11-12 POS→LEDGER ENGINEERING TRACK OPEN (REVIEW ONLY):** Non-posting [decision/acceptance seed](POS-LEDGER-EXECUTION-GATE-2026-11-12.md) models ADR-031 A/B truthful financial states in synthetic tests. Next independently reviewed PL-1 is default-OFF scoped POS Draft/Checkout Preview (no POSTED), PL-2 needs explicit Finance/Founder/Architecture ADR-031 signoff, PL-3 actual Sale→GL implementation only after that signoff. Commercial ADR-032, K5F, SQL 010–013 VPS and public auth gates unchanged.
 
 

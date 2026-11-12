@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-11-12 — Cashier reuse first pinned audit (review branch)
+
+- Reviewed Cashier pure Business Day planner, SQL booking locks, payroll/proration, tips, Inventory stock policy, WhatsApp outbox, and legacy DB adapter against their DRVO domain boundaries; pinned Cashier commit and reviewed-file links.
+- Added test-only Business Day characterization and regression cases with strict input validation, not executable production reuse/parity proof. No live Cashier DB, credentials, SQL/VPS, API or public flags. [Audit](CASHIER-REUSE-AUDIT-2026-11-12.md).
+
+
+
 ## 2026-11-12 — POS→Ledger preparation (review branch, no posting)
 
 - Added test-only synthetic first-journal evidence classifier for both proposed ADR-031 transaction options and regression cases for unbalanced/orphan journals, misleading POSTED state and unverified tender; no runtime integration or financial mutation.

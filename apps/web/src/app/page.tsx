@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const boundaries = [
   { name: "Platform Kernel", description: "الهوية، الشركات، الفروع والصلاحيات", state: "قيد البناء" },
   { name: "SaaS Commercial", description: "الخطط والاشتراكات وتفعيل الموديولات", state: "التالي" },
@@ -22,7 +24,11 @@ export default function Home() {
           بنبني DRVO ERP كنظام مرن للشركات والأنشطة المختلفة.
           هذه معاينة لأول واجهة تقنية وليست نظامًا جاهزًا للعملاء.
         </p>
-        <div className="status"><span className="dot" /> Web runtime is operational — business features not enabled</div>
+        <div className="demo-hero-actions">
+          <Link className="demo-hero-primary" href="/demo/salon">جرّب Demo الصالون الآن <span aria-hidden="true">←</span></Link>
+          <span className="demo-hero-description">بدون حساب · بيانات تجريبية · تجربة تفاعلية</span>
+        </div>
+        <div className="status"><span className="dot" /> Web runtime is operational — production business features not enabled</div>
       </section>
 
       <section className="section" aria-labelledby="boundaries">

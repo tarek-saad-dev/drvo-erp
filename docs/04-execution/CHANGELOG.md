@@ -1,5 +1,11 @@
 # Project changelog
 
+## 2026-11-12 — Demo-S1 public synthetic interactive salon UX (review PR)
+
+- Added isolated Next `/demo/salon` with branded RTL dashboard, synthetic seeded schedules and conflict-checked booking transitions, and in-browser POS service cart/saved DRAFT-only state. Added public homepage demo CTA and dedicated Next build/HTTP/private-auth-negative CI.
+- All data are fabricated/in-memory; **no API, K5, cookies, SQL, real client data, booking, payment, invoices or posted ledger**, and no changes to operational feature flags. Public demo availability must be verified after an authorized Staging code deploy. [Demo contract](SALON-FIRST-WORKING-DEMO-2026-11-12.md).
+
+
 ## 2026-11-12 — K5F-3 SQL restore + Finance Option A mechanics merged
 
 - Merged PR #69: existing staging automation disposable CI now performs an independent post-014 backup/restore into a fresh CI DB and verifies 001–014 checksums, POS draft tables/foreign keys and stored procedures; guarded migrator and root-bootstrap-proof CI succeeded.

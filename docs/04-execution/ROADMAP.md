@@ -1,5 +1,8 @@
 # Roadmap
 
+> **2026-11-12 DEMO-S1 SHOW A WORKING SALON UX FIRST (PR):** [Standalone salon interactive demo](SALON-FIRST-WORKING-DEMO-2026-11-12.md) adds public demo link from landing page to synthetic dashboard/Booking/POS cart and in-memory DRAFT previews. No account, SQL or API prerequisites, and real K5/Domain gates remain OFF; **this is not customer-ready SaaS**. Next operator deploy via existing Staging workflow if auto-deploy OFF, validate `/demo/salon` HTTP 200, gather UX feedback, then resume operational K5F + ADR-031/032 for real authenticated vertical slices.
+
+
 > **2026-11-12 PARALLEL K5F-3 + F-1a SOURCE PROOFS MERGED:** [K5F-3 #69](K5F3-POST-MIGRATION-ISOLATED-RESTORE-2026-11-12.md) establishes SQL Server CI post-014 checksum backup and separate DB recovery of all 14 migration objects; [Finance F-1a #70](FINANCE-F1A-OPTION-A-ATOMIC-SQL-PROBE-2026-11-12.md) establishes synthetic SQL atomic rollback/idempotent replay/8-way contention. These are evidence **not real VPS backups or customer accounting**. Next: authorized trusted-console K5F root-owned checker, off-host isolated restore, Nginx/trusted-IP/mail/Owner/Staff negative E2E; Finance/Founder/Architecture explicitly decide ADR-031 and CoA/VAT/AR/provider/period, then typed real Sale→GL owner contract + permission and approved migrations. ADR-032 paid activation separate; no SQL 010–014 VPS, no public flags.
 
 

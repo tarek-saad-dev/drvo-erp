@@ -1,5 +1,8 @@
 # Architecture baseline
 
+> **2026-11-12 K5F-2 STAGING PRE-ACTIVATION SECURITY GUARD (REVIEW):** Extend root-owned, read-only K5F checker to ensure currently implemented shared Module API/Web flags remain OFF, without relaxing exact applied SQL 001–009 or changing runtime/SQL. A separate source/CI-only manifest comparison audits all source migrations 001–014 but NEVER authorizes staging SQL or module enablement. ADR-030 scope remains accepted; K5F, ADR-031, ADR-032 gates remain open. [K5F-2 report](../04-execution/K5F2-STAGING-ACTIVATION-READINESS-2026-11-12.md).
+
+
 > **2026-11-12 MAINLINE RECONCILIATION:** Source/CI-only Shared POS durable DRAFT via merged PR #64 is backed by Branch-scoped SQL 014/EXECUTE-only principal, live K5+POS actions and Catalog price snapshots. Test-only Cashier synthetic identifier mapping merged via PR #63 remains outside runtime. No POSTED status or Accounting/Treasury writes, no SQL 010–014 authorization for VPS, no public feature activation. ADR-031/032 and K5F still open. Staging SSH code release #43204659041 succeeded for PR #64 SHA, but is not runtime/customer/DB acceptance.
 
 

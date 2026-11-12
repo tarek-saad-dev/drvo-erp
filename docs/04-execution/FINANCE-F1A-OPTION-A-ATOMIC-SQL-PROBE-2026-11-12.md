@@ -1,6 +1,6 @@
 # F-1a — Conditional Option A atomic SQL mechanics probe (2026-11-12)
 
-**Status: CI-ONLY SYNTHETIC TRANSACTION EXPERIMENT. Not a real Sale, Accounting implementation, API, ERP migration or financial sign-off.** This follows [ADR-031 Founder/Finance decision packet](ADR-031-FOUNDER-FINANCE-DECISION-PACKET-2026-11-12.md), which remains **PROPOSED**. The founder's instruction to continue two development tracks is not a substitute for Finance/account mapping or formal ADR acceptance.
+**Status: PR #70 MERGED with K0/K1 and Option A SQL Mechanics CI success. CI-ONLY SYNTHETIC TRANSACTION EXPERIMENT. Not a real Sale, Accounting implementation, API, ERP migration or financial sign-off.** This follows [ADR-031 Founder/Finance decision packet](ADR-031-FOUNDER-FINANCE-DECISION-PACKET-2026-11-12.md), which remains **PROPOSED**. The founder's instruction to continue two development tracks is not a substitute for Finance/account mapping or formal ADR acceptance.
 
 ## Architecture impact before changes
 

@@ -1,5 +1,8 @@
 # Current state
 
+> **2026-11-12 SALON DEMO-S1 REVIEW PR — FIRST INTERACTIVE UX:** Public synthetic `/demo/salon` Next Web route with real **in-browser** dashboard, seeded appointments, double-slot conflict checks, status transitions, services and DRAFT-only cart/calculation. Public homepage links to it, but it uses **zero K5/Auth/API/SQL/Cashier calls and no storage**. No real salon signups/bookings/payments or posted sales. Dedicated Next build/unit/HTTP smoke checks and K5 404 negatives required before merge. [Demo report](../04-execution/SALON-FIRST-WORKING-DEMO-2026-11-12.md). SQL 010–014 unapproved on VPS; K5F and ADR-031/032 remain OPEN. Deployment/public URL must be independently verified.
+
+
 > **2026-11-12 VERIFIED PARALLEL K5F-3 + FINANCE F-1a CHECKPOINT:** PR [#69](https://github.com/tarek-saad-dev/drvo-erp/pull/69) post-SQL-014 **disposable SQL backup/independent restore** and PR [#70](https://github.com/tarek-saad-dev/drvo-erp/pull/70) Option A **synthetic atomic first-journal mechanics** are **MERGED to main**, K0/K1 and specialized SQL CI PASS on reviewed PR heads. The SQL restore checks all 14 migration checksums and POS Draft scoped objects; Finance probe confirms source+balanced test journal+Outbox rollback/replay and 8 concurrent synthetic retries. **Neither is a VPS offsite restore, real Sale/POSTED API/Chart of Accounts, ADR-031 approval or paid activation.** K5F actual root-owned operator checks, off-host encrypted backup and independent restore, Nginx/mail/proxy/synthetic E2E security signoff remain OPEN. SQL 010–014 **NOT authorized/applied to VPS by this work**, Auth/Module flags remain OFF, ADR-031/032 PROPOSED. Previous review-PR notes below are historical.
 
 

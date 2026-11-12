@@ -1,5 +1,9 @@
 # Roadmap
 
+> **2026-11-12 F-0 ADR-031 DECISION EVIDENCE (REVIEW PR):** [Founder + Finance first-GL packet](ADR-031-FOUNDER-FINANCE-DECISION-PACKET-2026-11-12.md) compares conditional Option A co-located transaction vs B async mandatory Accounting pending, models 32 adverse evidence combinations in root tests and enumerates tax/AR/provider/period/race sign-offs. Next F-1 typed Sale→GL after explicit choice; F-2 live disposable SQL posting after Finance/Architecture authorization. POS DRAFT remains nonposting; ADR-031/032, K5F, VPS migrations not approved.
+
+
+
 > **2026-11-12 K5F-2 SAFE STAGING PREPARATION (REVIEW):** [Pre-activation gate](K5F2-STAGING-ACTIVATION-READINESS-2026-11-12.md) extends K5F read-only flag scan to every implemented shared module and runs a strict source migration manifest comparison for 001–014 without permission to apply them. Next: root-owned pinned operator checker execution, verified actual SQL 001–009, off-host backup + independent restore, proxy/Origin/roles, approved staging SQL 010–014 window and separate ADR-032 activation. K5F stays OPEN, Auth/Module flags OFF.
 
 

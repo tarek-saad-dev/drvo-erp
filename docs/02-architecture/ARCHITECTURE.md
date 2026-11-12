@@ -1,5 +1,9 @@
 # Architecture baseline
 
+> **2026-11-12 FIRST-GL DECISION EVIDENCE (REVIEW PR):** Shared POS DRAFT remains nonposting. [ADR-031 review packet](../04-execution/ADR-031-FOUNDER-FINANCE-DECISION-PACKET-2026-11-12.md) models Source+first balanced Accounting GL+Outbox mandatory truth (A co-transaction vs B explicit `ACCOUNTING_PENDING`); keeps Treasury settlement verification, Inventory/HR side effects and customer/Business scoped ownership separate. No runtime or SQL modification, financial policy or ADR sign-off. ADR-031/032 and K5F remain open.
+
+
+
 > **2026-11-12 K5F-2 STAGING PRE-ACTIVATION SECURITY GUARD (REVIEW):** Extend root-owned, read-only K5F checker to ensure currently implemented shared Module API/Web flags remain OFF, without relaxing exact applied SQL 001–009 or changing runtime/SQL. A separate source/CI-only manifest comparison audits all source migrations 001–014 but NEVER authorizes staging SQL or module enablement. ADR-030 scope remains accepted; K5F, ADR-031, ADR-032 gates remain open. [K5F-2 report](../04-execution/K5F2-STAGING-ACTIVATION-READINESS-2026-11-12.md).
 
 

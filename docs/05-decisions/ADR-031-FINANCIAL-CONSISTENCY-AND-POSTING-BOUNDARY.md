@@ -1,5 +1,8 @@
 # ADR-031 — Financial Source-of-Truth Posting Boundary and Reconciliation (PROPOSED)
 
+> **2026-11-12 FINANCE/FOUNDER REVIEW PACKET (STILL PROPOSED):** [A/B first-journal decision request + exhaustive synthetic proof seed](../04-execution/ADR-031-FOUNDER-FINANCE-DECISION-PACKET-2026-11-12.md) records the still-unapproved Option A/B choice, tender E1/E2 account policies and concrete next SQL proof gates. **No change to ADR acceptance, financial posting authority, customer flags or VPS SQL.**
+
+
 **Date:** 2026-10-30  
 **Status:** **PROPOSED / FOUNDER + FINANCE + ARCHITECTURE REVIEW REQUIRED — NOT ACCEPTED**. Phase 0 docs only; no code/SQL/tests/deployment.  
 **Severity:** Foundation Review FND-02 (P0 financial first-journal boundary), FND-04 (P0 domain contracts).  

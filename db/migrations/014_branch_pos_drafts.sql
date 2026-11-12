@@ -24,16 +24,16 @@ CREATE TABLE core.PosDraft (
 CREATE TABLE core.PosDraftLine (
  TenantId UNIQUEIDENTIFIER NOT NULL, BusinessId UNIQUEIDENTIFIER NOT NULL,
  BranchId UNIQUEIDENTIFIER NOT NULL, DraftId UNIQUEIDENTIFIER NOT NULL,
- LineNo INT NOT NULL, OfferingId UNIQUEIDENTIFIER NOT NULL,
+ [LineNo] INT NOT NULL, OfferingId UNIQUEIDENTIFIER NOT NULL,
  Kind VARCHAR(7) COLLATE Latin1_General_100_BIN2 NOT NULL,
  OfferingNameSnapshot NVARCHAR(160) NOT NULL,
  Quantity INT NOT NULL, UnitPriceMinor BIGINT NOT NULL, LineSubtotalMinor BIGINT NOT NULL,
- CONSTRAINT PK_PosDraftLine PRIMARY KEY(TenantId,BusinessId,BranchId,DraftId,LineNo),
+ CONSTRAINT PK_PosDraftLine PRIMARY KEY(TenantId,BusinessId,BranchId,DraftId,[LineNo]),
  CONSTRAINT FK_PosDraftLine_Draft FOREIGN KEY(TenantId,BusinessId,BranchId,DraftId)
   REFERENCES core.PosDraft(TenantId,BusinessId,BranchId,DraftId),
  CONSTRAINT FK_PosDraftLine_Offering FOREIGN KEY(TenantId,BusinessId,OfferingId)
   REFERENCES core.CatalogOffering(TenantId,BusinessId,OfferingId),
- CONSTRAINT CK_PosDraftLine_No CHECK(LineNo BETWEEN 1 AND 20),
+ CONSTRAINT CK_PosDraftLine_No CHECK([LineNo] BETWEEN 1 AND 20),
  CONSTRAINT CK_PosDraftLine_Quantity CHECK(Quantity BETWEEN 1 AND 20),
  CONSTRAINT CK_PosDraftLine_Money CHECK(UnitPriceMinor BETWEEN 0 AND 9000000000000
   AND LineSubtotalMinor BETWEEN 0 AND 9000000000000),
@@ -97,13 +97,13 @@ AS BEGIN
  FROM core.PosDraft d JOIN @Page p ON p.DraftId=d.DraftId
  WHERE d.TenantId=@TenantId AND d.BusinessId=@BusinessId AND d.BranchId=@BranchId
  ORDER BY d.CreatedAtUtc DESC,d.DraftId;
- SELECT CONVERT(VARCHAR(36),l.DraftId) AS draftId,l.LineNo AS lineNo,
+ SELECT CONVERT(VARCHAR(36),l.DraftId) AS draftId,l.[LineNo] AS [lineNo],
   CONVERT(VARCHAR(36),l.OfferingId) AS offeringId,l.Kind AS kind,
   l.OfferingNameSnapshot AS displayName,l.Quantity AS quantity,
   l.UnitPriceMinor AS unitPriceMinor,l.LineSubtotalMinor AS lineSubtotalMinor
  FROM core.PosDraftLine l JOIN @Page p ON p.DraftId=l.DraftId
  WHERE l.TenantId=@TenantId AND l.BusinessId=@BusinessId AND l.BranchId=@BranchId
- ORDER BY l.DraftId,l.LineNo;
+ ORDER BY l.DraftId,l.[LineNo];
  COMMIT TRANSACTION;
  SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
  END TRY
@@ -147,8 +147,8 @@ AS BEGIN
  BEGIN
   IF @LinesJson IS NULL OR LEN(@LinesJson)>4000 OR ISJSON(@LinesJson)<>1
    OR LEFT(LTRIM(@LinesJson),1)<>''['' THROW 51413,''Invalid line array'',1;
-  DECLARE @Parsed TABLE(LineNo INT PRIMARY KEY,OfferingId UNIQUEIDENTIFIER NULL,Quantity INT NULL);
-  INSERT @Parsed(LineNo,OfferingId,Quantity)
+  DECLARE @Parsed TABLE([LineNo] INT PRIMARY KEY,OfferingId UNIQUEIDENTIFIER NULL,Quantity INT NULL);
+  INSERT @Parsed([LineNo],OfferingId,Quantity)
    SELECT TRY_CONVERT(INT,j.[key])+1,
     TRY_CONVERT(UNIQUEIDENTIFIER,JSON_VALUE(j.value,''$.offeringId'')),
     TRY_CONVERT(INT,JSON_VALUE(j.value,''$.quantity''))
@@ -159,13 +159,13 @@ AS BEGIN
   ) OR EXISTS(SELECT OfferingId FROM @Parsed GROUP BY OfferingId HAVING COUNT(*)>1)
    THROW 51413,''Invalid line set'',1;
   DECLARE @Priced TABLE(
-   LineNo INT PRIMARY KEY,OfferingId UNIQUEIDENTIFIER NOT NULL,
+   [LineNo] INT PRIMARY KEY,OfferingId UNIQUEIDENTIFIER NOT NULL,
    Kind VARCHAR(7) NOT NULL,DisplayName NVARCHAR(160) NOT NULL,
    Currency CHAR(3) NOT NULL,Quantity INT NOT NULL,
    UnitPriceMinor BIGINT NOT NULL,LineSubtotal DECIMAL(38,0) NOT NULL
   );
-  INSERT @Priced(LineNo,OfferingId,Kind,DisplayName,Currency,Quantity,UnitPriceMinor,LineSubtotal)
-   SELECT p.LineNo,o.OfferingId,o.Kind,o.DisplayName,o.Currency,p.Quantity,o.PriceMinor,
+  INSERT @Priced([LineNo],OfferingId,Kind,DisplayName,Currency,Quantity,UnitPriceMinor,LineSubtotal)
+   SELECT p.[LineNo],o.OfferingId,o.Kind,o.DisplayName,o.Currency,p.Quantity,o.PriceMinor,
     CONVERT(DECIMAL(38,0),o.PriceMinor)*CONVERT(DECIMAL(38,0),p.Quantity)
    FROM @Parsed p JOIN core.CatalogOffering o WITH(HOLDLOCK)
     ON o.TenantId=@TenantId AND o.BusinessId=@BusinessId
@@ -184,9 +184,9 @@ AS BEGIN
    PayloadHash,CreatedByAccountId,Currency,SubtotalMinor)
   VALUES(@TenantId,@BusinessId,@BranchId,@NewId,@ClientRequestId,
    @PayloadHash,@AccountId,@Currency,CONVERT(BIGINT,@Total));
-  INSERT core.PosDraftLine(TenantId,BusinessId,BranchId,DraftId,LineNo,
+  INSERT core.PosDraftLine(TenantId,BusinessId,BranchId,DraftId,[LineNo],
    OfferingId,Kind,OfferingNameSnapshot,Quantity,UnitPriceMinor,LineSubtotalMinor)
-  SELECT @TenantId,@BusinessId,@BranchId,@NewId,LineNo,OfferingId,Kind,DisplayName,
+  SELECT @TenantId,@BusinessId,@BranchId,@NewId,[LineNo],OfferingId,Kind,DisplayName,
    Quantity,UnitPriceMinor,CONVERT(BIGINT,LineSubtotal) FROM @Priced;
   SELECT CONVERT(VARCHAR(36),@NewId) AS id,CAST(1 AS BIT) AS created,
    CAST(1 AS INT) AS version;

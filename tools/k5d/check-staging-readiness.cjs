@@ -72,12 +72,22 @@ const PUBLIC_PROCEDURES=[
   'core.AcceptBranchInvitation','core.ListBranchInvitations',
   'core.RevokeBranchInvitation',
 ];
+// All current user-facing domain flags stay OFF before independent activation approval.
+// Review this list whenever any runtime module gate is introduced: it is deliberately
+// explicit so that a forgotten flag fails the operator review/checklist process.
 const API_GATES=[
   'DRVO_K5_AUTH_ENABLED','DRVO_K5_OWNER_BOOTSTRAP_ENABLED',
   'DRVO_K5_VERIFY_API_ENABLED','DRVO_K5_INVITATIONS_ENABLED',
   'DRVO_K5_ROLE_ADMIN_ENABLED',
+  'DRVO_CATALOG_ENABLED','DRVO_CUSTOMERS_ENABLED','DRVO_BOOKING_ENABLED',
+  'DRVO_POS_PREVIEW_ENABLED','DRVO_POS_DRAFTS_ENABLED',
 ];
-const WEB_GATES=['DRVO_K5_WEB_ENABLED','DRVO_K5_VERIFY_UI_ENABLED'];
+const WEB_GATES=[
+  'DRVO_K5_WEB_ENABLED','DRVO_K5_VERIFY_UI_ENABLED',
+  'DRVO_CATALOG_WEB_ENABLED','DRVO_CUSTOMERS_WEB_ENABLED',
+  'DRVO_BOOKING_WEB_ENABLED','DRVO_POS_PREVIEW_WEB_ENABLED',
+  'DRVO_POS_DRAFTS_WEB_ENABLED',
+];
 const HEX_KEY=/^[a-f0-9]{64}$/i;
 const SHA=/^[a-f0-9]{40}$/i;
 const API_KEY=/^re_[A-Za-z0-9_]{12,}$/;
@@ -152,7 +162,7 @@ function readinessChecks(operator,api,web,migrator) {
       api.API_PORT==='3311'&&api.DRVO_K5_TRUST_NGINX_REAL_IP==='YES'],
     ['Web local production binding',
       web.NODE_ENV==='production'&&web.PORT==='3310'],
-    ['all public API and Web K5 flags remain OFF pending explicit approval',
+    ['all public K5 and business Module API/Web flags remain OFF pending explicit approval',
       API_GATES.every(k=>api[k]!=='YES') &&
       WEB_GATES.every(k=>web[k]!=='YES')],
     ['runtime SQL limited to DRVO staging app principal',
@@ -323,7 +333,7 @@ if(require.main===module) {
   });
 }
 module.exports={
-  MIGRATIONS,PRIVATE_TABLES,NO_DIRECT_TABLE_PERMISSIONS,PUBLIC_PROCEDURES,parseEnv,
+  MIGRATIONS,PRIVATE_TABLES,NO_DIRECT_TABLE_PERMISSIONS,PUBLIC_PROCEDURES,API_GATES,WEB_GATES,parseEnv,
   noDirectTablePermissions,rootBundleSafe,
   sameSecret,readinessChecks,dbConfig,protectedEnv,processEnvFor,
   auditDatabase,main,

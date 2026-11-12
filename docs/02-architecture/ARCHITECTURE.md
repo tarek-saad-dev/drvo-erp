@@ -1,5 +1,8 @@
 # Architecture baseline
 
+> **2026-11-12 DEMO-S1 PUBLIC SYNTHETIC UX (REVIEW ONLY):** An isolated `/demo/salon` Next client-side, seeded-only Salon walkthrough models UX for Booking/POS DRAFT without connecting to Shared Catalog/Booking/Accounting data, K5 credentials, runtime API or browser storage. It is not a new bypass for tenant RBAC or commercial entitlement; real authenticated modules remain default-OFF, SQL 010–014 VPS unapproved, ADR-031/032 and K5F OPEN. [Demo design](../04-execution/SALON-FIRST-WORKING-DEMO-2026-11-12.md).
+
+
 > **2026-11-12 PARALLEL K5F-3/F-1a MAINLINE EVIDENCE:** PRs #69 and #70 merged: guarded SQL migrator's disposable 001–014 restore now proves source schema recovery in a second test DB; a completely separate synthetic F-1a SQL proof tests co-transaction Sale+balanced dummy journal+Outbox without changing any actual POS/Accounting/Treasury owner tables or the runtime API. No inference of live scoped K5 entitlement, finance validity, performance SLA, offsite VPS recoverability or customer readiness. ADR-030 scope accepted; ADR-031/032 and K5F operational gate remain OPEN. [K5F-3](../04-execution/K5F3-POST-MIGRATION-ISOLATED-RESTORE-2026-11-12.md) · [F-1a](../04-execution/FINANCE-F1A-OPTION-A-ATOMIC-SQL-PROBE-2026-11-12.md).
 
 

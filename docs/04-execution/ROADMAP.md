@@ -1,5 +1,8 @@
 # Roadmap
 
+> **2026-11-12 FIRST LIVE-CODE SALON UX CHECKPOINT:** [Demo-S1 PR #72 merged](SALON-FIRST-WORKING-DEMO-2026-11-12.md) and code deployed to Staging receiver at SHA `38d5c1866104a4d6254c29ad46350f008b76ecc3` with PASS Next build/HTTP demo CI and K5 default-deny tests. External `/demo/salon` access not yet independently verified: get owner browser confirmation or network-level authorized smoke; if accessible, collect scheduling/POS UX feedback. After demo review, continue real authenticated Shared Booking/POS pilot only behind approved K5F/ADR-032/Finance gates. Do not connect fake demo to real customer data or enable SQL 010–014 prematurely.
+
+
 > **2026-11-12 DEMO-S1 SHOW A WORKING SALON UX FIRST (PR):** [Standalone salon interactive demo](SALON-FIRST-WORKING-DEMO-2026-11-12.md) adds public demo link from landing page to synthetic dashboard/Booking/POS cart and in-memory DRAFT previews. No account, SQL or API prerequisites, and real K5/Domain gates remain OFF; **this is not customer-ready SaaS**. Next operator deploy via existing Staging workflow if auto-deploy OFF, validate `/demo/salon` HTTP 200, gather UX feedback, then resume operational K5F + ADR-031/032 for real authenticated vertical slices.
 
 

@@ -1,0 +1,62 @@
+name: POS Drafts SQL API HTTP CI
+on:
+  pull_request:
+    paths:
+      - 'apps/api/src/pos-drafts/**'
+      - 'apps/api/src/app.module.ts'
+      - 'apps/api/test/pos-drafts.test.cjs'
+      - 'apps/web/src/app/workspace/**'
+      - 'db/migrations/014_branch_pos_drafts.sql'
+      - 'tools/pos-drafts/**'
+      - '.github/workflows/pos-drafts-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/api/src/pos-drafts/**'
+      - 'apps/api/src/app.module.ts'
+      - 'apps/web/src/app/workspace/**'
+      - 'db/migrations/014_branch_pos_drafts.sql'
+      - 'tools/pos-drafts/**'
+      - '.github/workflows/pos-drafts-ci.yml'
+permissions:
+  contents: read
+jobs:
+  durable-drafts-sql-http:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compile API and all unit tests
+        run: |
+          set -euo pipefail
+          npm ci --prefix apps/api --no-audit --no-fund
+          npm test --prefix apps/api
+          node --check tools/pos-drafts/verify.cjs
+      - name: Start disposable SQL Server 2022
+        shell: bash
+        run: |
+          set -euo pipefail
+          pass="DrvoDraftCi_$(openssl rand -hex 18)!"
+          echo "::add-mask::$pass"
+          echo "SQL_TEST_SA_PASSWORD=$pass" >> "$GITHUB_ENV"
+          docker run --detach --name drvo-posdraft-ci \
+            -e ACCEPT_EULA=Y \
+            -e MSSQL_PID=Developer \
+            -e MSSQL_SA_PASSWORD="$pass" \
+            -p 127.0.0.1:14346:1433 \
+            -p 127.0.0.1:1433:1433 \
+            mcr.microsoft.com/mssql/server:2022-latest
+      - name: Migration 014, SQL principal, session and live HTTP negative proof
+        env:
+          POS_DRAFTS_SQL_DISPOSABLE: 'YES'
+          POS_DRAFTS_TEST_PORT: '14346'
+        run: node tools/pos-drafts/verify.cjs
+      - name: Show isolated SQL logs on failure
+        if: failure()
+        run: docker logs --tail 90 drvo-posdraft-ci || true
+      - name: Destroy disposable SQL
+        if: always()
+        run: docker rm -f drvo-posdraft-ci || true

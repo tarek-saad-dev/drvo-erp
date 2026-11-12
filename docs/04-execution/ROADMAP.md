@@ -1,5 +1,8 @@
 # Roadmap
 
+> **2026-11-12 PL-1b PERSISTED DRAFTS REVIEW PR:** [SQL 014 / secure API / private UI](POS-DURABLE-DRAFTS-EXECUTION-2026-11-12.md) adds first durable DRAFT-only POS record after merged PL-1 preview; independent `pos.draft.read/manage`, typed scopes, SQL snapshots and Idempotency. SQL 014 CI-only, no VPS/flags, no invoice/payment/GL. Next independently reviewed Draft edit CAS, then financial ADR-031 adoption before POSTED sale; Commercial ADR-032 and operational K5F remain OPEN.
+
+
 > **2026-11-12 CU-1 PINNED CASHIER SOURCE PARITY PR:** [CU-1 source-provenance and test packet](CASHIER-PINNED-SOURCE-PARITY-2026-11-12.md) checks original Cashier BusinessDay and Payroll TS via exact Git blob snapshots and isolated test execution. BusinessDay candidate matches valid cases, invalid dates deliberately reject; payroll results are baseline observations only. CU-2 synthetic scoped legacy-ID mapping is next, CU-3 domain-owned adapted pure functions after review. No runtime legacy dependency or live data.
 
 

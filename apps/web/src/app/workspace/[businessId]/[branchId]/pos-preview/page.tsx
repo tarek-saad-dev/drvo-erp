@@ -9,5 +9,6 @@ export default async function PosPreviewPage({ params }: {
       process.env.DRVO_CATALOG_WEB_ENABLED !== "YES" ||
       process.env.DRVO_POS_PREVIEW_WEB_ENABLED !== "YES") notFound();
   const {businessId,branchId} = await params;
-  return <PosPreviewClient businessId={businessId} branchId={branchId}/>;
+  return <PosPreviewClient businessId={businessId} branchId={branchId}
+    draftsEnabled={process.env.DRVO_POS_DRAFTS_WEB_ENABLED==="YES"}/>;
 }

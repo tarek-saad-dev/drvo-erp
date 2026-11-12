@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-11-12 — PL-1b durable POS DRAFT-only review PR
+
+- Added Branch-scoped POS Draft/lines SQL 014 with immutable list-price snapshot, idempotent request hash, DRAFT-only status, scoped authorization procedures and denied direct application SQL table reads/writes.
+- Added separately gated Nest API and private RTL save/list to existing POS Preview, plus unit and disposable SQL2022/real HTTP Tenant/Business/Branch/revocation/replay CI.
+- No actual sale, posted invoice, GL/Treasury/Inventory/HR effect, financial entitlement, public auth/flags or VPS SQL rollout. ADR-031/032/K5F remain blocked. [Module contract](../03-modules/POS-DURABLE-DRAFTS-V0.md) · [review](POS-DURABLE-DRAFTS-EXECUTION-2026-11-12.md).
+
+
 ## 2026-11-12 — CU-1 Cashier pinned-source executable parity (review PR)
 
 - Added unmodified test-only pinned Cashier BusinessDay/Payroll pure TS source snapshots and Git blob identity checks, executing original functions isolated from any legacy SQL/PII.

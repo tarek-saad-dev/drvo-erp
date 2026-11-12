@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-12 — PL-1 POS nonposting checkout-preview feature PR
+
+- Added private feature-gated Shared POS preview API and RTL temporary cart; server refreshes authorized Catalog prices and computes minor-unit list-price subtotal without persistence or posted status.
+- Added strict request shape/currency/bounds/origin protection and extended disposable Catalog SQL+HTTP CI with cross-Tenant/Business/Branch and revoked role/member negative tests; app flags default OFF.
+- No Sales/Accounting/Treasury/Inventory writes, new SQL, real invoice/payment, VPS migration, public auth or customer activation. [PL-1 evidence](POS-NONPOSTING-PREVIEW-2026-11-12.md). ADR-031/032 remain PROPOSED.
+
+
+
 ## 2026-11-12 — Cashier reuse first pinned audit (review branch)
 
 - Reviewed Cashier pure Business Day planner, SQL booking locks, payroll/proration, tips, Inventory stock policy, WhatsApp outbox, and legacy DB adapter against their DRVO domain boundaries; pinned Cashier commit and reviewed-file links.

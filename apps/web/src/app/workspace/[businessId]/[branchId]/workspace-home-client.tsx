@@ -19,6 +19,7 @@ export default function WorkspaceHomeClient({businessId, branchId}: {
   const [canViewCatalog, setCanViewCatalog] = useState(false);
   const [canViewCustomers, setCanViewCustomers] = useState(false);
   const [canViewBooking, setCanViewBooking] = useState(false);
+  const [canPreviewPos, setCanPreviewPos] = useState(false);
   const [account, setAccount] = useState<Account | null>(null);
   const [status, setStatus] = useState<"loading"|"ready"|"denied"|"error">("loading");
 
@@ -77,6 +78,9 @@ export default function WorkspaceHomeClient({businessId, branchId}: {
         const bookingResult=await fetch(base + "/booking", {credentials:"same-origin",cache:"no-store"});
         if (!live) return;
         setCanViewBooking(bookingResult.ok && catalogResult.ok && customersResult.ok);
+        const posResult=await fetch(base + "/pos-preview", {credentials:"same-origin",cache:"no-store"});
+        if (!live) return;
+        setCanPreviewPos(posResult.ok && catalogResult.ok);
         setStatus("ready");
       } catch {
         if (live) setStatus("error");
@@ -120,6 +124,10 @@ export default function WorkspaceHomeClient({businessId, branchId}: {
         {canViewBooking && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/booking"} className="k5-verify-link">
           المواعيد والحجوزات
+        </Link>}
+        {canPreviewPos && <Link href={"/workspace/" + encodeURIComponent(businessId) +
+          "/" + encodeURIComponent(branchId) + "/pos-preview"} className="k5-verify-link">
+          معاينة مسودة بيع (غير محفوظة)
         </Link>}
         {canManageMembers && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/access"} className="k5-verify-link">

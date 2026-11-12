@@ -1,5 +1,8 @@
 # Current state
 
+> **2026-11-12 K5F-3 REVIEW BRANCH (DISPOSABLE RESTORE PROOF ONLY):** Extended existing SQL Server CI to take an independent post-014 COPY_ONLY backup, RESTORE VERIFYONLY and restore into a second throwaway DB, compare exact 14 migration checksums and POS Draft scoped objects. This is GitHub CI, **not off-host/VPS disaster recovery, K5F operator acceptance or SQL 010–014 authorization**. [K5F-3 report](../04-execution/K5F3-POST-MIGRATION-ISOLATED-RESTORE-2026-11-12.md). All K5/Auth/Module flags OFF; ADR-031/032 PROPOSED.
+
+
 > **2026-11-12 VERIFIED K5F-2 + ADR-031 ENGINEERING CHECKPOINT:** [K5F-2 #66](https://github.com/tarek-saad-dev/drvo-erp/pull/66) and [Finance decision evidence #67](https://github.com/tarek-saad-dev/drvo-erp/pull/67) **MERGED to main**. #66 source tests K0/K1 and K5D SQL CI PASS; #67 synthetic 32-case first-GL truth tests K0/K1 PASS. [Staging code deployment #43208411618](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43208411618) confirms successful SSH receiver for #66 merge SHA `a1477e07a3e6c1b191ba6417a92e6ca7b6d32f9a`; this **does not** deploy SQL or install/execute updated root-owned K5F checker bundle. SQL 010–014 VPS **NOT AUTHORIZED**, module/K5 flags **OFF**, K5F operational sign-off **OPEN**, ADR-031/032 **PROPOSED** and no financial POSTED sale. Historical branch/PR status notes below refer to earlier checkpoints.
 
 

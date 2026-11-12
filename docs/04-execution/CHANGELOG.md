@@ -1,5 +1,11 @@
 # Project changelog
 
+## 2026-11-12 — K5F-3 disposable post-migration restore review PR
+
+- Extended existing restricted staging migrator SQL2022 CI with second COPY_ONLY backup **after all 001–014 source migrations**, checksum VERIFYONLY, independently restored throwaway DB and exact migration-history/scoped POS Draft object checks.
+- No SQL 010–014 VPS execution, offsite backup proof, privileged operator checker run, public auth/flags or customer onboarding; K5F stays OPEN. [CI proof packet](K5F3-POST-MIGRATION-ISOLATED-RESTORE-2026-11-12.md).
+
+
 ## 2026-11-12 — K5F-2 + ADR-031 decision evidence merged checkpoint
 
 - Merged PR #66 (read-only K5F API/Web 17-flag safety check, local source migration 001–014 hash report and negative tests) and PR #67 (synthetic first-GL Option A/B truth test and Founder/Finance decision packet). CI K0/K1/K5D PASS as applicable.

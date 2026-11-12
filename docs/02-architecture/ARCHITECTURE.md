@@ -1,5 +1,8 @@
 # Architecture baseline
 
+> **2026-11-12 K5F-3 RECOVERY CI PROOF (REVIEW ONLY):** Existing staging SQL migration automation remains unchanged on VPS; its disposable SQL CI now plans an additional post-014 independent restore with matching exact history and POS Draft scoped objects. This does not imply production/site backup recoverability, a new migration/privilege, deployed SQL, Auth/Module flags or accepted ADR-031/032. [K5F-3 report](../04-execution/K5F3-POST-MIGRATION-ISOLATED-RESTORE-2026-11-12.md).
+
+
 > **2026-11-12 POST-MERGE SAFETY POSITION:** PRs #66 and #67 merged; source/CI-only K5F flag audit and finance A/B truth evidence do not alter Shared POS runtime, SQL schema, independent Accounting/Treasury owners or Tenant/Business/Branch scope. Successful #66 Staging code SSH receiver does not authorize SQL 010–014 or install root-owned checker; ADR-031/032 remain proposed and K5F operational acceptance OPEN. [K5F-2 report](../04-execution/K5F2-STAGING-ACTIVATION-READINESS-2026-11-12.md) · [Financial decision](../04-execution/ADR-031-FOUNDER-FINANCE-DECISION-PACKET-2026-11-12.md).
 
 

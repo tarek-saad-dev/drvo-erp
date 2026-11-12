@@ -116,6 +116,63 @@ async function main(){
     const history=await restored.query('SELECT COUNT(*) AS n FROM core.SchemaMigration');
     assert.equal(history.recordset[0].n,1,'Backup must reflect pre-migration K4 state');
     console.log('PASS: real SQL COPY_ONLY backup independently RESTORED to second database');
+
+    // K5F-3: second, AFTER-migrations independent restore on disposable CI ONLY.
+    // This proves recoverability of the SQL 014 source schema; it is NOT
+    // an offsite/VPS disaster-recovery run or operator authorization.
+    const postName='DRVO_ERP_CI_POSTRESTORE';
+    const postFile='/var/opt/mssql/data/drvo_erp_ci_post_014_checksum.bak';
+    const collision=await master.query("SELECT DB_ID(N'"+postName+"') AS id");
+    assert.equal(collision.recordset[0].id,null,'Post-restore target collision');
+    await admin.query(`BACKUP DATABASE [${DB}] TO DISK=N'${postFile}'
+      WITH COPY_ONLY,CHECKSUM,INIT`);
+    await master.query(`RESTORE VERIFYONLY FROM DISK=N'${postFile}' WITH CHECKSUM`);
+    const postList=await master.query(`RESTORE FILELISTONLY FROM DISK=N'${postFile}'`);
+    assert.ok(postList.recordset.length>=2);
+    const postMoves=postList.recordset.map((f,i)=>{
+      assert.ok(f.LogicalName && ['D','L'].includes(f.Type));
+      const ext=f.Type==='L'?'ldf':i===0?'mdf':'ndf';
+      return `MOVE N'${f.LogicalName.replaceAll("'","''")}'
+        TO N'/var/opt/mssql/data/drvo_erp_ci_post_014_${i}.${ext}'`;
+    });
+    await master.query(`RESTORE DATABASE [${postName}] FROM DISK=N'${postFile}'
+      WITH ${postMoves.join(', ')},CHECKSUM,RECOVERY`);
+    const post=await connect('sa',adminPass,postName);
+    try{
+      const original=await admin.query(
+        "SELECT MigrationId,Checksum FROM core.SchemaMigration ORDER BY MigrationId");
+      const recovered=await post.query(
+        "SELECT MigrationId,Checksum FROM core.SchemaMigration ORDER BY MigrationId");
+      assert.equal(recovered.recordset.length,payload.migrations.length);
+      assert.deepEqual(recovered.recordset,original.recordset,
+        'Restored migrations must preserve exact IDs and checksums');
+      const entities=await post.query(`
+        SELECT
+          OBJECT_ID(N'core.PosDraft',N'U') AS DraftTable,
+          OBJECT_ID(N'core.PosDraftLine',N'U') AS LineTable,
+          OBJECT_ID(N'core.CreateBranchPosDraft',N'P') AS CreateProc,
+          OBJECT_ID(N'core.ReadBranchPosDrafts',N'P') AS ReadProc
+      `);
+      for(const v of Object.values(entities.recordset[0]))
+        assert.ok(v!=null,'Missing post-restore POS scoped object');
+      const constraints=await post.query(`
+        SELECT name FROM sys.foreign_keys
+        WHERE parent_object_id=OBJECT_ID(N'core.PosDraftLine')
+      `);
+      assert.ok(constraints.recordset.some(x=>x.name==='FK_PosDraftLine_Draft'));
+      assert.ok(constraints.recordset.some(x=>x.name==='FK_PosDraftLine_Offering'));
+      const status=await post.query(`
+        SELECT definition FROM sys.check_constraints
+        WHERE name=N'CK_PosDraft_Status'
+      `);
+      assert.equal(status.recordset.length,1);
+      assert.match(status.recordset[0].definition,/DRAFT/);
+      console.log('PASS: isolated post-014 SQL restore matches history and POS scoped schema');
+    }finally{
+      await post.close();
+      await master.query(`ALTER DATABASE [${postName}]
+        SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE [${postName}]`);
+    }
     console.log('DRVO DB AUTOMATION DISPOSABLE SQL E2E: PASS');
   }finally{
     await restored?.close().catch(()=>{});

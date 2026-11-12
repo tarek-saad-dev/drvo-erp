@@ -1,5 +1,8 @@
 # Roadmap
 
+> **2026-11-12 K5F-3 POST-014 DISPOSABLE RESTORE REHEARSAL (PR):** [Isolated post-migration restore CI](K5F3-POST-MIGRATION-ISOLATED-RESTORE-2026-11-12.md) supplements current pre-migration restore proof and checks exact SQL 001–014 post-state. **No VPS access, offsite backup/restore or staging migration.** Next genuine blockers: root-owned K5F checker preflight, real offsite isolated restore and security/operator sign-off; flags OFF, ADR-032 and ADR-031 separate.
+
+
 > **2026-11-12 K5F-2 / ADR-031 MERGED READINESS:** PR #66 merged module-flag fail-closed read-only K5F checker and source SQL 001–014 manifest audit; PR #67 merged synthetic 32-case A/B first-journal truth matrix and Founder/Finance decision request. Code staging release for #66 SHA verified by SSH receiver; operator root-bundle pinning, K5F actual preflight, Nginx/access controls, off-host backup + isolated restore, and authorized SQL 010–014 staging application remain **OPEN**. ADR-031 Option A/B and tender/AR/tax mapping are **NOT DECIDED**; ADR-032 activation also pending. [K5F-2](K5F2-STAGING-ACTIVATION-READINESS-2026-11-12.md) · [Finance packet](ADR-031-FOUNDER-FINANCE-DECISION-PACKET-2026-11-12.md).
 
 

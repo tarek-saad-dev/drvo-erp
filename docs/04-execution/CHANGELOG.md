@@ -1,5 +1,11 @@
 # Project changelog
 
+## 2026-11-12 — POS→Ledger preparation (review branch, no posting)
+
+- Added test-only synthetic first-journal evidence classifier for both proposed ADR-031 transaction options and regression cases for unbalanced/orphan journals, misleading POSTED state and unverified tender; no runtime integration or financial mutation.
+- Documented PL-0 through PL-5 release/decision gates for future shared POS → Accounting/Treasury slice; ADR-031 not accepted, no SQL/API/VPS/feature change. [Execution gate](POS-LEDGER-EXECUTION-GATE-2026-11-12.md).
+
+
 ## 2026-11-12 — First shared Booking Core vertical slice (PR, not deployed)
 
 - Added Branch-owned Resources (person/chair/room/equipment) and BOOKED-only Appointment records referencing scoped Customers and Catalog SERVICE IDs via composite FKs; stored UTC interval using Catalog service duration at creation.

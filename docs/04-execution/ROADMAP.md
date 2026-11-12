@@ -1,5 +1,9 @@
 # Roadmap
 
+> **2026-11-12 CU-2 SAFE SYNTHETIC DATA-MAPPING REVIEW:** [Cashier CU-2 dry-run planner](CASHIER-CU2-SYNTHETIC-MAPPING-2026-11-12.md) records per-dataset source keys and explicit destination Tenant/Business/Branch ancestry, rejecting duplicate/foreign/PII inputs. No live legacy schema/table reads or target writes. Next CU-3 requires domain owner, financial/policy/data mapping, anonymized extracts and verified reconciliation.
+
+
+
 > **2026-11-12 PL-1b PERSISTED DRAFTS REVIEW PR:** [SQL 014 / secure API / private UI](POS-DURABLE-DRAFTS-EXECUTION-2026-11-12.md) adds first durable DRAFT-only POS record after merged PL-1 preview; independent `pos.draft.read/manage`, typed scopes, SQL snapshots and Idempotency. SQL 014 CI-only, no VPS/flags, no invoice/payment/GL. Next independently reviewed Draft edit CAS, then financial ADR-031 adoption before POSTED sale; Commercial ADR-032 and operational K5F remain OPEN.
 
 

@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-11-12 — CU-2 dry-run legacy identifier mapping PR
+
+- Added test-only deterministic Cashier `TblClient`/`TblPro` synthetic ID mapping planner with Business/Branch ownership validation and fail-closed fixture tests.
+- Explicitly rejected real customer/employee data, PII/connection strings, cross-Tenant mapping and duplicate keys. No live data transfer, financial posting, SQL migration or VPS changes. [CU-2 packet](CASHIER-CU2-SYNTHETIC-MAPPING-2026-11-12.md).
+
+
+
 ## 2026-11-12 — PL-1b durable POS DRAFT-only review PR
 
 - Added Branch-scoped POS Draft/lines SQL 014 with immutable list-price snapshot, idempotent request hash, DRAFT-only status, scoped authorization procedures and denied direct application SQL table reads/writes.

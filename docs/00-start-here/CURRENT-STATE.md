@@ -1,5 +1,9 @@
 # Current state
 
+> **2026-11-12 CU-2 SYNTHETIC CASHIER MAPPING (PR, NO IMPORT):** Added test-only dry-run identifier plan for source `TblClient`/ `TblPro` → scoped Customers/Catalog targets, explicitly mapped two Branches, deterministic digest, duplicate and cross-Tenant/Business negative tests. Does NOT connect to Cashier, handle PII, write SQL or grant permissions. [CU-2 gate](../04-execution/CASHIER-CU2-SYNTHETIC-MAPPING-2026-11-12.md). ADR-031/032 and K5F remain OPEN; SQL 010–014 not authorized on VPS.
+
+
+
 > **2026-11-12 PL-1b DURABLE POS DRAFT SOURCE/CI ONLY:** Feature PR introduces SQL 014 POS-owned Branch DRAFT/line snapshots, idempotent create/list, separate live `pos.draft.read/manage` checks, private RTL save/list and disposable SQL+HTTP isolation CI. **No POSTED sale, payment/GL/Inventory or customer activation. SQL 010–014 NOT authorized on VPS; K5F open, ADR-031/032 proposed, all flags OFF.** [Draft contract](../03-modules/POS-DURABLE-DRAFTS-V0.md) · [review packet](../04-execution/POS-DURABLE-DRAFTS-EXECUTION-2026-11-12.md). No CI/merge/deployment assumption until independently verified.
 
 

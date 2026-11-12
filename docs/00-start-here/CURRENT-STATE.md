@@ -1,5 +1,9 @@
 # Current state
 
+> **2026-11-12 PL-1 POS PREVIEW BRANCH — SOURCE/CI ONLY:** First guarded Shared POS cart/Checkout Preview uses live scoped `catalog.read` and re-reads list prices server-side, no write, no POSTED sale, no tax/GL/payment. [PL-1 report](../04-execution/POS-NONPOSTING-PREVIEW-2026-11-12.md). New POS API/Web preview flags remain OFF; SQL 010–013 unapproved for VPS. ADR-031/032 remain PROPOSED and K5F operational security OPEN. Code PR/CI/deploy must be verified independently. Older statuses below are historical.
+
+
+
 > **2026-11-12 CASHIER REUSE AUDIT BRANCH (NO PRODUCTION PORT):** [Pinned source audit](../04-execution/CASHIER-REUSE-AUDIT-2026-11-12.md) maps Cashier rules to future DRVO Shared Core/Salon Extensions, documents accept/adapt/reject criteria and adds test-only Business Day characterization fixtures. No Cashier production data/code integration, no DRVO runtime module, no live parity/performance claim. ADR-031/032 and K5F are OPEN; SQL 010–013 CI-only and public flags OFF. Branch/PR CI and merge must be verified independently.
 
 

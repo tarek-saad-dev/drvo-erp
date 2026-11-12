@@ -171,7 +171,7 @@ async function main(){
    NODE_ENV:'production',API_PORT:'3401',API_HOST:'127.0.0.1',
    DRVO_SQL_ENABLED:'YES',DRVO_SQL_HOST:'127.0.0.1',DRVO_SQL_PORT:'1433',
    DRVO_SQL_DATABASE:db,DRVO_SQL_USER:appLogin,DRVO_SQL_PASSWORD:appPass,
-   DRVO_K5_AUTH_ENABLED:'YES',DRVO_CATALOG_ENABLED:'YES',DRVO_K5_ORIGIN:origin,
+   DRVO_K5_AUTH_ENABLED:'YES',DRVO_CATALOG_ENABLED:'YES',DRVO_POS_PREVIEW_ENABLED:'YES',DRVO_K5_ORIGIN:origin,
   };
   server=spawn(process.execPath,['apps/api/dist/main.js'],{env,stdio:['ignore','pipe','pipe']});
   let log='';server.stdout.on('data',d=>{log+=String(d);});
@@ -211,6 +211,47 @@ async function main(){
    assert.equal(data.offerings.find(x=>x.kind==='SERVICE').priceMinor,12000);
    assert.equal(data.offerings.find(x=>x.kind==='SERVICE').durationMinutes,30);
   });
+  // PL-1 intentionally reuses the disposable Catalog SQL + real HTTP authorization proof.
+  // This does not authorize customer access or produce invoice, payment, tax, GL or stock writes.
+  const previewRoot=(b,br)=>url+'/workspaces/'+b+'/branches/'+br+'/pos-preview';
+  let sourceItem;
+  await pass('PL-1 POS preview reads fresh scoped Catalog and no persisted sale',async()=>{
+    assert.equal((await get(previewRoot(s.b,s.br))).status,401);
+    const list=await get(previewRoot(s.b,s.br),cookie);
+    assert.equal(list.status,200);
+    assert.equal(list.headers.get('cache-control'),'no-store');
+    const data=await list.json();
+    assert.equal(data.persisted,false);
+    sourceItem=data.offerings.find(x=>x.displayName==='Haircut');
+    assert.ok(sourceItem);
+    const body={lines:[{offeringId:sourceItem.offeringId,quantity:2}]};
+    const result=await post(previewRoot(s.b,s.br)+'/checkout-preview',cookie,id(),body);
+    assert.equal(result.status,200);
+    assert.equal(result.headers.get('cache-control'),'no-store');
+    const preview=await result.json();
+    assert.equal(preview.state,'DRAFT_PREVIEW_ONLY');
+    assert.equal(preview.persisted,false);
+    assert.equal(preview.accountingState,'NOT_POSTED');
+    assert.equal(preview.paymentState,'NOT_COLLECTED');
+    assert.equal(preview.taxComputed,false);
+    assert.equal(preview.listPriceSubtotalMinor,24000);
+    assert.equal(preview.currency,'EGP');
+    assert.equal((await admin.query('SELECT COUNT(*) AS n FROM core.CatalogOffering')).recordset[0].n,2);
+  });
+  await pass('PL-1 rejects forged origin, spoofed price and foreign business/branch references',async()=>{
+    const path=previewRoot(s.b,s.br)+'/checkout-preview';
+    const item={offeringId:sourceItem.offeringId,quantity:1};
+    assert.equal((await post(path,cookie,id(),{lines:[item]}, {Origin:'https://evil.example'})).status,401);
+    assert.equal((await post(path,cookie,id(),{lines:[{...item,priceMinor:0}]})).status,400);
+    assert.equal((await post(path,cookie,id(),{lines:[item],tenantId:s.otherT})).status,400);
+    assert.equal((await post(path,cookie,id(),{lines:[{offeringId:id(),quantity:1}]})).status,404);
+    for(const [b,br] of [[s.otherB,s.otherBr],[s.foreignB,s.foreignBr],[s.b,s.strangerBr]]) {
+      assert.equal((await get(previewRoot(b,br),cookie)).status,404);
+      assert.equal((await post(previewRoot(b,br)+'/checkout-preview',cookie,id(),{lines:[item]})).status,404);
+    }
+    assert.equal((await post(previewRoot(s.foreignB,s.foreignBr)+'/checkout-preview',foreign,id(),
+      {lines:[item]})).status,404);
+  });
   await pass('scope denial: same Tenant other Business, foreign Tenant, wrong Branch',async()=>{
    for(const [b,br] of [[s.otherB,s.otherBr],[s.foreignB,s.foreignBr],[s.b,s.strangerBr]]){
     const r=await get(root(b,br),cookie);
@@ -233,6 +274,7 @@ async function main(){
    await query(admin,"DELETE FROM core.RolePermission WHERE TenantId=@t AND BusinessId=@b"+
     " AND RoleId=@role AND ActionCode='catalog.read'",{t:s.t,b:s.b,role:s.role});
    assert.equal((await get(root(s.b,s.br),cookie)).status,404);
+   assert.equal((await get(previewRoot(s.b,s.br),cookie)).status,404);
    await query(admin,"INSERT core.RolePermission(TenantId,BusinessId,RoleId,ActionCode)"+
     " VALUES(@t,@b,@role,'catalog.read')",{t:s.t,b:s.b,role:s.role});
    await query(admin,"DELETE FROM core.RolePermission WHERE TenantId=@t AND BusinessId=@b"+
@@ -244,6 +286,7 @@ async function main(){
     " WHERE TenantId=@t AND BusinessId=@b AND AccountId=@a",
     {t:s.t,b:s.b,a:s.account});
    assert.equal((await get(root(s.b,s.br),cookie)).status,404);
+   assert.equal((await get(previewRoot(s.b,s.br),cookie)).status,404);
    await query(admin,"UPDATE core.AuthSession SET RevokedAtUtc=SYSUTCDATETIME()"+
     " WHERE TenantId=@t AND AccountId=@a AND RevokedAtUtc IS NULL",
     {t:s.t,a:s.account});

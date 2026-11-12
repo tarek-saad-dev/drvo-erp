@@ -20,12 +20,14 @@ import { CustomersController } from "./customers/customers.controller";
 import { CustomersService } from "./customers/customers.service";
 import { BookingController } from "./booking/booking.controller";
 import { BookingService } from "./booking/booking.service";
+import { PosPreviewController } from "./pos-preview/pos-preview.controller";
+import { PosPreviewService } from "./pos-preview/pos-preview.service";
 
 @Module({
   controllers: [HealthController, DatabaseHealthController, K3ScopeProofController,
     IdentityController, AuthorizedBranchController, BranchAccessController,
-    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, CatalogController, CustomersController, BookingController],
+    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, CatalogController, CustomersController, BookingController, PosPreviewController],
   providers: [FoundationDatabaseService, K3ScopeProofRepository, IdentityService, BranchAccessService,
-    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, CatalogService, CustomersService, BookingService],
+    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, CatalogService, CustomersService, BookingService, PosPreviewService],
 })
 export class AppModule {}

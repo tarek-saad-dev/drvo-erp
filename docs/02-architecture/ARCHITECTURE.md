@@ -1,5 +1,8 @@
 # Architecture baseline
 
+> **2026-11-12 PARALLEL K5F-3/F-1a MAINLINE EVIDENCE:** PRs #69 and #70 merged: guarded SQL migrator's disposable 001–014 restore now proves source schema recovery in a second test DB; a completely separate synthetic F-1a SQL proof tests co-transaction Sale+balanced dummy journal+Outbox without changing any actual POS/Accounting/Treasury owner tables or the runtime API. No inference of live scoped K5 entitlement, finance validity, performance SLA, offsite VPS recoverability or customer readiness. ADR-030 scope accepted; ADR-031/032 and K5F operational gate remain OPEN. [K5F-3](../04-execution/K5F3-POST-MIGRATION-ISOLATED-RESTORE-2026-11-12.md) · [F-1a](../04-execution/FINANCE-F1A-OPTION-A-ATOMIC-SQL-PROBE-2026-11-12.md).
+
+
 > **2026-11-12 OPTION A SQL MECHANICS CI PROOF (REVIEW ONLY):** Synthetic, isolated SQL probe tests source Sale, balanced test journal and Outbox as one SERIALIZABLE transaction with explicit Tenant/Business/Branch-scope keys, rollback and replay; not implemented in Shared POS or Accounting bounded contexts, not actual K5 auth/SQL permissions/CoA, and not permission for financial posting. [F-1a report](../04-execution/FINANCE-F1A-OPTION-A-ATOMIC-SQL-PROBE-2026-11-12.md). ADR-031/032 still PROPOSED, K5F OPEN.
 
 

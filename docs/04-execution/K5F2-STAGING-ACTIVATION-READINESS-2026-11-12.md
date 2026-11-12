@@ -1,6 +1,6 @@
 # K5F-2 — Safe Staging activation readiness: no-activation gate (2026-11-12)
 
-**Status:** GitHub review PR; **no VPS execution or operator sign-off**. K5F remains OPEN. This hardens a read-only operator checker, not a migration runner or entitlement activator. Prerequisites: [K5F security runbook](K5F-STAGING-SECURITY-VALIDATION-2026-11-10.md), [ADR-030 accepted scope](../05-decisions/ADR-030-TENANT-ISOLATION-ENFORCEMENT.md), [ADR-032 proposed activation](../05-decisions/ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md).
+**Status:** PR #66 MERGED with K0/K1/K5D CI success; **no VPS K5F operator execution or acceptance**. Staging code-only deploy for merge SHA a1477e07 was verified, but updated immutable root-owned checker bundle was NOT refreshed/executed. K5F remains OPEN. This hardens a read-only operator checker, not a migration runner or entitlement activator. Prerequisites: [K5F security runbook](K5F-STAGING-SECURITY-VALIDATION-2026-11-10.md), [ADR-030 accepted scope](../05-decisions/ADR-030-TENANT-ISOLATION-ENFORCEMENT.md), [ADR-032 proposed activation](../05-decisions/ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md).
 
 ## Architecture impact before change
 

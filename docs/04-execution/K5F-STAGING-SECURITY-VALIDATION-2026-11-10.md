@@ -1,5 +1,8 @@
 # K5F — Staging Security Validation & Real Onboarding E2E
 
+> **2026-11-12 K5F-2 follow-up (review PR, NOT a VPS preflight):** [Latest read-only module-flag gate and SQL source manifest audit](K5F2-STAGING-ACTIVATION-READINESS-2026-11-12.md) augments this runbook to cover Catalog/Customers/Booking/POS private flags, still expecting SQL 001–009 on the existing K5F target. Rebuild and review the immutable root bundle after the code merge; no SQL 010–014 staging approval or offsite restore evidence follows automatically.
+
+
 **Date:** 2026-11-10  
 **Status:** IN PROGRESS / NOT ACCEPTED. This report covers a proposed read-only security hardening PR. No live Owner, Staff, email, flag change, SQL migration, restore or VPS execution is implied by a merged PR or green isolated CI.
 

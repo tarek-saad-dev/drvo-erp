@@ -1,5 +1,8 @@
 # Current state
 
+> **2026-11-12 K5F-2 STAGING ACTIVATION PREFLIGHT REVIEW PR:** Root-owned read-only K5F checker now blocks all 10 current K5/business API and 7 Web flags (Catalog/Customers/Booking/POS included), keeps exact 001–009 SQL requirement. Test-only read-only source manifest planner checks 001–014 and refuses authorization, never reads VPS or runs migrations. [K5F-2 packet](../04-execution/K5F2-STAGING-ACTIVATION-READINESS-2026-11-12.md). **K5F OPEN, SQL 010–014 VPS blocked, ADR-031/032 PROPOSED; no changes to credentials, feature flags, or runtime.**
+
+
 > **2026-11-12 VERIFIED MAINLINE CHECKPOINT — PL-1b + CU-2:** PRs [#59](https://github.com/tarek-saad-dev/drvo-erp/pull/59), [#60](https://github.com/tarek-saad-dev/drvo-erp/pull/60), [#61](https://github.com/tarek-saad-dev/drvo-erp/pull/61), [#62](https://github.com/tarek-saad-dev/drvo-erp/pull/62), [#64](https://github.com/tarek-saad-dev/drvo-erp/pull/64) and [#63](https://github.com/tarek-saad-dev/drvo-erp/pull/63) are **merged to main** after successful recorded PR CI. SQL **014 is SOURCE/CI ONLY**; the PL-1b disposable SQL+HTTP CI passed 20 cases; CU-2 mapping tests passed K0/K1. [Staging code deployment](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43204659041) for PR #64 merge SHA `f3eedaf19d1168d2f2c2222501257fe89e01aae8` succeeded through the authorized SSH receiver; **this is not SQL deployment, VPS E2E proof, customer onboarding or financial activation**. SQL 010–014 remain unapproved for VPS; public K5/domain feature activation unapproved; K5F operational security OPEN, ADR-031/032 PROPOSED. Historical PR-only notes below reflect earlier checkpoints.
 
 

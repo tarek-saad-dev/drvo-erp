@@ -1,6 +1,6 @@
 # Demo-S1 — First working Salon walkthrough (2026-11-12)
 
-**Status:** GitHub review PR; standalone PUBLIC **synthetic** Web demonstration. **Not** real Booking/POS, not a sale, not a customer/onboarding environment. Founder requested skipping noncritical release work to view a working UI immediately.
+**Status:** [PR #72](https://github.com/tarek-saad-dev/drvo-erp/pull/72) MERGED; isolated Next Build/HTTP demo test and K5C security CI PASS. [Staging Deploy #43246246321](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43246246321) accepted code SHA `38d5c1866104a4d6254c29ad46350f008b76ecc3` via SSH receiver. **Public external HTTP reachability not independently verified.** Standalone PUBLIC **synthetic** Web demonstration, **not** real Booking/POS, payment, sale, or customer/onboarding environment. Founder requested skipping noncritical release work to view a working UI immediately.
 
 ## Architectural impact before implementation
 

@@ -1,5 +1,9 @@
 # Current state
 
+> **2026-11-12 ADR-031 FIRST-GL DECISION READINESS (REVIEW PR):** Founder/Finance A/B decision packet and pure test-only 32-case first-journal/outbox evidence matrix added; conditional V1 A recommendation remains **NOT ACCEPTED**, with no GL, Sale POSTED, or tender settlement implemented. [Decision packet](../04-execution/ADR-031-FOUNDER-FINANCE-DECISION-PACKET-2026-11-12.md). ADR-032 and K5F OPEN, SQL 010–014 VPS blocked and all business flags OFF.
+
+
+
 > **2026-11-12 K5F-2 STAGING ACTIVATION PREFLIGHT REVIEW PR:** Root-owned read-only K5F checker now blocks all 10 current K5/business API and 7 Web flags (Catalog/Customers/Booking/POS included), keeps exact 001–009 SQL requirement. Test-only read-only source manifest planner checks 001–014 and refuses authorization, never reads VPS or runs migrations. [K5F-2 packet](../04-execution/K5F2-STAGING-ACTIVATION-READINESS-2026-11-12.md). **K5F OPEN, SQL 010–014 VPS blocked, ADR-031/032 PROPOSED; no changes to credentials, feature flags, or runtime.**
 
 

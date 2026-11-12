@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-11-12 — ADR-031 first-journal Founder/Finance review packet (not accepted)
+
+- Added test-only synthetic 32-combination atomic-A/async-B first GL truth matrix, independent Treasury tender evidence assertions and unexpected-input negative cases.
+- Prepared explicit account/tax/AR/period/latency/first-journal decision form for Founder+Finance+Architecture; **does not select A/B or implement ledger, sale posting, SQL, payment, public auth or VPS changes**. [Decision packet](ADR-031-FOUNDER-FINANCE-DECISION-PACKET-2026-11-12.md).
+
+
+
 ## 2026-11-12 — K5F-2 read-only staging activation readiness (review PR)
 
 - Strengthened K5F operator checker to fail closed when Catalog/Customers/Booking/POS API or Web feature flags are enabled before authorization; preserves exact 001–009 migration baseline and root-owned operator bundle requirement.

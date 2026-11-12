@@ -1,5 +1,8 @@
 # Architecture baseline
 
+> **2026-11-12 PL-1b PERSISTED POS DRAFT CONTEXT (REVIEW ONLY):** POS owns `core.PosDraft`/`core.PosDraftLine` records and scoped write/read procedures, with explicit Tenant/Business/Branch FKs, live K5/Role intersection (`pos.draft.read/manage`) and current Catalog price snapshot at draft creation. Does not modify Catalog's source records or post Accounting/Treasury/HR/Inventory. No universal Kernel/POS financing coupling, no Salon hardcoded fields, no POSTED status. SQL 014 source/CI only, public/API/Web flags OFF, K5F/ADR-031/ADR-032 remain open. [POS module contract](../03-modules/POS-DURABLE-DRAFTS-V0.md).
+
+
 > **2026-11-12 SHARED POS NONPOSTING PREVIEW BRANCH:** Add optional POS bounded context exposing in-browser draft and a separate server preview from existing scoped Catalog reads; no sale posting, no GL/Treasury/HR/Inventory effects or SQL tables. No future authorization implied by `catalog.read`; POS-specific RBAC and entitlement require separate approval. Default-OFF K5/Catalog/POS Preview flags, SQL 010–013 CI-only, K5F and ADR-031/032 unresolved. [POS preview contract](../03-modules/POS-PREVIEW-CORE-V0.md) · [PL-1 report](../04-execution/POS-NONPOSTING-PREVIEW-2026-11-12.md).
 
 

@@ -1,5 +1,8 @@
 # ADR-031 — Financial Source-of-Truth Posting Boundary and Reconciliation (PROPOSED)
 
+> **2026-11-12 OPTION A MECHANICS PROOF — STILL PROPOSED:** [F-1a disposable SQL probe](../04-execution/FINANCE-F1A-OPTION-A-ATOMIC-SQL-PROBE-2026-11-12.md), PR #70 merged, demonstrates source+balanced synthetic first journal+Outbox single SQL transaction, rollback and concurrent idempotent replay. This does **not** decide Option A over B, approve journal accounts/tax/tender policies, establish real SQL/HTTP financial posting, or relax K5F/ADR-032 operational gates. ADR-031 retains PROPOSED status pending explicit Founder+Finance+Architecture sign-off.
+
+
 > **2026-11-12 FINANCE/FOUNDER REVIEW PACKET (STILL PROPOSED):** [A/B first-journal decision request + exhaustive synthetic proof seed](../04-execution/ADR-031-FOUNDER-FINANCE-DECISION-PACKET-2026-11-12.md) records the still-unapproved Option A/B choice, tender E1/E2 account policies and concrete next SQL proof gates. **No change to ADR acceptance, financial posting authority, customer flags or VPS SQL.**
 
 

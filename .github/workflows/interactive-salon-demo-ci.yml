@@ -1,0 +1,62 @@
+name: Interactive Salon Demo CI
+on:
+  pull_request:
+    paths:
+      - 'apps/web/src/app/demo/salon/**'
+      - 'apps/web/src/app/page.tsx'
+      - 'apps/web/src/app/globals.css'
+      - 'apps/web/test/salon-demo.test.cjs'
+      - '.github/workflows/interactive-salon-demo-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/web/src/app/demo/salon/**'
+      - 'apps/web/src/app/page.tsx'
+      - 'apps/web/src/app/globals.css'
+      - 'apps/web/test/salon-demo.test.cjs'
+      - '.github/workflows/interactive-salon-demo-ci.yml'
+permissions:
+  contents: read
+jobs:
+  public-demo-private-auth-stays-closed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and validate standalone Web
+        run: |
+          set -euo pipefail
+          npm ci --prefix apps/web --no-audit --no-fund
+          node --test apps/web/test/salon-demo.test.cjs
+          env -u DRVO_K5_WEB_ENABLED npm run build --prefix apps/web
+          npm run typecheck --prefix apps/web
+      - name: Public route renders; private auth and real workspace remain CLOSED
+        shell: bash
+        run: |
+          set -euo pipefail
+          env -u DRVO_K5_WEB_ENABLED npm run start --prefix apps/web \
+            > "$RUNNER_TEMP/salon-demo-web.log" 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 45); do
+            if curl -fsS -o /dev/null http://127.0.0.1:3100/; then break; fi
+            sleep 1
+          done
+          test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3100/)" = 200
+          test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:3100/demo/salon)" = 200
+          curl -fsS http://127.0.0.1:3100/demo/salon > "$RUNNER_TEMP/demo.html"
+          grep -Fq 'نسخة تجريبية تفاعلية' "$RUNNER_TEMP/demo.html"
+          grep -Fq 'إدارة النشاط' "$RUNNER_TEMP/demo.html"
+          curl -fsS http://127.0.0.1:3100/ > "$RUNNER_TEMP/home.html"
+          grep -Fq '/demo/salon' "$RUNNER_TEMP/home.html"
+          for route in /sign-in /verify-email /workspaces; do
+            status="$(curl -sS -o /dev/null -w '%{http_code}' "http://127.0.0.1:3100$route")"
+            test "$status" = 404 || { echo "FAIL: private route $route leaked HTTP $status"; exit 1; }
+          done
+          echo 'PASS: public synthetic salon route available, private K5 routes remain 404'
+      - name: Show Web error logs
+        if: failure()
+        run: tail -n 100 "$RUNNER_TEMP/salon-demo-web.log" || true

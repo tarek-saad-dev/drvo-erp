@@ -1,5 +1,8 @@
 # Architecture baseline
 
+> **2026-11-12 POST-MERGE SAFETY POSITION:** PRs #66 and #67 merged; source/CI-only K5F flag audit and finance A/B truth evidence do not alter Shared POS runtime, SQL schema, independent Accounting/Treasury owners or Tenant/Business/Branch scope. Successful #66 Staging code SSH receiver does not authorize SQL 010–014 or install root-owned checker; ADR-031/032 remain proposed and K5F operational acceptance OPEN. [K5F-2 report](../04-execution/K5F2-STAGING-ACTIVATION-READINESS-2026-11-12.md) · [Financial decision](../04-execution/ADR-031-FOUNDER-FINANCE-DECISION-PACKET-2026-11-12.md).
+
+
 > **2026-11-12 FIRST-GL DECISION EVIDENCE (REVIEW PR):** Shared POS DRAFT remains nonposting. [ADR-031 review packet](../04-execution/ADR-031-FOUNDER-FINANCE-DECISION-PACKET-2026-11-12.md) models Source+first balanced Accounting GL+Outbox mandatory truth (A co-transaction vs B explicit `ACCOUNTING_PENDING`); keeps Treasury settlement verification, Inventory/HR side effects and customer/Business scoped ownership separate. No runtime or SQL modification, financial policy or ADR sign-off. ADR-031/032 and K5F remain open.
 
 

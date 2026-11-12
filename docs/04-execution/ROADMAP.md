@@ -1,5 +1,8 @@
 # Roadmap
 
+> **2026-11-12 PARALLEL K5F-3 + F-1a SOURCE PROOFS MERGED:** [K5F-3 #69](K5F3-POST-MIGRATION-ISOLATED-RESTORE-2026-11-12.md) establishes SQL Server CI post-014 checksum backup and separate DB recovery of all 14 migration objects; [Finance F-1a #70](FINANCE-F1A-OPTION-A-ATOMIC-SQL-PROBE-2026-11-12.md) establishes synthetic SQL atomic rollback/idempotent replay/8-way contention. These are evidence **not real VPS backups or customer accounting**. Next: authorized trusted-console K5F root-owned checker, off-host isolated restore, Nginx/trusted-IP/mail/Owner/Staff negative E2E; Finance/Founder/Architecture explicitly decide ADR-031 and CoA/VAT/AR/provider/period, then typed real Sale→GL owner contract + permission and approved migrations. ADR-032 paid activation separate; no SQL 010–014 VPS, no public flags.
+
+
 > **2026-11-12 F-1a REAL SQL ATOMICITY MECHANICS PROOF (PR, CI ONLY):** [Option A synthetic SQL proof](FINANCE-F1A-OPTION-A-ATOMIC-SQL-PROBE-2026-11-12.md) tests rollback after Sale and after first journal, exact replay, cross-scope Draft denial and eight concurrent retries in a dedicated ephemeral SQL database. Financial chart/AR/tax/settlement not approved, no runtime code or actual POS POSTED. Next F-1 typed domain-owner/authorization contract after ADR-031 Finance/Founder/Architecture acceptance; F-2 real domain SQL only after decision and K5F gate.
 
 

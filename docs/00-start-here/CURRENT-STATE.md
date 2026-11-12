@@ -1,5 +1,8 @@
 # Current state
 
+> **2026-11-12 VERIFIED K5F-2 + ADR-031 ENGINEERING CHECKPOINT:** [K5F-2 #66](https://github.com/tarek-saad-dev/drvo-erp/pull/66) and [Finance decision evidence #67](https://github.com/tarek-saad-dev/drvo-erp/pull/67) **MERGED to main**. #66 source tests K0/K1 and K5D SQL CI PASS; #67 synthetic 32-case first-GL truth tests K0/K1 PASS. [Staging code deployment #43208411618](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43208411618) confirms successful SSH receiver for #66 merge SHA `a1477e07a3e6c1b191ba6417a92e6ca7b6d32f9a`; this **does not** deploy SQL or install/execute updated root-owned K5F checker bundle. SQL 010–014 VPS **NOT AUTHORIZED**, module/K5 flags **OFF**, K5F operational sign-off **OPEN**, ADR-031/032 **PROPOSED** and no financial POSTED sale. Historical branch/PR status notes below refer to earlier checkpoints.
+
+
 > **2026-11-12 ADR-031 FIRST-GL DECISION READINESS (REVIEW PR):** Founder/Finance A/B decision packet and pure test-only 32-case first-journal/outbox evidence matrix added; conditional V1 A recommendation remains **NOT ACCEPTED**, with no GL, Sale POSTED, or tender settlement implemented. [Decision packet](../04-execution/ADR-031-FOUNDER-FINANCE-DECISION-PACKET-2026-11-12.md). ADR-032 and K5F OPEN, SQL 010–014 VPS blocked and all business flags OFF.
 
 

@@ -1,5 +1,8 @@
 # Roadmap
 
+> **2026-11-12 K5F-2 / ADR-031 MERGED READINESS:** PR #66 merged module-flag fail-closed read-only K5F checker and source SQL 001–014 manifest audit; PR #67 merged synthetic 32-case A/B first-journal truth matrix and Founder/Finance decision request. Code staging release for #66 SHA verified by SSH receiver; operator root-bundle pinning, K5F actual preflight, Nginx/access controls, off-host backup + isolated restore, and authorized SQL 010–014 staging application remain **OPEN**. ADR-031 Option A/B and tender/AR/tax mapping are **NOT DECIDED**; ADR-032 activation also pending. [K5F-2](K5F2-STAGING-ACTIVATION-READINESS-2026-11-12.md) · [Finance packet](ADR-031-FOUNDER-FINANCE-DECISION-PACKET-2026-11-12.md).
+
+
 > **2026-11-12 F-0 ADR-031 DECISION EVIDENCE (REVIEW PR):** [Founder + Finance first-GL packet](ADR-031-FOUNDER-FINANCE-DECISION-PACKET-2026-11-12.md) compares conditional Option A co-located transaction vs B async mandatory Accounting pending, models 32 adverse evidence combinations in root tests and enumerates tax/AR/provider/period/race sign-offs. Next F-1 typed Sale→GL after explicit choice; F-2 live disposable SQL posting after Finance/Architecture authorization. POS DRAFT remains nonposting; ADR-031/032, K5F, VPS migrations not approved.
 
 

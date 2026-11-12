@@ -1,5 +1,8 @@
 # Architecture baseline
 
+> **2026-11-12 DEMO-S1 MAINLINE/DEPLOY BOUNDARY:** [PR #72](https://github.com/tarek-saad-dev/drvo-erp/pull/72) merged, staging code receiver success for SHA `38d5c1866104a4d6254c29ad46350f008b76ecc3`. Synthetic Next `/demo/salon` remains strictly client-local and public, while real Tenant/Business/Branch-scoped K5 APIs, SQL and paid module activation are unchanged/default OFF. Passing simulated booking/POS tests does not prove real Booking, posted Sales, accounting, external HTTP reachability or customer onboarding. K5F/ADR-031/032 and SQL 010–014 operational holds intact. [Demo-S1](../04-execution/SALON-FIRST-WORKING-DEMO-2026-11-12.md).
+
+
 > **2026-11-12 DEMO-S1 PUBLIC SYNTHETIC UX (REVIEW ONLY):** An isolated `/demo/salon` Next client-side, seeded-only Salon walkthrough models UX for Booking/POS DRAFT without connecting to Shared Catalog/Booking/Accounting data, K5 credentials, runtime API or browser storage. It is not a new bypass for tenant RBAC or commercial entitlement; real authenticated modules remain default-OFF, SQL 010–014 VPS unapproved, ADR-031/032 and K5F OPEN. [Demo design](../04-execution/SALON-FIRST-WORKING-DEMO-2026-11-12.md).
 
 

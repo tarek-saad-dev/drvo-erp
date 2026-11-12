@@ -1,6 +1,6 @@
 /**
  * Public SALON DEMO fixtures ONLY. Isolated from all real K5/Catalog/Booking/POS
- * APIs, session cookies, SQL, localStorage and commercial entitlement flows.
+ * APIs, session cookies, SQL, persistent browser state and commercial entitlement flows.
  * Nothing in this module is a customer booking, invoice, payment or sale.
  */
 export type DemoAppointmentStatus="confirmed"|"completed"|"cancelled";

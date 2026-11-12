@@ -1,5 +1,8 @@
 # Current state
 
+> **2026-11-12 FIRST INTERACTIVE SALON DEMO MERGED + STAGING CODE DEPLOYED:** [PR #72](https://github.com/tarek-saad-dev/drvo-erp/pull/72) is **MERGED** to main; synthetic `/demo/salon` dashboard, Booking schedule/conflict handling and in-memory POS DRAFT are implemented, all K0/K1, Salon Demo HTTP/Next and K5C private-route negative CI PASS. [Staging Deploy #43246246321](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43246246321) **SUCCESS**, SSH receiver explicitly accepted code SHA `38d5c1866104a4d6254c29ad46350f008b76ecc3`. Intended public URL: `https://erp-stage.drvotech.com/demo/salon`; **external HTTP reachability of that URL is NOT independently verified** (test tools could not access it). This is an isolated fake-data presentation only: no actual Auth/SQL/Cashier/customer records/bookings/sales, no persistent drafts, payment, invoice, posting or real SaaS readiness. SQL 010–014 VPS NOT authorized; K5F/ADR-031/032 still OPEN. [Demo record](../04-execution/SALON-FIRST-WORKING-DEMO-2026-11-12.md).
+
+
 > **2026-11-12 SALON DEMO-S1 REVIEW PR — FIRST INTERACTIVE UX:** Public synthetic `/demo/salon` Next Web route with real **in-browser** dashboard, seeded appointments, double-slot conflict checks, status transitions, services and DRAFT-only cart/calculation. Public homepage links to it, but it uses **zero K5/Auth/API/SQL/Cashier calls and no storage**. No real salon signups/bookings/payments or posted sales. Dedicated Next build/unit/HTTP smoke checks and K5 404 negatives required before merge. [Demo report](../04-execution/SALON-FIRST-WORKING-DEMO-2026-11-12.md). SQL 010–014 unapproved on VPS; K5F and ADR-031/032 remain OPEN. Deployment/public URL must be independently verified.
 
 

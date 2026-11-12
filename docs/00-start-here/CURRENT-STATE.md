@@ -1,5 +1,8 @@
 # Current state
 
+> **2026-11-12 PL-1b DURABLE POS DRAFT SOURCE/CI ONLY:** Feature PR introduces SQL 014 POS-owned Branch DRAFT/line snapshots, idempotent create/list, separate live `pos.draft.read/manage` checks, private RTL save/list and disposable SQL+HTTP isolation CI. **No POSTED sale, payment/GL/Inventory or customer activation. SQL 010–014 NOT authorized on VPS; K5F open, ADR-031/032 proposed, all flags OFF.** [Draft contract](../03-modules/POS-DURABLE-DRAFTS-V0.md) · [review packet](../04-execution/POS-DURABLE-DRAFTS-EXECUTION-2026-11-12.md). No CI/merge/deployment assumption until independently verified.
+
+
 > **2026-11-12 CU-1 CASHIER PINNED PURE SOURCE PARITY (REVIEW ONLY):** Immutable Cashier BusinessDay and Payroll pure source snapshots from exact legacy commit are placed **under test fixtures only**, checked by Git blob hash, compiled and executed without network/DB to compare supported Branch day decisions and record payroll golden values. [CU-1 report](../04-execution/CASHIER-PINNED-SOURCE-PARITY-2026-11-12.md). No runtime port, production Cashier operation or real payroll/SQL/financial changes. Legacy misuse risks remain; K5F, ADR-031/032, VPS SQL and public flags unchanged.
 
 

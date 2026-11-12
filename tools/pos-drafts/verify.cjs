@@ -375,7 +375,10 @@ async function main(){
     " AND RoleId=@role AND ActionCode='catalog.read'",{t:s.t,b:s.b,role:s.role});
    assert.equal((await get(root(s.b,s.br),cookie)).status,404);
    assert.equal((await get(previewRoot(s.b,s.br),cookie)).status,404);
-   assert.equal((await get(draftRoot(s.b,s.br),cookie)).status,404);
+   // POS draft READ is separate from catalog.read; prior snapshots remain readable.
+   assert.equal((await get(draftRoot(s.b,s.br),cookie)).status,200);
+   // New saves still require catalog.read in SQL at the same transaction boundary.
+   assert.equal((await post(draftRoot(s.b,s.br),cookie,id(),sampleDraft())).status,404);
    await query(admin,"INSERT core.RolePermission(TenantId,BusinessId,RoleId,ActionCode)"+
     " VALUES(@t,@b,@role,'catalog.read')",{t:s.t,b:s.b,role:s.role});
    await query(admin,"DELETE FROM core.RolePermission WHERE TenantId=@t AND BusinessId=@b"+
@@ -388,10 +391,12 @@ async function main(){
     {t:s.t,b:s.b,a:s.account});
    assert.equal((await get(root(s.b,s.br),cookie)).status,404);
    assert.equal((await get(previewRoot(s.b,s.br),cookie)).status,404);
+   assert.equal((await get(draftRoot(s.b,s.br),cookie)).status,404);
    await query(admin,"UPDATE core.AuthSession SET RevokedAtUtc=SYSUTCDATETIME()"+
     " WHERE TenantId=@t AND AccountId=@a AND RevokedAtUtc IS NULL",
     {t:s.t,a:s.account});
    assert.equal((await get(root(s.b,s.br),cookie)).status,401);
+   assert.equal((await get(draftRoot(s.b,s.br),cookie)).status,401);
   });
   console.log('PL-1b POS DRAFTS + CATALOG SQL HTTP PASS: '+tests+' security/domain cases');
  }finally{

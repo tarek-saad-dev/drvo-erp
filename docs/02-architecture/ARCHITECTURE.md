@@ -1,5 +1,8 @@
 # Architecture baseline
 
+> **2026-11-12 MAINLINE RECONCILIATION:** Source/CI-only Shared POS durable DRAFT via merged PR #64 is backed by Branch-scoped SQL 014/EXECUTE-only principal, live K5+POS actions and Catalog price snapshots. Test-only Cashier synthetic identifier mapping merged via PR #63 remains outside runtime. No POSTED status or Accounting/Treasury writes, no SQL 010–014 authorization for VPS, no public feature activation. ADR-031/032 and K5F still open. Staging SSH code release #43204659041 succeeded for PR #64 SHA, but is not runtime/customer/DB acceptance.
+
+
 > **2026-11-12 PL-1b PERSISTED POS DRAFT CONTEXT (REVIEW ONLY):** POS owns `core.PosDraft`/`core.PosDraftLine` records and scoped write/read procedures, with explicit Tenant/Business/Branch FKs, live K5/Role intersection (`pos.draft.read/manage`) and current Catalog price snapshot at draft creation. Does not modify Catalog's source records or post Accounting/Treasury/HR/Inventory. No universal Kernel/POS financing coupling, no Salon hardcoded fields, no POSTED status. SQL 014 source/CI only, public/API/Web flags OFF, K5F/ADR-031/ADR-032 remain open. [POS module contract](../03-modules/POS-DURABLE-DRAFTS-V0.md).
 
 

@@ -1,5 +1,9 @@
 # Architecture baseline
 
+> **2026-11-12 OPTION A SQL MECHANICS CI PROOF (REVIEW ONLY):** Synthetic, isolated SQL probe tests source Sale, balanced test journal and Outbox as one SERIALIZABLE transaction with explicit Tenant/Business/Branch-scope keys, rollback and replay; not implemented in Shared POS or Accounting bounded contexts, not actual K5 auth/SQL permissions/CoA, and not permission for financial posting. [F-1a report](../04-execution/FINANCE-F1A-OPTION-A-ATOMIC-SQL-PROBE-2026-11-12.md). ADR-031/032 still PROPOSED, K5F OPEN.
+
+
+
 > **2026-11-12 K5F-3 RECOVERY CI PROOF (REVIEW ONLY):** Existing staging SQL migration automation remains unchanged on VPS; its disposable SQL CI now plans an additional post-014 independent restore with matching exact history and POS Draft scoped objects. This does not imply production/site backup recoverability, a new migration/privilege, deployed SQL, Auth/Module flags or accepted ADR-031/032. [K5F-3 report](../04-execution/K5F3-POST-MIGRATION-ISOLATED-RESTORE-2026-11-12.md).
 
 

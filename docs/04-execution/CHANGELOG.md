@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-11-12 — F-1a Option A disposable SQL transaction proof (review PR)
+
+- Added an isolated SQL2022 source Sale + first balanced synthetic GL + Outbox transaction proof with SERIALIZABLE lock, exact replay, branch/tenant source boundary, rollback and concurrent idempotency cases; no production tables, API or migrations.
+- All money/journal numbers are synthetic mechanics, **not** accepted Chart of Accounts, tax or tender policy. ADR-031/032 and K5F stay OPEN; SQL 010–014 VPS blocked. [F-1a report](FINANCE-F1A-OPTION-A-ATOMIC-SQL-PROBE-2026-11-12.md).
+
+
+
 ## 2026-11-12 — K5F-3 disposable post-migration restore review PR
 
 - Extended existing restricted staging migrator SQL2022 CI with second COPY_ONLY backup **after all 001–014 source migrations**, checksum VERIFYONLY, independently restored throwaway DB and exact migration-history/scoped POS Draft object checks.

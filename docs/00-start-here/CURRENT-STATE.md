@@ -1,5 +1,9 @@
 # Current state
 
+> **2026-11-12 F-1a OPTION A DISPOSABLE SQL PROBE (REVIEW ONLY):** Added isolated SQL Server 2022 CI harness for synthetic Branch/Draft→Sale+balanced first-journal+Outbox SERIALIZABLE transaction with scoped keys, forced rollback, concurrent replay and source hash guards. **Not a real Accounting engine, customer POS, SQL 015 or POSTED API**. [F-1a report](../04-execution/FINANCE-F1A-OPTION-A-ATOMIC-SQL-PROBE-2026-11-12.md). ADR-031 still PROPOSED; Finance/tax/tender policy unapproved. K5F/ADR-032 OPEN, SQL 010–014 VPS blocked.
+
+
+
 > **2026-11-12 K5F-3 REVIEW BRANCH (DISPOSABLE RESTORE PROOF ONLY):** Extended existing SQL Server CI to take an independent post-014 COPY_ONLY backup, RESTORE VERIFYONLY and restore into a second throwaway DB, compare exact 14 migration checksums and POS Draft scoped objects. This is GitHub CI, **not off-host/VPS disaster recovery, K5F operator acceptance or SQL 010–014 authorization**. [K5F-3 report](../04-execution/K5F3-POST-MIGRATION-ISOLATED-RESTORE-2026-11-12.md). All K5/Auth/Module flags OFF; ADR-031/032 PROPOSED.
 
 

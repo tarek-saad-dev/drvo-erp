@@ -1,5 +1,9 @@
 # Roadmap
 
+> **2026-11-12 F-1a REAL SQL ATOMICITY MECHANICS PROOF (PR, CI ONLY):** [Option A synthetic SQL proof](FINANCE-F1A-OPTION-A-ATOMIC-SQL-PROBE-2026-11-12.md) tests rollback after Sale and after first journal, exact replay, cross-scope Draft denial and eight concurrent retries in a dedicated ephemeral SQL database. Financial chart/AR/tax/settlement not approved, no runtime code or actual POS POSTED. Next F-1 typed domain-owner/authorization contract after ADR-031 Finance/Founder/Architecture acceptance; F-2 real domain SQL only after decision and K5F gate.
+
+
+
 > **2026-11-12 K5F-3 POST-014 DISPOSABLE RESTORE REHEARSAL (PR):** [Isolated post-migration restore CI](K5F3-POST-MIGRATION-ISOLATED-RESTORE-2026-11-12.md) supplements current pre-migration restore proof and checks exact SQL 001–014 post-state. **No VPS access, offsite backup/restore or staging migration.** Next genuine blockers: root-owned K5F checker preflight, real offsite isolated restore and security/operator sign-off; flags OFF, ADR-032 and ADR-031 separate.
 
 

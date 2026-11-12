@@ -1,5 +1,8 @@
 # Current state
 
+> **2026-11-12 VERIFIED PARALLEL K5F-3 + FINANCE F-1a CHECKPOINT:** PR [#69](https://github.com/tarek-saad-dev/drvo-erp/pull/69) post-SQL-014 **disposable SQL backup/independent restore** and PR [#70](https://github.com/tarek-saad-dev/drvo-erp/pull/70) Option A **synthetic atomic first-journal mechanics** are **MERGED to main**, K0/K1 and specialized SQL CI PASS on reviewed PR heads. The SQL restore checks all 14 migration checksums and POS Draft scoped objects; Finance probe confirms source+balanced test journal+Outbox rollback/replay and 8 concurrent synthetic retries. **Neither is a VPS offsite restore, real Sale/POSTED API/Chart of Accounts, ADR-031 approval or paid activation.** K5F actual root-owned operator checks, off-host encrypted backup and independent restore, Nginx/mail/proxy/synthetic E2E security signoff remain OPEN. SQL 010–014 **NOT authorized/applied to VPS by this work**, Auth/Module flags remain OFF, ADR-031/032 PROPOSED. Previous review-PR notes below are historical.
+
+
 > **2026-11-12 F-1a OPTION A DISPOSABLE SQL PROBE (REVIEW ONLY):** Added isolated SQL Server 2022 CI harness for synthetic Branch/Draft→Sale+balanced first-journal+Outbox SERIALIZABLE transaction with scoped keys, forced rollback, concurrent replay and source hash guards. **Not a real Accounting engine, customer POS, SQL 015 or POSTED API**. [F-1a report](../04-execution/FINANCE-F1A-OPTION-A-ATOMIC-SQL-PROBE-2026-11-12.md). ADR-031 still PROPOSED; Finance/tax/tender policy unapproved. K5F/ADR-032 OPEN, SQL 010–014 VPS blocked.
 
 

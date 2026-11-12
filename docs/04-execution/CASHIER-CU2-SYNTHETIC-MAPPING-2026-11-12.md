@@ -1,6 +1,6 @@
 # CU-2 — Cashier → DRVO synthetic identifier mapping, dry-run ONLY
 
-**Date:** 2026-11-12. **Status:** review PR, not live ETL or production migration. Source-of-truth mapping concepts: [CASHIER-MIGRATION](../06-reference/CASHIER-MIGRATION.md), [pinned Cashier audit](CASHIER-REUSE-AUDIT-2026-11-12.md), [CU-1 source parity PR #62](https://github.com/tarek-saad-dev/drvo-erp/pull/62). ADR-030 accepted enforcement baseline; ADR-031/032 and K5F remain OPEN.
+**Date:** 2026-11-12. **Status:** PR #63 merged in main (K0/K1 CI PASS); test-only dry-run, not live ETL or production migration. Source-of-truth mapping concepts: [CASHIER-MIGRATION](../06-reference/CASHIER-MIGRATION.md), [pinned Cashier audit](CASHIER-REUSE-AUDIT-2026-11-12.md), [CU-1 source parity PR #62](https://github.com/tarek-saad-dev/drvo-erp/pull/62). ADR-030 accepted enforcement baseline; ADR-031/032 and K5F remain OPEN.
 
 ## Architectural change / security impact
 

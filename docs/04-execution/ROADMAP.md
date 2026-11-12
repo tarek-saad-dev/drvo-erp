@@ -1,5 +1,8 @@
 # Roadmap
 
+> **2026-11-12 MERGED CODE CHECKPOINT — scoped POS DRAFT + Cashier CU-2:** PR #64 delivers DRAFT-only SQL 014 + API + private UI (all default-OFF, no financial posting) and PR #63 delivers test-only synthetic Cashier ID mapping; previous PL-0/PL-1/CU-0/CU-1 PRs merged as well. Exact-head POS Draft SQL/HTTP CI: 20 cases PASS; CU-2 K0/K1 PASS. Main staging code package/SSH receiver for #64 succeeded; **no SQL 010–014 VPS migration or verified customer activation**. Next separate gates: K5F security/read-only migration-checker upgrade, independent backup/restore and authorized staging SQL; ADR-031 Finance/Founder first-GL decision and ADR-032 Commercial activation decision before POSTED transactions or SaaS launch. [POS Draft contract](../03-modules/POS-DURABLE-DRAFTS-V0.md) · [CU-2 report](CASHIER-CU2-SYNTHETIC-MAPPING-2026-11-12.md).
+
+
 > **2026-11-12 CU-2 SAFE SYNTHETIC DATA-MAPPING REVIEW:** [Cashier CU-2 dry-run planner](CASHIER-CU2-SYNTHETIC-MAPPING-2026-11-12.md) records per-dataset source keys and explicit destination Tenant/Business/Branch ancestry, rejecting duplicate/foreign/PII inputs. No live legacy schema/table reads or target writes. Next CU-3 requires domain owner, financial/policy/data mapping, anonymized extracts and verified reconciliation.
 
 

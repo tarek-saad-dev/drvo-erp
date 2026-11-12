@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-11-12 — Mainline consolidation: PL-1b + CU-2 merged
+
+- PR #64 merged scoped durable DRAFT-only SQL 014, API/UI and disposable SQL+HTTP 20-case proof; PR #63 merged synthetic-only Cashier mapping and passed K0/K1. Earlier PL-0/PL-1/CU-0/CU-1 PRs #59–#62 are merged.
+- GitHub [Staging Deploy #43204659041](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43204659041) successfully packaged and sent code revision `f3eedaf19d1168d2f2c2222501257fe89e01aae8` to its SSH receiver. Not a SQL migration, post-deploy operator verification, customer activation, or financial POSTED release.
+- Migration 014 and prior 010–013 remain SOURCE/CI only and unapproved for VPS. ADR-031/032, K5F security/backup/feature activation gates remain open.
+
+
 ## 2026-11-12 — CU-2 dry-run legacy identifier mapping PR
 
 - Added test-only deterministic Cashier `TblClient`/`TblPro` synthetic ID mapping planner with Business/Branch ownership validation and fail-closed fixture tests.

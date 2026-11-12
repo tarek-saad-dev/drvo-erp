@@ -1,6 +1,6 @@
 # PL-1b — Durable, scope-protected POS draft execution (2026-11-12)
 
-**Status:** review branch + PR; not merged or deployed at creation. No Production/VPS SQL authorization. Founder requested scoped durable drafts as the next slice after merged PL-1 Preview. ADR-030 implementation-neutral scope baseline accepted; **ADR-031/032 still PROPOSED**. K5F operational security OPEN.
+**Status:** PR #64 merged into main; SQL 014 CI-only. Code Staging Deploy #43204659041 SSH receiver PASS for SHA f3eedaf19d1168d2f2c2222501257fe89e01aae8; not a DB/customer activation. Historical review requirements remain operational gates. No Production/VPS SQL authorization. Founder requested scoped durable drafts as the next slice after merged PL-1 Preview. ADR-030 implementation-neutral scope baseline accepted; **ADR-031/032 still PROPOSED**. K5F operational security OPEN.
 
 ## Architecture impact (before implementation)
 

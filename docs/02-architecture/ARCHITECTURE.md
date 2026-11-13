@@ -1,5 +1,8 @@
 # Architecture baseline
 
+> **2026-11-13 S5 MODULE BOUNDARY CHECK:** Shared Booking alone owns SQL016 dated Resource windows and insert-time coverage enforcement under Tenant/Business/Branch+Resource scoped FKs, existing resource locks and K5 read/manage actions. No universal Salon-specific scheduler, employee HR identity, recurring local timezone guarantee or historical migration edits. Completed Booking is NOT a Sale; independent POS/Catalog API validates URL OfferingId before drafting an **unsaved** cart. Salon Overview is only a private scoped read-only Industry Solution composition. Exact Origin / separate POS Preview and Draft GET permissions remain; all financial and paid-module activation remains blocked by ADR-031/032 and K5F, SQL 010–016 VPS unauthorised. [S5](../04-execution/SALON-S5-THREE-TRACK-DELIVERY-2026-11-13.md).
+
+
 > **2026-11-13 SALON S4 ARCHITECTURE CHECK:** PRs #80/#81/#82 are separate Shared Booking lifecycle, Shared POS DRAFT UX and **Salon-only private Industry Solution composition**. No duplicated Salon Backend, no cross-owner SQL write, no Cashier numeric employee key copied, no GL or tender effects from Booking COMPLETE. SQL 015 BookingStatusChange references scoped Booking via composite Tenant/Business/Branch FK; revalidates K5 `booking.manage` and serializes Resource row with CreateBooking; independent Auth/Catalog/Customer/Booking/POS read is mandatory for overview. Public fake Demo stays isolated. K5F/ADR-031/032 release gates unchanged; SQL **010–015 NOT applied on VPS**. [S4 handoff](../04-execution/SALON-S4-PARALLEL-DELIVERY-2026-11-13.md).
 
 

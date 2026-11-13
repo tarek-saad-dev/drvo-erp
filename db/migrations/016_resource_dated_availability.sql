@@ -116,9 +116,10 @@ END');
 -- A trigger preserves the immutable SQL013 stored-procedure definition while
 -- enforcing the new optional opt-in policy on every real Booking insert.
 -- Old resources remain unrestricted until their first window is published.
--- Owner context ensures private table read works for the restricted app principal.
+-- Same-owner core tables use SQL Server ownership chaining; never impersonate dbo
+-- from the restricted DB-only migration principal.
 EXEC(N'CREATE TRIGGER core.TrgBookingEnforceResourceWindow
- ON core.BookingAppointment WITH EXECUTE AS OWNER
+ ON core.BookingAppointment
  AFTER INSERT AS BEGIN
  SET NOCOUNT ON;
  IF EXISTS(SELECT 1 FROM inserted i

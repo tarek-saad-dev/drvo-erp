@@ -4,8 +4,9 @@
 ALTER TABLE core.BookingResourceWindow ADD
  State VARCHAR(6) COLLATE Latin1_General_100_BIN2 NOT NULL
   CONSTRAINT DF_BookingWindowState DEFAULT('OPEN');
-ALTER TABLE core.BookingResourceWindow ADD CONSTRAINT CK_BookingWindowState
- CHECK(State IN('OPEN','CLOSED'));
+-- Dynamic DDL makes SQL Server compile this CHECK *after* the ADD COLUMN.
+EXEC(N'ALTER TABLE core.BookingResourceWindow ADD CONSTRAINT CK_BookingWindowState
+ CHECK(State IN(''OPEN'',''CLOSED''))');
 
 CREATE TABLE core.BookingWindowCloseAudit(
  TenantId UNIQUEIDENTIFIER NOT NULL, BusinessId UNIQUEIDENTIFIER NOT NULL,

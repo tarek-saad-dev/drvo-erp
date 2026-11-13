@@ -38,7 +38,7 @@ test('Workspace only reveals Salon tile after real module read and Web gates',()
 
 test('daily operational filters and Booking-to-POS actions honor independent access',()=>{
  const client=read('salon/salon-overview-client.tsx');
- assert.match(client,/setFilter=useState<"TODAY"\|"UPCOMING"\|"ALL">\("TODAY"\)/);
+ assert.match(client,/setFilter\]=useState<"TODAY"\|"UPCOMING"\|"ALL">\("TODAY"\)/);
  assert.match(client,/localToday\(when\)/);
  assert.match(client,/filter==="UPCOMING"/);
  assert.match(client,/b\.status==="BOOKED"/);

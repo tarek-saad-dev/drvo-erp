@@ -1,5 +1,8 @@
 # Roadmap
 
+> **2026-11-13 S5 PRODUCT INCREMENTS DELIVERED IN PARALLEL:** [S5 handoff](SALON-S5-THREE-TRACK-DELIVERY-2026-11-13.md): #84 Booking-owned future dated resource windows (UTC, opt-in, availability enforced by SQL016, 28 disposable HTTP+SQL CI checks + restricted DB migrator PASS); #85 completed-service Offering ID may prefill new **unsaved** POS DRAFT under independent POS/Catalog authorization; #86 read-only Salon TODAY/UPCOMING/ALL roster with scoped DRAFT links. Real POSTED sales still absent. **Immediate next engineering**: plan explicit Resource holiday/window correction/edit UX, positive UI browser E2E; no recurring staff schedules claimed. **Operator**: K5F and isolated offhost restore → separately authorized SQL 010–016 VPS window → private module rights, then Pilot. ADR-031/032 OPEN.
+
+
 > **2026-11-13 FAST LAUNCH S4 — THREE IMPLEMENTED, MERGED PRS:** [S4 handoff](SALON-S4-PARALLEL-DELIVERY-2026-11-13.md): #80 terminal Booking cancellation/completion with idempotent scoped SQL 015; #81 quicker POS DRAFT cart and saved-Draft-as-NEW-cart (no posting); #82 private Salon Overview with scoped Customer/Catalog/Booking/POS read. Booking real disposable SQL + Nest HTTP **24 cases PASS** and other CI green on PR heads. Source forward-only migrations now **001–015**; VPS history still K5F-observed 001–009, **NO SQL 010–015 VPS approval**. Operator must close K5F/offhost restore and authorize dedicated SQL window; ADR-031/032 unapproved. Product remains an isolated pilot candidate, not live customer-ready Salon/Cashier replacement.
 
 

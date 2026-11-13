@@ -138,9 +138,9 @@ async function main(){
    "',CHECK_POLICY=ON,CHECK_EXPIRATION=OFF");
   admin=await open({...base,database:db});
   await admin.query("CREATE USER ["+user+"] FOR LOGIN ["+user+"];GRANT CONNECT TO ["+user+"]");
-  await pass('16 forward-only migrations apply and replay, no synthetic appointment or draft seed',async()=>{
-   const applied=await applyMigrations(admin,undefined,16);
-   assert.equal(applied.length,16);
+  await pass('17 forward-only migrations apply and replay, no synthetic appointment or draft seed',async()=>{
+   const applied=await applyMigrations(admin,undefined,17);
+   assert.equal(applied.length,17)
    assert.ok(applied.every(x=>x.status==='applied'));
    const replay=await applyMigrations(admin,undefined,16);
    assert.ok(replay.every(x=>x.status==='unchanged'));

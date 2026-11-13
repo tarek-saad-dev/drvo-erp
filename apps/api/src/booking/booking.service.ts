@@ -14,6 +14,7 @@ export type AppointmentView={
  startsAtUtc:string;endsAtUtc:string;status:"BOOKED"|"CANCELLED"|"COMPLETED";
 };
 export type BookingRead={resources:BookingResourceView[];appointments:AppointmentView[]};
+export type BookingWindow={windowId:string;resourceId:string;startsAtUtc:string;endsAtUtc:string};
 export type Created={id:string;created:boolean};
 export type StatusChange={id:string;status:"CANCELLED"|"COMPLETED";changed:boolean};
 const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -70,6 +71,7 @@ export class BookingService {
    if(code===51154)throw new BadRequestException("Invalid booking input or reference");
    if(code===51155)throw new ConflictException("Appointment is final or cannot be completed yet");
    if(code===51156)throw new NotFoundException();
+   if(code===51157)throw new ConflictException("Resource is outside published availability");
    throw new ServiceUnavailableException("Booking unavailable");
   }
  }
@@ -151,5 +153,41 @@ export class BookingService {
    throw new ServiceUnavailableException("Booking transition unavailable");
   return {id:String(row.id),status:row.status as StatusChange["status"],
    changed:Boolean(row.changed)};
+ }
+ async listWindows(actor:Actor,token:string,businessId:string,branchId:string):
+  Promise<{windows:BookingWindow[]}>{
+  const result=await this.execute(this.scope(actor,token,businessId,branchId),
+   "core.ReadBookingResourceWindows");
+  const windows=(result.recordset??[]).map((row:Record<string,unknown>)=>({
+   windowId:String(row.windowId),resourceId:String(row.resourceId),
+   startsAtUtc:new Date(row.startsAtUtc as string|number|Date).toISOString(),
+   endsAtUtc:new Date(row.endsAtUtc as string|number|Date).toISOString(),
+  }));
+  return {windows};
+ }
+ async addWindow(actor:Actor,token:string,businessId:string,branchId:string,
+  requestId:unknown,body:unknown):Promise<Created>{
+  const scope=this.scope(actor,token,businessId,branchId);
+  const key=validId(requestId);
+  const d=data(body,["resourceId","startsAtUtc","endsAtUtc"]);
+  const id=validId(d.resourceId);
+  for(const field of ["startsAtUtc","endsAtUtc"]){
+   const v=d[field];
+   if(typeof v!=="string"||!ISO.test(v)||
+      !Number.isFinite(Date.parse(v))||
+      new Date(v).toISOString()!==v)
+    throw new BadRequestException("Windows require exact UTC minute");
+  }
+  const start=new Date(d.startsAtUtc as string),end=new Date(d.endsAtUtc as string);
+  if(end.getTime()<=start.getTime()||end.getTime()-start.getTime()>86400000)
+   throw new BadRequestException("Window must be 1 minute to 24 hours");
+  const result=await this.execute(scope,"core.CreateBookingResourceWindow",r=>r
+   .input("ClientRequestId",sql.UniqueIdentifier,key)
+   .input("ResourceId",sql.UniqueIdentifier,id)
+   .input("StartsAtUtc",sql.DateTime2(0),start)
+   .input("EndsAtUtc",sql.DateTime2(0),end));
+  const row=result.recordset?.[0];
+  if(!row)throw new ServiceUnavailableException("Window creation unavailable");
+  return {id:String(row.id),created:Boolean(row.created)};
  }
 }

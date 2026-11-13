@@ -3,6 +3,7 @@
 import Link from "next/link";
 import {useCallback,useEffect,useMemo,useRef,useState} from "react";
 import {suggestBookingStarts} from "./booking-availability-preview.mjs";
+import {toLocalMinute,windowCorrectionStage} from "./window-correction.mjs";
 import {useRouter} from "next/navigation";
 
 type Resource={resourceId:string;displayName:string;kind:"PERSON"|"CHAIR"|"ROOM"|"EQUIPMENT";isActive:boolean};
@@ -28,6 +29,7 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
   const [windowResourceId,setWindowResourceId]=useState("");
   const [windowLocalStart,setWindowLocalStart]=useState("");
   const [windowLocalEnd,setWindowLocalEnd]=useState("");
+  const [replacementWindowId,setReplacementWindowId]=useState<string|null>(null);
   const [customers,setCustomers]=useState<Customer[]>([]);
   const [services,setServices]=useState<Offering[]>([]);
   const [canOpenPos,setCanOpenPos]=useState(false);
@@ -48,6 +50,7 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
   const statusKeys=useRef<Map<string,string>>(new Map());
   const scope="/api/workspaces/"+encodeURIComponent(businessId)+"/branches/"+encodeURIComponent(branchId);
   const home="/workspace/"+encodeURIComponent(businessId)+"/"+encodeURIComponent(branchId);
+  const correctionStage=windowCorrectionStage(replacementWindowId,windowResourceId,windows);
   const slotPreview=useMemo(()=>suggestBookingStarts({
     resourceId,dayLocal:slotDay,
     durationMinutes:services.find(s=>s.offeringId===offeringId)?.durationMinutes,
@@ -141,8 +144,30 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
     const created=await submit("/resources",{displayName:resourceName,kind:resourceKind},resourceRequest);
     if(created)setResourceName("");
   }
+  function prepareWindowCorrection(w:BookingWindow){
+    if(busy||w.state!=="OPEN"||!GUID.test(w.windowId)||!GUID.test(w.resourceId))return;
+    // The correction is deliberately NOT an atomic close+replace operation.
+    setReplacementWindowId(w.windowId);
+    setWindowResourceId(w.resourceId);
+    setWindowLocalStart(toLocalMinute(w.startsAtUtc));
+    setWindowLocalEnd(toLocalMinute(w.endsAtUtc));
+    windowRequest.current=null;
+    setNotice("تعديل الفترة خطوتين: اقفل القديمة أولًا بعد مراجعة الحجوزات، ثم انشر البديل.");
+  }
+  function cancelWindowCorrection(){
+    setReplacementWindowId(null);
+    setWindowResourceId("");
+    setWindowLocalStart("");
+    setWindowLocalEnd("");
+    windowRequest.current=null;
+    setNotice("");
+  }
   async function addAvailability(event:React.FormEvent<HTMLFormElement>){
     event.preventDefault();
+    if(correctionStage!=="NO_CORRECTION"&&correctionStage!=="READY_TO_PUBLISH"){
+      setNotice("أولًا اقفل الفترة القديمة بنجاح، أو حدّث البيانات لو الفترة مش ظاهرة.");
+      return;
+    }
     if(!GUID.test(windowResourceId)||!windowLocalStart||!windowLocalEnd){
       setNotice("اختار مورد وبداية ونهاية نافذة التوافر.");return;
     }
@@ -157,7 +182,7 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
       resourceId:windowResourceId,
       startsAtUtc:start.toISOString(),endsAtUtc:end.toISOString(),
     },windowRequest);
-    if(saved){setWindowLocalStart("");setWindowLocalEnd("");}
+    if(saved){setWindowLocalStart("");setWindowLocalEnd("");setReplacementWindowId(null);}
   }
   async function closeAvailability(windowId:string){
     if(busy||!GUID.test(windowId))return;
@@ -286,14 +311,30 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
           <button className="k5-save" disabled={busy}>إضافة المورد</button>
         </form>
       </section>
-      <section className="k5-admin-card k5-invite-card" aria-label="توافر المورد بالتاريخ">
+      <section className="k5-admin-card k5-invite-card" id="window-correction" aria-label="توافر المورد بالتاريخ">
         <h2>ساعات العمل والتوافر لمورد حجز</h2>
         <p className="k5-muted">حدد فترة بتاريخ ووقت واضحين (حسب جهازك، والحفظ UTC).
           لو نشرت أول فترة لمورد، الحجوزات الجديدة ليه هتحتاج تقع بالكامل داخل فترة منشورة.
           الأيام من غير فترات بعد أول نشر تعتبر غير متاحة. التاريخ الأقصى 90 يوم.
           الفترة الحالية لا تمثل جدول أسبوعي متكرر أو حضور موظف HR.</p>
+        {replacementWindowId&&<div className="k5-notice" role="status">
+          <strong>تصحيح فترة منشورة — خطوتين مستقلتين</strong>
+          <p>تاريخ البديل قابل للتعديل؛ لا يوجد تعديل تلقائي أو تراجع تلقائي.
+            لو الإغلاق نجح والنشر فشل، المورد هيفضل غير متاح في الفترة دي لحد ما تنشر فترة جديدة.</p>
+          {correctionStage==="NEED_CLOSE"&&<>
+            <p>أولًا اقفل الفترة القديمة. SQL هيرفض الإغلاق لو حجز مؤكد بيعتمد عليها.</p>
+            <button type="button" className="k5-salon-refresh" disabled={busy}
+              onClick={()=>void closeAvailability(replacementWindowId)}>١. اقفل الفترة القديمة</button>
+          </>}
+          {correctionStage==="READY_TO_PUBLISH"&&
+            <p>اتأكدنا إن الفترة القديمة CLOSED من الـAPI. عدّل موعد البديل واضغط نشر الفترة الجديدة كخطوة تانية.</p>}
+          {correctionStage==="STALE_OR_MISSING"&&
+            <p>الفترة مش ظاهرة في آخر البيانات، فالنشر متوقف. حدّث من SQL أو الغِ التصحيح.</p>}
+          <button type="button" className="k5-salon-refresh"
+            disabled={busy} onClick={cancelWindowCorrection}>إلغاء خطوات التصحيح</button>
+        </div>}
         <form className="catalog-form" onSubmit={addAvailability}>
-          <label>المورد<select required value={windowResourceId}
+          <label>المورد<select required disabled={replacementWindowId!==null} value={windowResourceId}
             onChange={e=>{setWindowResourceId(e.target.value);windowRequest.current=null;}}>
             <option value="">اختر موردًا</option>
             {data.resources.filter(r=>r.isActive).map(r=>
@@ -305,7 +346,8 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
           <label>نهاية الفترة المحلية<input type="datetime-local" step={60} required
             value={windowLocalEnd}
             onChange={e=>{setWindowLocalEnd(e.target.value);windowRequest.current=null;}}/></label>
-          <button className="k5-save" disabled={busy||!data.resources.some(r=>r.isActive)}>
+          <button className="k5-save" disabled={busy||!data.resources.some(r=>r.isActive)||
+            (correctionStage!=="NO_CORRECTION"&&correctionStage!=="READY_TO_PUBLISH")}>
             نشر فترة التوافر
           </button>
         </form>
@@ -318,10 +360,12 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
             <td dir="ltr">{new Date(w.startsAtUtc).toLocaleString("ar-EG")}</td>
             <td dir="ltr">{new Date(w.endsAtUtc).toLocaleString("ar-EG")}</td>
             <td>{w.state==="OPEN"?"متاحة":"مقفولة"}</td>
-            <td>{w.state==="OPEN"?<button type="button" className="k5-salon-refresh"
-              disabled={busy} onClick={()=>void closeAvailability(w.windowId)}>
-              إغلاق الفترة
-            </button>:<span>—</span>}</td>
+            <td>{w.state==="OPEN"?<div className="k5-booking-actions">
+              <a href="#window-correction" className="k5-salon-refresh"
+                onClick={()=>prepareWindowCorrection(w)}>جهّز تعديل</a>
+              <button type="button" className="k5-salon-refresh"
+                disabled={busy} onClick={()=>void closeAvailability(w.windowId)}>إغلاق الفترة</button>
+            </div>:<span>—</span>}</td>
           </tr>)}</tbody>
         </table></div>
       </section>

@@ -1,6 +1,6 @@
 # Salon S7 — authorized advisory Booking slots + faster nonposting POS cart
 
-**Verified source checkpoint (2026-11-13):** [PR #92](https://github.com/tarek-saad-dev/drvo-erp/pull/92) and [PR #93](https://github.com/tarek-saad-dev/drvo-erp/pull/93) merged to main, combined product commit `968e2cf2c74a4e2db80ca98d5a284f28955f18e6`. Each PR head passed all nine triggered GitHub Actions workflows: K0, K1, K5C Next build/typecheck/private-404 regression, Shared Booking/Catalog/Customers/POS SQL2022 CI, Interactive Salon Demo and DevOps Staging Artifact CI. Product-main checks and remote Staging Deploy are separate evidence and cannot be inferred from PR-head success.
+**Verified source checkpoint (2026-11-13):** [PR #92](https://github.com/tarek-saad-dev/drvo-erp/pull/92) and [PR #93](https://github.com/tarek-saad-dev/drvo-erp/pull/93) merged to main, combined product commit `968e2cf2c74a4e2db80ca98d5a284f28955f18e6`. Each PR head passed all nine triggered GitHub Actions workflows: K0, K1, K5C Next build/typecheck/private-404 regression, Shared Booking/Catalog/Customers/POS SQL2022 CI, Interactive Salon Demo and DevOps Staging Artifact CI. Separately verified on product-main SHA: **all 10 GitHub workflows PASS**, including [Staging Deploy #43516035843](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43516035843), whose SSH forced-command receiver logged acceptance of the exact product SHA. This is code deployment evidence only; external HTTPS reachability and VPS SQL/operational K5F activation were NOT verified.
 
 ## Work delivered
 

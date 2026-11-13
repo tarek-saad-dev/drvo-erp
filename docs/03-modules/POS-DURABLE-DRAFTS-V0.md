@@ -1,5 +1,8 @@
 # Shared POS Core — persisted DRAFT-only V0
 
+> **2026-11-13 S2 CROSS-MODULE PROOF:** PR #74 exercised existing POS DRAFT SQL 014 after a real Customers→Catalog→Booking API journey with the same authenticated Branch scope. POST DRAFT persists/replays through real Nest SQL HTTP, exact Catalog list-price snapshots and separate `pos.draft.read/manage` revocation checks; still DRAFT only, no posted sale, invoice, tax, payment or GL. Public Salon Demo remains fake. SQL 010–014 not VPS-authorized, K5F/ADR-031/032 OPEN. [Handoff](../04-execution/SALON-S2-INTEGRATED-HANDOFF-2026-11-13.md).
+
+
 **Status (2026-11-12): code merged in main via PR #64; SQL 014 remains CI-only and NOT authorized on VPS. Not customer activated and not Sale/Accounting.** This is the first **durable, nonposting** POS document slice, following [PL-1 preview](POS-PREVIEW-CORE-V0.md). ADR-031 First-GL and ADR-032 paid module activation remain PROPOSED.
 
 ## Ownership and data

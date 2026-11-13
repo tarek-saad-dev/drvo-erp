@@ -1,5 +1,8 @@
 # Architecture baseline
 
+> **2026-11-13 SALON S2 DOMAIN COMPOSITION VERIFIED (SOURCE/CI ONLY):** Existing Customers, Catalog, Booking and POS Draft independent bounded contexts compose into a real synthetic K5-authenticated SQL2022/Nest HTTP transaction journey (PR #74, 19 CI checks). PR #75 adds independent Web gates and 200-verified POS navigation without creating a Salon backend, bypassing Tenant/Business/Branch SQL scopes or crossing domain ownership; public fake Demo remains separated. Pinned Cashier Booking lock proof PR #76 rejects global numeric EmpID lock-resource reuse in favor of SQL 013 composite Resource/Branch `UPDLOCK,HOLDLOCK`. No real SQL VPS activation, posted GL or approved ADR-031/032; K5F operator signoff OPEN. [S2 handoff](../04-execution/SALON-S2-INTEGRATED-HANDOFF-2026-11-13.md).
+
+
 > **2026-11-12 DEMO-S1 MAINLINE/DEPLOY BOUNDARY:** [PR #72](https://github.com/tarek-saad-dev/drvo-erp/pull/72) merged, staging code receiver success for SHA `38d5c1866104a4d6254c29ad46350f008b76ecc3`. Synthetic Next `/demo/salon` remains strictly client-local and public, while real Tenant/Business/Branch-scoped K5 APIs, SQL and paid module activation are unchanged/default OFF. Passing simulated booking/POS tests does not prove real Booking, posted Sales, accounting, external HTTP reachability or customer onboarding. K5F/ADR-031/032 and SQL 010–014 operational holds intact. [Demo-S1](../04-execution/SALON-FIRST-WORKING-DEMO-2026-11-12.md).
 
 

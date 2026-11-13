@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-13 — Salon S2 integrated private E2E verified in disposable SQL CI
+
+- Merged PR #74: real SQL2022 + Nest HTTP CI now covers Customer creation, Catalog service creation, Booking record persisted across GET, POS DRAFT save/replay and SQL price snapshot with cross Tenant/Business/Branch/RBAC/Origin denial; 19 case Shared Booking CI PASS. **No new production migrations or API owner changes.**
+- Merged PR #75: protected Booking Web guided workflow to independently authorized Customers/Catalog/Booking/POS Preview, refreshed SQL list, accessible styles. Existing private routes remain default 404, public synthetic demo unchanged.
+- Merged PR #76: pinned Cashier `publicBookingCreateLocks.ts` source fixture + root CI characterization; avoids copying numeric EmpID global lock keys/255-byte truncation instead of rewriting already scoped DRVO row locking.
+- K5F/ADR-031/032 SQL deployment and public activation gates unchanged, no real customer database access. [Full handoff](SALON-S2-INTEGRATED-HANDOFF-2026-11-13.md).
+
+
 ## 2026-11-12 — First interactive Salon Demo merged and staging receiver accepted code
 
 - Merged [PR #72](https://github.com/tarek-saad-dev/drvo-erp/pull/72): public mock-only `/demo/salon` with responsive RTL dashboard, Booking conflict/status workflows, and in-memory DRAFT-only POS cart, plus homepage CTA.

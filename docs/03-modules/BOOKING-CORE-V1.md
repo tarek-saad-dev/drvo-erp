@@ -1,5 +1,8 @@
 # Shared Booking Core — first appointment vertical slice
 
+> **2026-11-13 S2 CI MAINLINE STATUS:** Original Shared Booking code/SQL 013 merged previously; PR #74 additionally proved end-to-end Customer create + Catalog service create + Booking persisted/read again + POS DRAFT saved on disposable SQL2022 with 001–014 migrations, one real K5 Branch HTTP session and cross-scope negative cases (19 checks). PR #75 improved protected private Web workflow; PR #76 audited pinned Cashier lock key behavior, **without replacing** SQL resource-row locking. No salon/real user activation, no SQL 010–014 VPS approval. [Integrated handoff](../04-execution/SALON-S2-INTEGRATED-HANDOFF-2026-11-13.md).
+
+
 **Date:** 2026-11-12 · **Status:** engineering implementation in a review PR; not live or commercially activated.
 
 ## Shared Core ownership and scope

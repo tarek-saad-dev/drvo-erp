@@ -1,5 +1,8 @@
 # Roadmap
 
+> **2026-11-13 SALON S2 FIRST REAL PRIVATE VERTICAL SLICE E2E CI MERGED:** [S2 handoff](SALON-S2-INTEGRATED-HANDOFF-2026-11-13.md) records PRs #74/75/76: synthetic Customer + Catalog Service via independently authenticated APIs → booked Branch Resource persisted/read again from SQL → idempotent saved POS DRAFT price snapshot; 19 Booking SQL+HTTP checks including cross-Tenant, forged Origin and independent permission revocation. Web private flow now navigates owning Modules and refreshes SQL; Cashier lock review pins exact source but keeps DRVO scoped row locks. **Next operator gating work:** real off-host restore, root-only K5F checks, separate authorization for SQL 010–014 staging, ADR-032 private entitlement/flags. Finance/Founder/Architecture ADR-031 required for any actual SALE POSTED. Public mock Demo remains separate.
+
+
 > **2026-11-12 FIRST LIVE-CODE SALON UX CHECKPOINT:** [Demo-S1 PR #72 merged](SALON-FIRST-WORKING-DEMO-2026-11-12.md) and code deployed to Staging receiver at SHA `38d5c1866104a4d6254c29ad46350f008b76ecc3` with PASS Next build/HTTP demo CI and K5 default-deny tests. External `/demo/salon` access not yet independently verified: get owner browser confirmation or network-level authorized smoke; if accessible, collect scheduling/POS UX feedback. After demo review, continue real authenticated Shared Booking/POS pilot only behind approved K5F/ADR-032/Finance gates. Do not connect fake demo to real customer data or enable SQL 010–014 prematurely.
 
 

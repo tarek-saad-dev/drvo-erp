@@ -14,9 +14,10 @@ export type AppointmentView={
  startsAtUtc:string;endsAtUtc:string;status:"BOOKED"|"CANCELLED"|"COMPLETED";
 };
 export type BookingRead={resources:BookingResourceView[];appointments:AppointmentView[]};
-export type BookingWindow={windowId:string;resourceId:string;startsAtUtc:string;endsAtUtc:string};
+export type BookingWindow={windowId:string;resourceId:string;startsAtUtc:string;endsAtUtc:string;state:"OPEN"|"CLOSED"};
 export type Created={id:string;created:boolean};
 export type StatusChange={id:string;status:"CANCELLED"|"COMPLETED";changed:boolean};
+export type WindowClosure={id:string;state:"CLOSED";changed:boolean};
 const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const TOKEN=/^[A-Za-z0-9_-]{43}$/;
 const ISO=/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00\.000Z$/;
@@ -162,6 +163,7 @@ export class BookingService {
    windowId:String(row.windowId),resourceId:String(row.resourceId),
    startsAtUtc:new Date(row.startsAtUtc as string|number|Date).toISOString(),
    endsAtUtc:new Date(row.endsAtUtc as string|number|Date).toISOString(),
+   state:row.state==="CLOSED"?"CLOSED" as const:"OPEN" as const,
   }));
   return {windows};
  }
@@ -189,5 +191,18 @@ export class BookingService {
   const row=result.recordset?.[0];
   if(!row)throw new ServiceUnavailableException("Window creation unavailable");
   return {id:String(row.id),created:Boolean(row.created)};
+ }
+ async closeWindow(actor:Actor,token:string,businessId:string,branchId:string,
+  requestId:unknown,windowId:unknown,body:unknown):Promise<WindowClosure>{
+  const scope=this.scope(actor,token,businessId,branchId);
+  const key=validId(requestId),id=validId(windowId);
+  data(body,[]);
+  const result=await this.execute(scope,"core.CloseBookingResourceWindow",r=>r
+   .input("ClientRequestId",sql.UniqueIdentifier,key)
+   .input("WindowId",sql.UniqueIdentifier,id));
+  const row=result.recordset?.[0];
+  if(!row||row.state!=="CLOSED")
+   throw new ServiceUnavailableException("Window closure unavailable");
+  return {id:String(row.id),state:"CLOSED",changed:Boolean(row.changed)};
  }
 }

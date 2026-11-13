@@ -135,3 +135,33 @@ test("window creation rejects forged Origin before reading K5 session",async()=>
    }),e=>e.getStatus?.()===401);
  }finally{restore();}
 });
+
+
+test("window closure rejects forged body, invalid IDs and token before touching SQL",async()=>{
+ const restore=on({DRVO_BOOKING_ENABLED:"YES",DRVO_K5_AUTH_ENABLED:"YES"});
+ try{
+  const svc=new BookingService({getInternalPool(){throw Error("no DB call allowed");}});
+  for(const body of [{tenantId:GUID(1)},null,{status:"CLOSED"},{windowId:GUID(2)}])
+   await assert.rejects(()=>svc.closeWindow(actor,token,GUID(3),GUID(4),
+    GUID(5),GUID(6),body),e=>e.getStatus?.()===400);
+  await assert.rejects(()=>svc.closeWindow(actor,token,GUID(3),GUID(4),
+   "not-uuid",GUID(6),{}),e=>e.getStatus?.()===400);
+  await assert.rejects(()=>svc.closeWindow(actor,token,GUID(3),GUID(4),
+   GUID(5),"not-uuid",{}),e=>e.getStatus?.()===400);
+  await assert.rejects(()=>svc.closeWindow(actor,"bad",GUID(3),GUID(4),
+   GUID(5),GUID(6),{}),e=>e.getStatus?.()===404);
+ }finally{restore();}
+});
+test("window close endpoint rejects forged Origin before identity lookup",async()=>{
+ const restore=on({DRVO_BOOKING_ENABLED:"YES",DRVO_K5_AUTH_ENABLED:"YES",
+  DRVO_K5_ORIGIN:"https://erp-stage.drvotech.com"});
+ try{
+  const controller=new BookingController(
+    {actorFromToken(){throw Error("should not access identity");}},
+    {closeWindow(){throw Error("should not write SQL");}},
+  );
+  await assert.rejects(()=>controller.closeWindow(
+   "https://attacker.invalid",GUID(5),{headers:{}},{setHeader(){}},
+   GUID(3),GUID(4),GUID(6),{}),e=>e.getStatus?.()===401);
+ }finally{restore();}
+});

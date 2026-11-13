@@ -103,3 +103,17 @@
 .demo-hero-primary{display:inline-flex;gap:13px;align-items:center;min-height:52px;padding:12px 22px;border-radius:12px;background:var(--accent);color:#102b24;text-decoration:none;font-weight:800;font-size:14px;box-shadow:0 10px 32px #78dec425}
 .demo-hero-primary:hover{background:#a4f7d9}.demo-hero-primary:focus-visible{outline:3px solid #b6a6ef;outline-offset:4px}
 .demo-hero-description{color:var(--muted);font-size:12px}
+
+
+/* S1-Private: links exist only inside authenticated/authorized Booking view.
+   No styles or flags affect /demo/salon or public authentication. */
+.k5-salon-steps{display:flex;flex-wrap:wrap;gap:11px;margin:17px 0 5px}
+.k5-salon-steps a{border:1px solid #35564d;background:#20372f;color:#b7f5d8;
+  border-radius:10px;min-height:41px;padding:11px 14px;font-size:13px;
+  text-decoration:none;font-weight:600}
+.k5-salon-steps a:hover{border-color:#75d7b8;background:#284a3e}
+.k5-salon-steps a:focus-visible{outline:3px solid #8aebc9;outline-offset:3px}
+.k5-booking-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.k5-salon-refresh{background:#263d37;border:1px solid #53796d;border-radius:9px;
+  color:#bdf9df;padding:9px 13px;cursor:pointer;font-size:12px}
+.k5-salon-refresh:disabled{opacity:.45;cursor:wait}

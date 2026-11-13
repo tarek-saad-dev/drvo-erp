@@ -82,19 +82,22 @@ function assessPilotEvidence(evidence){
  });
 }
 
+// Shared bounded, redacted evidence input for read-only reports only.
+function readRedactedEvidence(file){
+ if(typeof file!=='string'||!file||file.startsWith('-'))
+  throw new TypeError('Invalid evidence filepath');
+ const raw=readFileSync(file);
+ if(raw.length>8192||raw.length===0)throw new Error('Evidence size is invalid');
+ return JSON.parse(raw.toString('utf8'));
+}
 function runCli(args){
  if(args.length===1&&args[0]==='--template'){
   process.stdout.write(JSON.stringify(candidateTemplate(),null,2)+'\n');
   return;
  }
  if(args.length===2&&args[0]==='--input'){
-  const file=args[1];
-  if(typeof file!=='string'||!file||file.startsWith('-'))
-   throw new TypeError('Invalid evidence filepath');
   // Strict bounded redacted JSON only. Contents are never echoed.
-  const raw=readFileSync(file);
-  if(raw.length>8192||raw.length===0)throw new Error('Evidence size is invalid');
-  const result=assessPilotEvidence(JSON.parse(raw.toString('utf8')));
+  const result=assessPilotEvidence(readRedactedEvidence(args[1]));
   process.stdout.write(JSON.stringify(result,null,2)+'\n');
   return;
  }
@@ -108,4 +111,4 @@ if(require.main===module){
   process.exitCode=1;
  }
 }
-module.exports={CONTROLS,STATES,candidateTemplate,assessPilotEvidence,runCli};
+module.exports={CONTROLS,STATES,candidateTemplate,assessPilotEvidence,readRedactedEvidence,runCli};

@@ -77,3 +77,30 @@ test('demo fixture only and reset does not retain previous state',()=>{
  assert.equal(d.DEMO_CUSTOMERS.length,5);
  for(const s of d.DEMO_SERVICES)assert.equal(Number.isSafeInteger(s.priceMinor),true);
 });
+
+test('S8 guided first-visit flow is a real synthetic three-step booking to DRAFT path',()=>{
+ const client=fs.readFileSync(path.join(root,'demo/salon/salon-demo-client.tsx'),'utf8');
+ assert.match(client,/function startTour\(\)/);
+ assert.match(client,/setData\(initialDemo\(\)\);setCart\(\[\]\);setTab\("appointments"\)/);
+ assert.match(client,/setTime\("18:00"\)/);
+ assert.match(client,/setTourBookingId\(next\.appointments\[next\.appointments\.length-1\]\.id\)/);
+ assert.match(client,/tourBookingId===id&&status==="completed"/);
+ assert.match(client,/setCart\(current=>addDemoCartLine\(current,created\.serviceId\)\)/);
+ assert.match(client,/setTab\("pos"\);setTourStep\(2\)/);
+ assert.match(client,/const next=saveDemoDraft\(data,cart\)/);
+ assert.match(client,/if\(tourActive&&tourStep===2\)\{setTourStep\(3\)/);
+ assert.match(client,/setTourActive\(false\);setTourStep\(0\);setTourBookingId\(null\)/);
+ assert.match(client,/مفيش حساب أو عميل حقيقي أو دفع أو فاتورة/);
+ assert.doesNotMatch(client,/fetch\s*\(|localStorage|sessionStorage|document\.cookie|\/api\/|POSTED/);
+ let state=d.initialDemo();
+ const before=state;
+ state=d.bookDemoAppointment(state,{customerId:'guest',staffId:'mostafa',serviceId:'cut',time:'18:00'});
+ const id=state.appointments.at(-1).id;
+ assert.equal(before.appointments.length,5);
+ state=d.updateDemoAppointment(state,id,'completed');
+ const cart=d.addDemoCartLine([],state.appointments.find(a=>a.id===id).serviceId);
+ state=d.saveDemoDraft(state,cart);
+ assert.equal(state.drafts[0].status,'DRAFT');
+ assert.equal(state.drafts[0].subtotalMinor,18000);
+ assert.equal(d.initialDemo().drafts.length,0);
+});

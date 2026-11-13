@@ -20,7 +20,7 @@ const CURRENT_K5F_PREFIX=Object.freeze([
  '008_invitation_management.sql',
  '009_operator_owner_approval_revocation.sql',
 ]);
-const SOURCE_TARGET_COUNT=16;
+const SOURCE_TARGET_COUNT=17;
 const FILE=/^([0-9]{3})_[a-z][a-z0-9_]*\.sql$/;
 const HASH=/^[a-f0-9]{64}$/;
 const DATABASE='DRVO_ERP_STAGING';

@@ -28,6 +28,9 @@ export default function SalonDemoClient(){
  const [time,setTime]=useState("16:00");
  const [notice,setNotice]=useState("");
  const [noticeError,setNoticeError]=useState(false);
+ const [tourActive,setTourActive]=useState(false);
+ const [tourStep,setTourStep]=useState<0|1|2|3>(0);
+ const [tourBookingId,setTourBookingId]=useState<number|null>(null);
 
  const confirmed=data.appointments.filter(x=>x.status==="confirmed").length;
  const completed=data.appointments.filter(x=>x.status==="completed").length;
@@ -40,16 +43,37 @@ export default function SalonDemoClient(){
 
  function message(text:string,error=false){setNotice(text);setNoticeError(error)}
  function switchTab(next:DemoSection){setTab(next);setNotice("")}
+ function startTour(){
+  // Restart solely local synthetic demo, never real Customer/Booking/POS.
+  setData(initialDemo());setCart([]);setTab("appointments");
+  setCustomerId("guest");setStaffId("mostafa");setServiceId("cut");setTime("18:00");
+  setTourBookingId(null);setTourStep(0);setTourActive(true);
+  message("بدأت جولة تجريبية: أكد الحجز المقترح، ثم أكمِل الموعد واحفظ المسودة.");
+ }
  function book(e:React.FormEvent<HTMLFormElement>){
   e.preventDefault();
   try{
-   setData(current=>bookDemoAppointment(current,{customerId,staffId,serviceId,time}));
-   message("تم إضافة الموعد في السيناريو التجريبي ✓");
+   const next=bookDemoAppointment(data,{customerId,staffId,serviceId,time});
+   setData(next);
+   if(tourActive&&tourStep===0){
+    setTourBookingId(next.appointments[next.appointments.length-1].id);
+    setTourStep(1);
+    message("الخطوة الثانية: اضغط مكتمل على الحجز الجديد علشان نجهز مسودة الخدمة.");
+   }else message("تم إضافة الموعد في السيناريو التجريبي ✓");
   }catch(error){message(error instanceof Error?error.message:"تعذر إضافة الموعد",true)}
  }
  function updateAppointment(id:number,status:"completed"|"cancelled"){
-  try{setData(current=>updateDemoAppointment(current,id,status));
-   message(status==="completed"?"اتسجل الموعد مكتمل (تجريبي)":"اتلغى الموعد التجريبي");
+  try{
+   const next=updateDemoAppointment(data,id,status);
+   setData(next);
+   if(tourActive&&tourStep===1&&tourBookingId===id&&status==="completed"){
+    const created=next.appointments.find(a=>a.id===id);
+    if(created){
+     setCart(current=>addDemoCartLine(current,created.serviceId));
+     setTab("pos");setTourStep(2);
+     message("الخطوة الثالثة: الخدمة اتجهزت كمسودة غير مدفوعة. اضغط حفظ مسودة تجريبية.");
+    }
+   }else message(status==="completed"?"اتسجل الموعد مكتمل (تجريبي)":"اتلغى الموعد التجريبي");
   }catch(e){message(e instanceof Error?e.message:"تعذر التحديث",true)}
  }
  function addService(id:string){
@@ -63,13 +87,17 @@ export default function SalonDemoClient(){
   catch(e){message(e instanceof Error?e.message:"تعذر الإضافة",true)}
  }
  function saveDraft(){
-  try{setData(current=>saveDemoDraft(current,cart));setCart([]);
-   message("المسودة اتحفظت في جلسة الديمو فقط، من غير فاتورة أو دفع ✓");}
+  try{
+   const next=saveDemoDraft(data,cart);setData(next);setCart([]);
+   if(tourActive&&tourStep===2){setTourStep(3);
+    message("اكتملت الجولة التجريبية ✓ حجز ومتابعة ومسودة فقط، بدون عملية بيع أو تحصيل.");
+   }else message("المسودة اتحفظت في جلسة الديمو فقط، من غير فاتورة أو دفع ✓");}
   catch(e){message(e instanceof Error?e.message:"تعذر حفظ المسودة",true)}
  }
  function resetDemo(){
   setData(initialDemo());setCart([]);setTab("overview");setNotice("");
   setCustomerId("guest");setStaffId("mostafa");setServiceId("cut");setTime("16:00");
+  setTourActive(false);setTourStep(0);setTourBookingId(null);
  }
 
  return <main className="sd-root" dir="rtl">
@@ -98,6 +126,22 @@ export default function SalonDemoClient(){
 
    <div className="sd-content">
     <div className="sd-disclaimer"><span className="sd-disclaimer-icon">ⓘ</span><span><strong>نسخة تجريبية تفاعلية</strong> — كل الأسماء والأرقام وهمية. المواعيد والمسودات موجودة في الصفحة دي فقط، وهتتمسح مع التحديث. مفيش تسجيل دخول أو حجز فعلي أو تحصيل أو فواتير.</span></div>
+    <section className="sd-tour" aria-label="جولة تعريفية تجريبية">
+      <div className="sd-tour-title"><span className="sd-panel-eyebrow">GUIDED TOUR · SYNTHETIC DATA</span>
+        <h2>جرّب دورة عمل صالون كاملة في 3 خطوات</h2>
+        <p>احجز موعد → أكمِل الخدمة → احفظ مسودة. بيانات وهمية فقط؛
+          مفيش حساب أو عميل حقيقي أو دفع أو فاتورة.</p>
+      </div>
+      {tourActive&&<div className="sd-tour-progress" role="status">
+        <span>١. حجز {tourStep>=1?"✓":""}</span>
+        <span>٢. إتمام {tourStep>=2?"✓":""}</span>
+        <span>٣. مسودة {tourStep===3?"✓":""}</span>
+        <strong>{tourStep===3?"اكتملت الجولة التجريبية":tourStep===2?"احفظ المسودة":tourStep===1?"أكمِل الحجز":"أكد الموعد"}</strong>
+      </div>}
+      <button type="button" className="sd-primary" onClick={startTour}>
+        {tourActive?"↺ ابدأ الجولة من جديد":"ابدأ الجولة التفاعلية"}
+      </button>
+    </section>
     {notice&&<div role="status" className={"sd-toast"+(noticeError?" sd-toast-error":"")}><span>{noticeError?"!":"✓"}</span>{notice}<button type="button" onClick={()=>setNotice("")} aria-label="إغلاق الرسالة">×</button></div>}
 
     {tab==="overview"&&<>

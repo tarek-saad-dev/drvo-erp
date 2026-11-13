@@ -25,7 +25,7 @@ test('overview must verify branch session and independently authorized modules',
  assert.match(client,/credentials:"same-origin",cache:"no-store"/);
  assert.match(client,/drafts\.ok/);
  assert.match(client,/let draftCount:number\\|null=null/);
- assert.match(client,/لا توجد حجوزات/);
+ assert.match(client,/مفيش حجوزات في الفترة المعروضة/);
  assert.doesNotMatch(client,/localStorage|sessionStorage|\/demo\/salon|\.post\(|method:"POST"/);
 });
 test('Workspace only reveals Salon tile after real module read and Web gates',()=>{
@@ -34,4 +34,18 @@ test('Workspace only reveals Salon tile after real module read and Web gates',()
  assert.match(page,/salonWebEnabled=/);
  assert.match(source,/salonWebEnabled&&canViewBooking/);
  assert.match(source,/setCanViewBooking\(bookingResult\.ok && catalogResult\.ok && customersResult\.ok\)/);
+});
+
+test('daily operational filters and Booking-to-POS actions honor independent access',()=>{
+ const client=read('salon/salon-overview-client.tsx');
+ assert.match(client,/setFilter\]=useState<"TODAY"\|"UPCOMING"\|"ALL">\("TODAY"\)/);
+ assert.match(client,/localToday\(when\)/);
+ assert.match(client,/filter==="UPCOMING"/);
+ assert.match(client,/b\.status==="BOOKED"/);
+ assert.match(client,/posPreviewAllowed=preview\.ok/);
+ assert.match(client,/overview\.posPreviewAllowed&&b\.status==="COMPLETED"&&GUID\.test\(b\.offeringId\)/);
+ assert.match(client,/encodeURIComponent\(b\.offeringId\)/);
+ assert.match(client,/root\+"\/pos-preview"/);
+ assert.match(client,/بدون مبيعات أو تحصيل/);
+ assert.doesNotMatch(client,/method:"POST"|\/sales\/posted|\.post\(/);
 });

@@ -3,10 +3,10 @@ import Link from "next/link";
 import {useCallback,useEffect,useState} from "react";
 import {useRouter} from "next/navigation";
 
-type Booking={bookingId:string;customerName:string;offeringName:string;
+type Booking={bookingId:string;offeringId:string;customerName:string;offeringName:string;
  resourceName:string;startsAtUtc:string;status:"BOOKED"|"CANCELLED"|"COMPLETED"};
 type Overview={branchName:string;businessName:string;bookings:Booking[];
- customersCount:number;offeringsCount:number;draftCount:number|null};
+ customersCount:number;offeringsCount:number;draftCount:number|null;posPreviewAllowed:boolean};
 type Status="loading"|"ready"|"denied"|"unavailable";
 const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -16,6 +16,7 @@ export default function SalonOverview({businessId,branchId,draftsAvailable}:{
  const router=useRouter();
  const [status,setStatus]=useState<Status>("loading");
  const [overview,setOverview]=useState<Overview|null>(null);
+ const [filter,setFilter]=useState<"TODAY"|"UPCOMING"|"ALL">("TODAY");
  const home="/workspace/"+encodeURIComponent(businessId)+"/"+encodeURIComponent(branchId);
  const root="/api/workspaces/"+encodeURIComponent(businessId)+
   "/branches/"+encodeURIComponent(branchId);
@@ -66,6 +67,7 @@ export default function SalonOverview({businessId,branchId,draftsAvailable}:{
    // The POS draft owner authorizes separately. A denied result never reveals
    // counts or saves; no ability to post sales or payments is implied.
    let draftCount:number|null=null;
+   let posPreviewAllowed=false;
    if(draftsAvailable){
     const drafts=await fetch(root+"/pos-drafts",{
       credentials:"same-origin",cache:"no-store",
@@ -74,15 +76,36 @@ export default function SalonOverview({businessId,branchId,draftsAvailable}:{
     if(drafts.ok){
       const body=await drafts.json() as {drafts?:unknown[]};
       if(Array.isArray(body.drafts))draftCount=body.drafts.length;
+      // POS preview is independently authorized and must not be inferred from
+      // POS DRAFT read, Booking status, or Web flags alone.
+      const preview=await fetch(root+"/pos-preview",{
+        credentials:"same-origin",cache:"no-store",
+      });
+      if(preview.status===401){router.replace("/sign-in");return;}
+      posPreviewAllowed=preview.ok;
     }
    }
    setOverview({branchName:branchData.branchName,businessName:matching.businessName,
     bookings:bookingData.appointments,customersCount:customerData.customers.length,
-    offeringsCount:catalogData.offerings.filter(x=>x.isActive).length,draftCount});
+    offeringsCount:catalogData.offerings.filter(x=>x.isActive).length,
+    draftCount,posPreviewAllowed});
    setStatus("ready");
   }catch{setStatus("unavailable");}
  },[businessId,branchId,root,draftsAvailable,router]);
  useEffect(()=>{void load();},[load]);
+ const now=new Date();
+ const localToday=(d:Date)=>d.getFullYear()===now.getFullYear()&&
+  d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();
+ const filtered=(overview?.bookings??[]).filter(b=>{
+  const when=new Date(b.startsAtUtc);
+  if(filter==="TODAY")return localToday(when);
+  if(filter==="UPCOMING")return b.status==="BOOKED"&&when.getTime()>=now.getTime();
+  return true;
+ }).sort((a,b)=>filter==="UPCOMING"?
+  Date.parse(a.startsAtUtc)-Date.parse(b.startsAtUtc):
+  Date.parse(b.startsAtUtc)-Date.parse(a.startsAtUtc));
+ const today=(overview?.bookings??[]).filter(b=>localToday(new Date(b.startsAtUtc)));
+
  return <main className="k5-workspace">
   <header className="k5-workspace-header">
    <div className="k5-brand"><span className="brandmark">D</span> DRVO <b>ERP</b></div>
@@ -108,6 +131,9 @@ export default function SalonOverview({businessId,branchId,draftsAvailable}:{
     <div className="k5-salon-steps" aria-label="ملخص الصالون">
      <span className="k5-count">الحجوزات المعروضة: {overview.bookings.length}</span>
      <span className="k5-count">المؤكدة: {overview.bookings.filter(x=>x.status==="BOOKED").length}</span>
+     <span className="k5-count">حجوزات النهارده (المعروضة): {today.length}</span>
+     <span className="k5-count">مواعيد اليوم المتبقية: {today.filter(x=>
+      x.status==="BOOKED"&&Date.parse(x.startsAtUtc)>=now.getTime()).length}</span>
      <span className="k5-count">المكتملة: {overview.bookings.filter(x=>x.status==="COMPLETED").length}</span>
      <span className="k5-count">الملغاة: {overview.bookings.filter(x=>x.status==="CANCELLED").length}</span>
      <span className="k5-count">العملاء المعروضون: {overview.customersCount}</span>
@@ -122,15 +148,33 @@ export default function SalonOverview({businessId,branchId,draftsAvailable}:{
     </nav>
    </section>
    <section className="k5-admin-card">
-    <h2>آخر الحجوزات الظاهرة</h2>
+    <div className="k5-admin-summary">
+     <h2>متابعة المواعيد اليومية</h2>
+     <div className="k5-booking-actions">
+       <label htmlFor="k5-salon-day-filter">اعرض</label>
+       <select id="k5-salon-day-filter" value={filter}
+        onChange={e=>setFilter(e.target.value as "TODAY"|"UPCOMING"|"ALL")}>
+        <option value="TODAY">مواعيد اليوم المحلي</option>
+        <option value="UPCOMING">مواعيد قادمة مؤكدة</option>
+        <option value="ALL">آخر 200 حجز من API</option>
+       </select>
+     </div>
+    </div>
+    <p className="k5-muted">الفلاتر بتشتغل على آخر 200 حجز مسموح بعرضهم، بتوقيت جهازك؛
+      مفيش تقويم دوام أو تقرير إيرادات أو حجز جديد ضمن الفلترة.</p>
     <div className="k5-table-wrap"><table className="k5-table">
-     <thead><tr><th>العميل</th><th>الخدمة</th><th>المورد</th><th>الموعد</th><th>الحالة</th></tr></thead>
-     <tbody>{overview.bookings.length===0?
-       <tr><td colSpan={5} className="k5-empty">لا توجد حجوزات.</td></tr>:
-       overview.bookings.slice(0,10).map(b=><tr key={b.bookingId}>
+     <thead><tr><th>العميل</th><th>الخدمة</th><th>المورد</th><th>الموعد</th><th>الحالة</th><th>التالي</th></tr></thead>
+     <tbody>{filtered.length===0?
+       <tr><td colSpan={6} className="k5-empty">مفيش حجوزات في الفترة المعروضة.</td></tr>:
+       filtered.slice(0,30).map(b=><tr key={b.bookingId}>
         <td>{b.customerName}</td><td>{b.offeringName}</td><td>{b.resourceName}</td>
         <td dir="ltr">{new Date(b.startsAtUtc).toLocaleString("ar-EG")}</td>
         <td>{b.status==="BOOKED"?"محجوز":b.status==="COMPLETED"?"مكتمل":"ملغي"}</td>
+        <td>{overview.posPreviewAllowed&&b.status==="COMPLETED"&&GUID.test(b.offeringId)?
+         <Link href={home+"/pos-preview?offeringId="+encodeURIComponent(b.offeringId)}>
+           جهّز مسودة من الخدمة
+         </Link>:
+         b.status==="BOOKED"?<Link href={home+"/booking"}>إدارة الحجز</Link>:<span>—</span>}</td>
        </tr>)}</tbody>
     </table></div>
    </section>

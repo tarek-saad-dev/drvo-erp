@@ -1,5 +1,8 @@
 # Architecture baseline
 
+> **2026-11-13 SALON S4 ARCHITECTURE CHECK:** PRs #80/#81/#82 are separate Shared Booking lifecycle, Shared POS DRAFT UX and **Salon-only private Industry Solution composition**. No duplicated Salon Backend, no cross-owner SQL write, no Cashier numeric employee key copied, no GL or tender effects from Booking COMPLETE. SQL 015 BookingStatusChange references scoped Booking via composite Tenant/Business/Branch FK; revalidates K5 `booking.manage` and serializes Resource row with CreateBooking; independent Auth/Catalog/Customer/Booking/POS read is mandatory for overview. Public fake Demo stays isolated. K5F/ADR-031/032 release gates unchanged; SQL **010–015 NOT applied on VPS**. [S4 handoff](../04-execution/SALON-S4-PARALLEL-DELIVERY-2026-11-13.md).
+
+
 > **2026-11-13 S3 PRIVATE PILOT RELEASE-BOUNDARY MERGED:** PR #78 produced a pure local CI/read-only assessment for reported K5F/restore/ACL/SQL evidence, merged as `4b010ad30387c41b6c3a915f6e7845330020651b`. Operator evidence is not an attestation and no result permits production/staging SQL, Auth/Module activation, invitations or Sale POSTED. Existing modular architecture/SQL API unchanged; K5F, real independent offhost recovery and ADR-031/032 explicitly OPEN. [S3](../04-execution/SALON-S3-PILOT-ACTIVATION-PREFLIGHT-2026-11-13.md).
 
 

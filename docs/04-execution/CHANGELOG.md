@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-11-13 — Salon S7 private Booking/POS UX (PRs #92–#93 merged)
+
+- **#92:** Protected Shared Booking shows advisory-only local-day/Resource/Service-duration candidate slots based on returned OPEN windows and booked intervals, never a SQL availability guarantee. Five pure Node tests, K5C Build/typecheck and 404 security CI PASS.
+- **#93:** Independently permitted Shared POS DRAFT adds client-local search of Catalog, accessible 1–20 quantity edits and old-preview/idempotency-key invalidation. Existing DRAFT-only SQL price revalidation and financial no-posting unchanged.
+- Each PR exact head passed **9/9 GitHub workflows** including K0, K1, K5C, Booking/Catalog/Customers/POS SQL API HTTP, Interactive Demo and Staging Artifact. Merged product main is SHA 968e2cf2c74a4e2db80ca98d5a284f28955f18e6; combined main workflow and staging deployment statuses must be independently verified.
+- **Release hold unchanged:** no new migration after 017, SQL 010–017 VPS not authorized, K5F/offhost independent restore OPEN, Public Auth/business module flags OFF, ADR-031/032 PROPOSED. [S7 integrated handoff](SALON-S7-INTEGRATED-DELIVERY-2026-11-13.md).
+
 ## 2026-11-13 — Salon S6 parallel release-safe code (PRs #88–#90 merged)
 
 - **#88:** Source-only SQL017 Booking window OPEN/CLOSED, per-Branch+Actor idempotent closure audit, K5 private closing API/UI and no-uncapped-hour fallback. Real disposable SQL2022+Nest HTTP 32 cases PASS; **restricted Staging DB Automation SQL migration+restore CI PASS**. No VPS migration.

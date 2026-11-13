@@ -18,3 +18,25 @@ test('quick POS selections are nonposting and do not write draft without explici
  assert.match(source,/credentials:"same-origin",cache:"no-store"/);
  assert.doesNotMatch(source,/localStorage|sessionStorage|\.\/demo\/salon/);
 });
+
+test('search narrows only authorized active Catalog suggestions, never new API scope',()=>{
+ assert.match(source,/const \[catalogSearch,setCatalogSearch\]=useState\(""\)/);
+ assert.match(source,/const matchingOfferings=offerings\.filter\(o=>o\.isActive&&/);
+ assert.match(source,/o\.displayName\.toLocaleLowerCase\(\)\.includes\(catalogSearch\.trim\(\)\.toLocaleLowerCase\(\)\)/);
+ assert.match(source,/type="search" maxLength=\{100\}/);
+ assert.match(source,/matchingOfferings\.filter\(o=>/);
+ assert.match(source,/\.slice\(0,8\)\.map\(o=><button/);
+ assert.doesNotMatch(source,/fetch\([^)]*catalogSearch/);
+});
+test('quantity controls are bounded and invalidate stale preview/idempotency before save',()=>{
+ assert.match(source,/function adjustLineQuantity\(selectedOfferingId:string,delta:-1\|1\)/);
+ assert.match(source,/if\(busy\|\|draftBusy\)return;/);
+ assert.match(source,/existing\.quantity\+delta<1\|\|existing\.quantity\+delta>20/);
+ assert.match(source,/retryKey\.current=null;setPreview\(null\);setMessage\(""\)/);
+ assert.match(source,/next>=1&&next<=20\?\{\.\.\.l,quantity:next\}:l/);
+ assert.match(source,/disabled=\{busy\|\|draftBusy\|\|l\.quantity<=1\}/);
+ assert.match(source,/disabled=\{busy\|\|draftBusy\|\|l\.quantity>=20\}/);
+ assert.match(source,/if\(busy\|\|draftBusy\|\|lines\.length===0\)return;/);
+ assert.match(source,/method:"POST",credentials:"same-origin",cache:"no-store"/);
+ assert.doesNotMatch(source,/\/sales\/posted|\/payment|localStorage|sessionStorage/);
+});

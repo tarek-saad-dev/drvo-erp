@@ -1,5 +1,8 @@
 # Shared Booking Core — first appointment vertical slice
 
+> **2026-11-13 S5 BOOKING DATED WORK WINDOWS MERGED:** PR #84 implements source SQL016 `core.BookingResourceWindow`, authenticated Branch/K5 `GET/POST /booking/windows`, private Arabic window publishing UI and insert trigger enforcing only published opt-in UTC intervals. Initially unconfigured resources keep legacy availability. Publishing first window cannot strand existing future BOOKED appointments. **Dated UTC periods only; NOT recurring shifts, DST-safe staff local hours, HR, clinical availability, multiple chair+stylist simultaneous allocation or scheduling optimization.** 28 SQL2022 real HTTP tests plus restricted DB-only migration CI PASS. SQL 010–016 VPS unauthorised, ADR-031/032/K5F OPEN. [S5](../04-execution/SALON-S5-THREE-TRACK-DELIVERY-2026-11-13.md).
+
+
 > **2026-11-13 S4 TERMINAL LIFECYCLE EXTENSION MERGED:** PR #80 adds source-only forward migration **015** + `core.BookingStatusChange` audit, strictly scoped `booking.manage` Origin-verified UUID-idempotent BOOKED→CANCELLED/COMPLETED endpoint, new private Web actions. Cancellation frees the resource slot; completion only after start and is **NOT POS paid/posted, invoice or HR service execution**. Real disposable SQL2022/HTTP regression **24 checks PASS** (incl. canceled slot, completed past-start, idempotency, tenant/permission negative). Supersedes original BOOKED-only product-slice status above but NOT real production activation or full rescheduling/availability. SQL 010–015 VPS unauthorised; K5F/ADR-031/032 OPEN. [S4](../04-execution/SALON-S4-PARALLEL-DELIVERY-2026-11-13.md).
 
 

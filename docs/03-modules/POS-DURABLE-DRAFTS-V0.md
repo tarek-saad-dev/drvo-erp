@@ -1,5 +1,7 @@
 # Shared POS Core — persisted DRAFT-only V0
 
+> **2026-11-13 S7 PRIVATE NONPOSTING CART UX:** [PR #93](https://github.com/tarek-saad-dev/drvo-erp/pull/93) merged client-only search of already authorized Catalog offerings, accessible +/- bounded quantity controls 1–20, and reset of stale checkout-preview + retry idempotency key on edit. DRAFT save remains explicit, separately permitted, SQL-repriced and nonposting; originals immutable. K5C Next/typecheck and all 9 PR workflows PASS. No sale, invoice, accounting, payment, tax, schema or entitlement change. [S7](../04-execution/SALON-S7-INTEGRATED-DELIVERY-2026-11-13.md).
+
 > **2026-11-13 S6 BOOKING LIST DIRECT DRAFT LINK:** PR #89, after separate Web flags, POS Preview **and** POS DRAFT authorized HTTP GETs, adds an optional OfferingId-based link from COMPLETED Booking rows. POS validates active Catalog SERVICE before filling an unsaved cart. No client price authority, persisted foreign Booking link, automatic Save, POSTED sale, VAT/Treasury/GL or K5 entitlement activation. [S6](../04-execution/SALON-S6-INTEGRATED-DELIVERY-2026-11-13.md).
 
 

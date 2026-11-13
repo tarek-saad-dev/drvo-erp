@@ -5,10 +5,11 @@ const {CURRENT_K5F_PREFIX,sourceManifest,compareHistoryToSource}=require('../too
 const source=sourceManifest();
 const prefix=source.slice(0,9).map(x=>({name:x.name,checksum:x.checksum}));
 const evidence=(rows)=>({database:'DRVO_ERP_STAGING',rows});
-test('staging source manifest enumerates exactly 001–014, with original 001–009 K5F prefix',()=>{
- assert.equal(source.length,14);assert.equal(CURRENT_K5F_PREFIX.length,9);
+test('staging source manifest enumerates exactly 001–015, with original 001–009 K5F prefix',()=>{
+ assert.equal(source.length,15);assert.equal(CURRENT_K5F_PREFIX.length,9);
  assert.deepEqual(source.slice(0,9).map(x=>x.name),[...CURRENT_K5F_PREFIX]);
  assert.equal(source[13].name,'014_branch_pos_drafts.sql');
+ assert.equal(source[14].name,'015_booking_appointment_lifecycle.sql');
 });
 test('all valid simulated K5F records still leave activation explicitly blocked',()=>{
  const result=compareHistoryToSource(evidence(prefix));
@@ -21,7 +22,7 @@ test('all valid simulated K5F records still leave activation explicitly blocked'
 test('no-history report is not a pass/approval',()=>{
  const result=compareHistoryToSource(evidence([]));
  assert.equal(result.canApplyToVps,false);
- assert.equal(result.unobservedSourceMigrations.length,14);
+ assert.equal(result.unobservedSourceMigrations.length,15);
 });
 test('unknown target, more than nine rows, reordering and checksum drift fail closed',()=>{
  const bad=[

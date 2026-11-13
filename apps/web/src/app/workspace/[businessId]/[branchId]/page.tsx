@@ -10,5 +10,8 @@ export default async function WorkspaceHomePage({
 }) {
   if (process.env.DRVO_K5_WEB_ENABLED !== "YES") notFound();
   const { businessId, branchId } = await params;
-  return <WorkspaceHomeClient businessId={businessId} branchId={branchId} />;
+  return <WorkspaceHomeClient businessId={businessId} branchId={branchId}
+    salonWebEnabled={process.env.DRVO_BOOKING_WEB_ENABLED==="YES"&&
+      process.env.DRVO_CUSTOMERS_WEB_ENABLED==="YES"&&
+      process.env.DRVO_CATALOG_WEB_ENABLED==="YES"} />;
 }

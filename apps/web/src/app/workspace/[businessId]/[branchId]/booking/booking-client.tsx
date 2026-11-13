@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import {useCallback,useEffect,useRef,useState} from "react";
+import {useCallback,useEffect,useMemo,useRef,useState} from "react";
+import {suggestBookingStarts} from "./booking-availability-preview.mjs";
 import {useRouter} from "next/navigation";
 
 type Resource={resourceId:string;displayName:string;kind:"PERSON"|"CHAIR"|"ROOM"|"EQUIPMENT";isActive:boolean};
@@ -39,6 +40,7 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
   const [offeringId,setOfferingId]=useState("");
   const [resourceId,setResourceId]=useState("");
   const [localStart,setLocalStart]=useState("");
+  const [slotDay,setSlotDay]=useState("");
   const resourceRequest=useRef<string|null>(null);
   const bookingRequest=useRef<string|null>(null);
   const windowRequest=useRef<string|null>(null);
@@ -46,6 +48,11 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
   const statusKeys=useRef<Map<string,string>>(new Map());
   const scope="/api/workspaces/"+encodeURIComponent(businessId)+"/branches/"+encodeURIComponent(branchId);
   const home="/workspace/"+encodeURIComponent(businessId)+"/"+encodeURIComponent(branchId);
+  const slotPreview=useMemo(()=>suggestBookingStarts({
+    resourceId,dayLocal:slotDay,
+    durationMinutes:services.find(s=>s.offeringId===offeringId)?.durationMinutes,
+    windows,appointments:data.appointments,
+  }),[resourceId,slotDay,offeringId,services,windows,data.appointments]);
 
   const load=useCallback(async()=>{
     if(!GUID.test(businessId)||!GUID.test(branchId)){setStatus("denied");return;}
@@ -342,6 +349,29 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
           <button className="k5-save" disabled={busy||!customers.length||!services.length||
             !data.resources.some(r=>r.isActive)}>تأكيد الحجز</button>
         </form>
+        <div className="k5-salon-suggestions" aria-label="مواعيد مرشحة للحجز">
+          <h3>أوقات مرشحة فقط — مش تأكيد توافر</h3>
+          <p className="k5-muted">اختار المورد والخدمة واليوم لعرض اقتراحات من آخر البيانات المصرّح بيها.
+            القائمة قد تكون ناقصة (آخر 200 حجز / 300 فترة توافر). لازم تضغط تأكيد الحجز
+            علشان SQL يراجع التوافر والتعارض من جديد.</p>
+          <label>يوم الاقتراحات حسب جهازك
+            <input type="date" value={slotDay} onChange={e=>setSlotDay(e.target.value)}/>
+          </label>
+          {slotPreview.status==="NEED_SELECTION"?
+            <p className="k5-muted">حدد المورد والخدمة وتاريخ صالح لعرض الأوقات.</p>:
+           slotPreview.status==="NO_OPEN_WINDOWS_RETURNED"?
+            <p className="k5-muted">مفيش فترات OPEN ظاهرة للمورد في البيانات المحملة؛
+              ده مش دليل إن المورد متاح بدون قيود، وممكن القائمة تكون محدودة.</p>:
+           slotPreview.status==="NO_VISIBLE_CANDIDATES"?
+            <p className="k5-muted">مفيش وقت مرشح ظاهر لليوم ده؛ جرب يوم تاني أو حدث البيانات من SQL.</p>:
+            <div className="k5-salon-steps">
+              {slotPreview.slots.map(slot=><button key={slot.startsAtUtc} type="button"
+                className="k5-salon-refresh" disabled={busy}
+                onClick={()=>{setLocalStart(slot.localInput);bookingRequest.current=null;}}>
+                {slot.localLabel} — اختيار الوقت
+              </button>)}
+            </div>}
+        </div>
         {!customers.length||!services.length||!data.resources.some(r=>r.isActive)?
           <p className="k5-footnote">لتسجيل حجز لازم يكون فيه عميل وخدمة نشطة ومورد حجز أولًا.</p>:null}
       </section>

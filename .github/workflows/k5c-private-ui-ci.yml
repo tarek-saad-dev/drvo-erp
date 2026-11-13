@@ -30,6 +30,7 @@ jobs:
           node --test apps/web/test/verification-fragment.test.cjs
           node --test apps/web/test/authorized-workspaces.test.cjs
           node --test apps/web/test/private-salon-pilot.test.cjs
+          node --test apps/web/test/booking-availability-preview.test.cjs
           node --test apps/web/test/pos-draft-quick-cart.test.cjs
           node --test apps/web/test/booking-pos-handoff.test.cjs
       - name: Smoke public preview while private auth remains 404

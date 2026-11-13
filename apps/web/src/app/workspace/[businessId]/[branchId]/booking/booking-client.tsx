@@ -16,12 +16,15 @@ type Offering={offeringId:string;displayName:string;kind:string;durationMinutes:
 const GUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 type Status="loading"|"ready"|"denied"|"unavailable"|"prerequisites";
 
-export default function BookingClient({businessId,branchId}:{businessId:string;branchId:string}){
+export default function BookingClient({businessId,branchId,posWebEnabled}:{
+  businessId:string;branchId:string;posWebEnabled:boolean;
+}){
   const router=useRouter();
   const [status,setStatus]=useState<Status>("loading");
   const [data,setData]=useState<BookingRead>({resources:[],appointments:[]});
   const [customers,setCustomers]=useState<Customer[]>([]);
   const [services,setServices]=useState<Offering[]>([]);
+  const [canOpenPos,setCanOpenPos]=useState(false);
   const [notice,setNotice]=useState("");
   const [busy,setBusy]=useState(false);
   const [resourceName,setResourceName]=useState("");
@@ -62,9 +65,19 @@ export default function BookingClient({businessId,branchId}:{businessId:string;b
       setCustomers(cs.customers.filter(c=>c.isActive));
       setServices(cat.offerings.filter(s=>s.isActive&&s.kind==="SERVICE"&&
         typeof s.durationMinutes==="number"&&s.durationMinutes>0));
+      // POS preview is a distinct protected owner, never assumed from Booking
+      // read or from a Next.js feature flag alone.
+      setCanOpenPos(false);
+      if(posWebEnabled){
+        const preview=await fetch(scope+"/pos-preview",{
+          credentials:"same-origin",cache:"no-store",
+        });
+        if(preview.status===401){router.replace("/sign-in");return;}
+        setCanOpenPos(preview.ok);
+      }
       setStatus("ready");
     }catch{setStatus("unavailable");}
-  },[businessId,branchId,scope,router]);
+  },[businessId,branchId,scope,router,posWebEnabled]);
   useEffect(()=>{void load();},[load]);
 
   async function submit(path:string,body:unknown,id:React.MutableRefObject<string|null>){
@@ -125,6 +138,17 @@ export default function BookingClient({businessId,branchId}:{businessId:string;b
       <h1>المواعيد والحجوزات</h1>
       <p className="k5-muted">مواعيد الفرع حسب المورد، مع ربط العميل والخدمة بنفس الـBusiness. يمنع الحجز المتداخل.</p>
     </div></div>
+    {status==="ready"&&<section className="k5-admin-card" aria-label="خطوات تشغيل الصالون التجريبي">
+      <h2>تجربة الصالون خطوة بخطوة</h2>
+      <p className="k5-muted">البيانات هنا بتتحفظ في قاعدة SQL الخاصة بالفرع المصرّح لك بيه.
+      ده مسار خاص؛ مش الديمو العام، ومفيش فاتورة أو تحصيل.</p>
+      <nav className="k5-salon-steps" aria-label="رحلة إدارة الصالون">
+        <Link href={home+"/customers"}>١. إضافة عميل</Link>
+        <Link href={home+"/catalog"}>٢. إضافة خدمة</Link>
+        <a href="#new-appointment">٣. تسجيل موعد</a>
+        {canOpenPos&&<Link href={home+"/pos-preview"}>٤. مسودة بيع (بدون دفع)</Link>}
+      </nav>
+    </section>}
     {status==="loading"&&<p role="status" className="k5-table-state">جاري التحقق وتحميل الحجوزات…</p>}
     {status==="denied"&&<p role="alert" className="k5-error">الحجوزات مش متاحة لحسابك أو الفرع ده.</p>}
     {status==="unavailable"&&<p role="alert" className="k5-error">تعذر تحميل الحجوزات. حاول مرة تانية.</p>}
@@ -148,7 +172,7 @@ export default function BookingClient({businessId,branchId}:{businessId:string;b
           <button className="k5-save" disabled={busy}>إضافة المورد</button>
         </form>
       </section>
-      <section className="k5-admin-card k5-invite-card">
+      <section className="k5-admin-card k5-invite-card" id="new-appointment">
         <h2>حجز موعد جديد</h2>
         <p className="k5-muted">اختار عميل وخدمة ومورد. المدة بتتحدد من الخدمة في Catalog، والتوقيت المعروض حسب جهازك.</p>
         <form className="catalog-form" onSubmit={addBooking}>
@@ -177,7 +201,11 @@ export default function BookingClient({businessId,branchId}:{businessId:string;b
       </section>
       <section className="k5-admin-card">
         <div className="k5-admin-summary"><h2>حجوزات الفرع</h2>
-          <span className="k5-count">{data.appointments.length} حجز (آخر 200)</span></div>
+          <div className="k5-booking-actions">
+            <span className="k5-count">{data.appointments.length} حجز (آخر 200)</span>
+            <button type="button" className="k5-salon-refresh" disabled={busy}
+              onClick={()=>{void load();}}>تحديث من SQL ↻</button>
+          </div></div>
         <div className="k5-table-wrap"><table className="k5-table">
           <thead><tr><th>العميل</th><th>الخدمة</th><th>المورد</th><th>البداية</th><th>النهاية</th></tr></thead>
           <tbody>{data.appointments.length===0?

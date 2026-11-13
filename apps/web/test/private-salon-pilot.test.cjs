@@ -21,3 +21,18 @@ test('private Salon pilot journey never enables K5 or public Booking',()=>{
  assert.match(client,/تحديث من SQL/);
  assert.doesNotMatch(client,/\/demo\/salon|localStorage|sessionStorage/);
 });
+
+test('Booking completed-to-POS route requires draft AND preview grants, never posts',()=>{
+ const booking=read('booking-client.tsx');
+ const page=read('page.tsx');
+ assert.match(page,/DRVO_POS_DRAFTS_WEB_ENABLED==="YES"/);
+ assert.match(page,/draftsWebEnabled=/);
+ assert.match(booking,/setCanPrepareDraft\(false\)/);
+ assert.match(booking,/setCanOpenPos\(preview\.ok\)/);
+ assert.match(booking,/if\(preview\.ok&&draftsWebEnabled\)/);
+ assert.match(booking,/fetch\(scope\+"\/pos-drafts"/);
+ assert.match(booking,/setCanPrepareDraft\(drafts\.ok\)/);
+ assert.match(booking,/b\.status==="COMPLETED"&&canPrepareDraft&&GUID\.test\(b\.offeringId\)/);
+ assert.match(booking,/encodeURIComponent\(b\.offeringId\)/);
+ assert.doesNotMatch(booking,/\/sales\/posted|localStorage|sessionStorage/);
+});

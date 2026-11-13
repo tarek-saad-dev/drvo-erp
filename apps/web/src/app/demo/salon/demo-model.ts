@@ -33,7 +33,33 @@ export const DEMO_CUSTOMERS:readonly DemoCustomer[]=[
  {id:"mahmoud",name:"محمود (تجريبي)"},
  {id:"khaled",name:"خالد (تجريبي)"},
 ];
-export const DEMO_TIMES=Object.freeze(["10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00"]);
+// Half-hour preview intervals within the synthetic 10:00–19:00 demo day.
+export const DEMO_TIMES=Object.freeze(Array.from({length:18},(_,i)=>{
+ const minutes=10*60+i*30;
+ return String(Math.floor(minutes/60)).padStart(2,"0")+":"+
+  String(minutes%60).padStart(2,"0");
+}));
+const DEMO_CLOSE_MINUTE=19*60;
+function demoMinute(time:string):number{
+ if(!/^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(time))
+  throw new Error("Invalid demo time");
+ const [h,m]=time.split(":").map(Number);
+ return h*60+m;
+}
+export function demoAvailableTimes(data:DemoData,staffId:string,serviceId:string):string[]{
+ demoStaff(staffId);
+ const duration=demoService(serviceId).duration;
+ return DEMO_TIMES.filter(time=>{
+  const start=demoMinute(time),end=start+duration;
+  if(end>DEMO_CLOSE_MINUTE)return false;
+  return !data.appointments.some(a=>{
+   if(a.staffId!==staffId||a.status==="cancelled")return false;
+   const bookedStart=demoMinute(a.time);
+   const bookedEnd=bookedStart+demoService(a.serviceId).duration;
+   return start<bookedEnd&&end>bookedStart;
+  });
+ });
+}
 
 const seededAppointments:DemoAppointment[]=[
  {id:1,customerId:"omar",staffId:"mostafa",serviceId:"bundle",time:"10:00",status:"completed"},
@@ -71,9 +97,8 @@ export function bookDemoAppointment(data:DemoData,raw:{
  demoStaff(raw.staffId);
  demoService(raw.serviceId);
  if(!DEMO_TIMES.includes(raw.time))throw new Error("اختار ميعاد متاح في اليوم التجريبي");
- const conflict=data.appointments.some(a=>
-  a.staffId===raw.staffId&&a.time===raw.time&&a.status!=="cancelled");
- if(conflict)throw new Error("الحلاق عنده موعد في الساعة دي. اختار وقت تاني.");
+ if(!demoAvailableTimes(data,raw.staffId,raw.serviceId).includes(raw.time))
+  throw new Error("الحلاق عنده موعد متداخل أو الوقت خارج اليوم التجريبي. اختار وقت تاني.");
  const id=Math.max(0,...data.appointments.map(a=>a.id))+1;
  return {...data,appointments:[...data.appointments,{
   id,customerId:raw.customerId,staffId:raw.staffId,serviceId:raw.serviceId,

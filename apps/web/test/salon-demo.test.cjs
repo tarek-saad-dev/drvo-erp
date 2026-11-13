@@ -104,3 +104,39 @@ test('S8 guided first-visit flow is a real synthetic three-step booking to DRAFT
  assert.equal(state.drafts[0].subtotalMinor,18000);
  assert.equal(d.initialDemo().drafts.length,0);
 });
+
+test('S9 synthetic half-hour intervals reject overlapping durations, allow adjacent and canceled slots',()=>{
+ const seed=d.initialDemo();
+ assert.equal(d.DEMO_TIMES.length,18);
+ assert.equal(d.DEMO_TIMES[1],'10:30');
+ assert.equal(d.DEMO_TIMES.at(-1),'18:30');
+ assert.ok(!d.demoAvailableTimes(seed,'mostafa','cut').includes('10:30'),
+  'completed 10:00–11:00 bundle remains occupied');
+ assert.ok(d.demoAvailableTimes(seed,'mostafa','cut').includes('11:00'),
+  'back-to-back booking is allowed');
+ assert.ok(!d.demoAvailableTimes(seed,'youssef','bundle').includes('10:30'),
+  'a 60-minute service starting 10:30 overlaps existing 11:00 cut');
+ assert.ok(d.demoAvailableTimes(seed,'youssef','cut').includes('10:30'),
+  'short 30-minute service ends at 11:00 and does not overlap');
+ const input={customerId:'guest',staffId:'youssef',serviceId:'bundle',time:'10:30'};
+ assert.throws(()=>d.bookDemoAppointment(seed,input),/متداخل/);
+ const adjacent=d.bookDemoAppointment(seed,{...input,serviceId:'cut'});
+ assert.equal(adjacent.appointments.length,seed.appointments.length+1);
+ assert.throws(()=>d.bookDemoAppointment(seed,{...input,staffId:'mostafa',serviceId:'cut'}),/متداخل/);
+ assert.throws(()=>d.bookDemoAppointment(seed,{...input,staffId:'hassan',time:'18:30'}),/خارج اليوم/);
+ assert.ok(d.demoAvailableTimes(seed,'hassan','cut').includes('18:30'));
+ assert.ok(!d.demoAvailableTimes(seed,'hassan','bundle').includes('18:30'));
+ const canceled=d.updateDemoAppointment(seed,2,'cancelled');
+ assert.ok(d.demoAvailableTimes(canceled,'youssef','bundle').includes('10:30'));
+ assert.throws(()=>d.demoAvailableTimes(seed,'unknown-staff','cut'));
+ assert.throws(()=>d.demoAvailableTimes(seed,'youssef','unknown-service'));
+});
+test('S9 real demo UI disables occupied options, never pretends SQL guarantees',()=>{
+ const client=fs.readFileSync(path.join(root,'demo/salon/salon-demo-client.tsx'),'utf8');
+ assert.match(client,/const availableTimes=useMemo\(\(\)=>demoAvailableTimes\(data,staffId,serviceId\)/);
+ assert.match(client,/disabled=\{!availableTimes\.includes\(t\)\}/);
+ assert.match(client,/disabled=\{!availableTimes\.includes\(time\)\}/);
+ assert.match(client,/setTime\(current=>slots\.includes\(current\)\?current:\(slots\[0\]\?\?""\)\)/);
+ assert.match(client,/مفيش حجز حقيقي أو مزامنة مع SQL/);
+ assert.doesNotMatch(client,/fetch\s*\(|\/api\/|localStorage|sessionStorage|document\.cookie/);
+});

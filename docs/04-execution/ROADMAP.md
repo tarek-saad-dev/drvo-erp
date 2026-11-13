@@ -1,5 +1,8 @@
 # Roadmap
 
+> **2026-11-13 S6 ENGINEERING DELIVERY:** [Integrated S6](SALON-S6-INTEGRATED-DELIVERY-2026-11-13.md): SQL017 closes a Booking Resource published OPEN window with Branch-scope audit, same Resource lock as creation, no future confirmed booking stranded and no unlimited-hour fallback; 32 SQL+HTTP checks + restricted migrator CI PASS on PR #88. PR #89 directly links Completed Booking to independently authorized **unsaved** POS DRAFT. PR #90 resource/status roster filters with device-local day and max last 200 entries. **Next engineering:** availability preview for selected Resource, safe window replacement workflow, owner/staff browser test after approval; no HR shifts or paid invoices yet. **Operator:** K5F root + offsite independent restore then separately approved SQL **010–017** VPS migration/ADR-032 activation; ADR-031 before POSTED.
+
+
 > **2026-11-13 S5 PRODUCT INCREMENTS DELIVERED IN PARALLEL:** [S5 handoff](SALON-S5-THREE-TRACK-DELIVERY-2026-11-13.md): #84 Booking-owned future dated resource windows (UTC, opt-in, availability enforced by SQL016, 28 disposable HTTP+SQL CI checks + restricted DB migrator PASS); #85 completed-service Offering ID may prefill new **unsaved** POS DRAFT under independent POS/Catalog authorization; #86 read-only Salon TODAY/UPCOMING/ALL roster with scoped DRAFT links. Real POSTED sales still absent. **Immediate next engineering**: plan explicit Resource holiday/window correction/edit UX, positive UI browser E2E; no recurring staff schedules claimed. **Operator**: K5F and isolated offhost restore → separately authorized SQL 010–016 VPS window → private module rights, then Pilot. ADR-031/032 OPEN.
 
 

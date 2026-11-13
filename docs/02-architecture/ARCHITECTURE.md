@@ -1,5 +1,8 @@
 # Architecture baseline
 
+> **2026-11-13 S6 MODULAR BOUNDARY CHECK:** Shared Booking owns SQL017 scoped window CLOSED state and independent auditable `booking.manage` status transition; original resource availability opt-in persists even if all windows CLOSED. Same Resource lock ordering and composite Branch FK protect existing BOOKED appointments. Private Booking→POS link is an *untrusted OfferingId suggestion* and requires independent POS Preview/Draft rights, never Booking-permission escalation or automatic sale. Private Salon roster adds only local filters over authorized Booking rows. No Salon duplicate backend, cross-domain writes, global Cashier EmpID resource, HR shift, finance/GL action or clinical assumptions. ADR-030 accepted; ADR-031/032 + K5F OPEN; **SQL 010–017 VPS unauthorized**. [S6 handoff](../04-execution/SALON-S6-INTEGRATED-DELIVERY-2026-11-13.md).
+
+
 > **2026-11-13 S5 MODULE BOUNDARY CHECK:** Shared Booking alone owns SQL016 dated Resource windows and insert-time coverage enforcement under Tenant/Business/Branch+Resource scoped FKs, existing resource locks and K5 read/manage actions. No universal Salon-specific scheduler, employee HR identity, recurring local timezone guarantee or historical migration edits. Completed Booking is NOT a Sale; independent POS/Catalog API validates URL OfferingId before drafting an **unsaved** cart. Salon Overview is only a private scoped read-only Industry Solution composition. Exact Origin / separate POS Preview and Draft GET permissions remain; all financial and paid-module activation remains blocked by ADR-031/032 and K5F, SQL 010–016 VPS unauthorised. [S5](../04-execution/SALON-S5-THREE-TRACK-DELIVERY-2026-11-13.md).
 
 

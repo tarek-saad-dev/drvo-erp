@@ -138,11 +138,11 @@ async function main(){
    "',CHECK_POLICY=ON,CHECK_EXPIRATION=OFF");
   admin=await open({...base,database:db});
   await admin.query("CREATE USER ["+user+"] FOR LOGIN ["+user+"];GRANT CONNECT TO ["+user+"]");
-  await pass('15 forward-only migrations apply and replay, no synthetic appointment or draft seed',async()=>{
-   const applied=await applyMigrations(admin,undefined,15);
-   assert.equal(applied.length,15);
+  await pass('16 forward-only migrations apply and replay, no synthetic appointment or draft seed',async()=>{
+   const applied=await applyMigrations(admin,undefined,16);
+   assert.equal(applied.length,16);
    assert.ok(applied.every(x=>x.status==='applied'));
-   const replay=await applyMigrations(admin,undefined,14);
+   const replay=await applyMigrations(admin,undefined,16);
    assert.ok(replay.every(x=>x.status==='unchanged'));
    const r=await admin.query("SELECT COUNT(*) AS n FROM core.BookingAppointment");
    assert.equal(r.recordset[0].n,0);

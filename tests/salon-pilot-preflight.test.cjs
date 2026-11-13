@@ -33,7 +33,7 @@ test('template is missing-evidence by default and NEVER authorizes VPS work',()=
  assert.equal(result.status,'BLOCKED_SOURCE_PREPARATION');
  assert.equal(result.missingChecks.length,10);
  assert.equal(result.observedHistoryCount,0);
- assert.equal(result.unobservedSourceMigrations.length,15);
+ assert.equal(result.unobservedSourceMigrations.length,16);
  deny(result);
 });
 test('even perfect self-reported evidence cannot authorize SQL, K5 or invite',()=>{
@@ -43,7 +43,7 @@ test('even perfect self-reported evidence cannot authorize SQL, K5 or invite',()
  assert.equal(result.historyPrefixMatchesSubmittedSource,true);
  assert.equal(result.releaseShaMatchReported,true);
  assert.deepEqual(result.unobservedSourceMigrations.map(n=>n.slice(0,3)),
-  ['010','011','012','013','014','015']);
+  ['010','011','012','013','014','015','016']);
  assert.equal(result.operatorReportedControls.length,CONTROLS.length);
  deny(result);
 });

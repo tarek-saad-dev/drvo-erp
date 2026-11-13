@@ -1,0 +1,23 @@
+'use strict';
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const app=path.join(__dirname,'../src/app/workspace/[businessId]/[branchId]/booking');
+const read=name=>fs.readFileSync(path.join(app,name),'utf8');
+test('private Salon pilot journey never enables K5 or public Booking',()=>{
+ const page=read('page.tsx'),client=read('booking-client.tsx');
+ assert.match(page,/DRVO_K5_WEB_ENABLED !== "YES"/);
+ assert.match(page,/DRVO_BOOKING_WEB_ENABLED !== "YES"/);
+ assert.match(page,/DRVO_POS_PREVIEW_WEB_ENABLED==="YES"/);
+ assert.match(page,/DRVO_CATALOG_WEB_ENABLED==="YES"/);
+ assert.match(client,/status==="ready"&&<section/);
+ assert.match(client,/href=\{home\+"\/customers"\}/);
+ assert.match(client,/href=\{home\+"\/catalog"\}/);
+ assert.match(client,/id="new-appointment"/);
+ assert.match(client,/canOpenPos&&<Link/);
+ assert.match(client,/setCanOpenPos\(preview\.ok\)/);
+ assert.match(client,/credentials:"same-origin",cache:"no-store"/);
+ assert.match(client,/تحديث من SQL/);
+ assert.doesNotMatch(client,/\/demo\/salon|localStorage|sessionStorage/);
+});

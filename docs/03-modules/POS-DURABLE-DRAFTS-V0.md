@@ -1,5 +1,8 @@
 # Shared POS Core — persisted DRAFT-only V0
 
+> **2026-11-13 S6 BOOKING LIST DIRECT DRAFT LINK:** PR #89, after separate Web flags, POS Preview **and** POS DRAFT authorized HTTP GETs, adds an optional OfferingId-based link from COMPLETED Booking rows. POS validates active Catalog SERVICE before filling an unsaved cart. No client price authority, persisted foreign Booking link, automatic Save, POSTED sale, VAT/Treasury/GL or K5 entitlement activation. [S6](../04-execution/SALON-S6-INTEGRATED-DELIVERY-2026-11-13.md).
+
+
 > **2026-11-13 S5 UNSAVED SERVICE HANDOFF MERGED:** PR #85 takes an OPTIONAL untrusted Offering ID from a private Booking-completion link; only after a permitted POS/Catalog HTTP GET and active SERVICE validation, prepares an in-memory cart line. PR #86 displays this link only for COMPLETED Booking with separately granted POS Draft read and POS Preview HTTP 200. **No Booking→POS automatic write, no customer PII in URL, no payment/invoice/GL/posted sale;** POS still owns fresh SQL Catalog price validation at explicit DRAFT save. [S5](../04-execution/SALON-S5-THREE-TRACK-DELIVERY-2026-11-13.md).
 
 

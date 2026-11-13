@@ -1,5 +1,8 @@
 # DRVO ERP Salon S4 — fast parallel delivery checkpoint (2026-11-13)
 
+> **HISTORICAL S4 CHECKPOINT:** S4 source counted 001–015 correctly at creation. S5 [PR #84](https://github.com/tarek-saad-dev/drvo-erp/pull/84) subsequently adds migration 016 for explicit dated Booking resource availability. It remains **source/isolated CI only**; VPS 010–016 not authorized. [S5](SALON-S5-THREE-TRACK-DELIVERY-2026-11-13.md).
+
+
 **PRs #80, #81, #82 merged to main; independent reviewed PR-head tests PASS.** GitHub [#80](https://github.com/tarek-saad-dev/drvo-erp/pull/80), [#81](https://github.com/tarek-saad-dev/drvo-erp/pull/81), [#82](https://github.com/tarek-saad-dev/drvo-erp/pull/82). Three isolated workstreams, **not** three independent industry backends.
 
 ## What exists, and its architecture ownership

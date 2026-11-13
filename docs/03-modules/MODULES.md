@@ -1,5 +1,8 @@
 # Modules catalog
 
+> **2026-11-13 S5 OVERRIDE OF HISTORICAL MODULE TABLE:** Shared Booking now includes an opt-in **dated UTC Resource availability** SQL016 slice in addition to create/status/read and strict tenant locks; the private Salon solution now has local-day operating filters and nonposting completed-service handoff to independently authorized POS Draft UX. Shared Catalog, Customers and POS DRAFT remain narrow SQL/API CRUD slices. Financial POS POSTED, full HR/Inventory, paid Commercial Activation, Clinic Clinical Module remain unimplemented. SQL 010–016 source/CI only and K5F/ADR-031/032 OPEN. [S5](../04-execution/SALON-S5-THREE-TRACK-DELIVERY-2026-11-13.md).
+
+
 > **2026-11-13 ACTUAL CODE STATUS OVERRIDE (older table below is historical):** Existing Shared Catalog and Customers create/list, Booking create/list + CANCELLED/COMPLETED statuses (SQL source 013+015), POS DRAFT create/list (SQL source 014) and K5 private Web all MERGED to main with disposable SQL2022/Nest HTTP success; Salon private overview is a composition of existing owners, not a new standalone Salon Domain. **All SQL 010–015 are still not applied to VPS / Business flags remain OFF**, no real POS POSTED/Treasury/Accounting, full SaaS activation or Clinic Clinical Records module. See [S4 status](../04-execution/SALON-S4-PARALLEL-DELIVERY-2026-11-13.md).
 
 

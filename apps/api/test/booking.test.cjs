@@ -67,3 +67,36 @@ test("Booking controller denies forged Origin before loading actor or invoking S
     e=>e.getStatus?.()===401);
  }finally{restore();}
 });
+
+test("status lifecycle rejects forged scope/fields before SQL",async()=>{
+ const restore=on({DRVO_BOOKING_ENABLED:"YES",DRVO_K5_AUTH_ENABLED:"YES"});
+ try{
+  const svc=new BookingService({getInternalPool(){throw Error("DB must not be used");}});
+  const book=GUID(13),id=GUID(14);
+  for(const body of [
+   {status:"POSTED"},{status:"BOOKED"},{status:"CANCELLED",tenantId:GUID(1)},
+   {status:"COMPLETED",posted:true},{},{status:null},
+  ])await assert.rejects(()=>svc.changeAppointmentStatus(
+   actor,token,GUID(3),GUID(4),id,book,body),e=>e.getStatus?.()===400);
+  await assert.rejects(()=>svc.changeAppointmentStatus(actor,"bad",GUID(3),
+    GUID(4),id,book,{status:"CANCELLED"}),e=>e.getStatus?.()===404);
+  await assert.rejects(()=>svc.changeAppointmentStatus(actor,token,GUID(3),
+    GUID(4),"bad",book,{status:"CANCELLED"}),e=>e.getStatus?.()===400);
+  await assert.rejects(()=>svc.changeAppointmentStatus(actor,token,GUID(3),
+    GUID(4),id,"other", {status:"CANCELLED"}),e=>e.getStatus?.()===400);
+ }finally{restore();}
+});
+
+test("status change endpoint rejects foreign Origin before auth",async()=>{
+ const restore=on({DRVO_BOOKING_ENABLED:"YES",DRVO_K5_AUTH_ENABLED:"YES",
+  DRVO_K5_ORIGIN:"https://erp-stage.drvotech.com"});
+ try{
+  const controller=new BookingController(
+    {actorFromToken(){throw Error("must not authenticate");}},
+    {changeAppointmentStatus(){throw Error("must not update");}},
+  );
+  await assert.rejects(()=>controller.changeStatus(
+   "https://malicious.invalid",GUID(8),{headers:{}},{setHeader(){}},
+   GUID(3),GUID(4),GUID(5),{status:"CANCELLED"}),e=>e.getStatus?.()===401);
+ }finally{restore();}
+});

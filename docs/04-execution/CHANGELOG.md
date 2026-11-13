@@ -1,5 +1,11 @@
 # Project changelog
 
+## 2026-11-14 — SC-1 read-only technical Business bundle simulation (stacked PR)
+
+- Reuses SC-0 trusted-only release contract and K6A/B pure graph to compute Required closure and selected Optional modules from explicit synthetic evidence; integer minor base+tax quote arithmetic for CI only, `SIMULATION_ONLY`, never approvable. Missing/forged price, revision, market, active state, graph, mixed currency/period and overflow fail closed.
+- K5 scoped private `GET activation-preview?moduleKey=` always returns `UNQUOTABLE`, no invented price or real entitlement; feature flag OFF by default. Unit tests for strict auth and pure negative simulation; no SQL/VPS/Public Auth/approved financial policy change. [SC-1 spec](SC1-READONLY-BUSINESS-ACTIVATION-PREVIEW-2026-11-14.md); SC-0 #104 must merge first.
+
+
 ## 2026-11-14 — SC-0 immutable read-only release evidence registry (feature PR)
 
 - Added Lean Kernel pure validated release-evidence snapshots, deterministic graph/market eligibility and strict approved signer verifier callback. Production registry ships EMPTY, no trusted keys or published releases.

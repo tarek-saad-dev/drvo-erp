@@ -1,5 +1,11 @@
 # Project changelog
 
+## 2026-11-14 — SC-0 immutable read-only release evidence registry (feature PR)
+
+- Added Lean Kernel pure validated release-evidence snapshots, deterministic graph/market eligibility and strict approved signer verifier callback. Production registry ships EMPTY, no trusted keys or published releases.
+- Added default-OFF K5-Branch-authorized private GET that returns NO_VERIFIED_RELEASES only. Added Node Ed25519 synthetic validation and API deny-by-default unit tests. No SQL, publish/activation endpoint, entitlements, prices, real users, public auth or VPS deployment. [SC-0 spec](SC0-READONLY-VERIFIED-MODULE-RELEASE-REGISTRY-2026-11-14.md).
+
+
 ## 2026-11-14 — ADR-032 V1 Baseline explicitly approved, SC-0/SC-1 read-only authorized
 
 - Founder approved ACT-01–ACT-07 as a bounded architecture/product baseline only: global reviewed/eligible releases, trusted Business scope, immutable full required closure with one consent, independently verified payment before paid Entitlement, per-Business CAS/idempotency, honest ACTIVE truth, Owner-only paid approval and safe dependency disable. No commercial pricing/tax/collection/refund/role privilege specifics, production activation, K5F acceptance or ADR-031 decision implied.

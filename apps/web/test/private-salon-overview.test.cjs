@@ -24,7 +24,7 @@ test('overview must verify branch session and independently authorized modules',
  }
  assert.match(client,/credentials:"same-origin",cache:"no-store"/);
  assert.match(client,/drafts\.ok/);
- assert.match(client,/draftCount:null/);
+ assert.match(client,/let draftCount:number\\|null=null/);
  assert.match(client,/لا توجد حجوزات/);
  assert.doesNotMatch(client,/localStorage|sessionStorage|\/demo\/salon|\.post\(|method:"POST"/);
 });

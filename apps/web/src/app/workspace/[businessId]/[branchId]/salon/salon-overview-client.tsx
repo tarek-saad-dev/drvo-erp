@@ -3,7 +3,7 @@ import Link from "next/link";
 import {useCallback,useEffect,useState} from "react";
 import {useRouter} from "next/navigation";
 
-type Booking={bookingId:string;offeringId:string;customerName:string;offeringName:string;
+type Booking={bookingId:string;offeringId:string;resourceId:string;customerName:string;offeringName:string;
  resourceName:string;startsAtUtc:string;status:"BOOKED"|"CANCELLED"|"COMPLETED"};
 type Overview={branchName:string;businessName:string;bookings:Booking[];
  customersCount:number;offeringsCount:number;draftCount:number|null;posPreviewAllowed:boolean};
@@ -17,6 +17,8 @@ export default function SalonOverview({businessId,branchId,draftsAvailable}:{
  const [status,setStatus]=useState<Status>("loading");
  const [overview,setOverview]=useState<Overview|null>(null);
  const [filter,setFilter]=useState<"TODAY"|"UPCOMING"|"ALL">("TODAY");
+ const [resourceFilter,setResourceFilter]=useState("");
+ const [statusFilter,setStatusFilter]=useState<"ALL"|"BOOKED"|"COMPLETED"|"CANCELLED">("ALL");
  const home="/workspace/"+encodeURIComponent(businessId)+"/"+encodeURIComponent(branchId);
  const root="/api/workspaces/"+encodeURIComponent(businessId)+
   "/branches/"+encodeURIComponent(branchId);
@@ -101,10 +103,15 @@ export default function SalonOverview({businessId,branchId,draftsAvailable}:{
   if(filter==="TODAY")return localToday(when);
   if(filter==="UPCOMING")return b.status==="BOOKED"&&when.getTime()>=now.getTime();
   return true;
- }).sort((a,b)=>filter==="UPCOMING"?
+ }).filter(b=>!resourceFilter||b.resourceId===resourceFilter)
+   .filter(b=>statusFilter==="ALL"||b.status===statusFilter)
+   .sort((a,b)=>filter==="UPCOMING"?
   Date.parse(a.startsAtUtc)-Date.parse(b.startsAtUtc):
   Date.parse(b.startsAtUtc)-Date.parse(a.startsAtUtc));
  const today=(overview?.bookings??[]).filter(b=>localToday(new Date(b.startsAtUtc)));
+ const resourceOptions=Array.from(new Map((overview?.bookings??[]).map(b=>
+  [b.resourceId,b.resourceName])).entries()).filter(([id])=>GUID.test(id))
+  .sort((a,b)=>a[1].localeCompare(b[1],"ar"));
 
  return <main className="k5-workspace">
   <header className="k5-workspace-header">
@@ -158,10 +165,27 @@ export default function SalonOverview({businessId,branchId,draftsAvailable}:{
         <option value="UPCOMING">مواعيد قادمة مؤكدة</option>
         <option value="ALL">آخر 200 حجز من API</option>
        </select>
+       <label htmlFor="k5-salon-resource-filter">المورد</label>
+       <select id="k5-salon-resource-filter" value={resourceFilter}
+         onChange={e=>setResourceFilter(e.target.value)}>
+         <option value="">كل الموارد الظاهرة</option>
+         {resourceOptions.map(([id,name])=>
+           <option value={id} key={id}>{name}</option>)}
+       </select>
+       <label htmlFor="k5-salon-status-filter">الحالة</label>
+       <select id="k5-salon-status-filter" value={statusFilter}
+         onChange={e=>setStatusFilter(e.target.value as
+           "ALL"|"BOOKED"|"COMPLETED"|"CANCELLED")}>
+         <option value="ALL">كل الحالات</option>
+         <option value="BOOKED">محجوز</option>
+         <option value="COMPLETED">مكتمل</option>
+         <option value="CANCELLED">ملغي</option>
+       </select>
      </div>
     </div>
     <p className="k5-muted">الفلاتر بتشتغل على آخر 200 حجز مسموح بعرضهم، بتوقيت جهازك؛
       مفيش تقويم دوام أو تقرير إيرادات أو حجز جديد ضمن الفلترة.</p>
+    <p className="k5-muted" role="status">نتائج الفلترة من السجلات المسموح بعرضها: {filtered.length}</p>
     <div className="k5-table-wrap"><table className="k5-table">
      <thead><tr><th>العميل</th><th>الخدمة</th><th>المورد</th><th>الموعد</th><th>الحالة</th><th>التالي</th></tr></thead>
      <tbody>{filtered.length===0?

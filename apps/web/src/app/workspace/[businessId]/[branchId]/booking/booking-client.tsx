@@ -3,6 +3,7 @@
 import Link from "next/link";
 import {useCallback,useEffect,useMemo,useRef,useState} from "react";
 import {suggestBookingStarts} from "./booking-availability-preview.mjs";
+import {findAuthorizedCustomers} from "./customer-finder.mjs";
 import {toLocalMinute,windowCorrectionStage} from "./window-correction.mjs";
 import {useRouter} from "next/navigation";
 
@@ -14,7 +15,7 @@ type Appointment={
 };
 type BookingRead={resources:Resource[];appointments:Appointment[]};
 type BookingWindow={windowId:string;resourceId:string;startsAtUtc:string;endsAtUtc:string;state:"OPEN"|"CLOSED"};
-type Customer={customerId:string;displayName:string;isActive:boolean};
+type Customer={customerId:string;displayName:string;phoneE164?:string|null;isActive:boolean};
 type Offering={offeringId:string;displayName:string;kind:string;durationMinutes:number|null;isActive:boolean};
 const GUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 type Status="loading"|"ready"|"denied"|"unavailable"|"prerequisites";
@@ -31,6 +32,7 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
   const [windowLocalEnd,setWindowLocalEnd]=useState("");
   const [replacementWindowId,setReplacementWindowId]=useState<string|null>(null);
   const [customers,setCustomers]=useState<Customer[]>([]);
+  const [customerQuery,setCustomerQuery]=useState("");
   const [services,setServices]=useState<Offering[]>([]);
   const [canOpenPos,setCanOpenPos]=useState(false);
   const [canPrepareDraft,setCanPrepareDraft]=useState(false);
@@ -51,6 +53,7 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
   const scope="/api/workspaces/"+encodeURIComponent(businessId)+"/branches/"+encodeURIComponent(branchId);
   const home="/workspace/"+encodeURIComponent(businessId)+"/"+encodeURIComponent(branchId);
   const correctionStage=windowCorrectionStage(replacementWindowId,windowResourceId,windows);
+  const filteredCustomers=useMemo(()=>findAuthorizedCustomers(customers,customerQuery),[customers,customerQuery]);
   const slotPreview=useMemo(()=>suggestBookingStarts({
     resourceId,dayLocal:slotDay,
     durationMinutes:services.find(s=>s.offeringId===offeringId)?.durationMinutes,
@@ -373,10 +376,22 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
         <h2>حجز موعد جديد</h2>
         <p className="k5-muted">اختار عميل وخدمة ومورد. المدة بتتحدد من الخدمة في Catalog، والتوقيت المعروض حسب جهازك.</p>
         <form className="catalog-form" onSubmit={addBooking}>
+          <label>ابحث عن العميل في القائمة المصرّح بيها
+            <input type="search" maxLength={80} value={customerQuery}
+              placeholder="الاسم أو رقم الموبايل الدولي"
+              onChange={e=>{setCustomerQuery(e.target.value);
+                setCustomerId("");bookingRequest.current=null;}}/>
+          </label>
+          <p className="k5-muted" role="status">ظاهر {filteredCustomers.length} من {customers.length} عميل
+            (أول 200 عميل في الـ API فقط). البحث محلي ومش بيشمل كل العملاء.
+            {filteredCustomers.length===0&&customers.length>0?
+              " مفيش نتيجة ظاهرة؛ جرّب البحث بطريقة تانية.":""}
+            <Link href={home+"/customers"}> دليل العملاء</Link>
+          </p>
           <label>العميل<select required value={customerId} onChange={e=>{
             setCustomerId(e.target.value);bookingRequest.current=null;
           }}><option value="">اختر عميلًا</option>
-            {customers.map(c=><option key={c.customerId} value={c.customerId}>{c.displayName}</option>)}
+            {filteredCustomers.map(c=><option key={c.customerId} value={c.customerId}>{c.displayName}</option>)}
           </select></label>
           <label>الخدمة<select required value={offeringId} onChange={e=>{
             setOfferingId(e.target.value);bookingRequest.current=null;

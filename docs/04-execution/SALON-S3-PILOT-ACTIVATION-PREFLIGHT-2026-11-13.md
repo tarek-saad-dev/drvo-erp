@@ -1,5 +1,8 @@
 # Salon S3 — Private Pilot operator preflight / explicit Go–No-Go (2026-11-13)
 
+> **2026-11-13 S4 update:** Source SQL migration count is now **15 (001–015)** due to reviewed Booking lifecycle PR #80. The operator's actual K5F pre-migration history must **still** match only 001–009; SQL 010–015 is unapproved for VPS. This source planner remains read-only and nonauthorizing, including if all claims are operator-reported. [S4](SALON-S4-PARALLEL-DELIVERY-2026-11-13.md).
+
+
 **Status:** PR [#78](https://github.com/tarek-saad-dev/drvo-erp/pull/78) MERGED at `4b010ad30387c41b6c3a915f6e7845330020651b`; K0/K1/Staging Artifact CI PASS. SOURCE-ONLY, READ-ONLY candidate-evidence assessment. NOT a VPS audit, staging SQL migration approval, K5 activation, pilot login or acceptance of proposed ADR-032. Prior [S2 integration](SALON-S2-INTEGRATED-HANDOFF-2026-11-13.md) proved actual Customer→Catalog→Booking→POS DRAFT through authenticated Nest + disposable SQL2022, **not through live VPS**.
 
 ## Why this is the next necessary slice

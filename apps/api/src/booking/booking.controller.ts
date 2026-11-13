@@ -4,7 +4,7 @@ import {
 } from "@nestjs/common";
 import type {IncomingMessage,ServerResponse} from "node:http";
 import {IdentityService,extractSessionCookie} from "../identity/identity.service";
-import {BookingService,type BookingRead,type Created,type StatusChange,type BookingWindow} from "./booking.service";
+import {BookingService,type BookingRead,type Created,type StatusChange,type BookingWindow,type WindowClosure} from "./booking.service";
 
 function enabled():void{
  if(process.env.DRVO_K5_AUTH_ENABLED!=="YES"||
@@ -82,5 +82,17 @@ export class BookingController {
   const token=extractSessionCookie(req.headers.cookie);
   const actor=await this.identity.actorFromToken(token);
   return this.booking.addWindow(actor,token!,businessId,branchId,key,body);
+ }
+ @Post("windows/:windowId/close") @HttpCode(200)
+ async closeWindow(@Headers("origin") origin:string|undefined,
+  @Headers("idempotency-key") key:string|undefined,
+  @Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,
+  @Param("businessId") businessId:string,@Param("branchId") branchId:string,
+  @Param("windowId") windowId:string,@Body() body:unknown
+ ):Promise<WindowClosure>{
+  res.setHeader("Cache-Control","no-store");enabled();allowedOrigin(origin);
+  const token=extractSessionCookie(req.headers.cookie);
+  const actor=await this.identity.actorFromToken(token);
+  return this.booking.closeWindow(actor,token!,businessId,branchId,key,windowId,body);
  }
 }

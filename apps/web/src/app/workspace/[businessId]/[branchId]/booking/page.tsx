@@ -11,5 +11,7 @@ export default async function BookingPage({
   if (process.env.DRVO_K5_WEB_ENABLED !== "YES" ||
       process.env.DRVO_BOOKING_WEB_ENABLED !== "YES") notFound();
   const {businessId,branchId} = await params;
-  return <BookingClient businessId={businessId} branchId={branchId} />;
+  return <BookingClient businessId={businessId} branchId={branchId}
+    posWebEnabled={process.env.DRVO_POS_PREVIEW_WEB_ENABLED==="YES" &&
+      process.env.DRVO_CATALOG_WEB_ENABLED==="YES"} />;
 }

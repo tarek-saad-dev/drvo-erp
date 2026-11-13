@@ -1,5 +1,8 @@
 # Current state
 
+> **2026-11-13 VERIFIED SALON S3 SOURCE PREFLIGHT MERGED:** [PR #78](https://github.com/tarek-saad-dev/drvo-erp/pull/78) is **MERGED** into main as commit `4b010ad30387c41b6c3a915f6e7845330020651b`. The read-only local redacted evidence tool and fail-closed negative test matrix were verified by K0/K1 and DevOps Staging Artifact CI on the merge head. **No K5F root-owned checker executed on VPS, no off-host encrypted backup independently restored, no SQL 010–014 VPS applied, and no K5 or Business Module flags enabled.** Self-reported operator evidence never authorizes SQL/Auth/financial actions; ADR-031/032 remain PROPOSED. [S3 runbook](../04-execution/SALON-S3-PILOT-ACTIVATION-PREFLIGHT-2026-11-13.md).
+
+
 > **2026-11-13 SALON S3 OPERATOR PREFLIGHT REVIEW (NO VPS ACTIVATION):** Added a standalone **read-only** redacted operator-evidence validator under `tools/salon-pilot/preflight.cjs` and negative tests. It compares an operator-REPORTED pre-SQL-history 001–009 to immutable source 001–014, explicit SHA reporting, root K5F bundle, offhost encrypted restore, reverse-proxy/Origin, Owner/Staff isolation, SQL approval and ADR-032 entitlement decision. **Even complete reported evidence NEVER authorizes SQL/flags/users/financial POSTED**; independent security and operator approval still required. Previous real SQL/Nest Customer→Catalog→Booking→POS DRAFT integration remains CI-only, not live customer staging. K5F operator execution/offsite restore OPEN; SQL 010–014 VPS, Public Auth and private Business flags OFF/not authorized; ADR-031/032 PROPOSED. [S3 runbook](../04-execution/SALON-S3-PILOT-ACTIVATION-PREFLIGHT-2026-11-13.md).
 
 

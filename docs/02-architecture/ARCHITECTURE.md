@@ -1,5 +1,8 @@
 # Architecture baseline
 
+> **2026-11-13 S3 PRIVATE PILOT RELEASE-BOUNDARY MERGED:** PR #78 produced a pure local CI/read-only assessment for reported K5F/restore/ACL/SQL evidence, merged as `4b010ad30387c41b6c3a915f6e7845330020651b`. Operator evidence is not an attestation and no result permits production/staging SQL, Auth/Module activation, invitations or Sale POSTED. Existing modular architecture/SQL API unchanged; K5F, real independent offhost recovery and ADR-031/032 explicitly OPEN. [S3](../04-execution/SALON-S3-PILOT-ACTIVATION-PREFLIGHT-2026-11-13.md).
+
+
 > **2026-11-13 SALON S3 OPERATIONAL GATE BOUNDARY:** The upcoming private Salon pilot is gated by **independent real VPS K5F root-bundle security review, off-host encrypted backup/isolated restore, trusted proxy/Origin validation and explicit scoped entitlements**. A new isolated local-only `tools/salon-pilot/preflight.cjs` can analyze strictly bounded redacted operator-reported history/SHA/control evidence, but is never itself an attestation or an activation/migration engine. Output always forbids VPS SQL, K5, Module flags, user invites and Sale POSTED. Public synthetic `/demo/salon`, private K5 API contracts, SQL migration files and Cashier remain unchanged. ADR-030 accepted baseline; ADR-031/032 and K5F remain OPEN. [S3 operator runbook](../04-execution/SALON-S3-PILOT-ACTIVATION-PREFLIGHT-2026-11-13.md).
 
 

@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-13 — S4 fast Salon parallel product slices merged
+
+- **PR #80:** SQL 015 scoped BookingStatusChange + terminal CANCELLED/COMPLETED, strict Origin/session/RBAC/idempotency, private UI cancel/complete, disposable SQL2022 Nest HTTP 24 case PASS; source manifest updated 001–015, K5F observed 001–009 fixed.
+- **PR #81:** private POS DRAFT quick Catalog add and safe immutable saved-Draft-as-NEW-cart, current authorized active refs and fresh SQL pricing on save; no invoice/GL/payment.
+- **PR #82:** private K5/Branch-scope gated Salon overview shows limited booking/customer/service/draft counts via existing owner APIs; public demo unchanged; security 404 CI, Web tests and module CI passed.
+- Product/source only; no staged SQL 010–015, Public Auth or paid Business activation. K5F/off-host recovery and ADR-031/032 pending. [Integrated S4 checkpoint](SALON-S4-PARALLEL-DELIVERY-2026-11-13.md).
+
+
 ## 2026-11-13 — Salon S3 operator-readiness source gate merged
 
 - [PR #78](https://github.com/tarek-saad-dev/drvo-erp/pull/78) **MERGED**, commit `4b010ad30387c41b6c3a915f6e7845330020651b`; K0, K1 and Staging Artifact CI on merge commit PASS. Redacted local report can only identify missing/untrusted operator evidence, not perform a live migration/activation.

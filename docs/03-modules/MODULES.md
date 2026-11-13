@@ -1,5 +1,8 @@
 # Modules catalog
 
+> **2026-11-13 ACTUAL CODE STATUS OVERRIDE (older table below is historical):** Existing Shared Catalog and Customers create/list, Booking create/list + CANCELLED/COMPLETED statuses (SQL source 013+015), POS DRAFT create/list (SQL source 014) and K5 private Web all MERGED to main with disposable SQL2022/Nest HTTP success; Salon private overview is a composition of existing owners, not a new standalone Salon Domain. **All SQL 010–015 are still not applied to VPS / Business flags remain OFF**, no real POS POSTED/Treasury/Accounting, full SaaS activation or Clinic Clinical Records module. See [S4 status](../04-execution/SALON-S4-PARALLEL-DELIVERY-2026-11-13.md).
+
+
 > **NORTH STAR ADR-029:** Modules are reusable platform capabilities supporting ANY investigated industry and businesses from tiny to huge. The valid minimum Business setup must not be artificially bloated; independent Domain Modules are justified by genuine aggregates/lifecycles. **Adding Modules does not automatically scale SQL/operations** — every major module design must pass [Architecture Fitness Gates](../02-architecture/UNIVERSAL-ERP-SCALE-AND-INDUSTRY-FITNESS-GATES.md). [Founder Charter](../00-start-here/PROJECT-NORTH-STAR-ARCHITECTURE-CHARTER.md).
 
 

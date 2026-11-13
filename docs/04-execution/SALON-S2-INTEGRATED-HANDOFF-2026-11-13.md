@@ -1,5 +1,8 @@
 # Salon S2 — Integrated private-pilot handoff (2026-11-13)
 
+> **HISTORICAL CHECKPOINT:** This document records the verified S2 001–014 source state as of its creation. On 2026-11-13 S4 PR #80 added *new immutable forward-only migration 015* for Booking lifecycle; do not read older source count as the latest target or VPS applied state. [S4](SALON-S4-PARALLEL-DELIVERY-2026-11-13.md). K5F still expects actual 001–009 before authorized migrations.
+
+
 **Verified GitHub state:** PRs [#74](https://github.com/tarek-saad-dev/drvo-erp/pull/74), [#75](https://github.com/tarek-saad-dev/drvo-erp/pull/75), and [#76](https://github.com/tarek-saad-dev/drvo-erp/pull/76) merged to main. PR #74's real Nest + disposable SQL Server 2022 **19-case Shared Booking CI** PASS; K0/K1 PASS. PR #75's Next build, protected route/Booking/Customers/Catalog/POS Draft SQL CI and K0/K1 PASS. PR #76's pinned Cashier source characterization K0/K1 PASS. **No evidence of real customer-ready staging database activation.**
 
 ## Architectural impact and ownership

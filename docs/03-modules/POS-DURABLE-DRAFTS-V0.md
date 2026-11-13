@@ -1,5 +1,8 @@
 # Shared POS Core — persisted DRAFT-only V0
 
+> **2026-11-13 S4 PRIVATE POS UX FAST PATH MERGED:** PR #81 adds quick active Catalog Offering selection and explicitly preparing a **NEW** cart from an immutable saved DRAFT, requiring currently active authorized Offering references, new UUID and fresh SQL re-price at new DRAFT creation. Existing saved drafts never edited. No sale POSTED, payment, tax, GL or public activation. K5C/Next build and existing POS SQL CI passed. [S4](../04-execution/SALON-S4-PARALLEL-DELIVERY-2026-11-13.md).
+
+
 > **2026-11-13 S2 CROSS-MODULE PROOF:** PR #74 exercised existing POS DRAFT SQL 014 after a real Customers→Catalog→Booking API journey with the same authenticated Branch scope. POST DRAFT persists/replays through real Nest SQL HTTP, exact Catalog list-price snapshots and separate `pos.draft.read/manage` revocation checks; still DRAFT only, no posted sale, invoice, tax, payment or GL. Public Salon Demo remains fake. SQL 010–014 not VPS-authorized, K5F/ADR-031/032 OPEN. [Handoff](../04-execution/SALON-S2-INTEGRATED-HANDOFF-2026-11-13.md).
 
 

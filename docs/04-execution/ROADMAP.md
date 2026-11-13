@@ -1,5 +1,8 @@
 # Roadmap
 
+> **2026-11-13 FAST LAUNCH S4 — THREE IMPLEMENTED, MERGED PRS:** [S4 handoff](SALON-S4-PARALLEL-DELIVERY-2026-11-13.md): #80 terminal Booking cancellation/completion with idempotent scoped SQL 015; #81 quicker POS DRAFT cart and saved-Draft-as-NEW-cart (no posting); #82 private Salon Overview with scoped Customer/Catalog/Booking/POS read. Booking real disposable SQL + Nest HTTP **24 cases PASS** and other CI green on PR heads. Source forward-only migrations now **001–015**; VPS history still K5F-observed 001–009, **NO SQL 010–015 VPS approval**. Operator must close K5F/offhost restore and authorize dedicated SQL window; ADR-031/032 unapproved. Product remains an isolated pilot candidate, not live customer-ready Salon/Cashier replacement.
+
+
 > **2026-11-13 S3 READ-ONLY PILOT PREFLIGHT MERGED/VERIFIED:** [PR #78](https://github.com/tarek-saad-dev/drvo-erp/pull/78) delivered a strict redacted, source-only Go/No-Go operator-evidence CLI + tests; exact post-merge SHA `4b010ad30387c41b6c3a915f6e7845330020651b` K0/K1/Staging Artifact CI PASS. **Next external owner/operator action:** read-only trusted root K5F verification on immutable bundle + genuinely independent encrypted offsite backup/restore, Origin/proxy and isolation proof. Only after explicit security/operator approval can a separately manual SQL migration window 010–014 and private Business test grants be considered. No live Salon Pilot yet; ADR-031/032 pending. [Runbook](SALON-S3-PILOT-ACTIVATION-PREFLIGHT-2026-11-13.md).
 
 

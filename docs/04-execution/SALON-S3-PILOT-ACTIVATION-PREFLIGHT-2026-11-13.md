@@ -1,5 +1,8 @@
 # Salon S3 — Private Pilot operator preflight / explicit Go–No-Go (2026-11-13)
 
+> **2026-11-13 S6 SOURCE UPDATE:** Forward-only source migration count is **17 (001–017)**, newest Booking SQL017 window closure. The legitimate K5F pre-migration observed DB prefix remains **001–009**, not all 17; SQL 010–017 is still **not authorized on VPS**. Redacted evidence CLI stays nonauthorizing. [S6](SALON-S6-INTEGRATED-DELIVERY-2026-11-13.md).
+
+
 > **2026-11-13 S5 UPDATE:** Source migrations now **001–016** (new Booking dated availability SQL016). K5F pre-migration observed-history checker remains fixed to legitimate 001–009; never confuse source manifest size with actual VPS schema. SQL **010–016 is NOT approved on VPS**. The evidence CLI remains read-only/non-authorizing. [S5 handoff](SALON-S5-THREE-TRACK-DELIVERY-2026-11-13.md).
 
 

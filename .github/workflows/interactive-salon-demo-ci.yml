@@ -6,6 +6,8 @@ on:
       - 'apps/web/src/app/page.tsx'
       - 'apps/web/src/app/globals.css'
       - 'apps/web/test/salon-demo.test.cjs'
+      - 'apps/web/src/app/workspace/**'
+      - 'apps/web/test/private-salon-overview.test.cjs'
       - '.github/workflows/interactive-salon-demo-ci.yml'
   push:
     branches: [main]
@@ -14,6 +16,8 @@ on:
       - 'apps/web/src/app/page.tsx'
       - 'apps/web/src/app/globals.css'
       - 'apps/web/test/salon-demo.test.cjs'
+      - 'apps/web/src/app/workspace/**'
+      - 'apps/web/test/private-salon-overview.test.cjs'
       - '.github/workflows/interactive-salon-demo-ci.yml'
 permissions:
   contents: read
@@ -31,6 +35,7 @@ jobs:
           set -euo pipefail
           npm ci --prefix apps/web --no-audit --no-fund
           node --test apps/web/test/salon-demo.test.cjs
+          node --test apps/web/test/private-salon-overview.test.cjs
           env -u DRVO_K5_WEB_ENABLED npm run build --prefix apps/web
           npm run typecheck --prefix apps/web
       - name: Public route renders; private auth and real workspace remain CLOSED
@@ -52,7 +57,8 @@ jobs:
           grep -Fq 'إدارة النشاط' "$RUNNER_TEMP/demo.html"
           curl -fsS http://127.0.0.1:3100/ > "$RUNNER_TEMP/home.html"
           grep -Fq '/demo/salon' "$RUNNER_TEMP/home.html"
-          for route in /sign-in /verify-email /workspaces; do
+          for route in /sign-in /verify-email /workspaces \
+            /workspace/11111111-1111-1111-1111-111111111111/22222222-2222-2222-2222-222222222222/salon; do
             status="$(curl -sS -o /dev/null -w '%{http_code}' "http://127.0.0.1:3100$route")"
             test "$status" = 404 || { echo "FAIL: private route $route leaked HTTP $status"; exit 1; }
           done

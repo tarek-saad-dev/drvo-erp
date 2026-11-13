@@ -1,5 +1,8 @@
 # Shared Booking Core — first appointment vertical slice
 
+> **2026-11-13 S6 SAFE WINDOW CLOSURE IMPLEMENTED IN SOURCE:** PR #88 adds forward-only SQL017 window OPEN/CLOSED status, immutable per-Tenant/Business/Branch Actor+request audit, K5 `POST /booking/windows/:windowId/close` and private UI. Refuses close if future/ongoing BOOKED appointment overlaps the window; CLOSED window still permanently opts the resource into constrained scheduling, so closing its last OPEN window NEVER restores unrestricted bookings. New OPEN windows may replace closed ones. Real disposable SQL+HTTP **32 checks** and restricted DB-only migrator CI PASS. Distinct from edit/reschedule, recurring weeks, HR shifts, DST policy and Salon-specific industry extensions. VPS SQL 010–017 NOT authorized/applied; K5F/ADR-031/032 OPEN. [S6](../04-execution/SALON-S6-INTEGRATED-DELIVERY-2026-11-13.md).
+
+
 > **2026-11-13 S5 BOOKING DATED WORK WINDOWS MERGED:** PR #84 implements source SQL016 `core.BookingResourceWindow`, authenticated Branch/K5 `GET/POST /booking/windows`, private Arabic window publishing UI and insert trigger enforcing only published opt-in UTC intervals. Initially unconfigured resources keep legacy availability. Publishing first window cannot strand existing future BOOKED appointments. **Dated UTC periods only; NOT recurring shifts, DST-safe staff local hours, HR, clinical availability, multiple chair+stylist simultaneous allocation or scheduling optimization.** 28 SQL2022 real HTTP tests plus restricted DB-only migration CI PASS. SQL 010–016 VPS unauthorised, ADR-031/032/K5F OPEN. [S5](../04-execution/SALON-S5-THREE-TRACK-DELIVERY-2026-11-13.md).
 
 

@@ -15,8 +15,8 @@ const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f
 function money(minor:number,currency:string):string {
   return (minor/100).toFixed(2)+" "+currency;
 }
-export default function PosPreviewClient({businessId,branchId,draftsEnabled}:{
-  businessId:string;branchId:string;draftsEnabled:boolean;
+export default function PosPreviewClient({businessId,branchId,draftsEnabled,initialOfferingId}:{
+  businessId:string;branchId:string;draftsEnabled:boolean;initialOfferingId:string|null;
 }) {
   const router=useRouter();
   const [status,setStatus]=useState<"loading"|"ready"|"denied"|"error">("loading");
@@ -31,6 +31,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled}:{
   const [savedDrafts,setSavedDrafts]=useState<SavedDraft[]>([]);
   const [draftBusy,setDraftBusy]=useState(false);
   const retryKey=useRef<string|null>(null);
+  const handoffApplied=useRef(false);
   const home="/workspace/"+encodeURIComponent(businessId)+"/"+encodeURIComponent(branchId);
   const api="/api/workspaces/"+encodeURIComponent(businessId)+"/branches/"+
     encodeURIComponent(branchId)+"/pos-preview";
@@ -48,9 +49,25 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled}:{
       if(data.state!=="DRAFT_PREVIEW_ONLY"||data.persisted!==false||!Array.isArray(data.offerings)){
         setStatus("error");return;
       }
-      setOfferings(data.offerings);setStatus("ready");
+      setOfferings(data.offerings);
+      // The query is NEVER an authority, price, sale or booked-status proof.
+      // Only the independently permitted POS/Catalog response can validate it.
+      if(!handoffApplied.current&&initialOfferingId!==null){
+        handoffApplied.current=true;
+        const offering=data.offerings.find(o=>
+          o.offeringId===initialOfferingId&&GUID.test(o.offeringId)&&
+          o.isActive&&o.kind==="SERVICE");
+        if(offering){
+          setLines(current=>current.length===0?
+            [{offeringId:offering.offeringId,quantity:1}]:current);
+          setMessage("اتجهزت سلة مسودة جديدة من خدمة الحجز. راجع الأسعار، ولا يوجد بيع أو تحصيل.");
+        }else{
+          setMessage("الخدمة مش متاحة في الكتالوج الحالي. اختار خدمة من القائمة.");
+        }
+      }
+      setStatus("ready");
     } catch {setStatus("error");}
-  },[api,businessId,branchId,router]);
+  },[api,businessId,branchId,router,initialOfferingId]);
   useEffect(()=>{void load();},[load]);
 
   const loadDrafts=useCallback(async()=>{

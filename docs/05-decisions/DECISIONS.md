@@ -49,7 +49,7 @@ Accepted directions are **not implemented features**.
 
 | ADR-031 | First POS sale + mandatory Accounting journal atomic A vs durable pending B; separated tender/stock/commission truth | **PROPOSED — founder/finance/architecture choice pending** | [ADR-031](ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md) |
 
-| ADR-032 | Business-scoped immutable module activation plan and quote, idempotent entitlement and safe version/dependency lifecycle | **PROPOSED — founder/billing/security approval pending** | [ADR-032](ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md) |
+| ADR-032 | Business-scoped immutable module activation plan and quote, idempotent entitlement and safe version/dependency lifecycle | **FOUNDER-ACCEPTED V1 BASELINE ACT-01–07 (2026-11-14); finance/security/detail/real activation OPEN** | [ADR-032](ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md) |
 
 | ADR-033 | Business identity independent of industry; compatible multi-industry capabilities inside one Business while separate legal/financial entities retain Business boundaries | **ACCEPTED — founder** | [ADR-033](ADR-033-BUSINESS-IDENTITY-INDEPENDENT-OF-INDUSTRY.md) |
 

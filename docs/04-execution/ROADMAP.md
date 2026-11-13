@@ -1,5 +1,8 @@
 # Roadmap
 
+> **2026-11-13 SALON S3 ACTIVATION GO/NO-GO SOURCE GATE (REVIEW PR):** [Redacted local operator-evidence preflight](SALON-S3-PILOT-ACTIVATION-PREFLIGHT-2026-11-13.md) deterministically rejects missing release SHA/history, unreviewed K5F root checker, off-host restore, Origin/proxy and Tenant negative tests, explicit SQL approval and ADR-032 entitlement. Report is deliberately **read-only and non-authorizing** even when all inputs are marked OPERATOR_REPORTED. Next real task is an authorized administrator's root K5F preflight plus independent encrypted off-host restore, *then* a separately explicitly approved SQL 010–014 Staging window, then a privately authorized Salon browser pilot. Finance ADR-031 before any POS POSTED. No VPS change in this work.
+
+
 > **2026-11-13 SALON S2 FIRST REAL PRIVATE VERTICAL SLICE E2E CI MERGED:** [S2 handoff](SALON-S2-INTEGRATED-HANDOFF-2026-11-13.md) records PRs #74/75/76: synthetic Customer + Catalog Service via independently authenticated APIs → booked Branch Resource persisted/read again from SQL → idempotent saved POS DRAFT price snapshot; 19 Booking SQL+HTTP checks including cross-Tenant, forged Origin and independent permission revocation. Web private flow now navigates owning Modules and refreshes SQL; Cashier lock review pins exact source but keeps DRVO scoped row locks. **Next operator gating work:** real off-host restore, root-only K5F checks, separate authorization for SQL 010–014 staging, ADR-032 private entitlement/flags. Finance/Founder/Architecture ADR-031 required for any actual SALE POSTED. Public mock Demo remains separate.
 
 

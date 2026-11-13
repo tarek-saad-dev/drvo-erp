@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-13 — Salon S5 three balanced working slices merged
+
+- **PR #84**: new immutable forward-only SQL 016 BookingResourceWindow date/hour availability, strict scoped K5 GET/POST and private Arabic UI. Booking INSERT trigger rejects uncovered future reservation after explicit resource opt-in; protects legacy future bookings and runtime SQL least privilege. 28 disposable real SQL2022/Nest HTTP tests PASS; restricted Staging DB automation CI PASS after removing dbo impersonation. NO VPS SQL.
+- **PR #85**: authorized Catalog SERVICE offering query handoff prefills an **unsaved** new POS DRAFT cart only; no financial posting or client-supplied price.
+- **PR #86**: daily/upcoming/all private Salon appointment roster, device-local day filtering, limited counts, and independently authorized completed-booking POS DRAFT link.
+- Source migration set **001–016**; actual VPS 010–016 still held. K5F operational sign-off/off-host isolated recovery, ADR-031 financial and ADR-032 activation decisions not complete. [S5 evidence](SALON-S5-THREE-TRACK-DELIVERY-2026-11-13.md).
+
+
 ## 2026-11-13 — S4 fast Salon parallel product slices merged
 
 - **PR #80:** SQL 015 scoped BookingStatusChange + terminal CANCELLED/COMPLETED, strict Origin/session/RBAC/idempotency, private UI cancel/complete, disposable SQL2022 Nest HTTP 24 case PASS; source manifest updated 001–015, K5F observed 001–009 fixed.

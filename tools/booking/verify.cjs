@@ -598,6 +598,89 @@ async function main(){
    await assert.rejects(()=>app.query("SELECT TOP(1) * FROM core.BookingResourceWindow"),
     e=>e.number===229);
   });
+
+  await pass('Close window: future BOOKED appointment prevents removal of hours',async()=>{
+   const endpoint=path(g.business,g.branch);
+   const windows=(await (await get(endpoint+'/windows',cookie)).json()).windows;
+   const target=windows.find(x=>x.resourceId===hoursResource);
+   assert.ok(target);assert.equal(target.state,'OPEN');
+   const closeUrl=endpoint+'/windows/'+target.windowId+'/close';
+   assert.equal((await post(closeUrl,cookie,guid(),{})).status,409);
+   const unchanged=(await (await get(endpoint+'/windows',cookie)).json()).windows;
+   assert.equal(unchanged.find(x=>x.windowId===target.windowId)?.state,'OPEN');
+   const confirmed=(await (await get(endpoint,cookie)).json()).appointments.find(x=>
+    x.resourceId===hoursResource&&x.startsAtUtc===shift(hoursStart,15)&&x.status==='BOOKED');
+   assert.ok(confirmed,'real booking must exist before closure rejection');
+   assert.equal((await post(changePath(g.business,g.branch,confirmed.bookingId),
+    cookie,guid(),{status:'CANCELLED'})).status,200);
+  });
+  let closedWindowId,closeRequestId;
+  await pass('Close window: idempotent audit, CLOSED in reads, no unrestricted fallback',async()=>{
+   const endpoint=path(g.business,g.branch);
+   const windows=(await (await get(endpoint+'/windows',cookie)).json()).windows;
+   const target=windows.find(x=>x.resourceId===hoursResource&&x.state==='OPEN');
+   assert.ok(target);closedWindowId=target.windowId;
+   closeRequestId=guid();
+   const u=endpoint+'/windows/'+closedWindowId+'/close';
+   const first=await post(u,cookie,closeRequestId,{});
+   assert.equal(first.status,200);assert.deepEqual(await first.json(),{
+    id:closedWindowId,state:'CLOSED',changed:true,
+   });
+   const replay=await post(u,cookie,closeRequestId,{});
+   assert.equal(replay.status,200);assert.deepEqual(await replay.json(),{
+    id:closedWindowId,state:'CLOSED',changed:false,
+   });
+   assert.equal((await post(u,cookie,guid(),{})).status,409);
+   const closed=(await (await get(endpoint+'/windows',cookie)).json()).windows;
+   assert.equal(closed.find(x=>x.windowId===closedWindowId)?.state,'CLOSED');
+   const out=await post(endpoint+'/appointments',cookie,guid(),{
+    resourceId:hoursResource,customerId:g.customer,offeringId:g.service,
+    startsAtUtc:shift(hoursStart,15),
+   });
+   assert.equal(out.status,409,'closing LAST window must not unrestrict a resource');
+   const count=(await admin.request()
+    .input('t',sql.UniqueIdentifier,g.t).input('b',sql.UniqueIdentifier,g.business)
+    .input('br',sql.UniqueIdentifier,g.branch).input('id',sql.UniqueIdentifier,closedWindowId)
+    .query('SELECT COUNT(*) AS n FROM core.BookingWindowCloseAudit WHERE'+
+     ' TenantId=@t AND BusinessId=@b AND BranchId=@br AND WindowId=@id')
+   ).recordset[0].n;
+   assert.equal(count,1);
+  });
+  await pass('Close window: old CLOSED period can be replaced only by a fresh OPEN one',async()=>{
+   const endpoint=path(g.business,g.branch);
+   const replacement=await post(endpoint+'/windows',cookie,guid(),windowPayload(
+    hoursResource,hoursStart,shift(hoursStart,60)));
+   assert.equal(replacement.status,200);
+   const replacementId=(await replacement.json()).id;
+   assert.notEqual(replacementId,closedWindowId);
+   const newAppointment=await post(endpoint+'/appointments',cookie,guid(),{
+    resourceId:hoursResource,customerId:g.customer,offeringId:g.service,
+    startsAtUtc:shift(hoursStart,15),
+   });
+   assert.equal(newAppointment.status,200,'open window restores precisely scoped dates');
+   const reused=await post(endpoint+'/windows/'+replacementId+'/close',cookie,
+    closeRequestId,{});
+   assert.equal(reused.status,409,'one idempotency UUID cannot close two windows');
+   assert.equal((await post(endpoint+'/windows/'+replacementId+'/close',cookie,guid(),
+    {})).status,409,'new booking protects replacement window');
+  });
+  await pass('Close window: foreign Branch/Origin/payload fail, runtime denied direct writes',async()=>{
+   const endpoint=path(g.business,g.branch);
+   const pathClose=endpoint+'/windows/'+closedWindowId+'/close';
+   assert.equal((await post(pathClose,cookie,guid(),{tenantId:g.t})).status,400);
+   assert.equal((await post(pathClose,cookie,guid(),{},{
+    Origin:'https://attacker.invalid',
+   })).status,401);
+   assert.equal((await post(path(g.foreignBusiness,g.foreignBranch)+
+    '/windows/'+closedWindowId+'/close',cookie,guid(),{})).status,404);
+   assert.equal((await post(endpoint+'/windows/'+guid()+'/close',cookie,guid(),
+    {})).status,404);
+   const perms=await app.query("SELECT "+
+    "HAS_PERMS_BY_NAME('core.BookingWindowCloseAudit','OBJECT','INSERT') AS i,"+
+    "HAS_PERMS_BY_NAME('core.BookingResourceWindow','OBJECT','UPDATE') AS u,"+
+    "HAS_PERMS_BY_NAME('core.CloseBookingResourceWindow','OBJECT','EXECUTE') AS e");
+   assert.deepEqual(Object.values(perms.recordset[0]).map(Number),[0,0,1]);
+  });
   await pass('Revoked booking read/write role and Business membership deny next request',async()=>{
    await q(admin,"DELETE core.RolePermission WHERE TenantId=@t"+
     " AND BusinessId=@b AND RoleId=@r AND ActionCode='booking.read'",

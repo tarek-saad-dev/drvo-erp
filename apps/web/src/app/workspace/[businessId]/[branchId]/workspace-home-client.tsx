@@ -122,6 +122,10 @@ export default function WorkspaceHomeClient({businessId, branchId}: {
           العملاء
         </Link>}
         {canViewBooking && <Link href={"/workspace/" + encodeURIComponent(businessId) +
+          "/" + encodeURIComponent(branchId) + "/salon"} className="k5-verify-link">
+          لوحة تشغيل الصالون (بيانات الفرع)
+        </Link>}
+        {canViewBooking && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/booking"} className="k5-verify-link">
           المواعيد والحجوزات
         </Link>}

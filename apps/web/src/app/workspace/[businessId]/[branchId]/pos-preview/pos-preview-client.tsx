@@ -10,7 +10,7 @@ type Preview = {state:"DRAFT_PREVIEW_ONLY";persisted:false;accountingState:"NOT_
   paymentState:"NOT_COLLECTED";currency:string;taxComputed:false;
   lines:Array<{offeringId:string;displayName:string;quantity:number;unitPriceMinor:number;lineSubtotalMinor:number}>;
   listPriceSubtotalMinor:number};
-type SavedDraft={draftId:string;status:"DRAFT";version:number;currency:string;subtotalMinor:number;createdAtUtc:string;lines:Array<{displayName:string;quantity:number}>};
+type SavedDraft={draftId:string;status:"DRAFT";version:number;currency:string;subtotalMinor:number;createdAtUtc:string;lines:Array<{offeringId:string;displayName:string;quantity:number}>};
 const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function money(minor:number,currency:string):string {
   return (minor/100).toFixed(2)+" "+currency;
@@ -86,6 +86,26 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled}:{
     }catch{setMessage("اتصال غير متاح. أعد المحاولة بنفس البيانات للتأكد من عدم التكرار.");}
     finally{setDraftBusy(false);}
   }
+  function quickAdd(offering:Offering){
+    if(busy||draftBusy||!offering.isActive||lines.length>=20||
+       lines.some(x=>x.offeringId===offering.offeringId))return;
+    retryKey.current=null;setPreview(null);setMessage("");
+    setLines(current=>[...current,{offeringId:offering.offeringId,quantity:1}]);
+  }
+  function createNewFromDraft(d:SavedDraft){
+    if(busy||draftBusy)return;
+    // A saved DRAFT is IMMUTABLE. Preparing a new cart always uses currently
+    // authorized active Catalog references and requires fresh server pricing.
+    if(!d.lines.length||d.lines.length>20||
+      d.lines.some(x=>!GUID.test(x.offeringId)||x.quantity<1||x.quantity>20||
+        !offerings.some(o=>o.offeringId===x.offeringId&&o.isActive))||
+      new Set(d.lines.map(x=>x.offeringId)).size!==d.lines.length){
+      setMessage("فيه عناصر قديمة أو غير متاحة. لازم تعمل مسودة جديدة من الكتالوج.");return;
+    }
+    retryKey.current=null;setPreview(null);
+    setLines(d.lines.map(x=>({offeringId:x.offeringId,quantity:x.quantity})));
+    setMessage("تم تجهيز سلة جديدة من المسودة القديمة. راجع الأسعار الحالية قبل الحفظ؛ المسودة الأصلية لم تتغير.");
+  }
   function addLine(event:React.FormEvent<HTMLFormElement>) {
     event.preventDefault(); setPreview(null);setMessage("");
     if(!GUID.test(offeringId)||!Number.isSafeInteger(quantity)||quantity<1||quantity>20||
@@ -133,6 +153,15 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled}:{
     {status==="ready"&&<>
       <section className="k5-admin-card k5-invite-card">
         <h2>إضافة عنصر للمسودة</h2>
+        <p className="k5-muted">اختار عنصر من القائمة أو اضغط إضافة سريعة. كل الأسعار استرشادية، والسلة مش فاتورة.</p>
+        <div className="k5-salon-steps" aria-label="إضافة سريعة من الكتالوج">
+          {offerings.filter(o=>o.isActive&&
+            !lines.some(l=>l.offeringId===o.offeringId)).slice(0,8).map(o=><button
+            key={o.offeringId} type="button" className="k5-salon-refresh"
+            disabled={busy||draftBusy||lines.length>=20} onClick={()=>quickAdd(o)}>
+            + {o.displayName} — {money(o.priceMinor,o.currency)}
+          </button>)}
+        </div>
         <form className="catalog-form" onSubmit={addLine}>
           <label>الخدمة أو المنتج<select value={offeringId} required
             onChange={e=>setOfferingId(e.target.value)}>
@@ -175,11 +204,13 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled}:{
         <h2>مسودات محفوظة — مش فواتير</h2>
         {savedDrafts.length===0?<p className="k5-muted">مفيش مسودات محفوظة للفرع.</p>:
           <div className="k5-table-wrap"><table className="k5-table">
-            <thead><tr><th>تاريخ الحفظ</th><th>العناصر</th><th>إجمالي القائمة وقت الحفظ</th><th>الحالة</th></tr></thead>
+            <thead><tr><th>تاريخ الحفظ</th><th>العناصر</th><th>إجمالي القائمة وقت الحفظ</th><th>الحالة</th><th>استخدام كقالب</th></tr></thead>
             <tbody>{savedDrafts.map(d=><tr key={d.draftId}>
               <td>{new Date(d.createdAtUtc).toLocaleString("ar-EG")}</td>
               <td>{d.lines.map(l=>l.displayName+" × "+l.quantity).join("، ")}</td>
               <td dir="ltr">{money(d.subtotalMinor,d.currency)}</td><td>مسودة فقط</td>
+              <td><button className="k5-salon-refresh" type="button" disabled={busy||draftBusy}
+                onClick={()=>createNewFromDraft(d)}>جهّز سلة جديدة</button></td>
             </tr>)}</tbody>
           </table></div>}
       </section>}

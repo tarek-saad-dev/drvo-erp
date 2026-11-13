@@ -1,5 +1,7 @@
 # Modules catalog
 
+> **2026-11-13 S7 ACTUAL SOURCE OVERRIDE:** Shared Booking now provides private **non-authoritative candidate slots** from authorized OPEN dated windows + last-200 visible bookings, with server SQL retaining all conflict enforcement. Shared POS DRAFT adds local search and bounded quantity editing, without invoice/payment/tax/POSTED. #92/#93 merged and each passed 9/9 PR checks. No new Module, Industry domain schema, API/permission, SQL migration beyond 017, or Paid Entitlement activation. SQL 010–017 VPS held; ADR-031/032, K5F and genuine offhost restore remain OPEN. [S7](../04-execution/SALON-S7-INTEGRATED-DELIVERY-2026-11-13.md).
+
 > **2026-11-13 S6 CURRENT CODE OVERRIDE:** Shared Booking SQL source now 017 (scoped dated availability window closure audit and active coverage), after 013 create/014 POS/015 lifecycle/016 dated windows. Private Salon composition includes authorized resource/status/day filters and completed Booking→unsaved POS DRAFT link. None of 010–017 is approved to apply on VPS, and Public Auth/paid Business flags remain OFF; ADR-031 finance POSTED, ADR-032 activation, K5F root/offhost restore and Clinical Records unimplemented. [S6](../04-execution/SALON-S6-INTEGRATED-DELIVERY-2026-11-13.md).
 
 

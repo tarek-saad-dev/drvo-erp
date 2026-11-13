@@ -9,8 +9,8 @@ type AuthorizedWorkspace = { businessId: string; branchId: string; businessName:
 type Account = { username: string; mustChangePassword: boolean };
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export default function WorkspaceHomeClient({businessId, branchId}: {
-  businessId: string; branchId: string;
+export default function WorkspaceHomeClient({businessId, branchId,salonWebEnabled}: {
+  businessId: string; branchId: string;salonWebEnabled:boolean;
 }) {
   const router = useRouter();
   const [branch, setBranch] = useState<Branch | null>(null);
@@ -121,7 +121,7 @@ export default function WorkspaceHomeClient({businessId, branchId}: {
           "/" + encodeURIComponent(branchId) + "/customers"} className="k5-verify-link">
           العملاء
         </Link>}
-        {canViewBooking && <Link href={"/workspace/" + encodeURIComponent(businessId) +
+        {salonWebEnabled&&canViewBooking && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/salon"} className="k5-verify-link">
           لوحة تشغيل الصالون (بيانات الفرع)
         </Link>}

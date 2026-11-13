@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-13 — Salon S6 parallel release-safe code (PRs #88–#90 merged)
+
+- **#88:** Source-only SQL017 Booking window OPEN/CLOSED, per-Branch+Actor idempotent closure audit, K5 private closing API/UI and no-uncapped-hour fallback. Real disposable SQL2022+Nest HTTP 32 cases PASS; **restricted Staging DB Automation SQL migration+restore CI PASS**. No VPS migration.
+- **#89:** Completed Booking displays prefill of an **unsaved** POS DRAFT cart only after independently permitted POS Drafts and POS Preview reads; URL includes OfferingId only, pricing stays POS/Catalog-owned, zero invoice/payment/posting.
+- **#90:** Private Salon roster resource and lifecycle status filters, only already authorized last-200 Booking rows. No PII export, new SQL or HR shift contract.
+- Source forward-only migration set **001–017**; deployment + K5F/offhost restore/ADR-032 commercial/ADR-031 finance gates unchanged. [S6 handoff](SALON-S6-INTEGRATED-DELIVERY-2026-11-13.md).
+
+
 ## 2026-11-13 — Salon S5 three balanced working slices merged
 
 - **PR #84**: new immutable forward-only SQL 016 BookingResourceWindow date/hour availability, strict scoped K5 GET/POST and private Arabic UI. Booking INSERT trigger rejects uncovered future reservation after explicit resource opt-in; protects legacy future bookings and runtime SQL least privilege. 28 disposable real SQL2022/Nest HTTP tests PASS; restricted Staging DB automation CI PASS after removing dbo impersonation. NO VPS SQL.

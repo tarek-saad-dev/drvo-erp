@@ -8,7 +8,7 @@ type Resource={resourceId:string;displayName:string;kind:"PERSON"|"CHAIR"|"ROOM"
 type Appointment={
   bookingId:string;customerId:string;offeringId:string;resourceId:string;
   customerName:string;offeringName:string;resourceName:string;
-  startsAtUtc:string;endsAtUtc:string;status:"BOOKED";
+  startsAtUtc:string;endsAtUtc:string;status:"BOOKED"|"CANCELLED"|"COMPLETED";
 };
 type BookingRead={resources:Resource[];appointments:Appointment[]};
 type Customer={customerId:string;displayName:string;isActive:boolean};
@@ -35,6 +35,7 @@ export default function BookingClient({businessId,branchId,posWebEnabled}:{
   const [localStart,setLocalStart]=useState("");
   const resourceRequest=useRef<string|null>(null);
   const bookingRequest=useRef<string|null>(null);
+  const statusKeys=useRef<Map<string,string>>(new Map());
   const scope="/api/workspaces/"+encodeURIComponent(businessId)+"/branches/"+encodeURIComponent(branchId);
   const home="/workspace/"+encodeURIComponent(businessId)+"/"+encodeURIComponent(branchId);
 
@@ -128,6 +129,37 @@ export default function BookingClient({businessId,branchId,posWebEnabled}:{
     },bookingRequest);
     if(created)setLocalStart("");
   }
+  async function changeStatus(bookingId:string,next:"CANCELLED"|"COMPLETED"){
+    if(busy||!GUID.test(bookingId))return;
+    setBusy(true);setNotice("");
+    const retryId=bookingId+":"+next;
+    if(!statusKeys.current.has(retryId))statusKeys.current.set(retryId,crypto.randomUUID());
+    try{
+      const response=await fetch(scope+"/booking/appointments/"+encodeURIComponent(bookingId)+"/status",{
+        method:"POST",credentials:"same-origin",cache:"no-store",
+        headers:{"Content-Type":"application/json",
+          "Idempotency-Key":statusKeys.current.get(retryId)!},
+        body:JSON.stringify({status:next}),
+      });
+      if(response.status===401){router.replace("/sign-in");return;}
+      if(response.status===403||response.status===404){setStatus("denied");return;}
+      if(response.status===409){statusKeys.current.delete(retryId);
+        setNotice("الحجز اتغيّر بالفعل، أو لسه ما بدأش. راجع الحالة قبل المحاولة.");
+        await load();return;
+      }
+      if(response.status===400){statusKeys.current.delete(retryId);
+        setNotice("الحالة المطلوبة غير صالحة.");return;}
+      if(!response.ok){setNotice("تعذر تحديث الحجز. أعد المحاولة بنفس الطلب.");return;}
+      const result=await response.json() as {id:string;status:string};
+      if(result.id.toLowerCase()!==bookingId.toLowerCase()||result.status!==next){
+        setNotice("استجابة تحديث غير صحيحة.");return;
+      }
+      statusKeys.current.delete(retryId);
+      setNotice(next==="CANCELLED"?"تم إلغاء الحجز وتحرير الموعد.":"تم إتمام الموعد. لا يوجد بيع أو تحصيل تلقائي.");
+      await load();
+    }catch{setNotice("تعذر الاتصال. أعد المحاولة بنفس الطلب لتفادي التكرار.");}
+    finally{setBusy(false);}
+  }
   return <main className="k5-workspace">
     <header className="k5-workspace-header">
       <div className="k5-brand"><span className="brandmark">D</span> DRVO <b>ERP</b></div>
@@ -207,13 +239,24 @@ export default function BookingClient({businessId,branchId,posWebEnabled}:{
               onClick={()=>{void load();}}>تحديث من SQL ↻</button>
           </div></div>
         <div className="k5-table-wrap"><table className="k5-table">
-          <thead><tr><th>العميل</th><th>الخدمة</th><th>المورد</th><th>البداية</th><th>النهاية</th></tr></thead>
+          <thead><tr><th>العميل</th><th>الخدمة</th><th>المورد</th><th>البداية</th><th>النهاية</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
           <tbody>{data.appointments.length===0?
-            <tr><td colSpan={5} className="k5-empty">لا توجد حجوزات مسجلة.</td></tr>:
+            <tr><td colSpan={7} className="k5-empty">لا توجد حجوزات مسجلة.</td></tr>:
             data.appointments.map(b=><tr key={b.bookingId}>
               <td>{b.customerName}</td><td>{b.offeringName}</td><td>{b.resourceName}</td>
               <td dir="ltr">{new Date(b.startsAtUtc).toLocaleString("ar-EG")}</td>
               <td dir="ltr">{new Date(b.endsAtUtc).toLocaleString("ar-EG")}</td>
+              <td>{b.status==="BOOKED"?"محجوز":b.status==="CANCELLED"?"ملغي":"مكتمل"}</td>
+              <td>{b.status==="BOOKED"?<div className="k5-booking-actions">
+                <button type="button" disabled={busy} onClick={()=>void changeStatus(b.bookingId,"CANCELLED")}>
+                  إلغاء الحجز
+                </button>
+                <button type="button" disabled={busy||Date.parse(b.startsAtUtc)>Date.now()}
+                  title="الإتمام متاح بعد بداية الموعد فقط"
+                  onClick={()=>void changeStatus(b.bookingId,"COMPLETED")}>
+                  إتمام الموعد
+                </button>
+              </div>:<span>—</span>}</td>
             </tr>)}</tbody>
         </table></div>
       </section>

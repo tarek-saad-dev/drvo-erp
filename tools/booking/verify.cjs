@@ -138,9 +138,9 @@ async function main(){
    "',CHECK_POLICY=ON,CHECK_EXPIRATION=OFF");
   admin=await open({...base,database:db});
   await admin.query("CREATE USER ["+user+"] FOR LOGIN ["+user+"];GRANT CONNECT TO ["+user+"]");
-  await pass('14 forward-only migrations apply and replay, no synthetic appointment or draft seed',async()=>{
-   const applied=await applyMigrations(admin,undefined,14);
-   assert.equal(applied.length,14);
+  await pass('15 forward-only migrations apply and replay, no synthetic appointment or draft seed',async()=>{
+   const applied=await applyMigrations(admin,undefined,15);
+   assert.equal(applied.length,15);
    assert.ok(applied.every(x=>x.status==='applied'));
    const replay=await applyMigrations(admin,undefined,14);
    assert.ok(replay.every(x=>x.status==='unchanged'));
@@ -434,6 +434,92 @@ async function main(){
     {Origin:'https://attacker.invalid'})).status,401);
    assert.equal((await post(p,cookie,guid(),
     {displayName:'Bad',kind:'CHAIR',tenantId:g.foreignTenant})).status,400);
+  });
+  const changePath=(b,br,id)=>path(b,br)+'/appointments/'+id+'/status';
+  await pass('Lifecycle: terminal cancel is persisted; slot is released for a new booking',async()=>{
+   const at=future(720),req={customerId:g.customer,offeringId:g.service,
+    resourceId,startsAtUtc:at};
+   const postPath=path(g.business,g.branch)+'/appointments';
+   const create=await post(postPath,cookie,guid(),req);
+   assert.equal(create.status,200);
+   const bookingId=(await create.json()).id;
+   const k=guid();
+   const cancel=await post(changePath(g.business,g.branch,bookingId),cookie,k,{status:'CANCELLED'});
+   assert.equal(cancel.status,200);assert.deepEqual(await cancel.json(),{
+    id:bookingId,status:'CANCELLED',changed:true,
+   });
+   const again=await post(changePath(g.business,g.branch,bookingId),cookie,k,{status:'CANCELLED'});
+   assert.equal(again.status,200);assert.deepEqual(await again.json(),{
+    id:bookingId,status:'CANCELLED',changed:false,
+   });
+   const listed=(await (await get(path(g.business,g.branch),cookie)).json()).appointments;
+   assert.equal(listed.find(b=>b.bookingId===bookingId)?.status,'CANCELLED');
+   const replacement=await post(postPath,cookie,guid(),req);
+   assert.equal(replacement.status,200);
+   assert.notEqual((await replacement.json()).id,bookingId);
+   assert.equal((await post(changePath(g.business,g.branch,bookingId),cookie,guid(),
+    {status:'COMPLETED'})).status,409);
+  });
+  await pass('Lifecycle: completion requires booking already started, preserves history',async()=>{
+   const at=future(780),req={customerId:g.customer,offeringId:g.service,
+    resourceId:secondResource,startsAtUtc:at};
+   const create=await post(path(g.business,g.branch)+'/appointments',cookie,guid(),req);
+   assert.equal(create.status,200);
+   const bookingId=(await create.json()).id;
+   const urlChange=changePath(g.business,g.branch,bookingId);
+   assert.equal((await post(urlChange,cookie,guid(),{status:'COMPLETED'})).status,409);
+   await admin.request().input('t',sql.UniqueIdentifier,g.t)
+    .input('b',sql.UniqueIdentifier,g.business)
+    .input('br',sql.UniqueIdentifier,g.branch)
+    .input('id',sql.UniqueIdentifier,bookingId)
+    .query("UPDATE core.BookingAppointment SET StartsAtUtc=DATEADD(MINUTE,-40,SYSUTCDATETIME()),"+
+      " EndsAtUtc=DATEADD(MINUTE,-10,SYSUTCDATETIME())"+
+      " WHERE TenantId=@t AND BusinessId=@b AND BranchId=@br AND BookingId=@id");
+   const complete=await post(urlChange,cookie,guid(),{status:'COMPLETED'});
+   assert.equal(complete.status,200);
+   assert.equal((await complete.json()).status,'COMPLETED');
+   const listed=(await (await get(path(g.business,g.branch),cookie)).json()).appointments;
+   assert.equal(listed.find(x=>x.bookingId===bookingId)?.status,'COMPLETED');
+   assert.equal((await post(urlChange,cookie,guid(),{status:'CANCELLED'})).status,409);
+  });
+  await pass('Lifecycle: denied Origin and invalid state fail before SQL state mutation',async()=>{
+   const at=future(840);
+   const create=await post(path(g.business,g.branch)+'/appointments',cookie,guid(),
+    {customerId:g.customer,offeringId:g.service,resourceId,startsAtUtc:at});
+   assert.equal(create.status,200);
+   const bookingId=(await create.json()).id;
+   const urlChange=changePath(g.business,g.branch,bookingId);
+   const k=guid();
+   assert.equal((await post(urlChange,cookie,k,{status:'CANCELLED',tenantId:g.t})).status,400);
+   assert.equal((await post(urlChange,cookie,k,{status:'INVOICED'})).status,400);
+   assert.equal((await post(urlChange,cookie,k,{status:'CANCELLED'},
+    {Origin:'https://attacker.invalid'})).status,401);
+   assert.equal((await post(urlChange,cookie,k,{status:'CANCELLED'})).status,200);
+   assert.equal((await post(urlChange,cookie,k,{status:'COMPLETED'})).status,409);
+   const changed=(await admin.request()
+    .input('t',sql.UniqueIdentifier,g.t).input('b',sql.UniqueIdentifier,g.business)
+    .input('br',sql.UniqueIdentifier,g.branch).input('id',sql.UniqueIdentifier,bookingId)
+    .query("SELECT COUNT(*) AS n FROM core.BookingStatusChange"+
+      " WHERE TenantId=@t AND BusinessId=@b AND BranchId=@br AND BookingId=@id")).recordset[0].n;
+   assert.equal(changed,1);
+  });
+  await pass('Lifecycle: foreign Tenant and unauthorized Branch cannot mutate Booking',async()=>{
+   const existing=(await (await get(path(g.business,g.branch),cookie)).json()).appointments[0];
+   assert.ok(existing);
+   for(const [business,branch] of [[g.otherBusiness,g.otherBranch],
+    [g.foreignBusiness,g.foreignBranch],[g.business,g.unassignedBranch]]){
+    assert.equal((await post(changePath(business,branch,existing.bookingId),cookie,guid(),
+     {status:'CANCELLED'})).status,404);
+   }
+   assert.equal((await post(changePath(g.business,g.branch,guid()),cookie,guid(),
+    {status:'CANCELLED'})).status,404);
+  });
+  await pass('Lifecycle: runtime SQL cannot change status/audit directly',async()=>{
+   const r=await app.query("SELECT "+
+    "HAS_PERMS_BY_NAME('core.BookingStatusChange','OBJECT','INSERT') AS i,"+
+    "HAS_PERMS_BY_NAME('core.BookingAppointment','OBJECT','UPDATE') AS u,"+
+    "HAS_PERMS_BY_NAME('core.ChangeBookingAppointmentStatus','OBJECT','EXECUTE') AS e");
+   assert.deepEqual(Object.values(r.recordset[0]).map(Number),[0,0,1]);
   });
   await pass('Revoked booking read/write role and Business membership deny next request',async()=>{
    await q(admin,"DELETE core.RolePermission WHERE TenantId=@t"+

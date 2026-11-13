@@ -11,10 +11,11 @@ export type BookingResourceView={resourceId:string;displayName:string;kind:strin
 export type AppointmentView={
  bookingId:string;customerId:string;offeringId:string;resourceId:string;
  customerName:string;offeringName:string;resourceName:string;
- startsAtUtc:string;endsAtUtc:string;status:"BOOKED";
+ startsAtUtc:string;endsAtUtc:string;status:"BOOKED"|"CANCELLED"|"COMPLETED";
 };
 export type BookingRead={resources:BookingResourceView[];appointments:AppointmentView[]};
 export type Created={id:string;created:boolean};
+export type StatusChange={id:string;status:"CANCELLED"|"COMPLETED";changed:boolean};
 const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const TOKEN=/^[A-Za-z0-9_-]{43}$/;
 const ISO=/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00\.000Z$/;
@@ -67,6 +68,8 @@ export class BookingService {
    if(code===51152)throw new ConflictException("Idempotency request changed");
    if(code===51153)throw new ConflictException("Resource is already booked");
    if(code===51154)throw new BadRequestException("Invalid booking input or reference");
+   if(code===51155)throw new ConflictException("Appointment is final or cannot be completed yet");
+   if(code===51156)throw new NotFoundException();
    throw new ServiceUnavailableException("Booking unavailable");
   }
  }
@@ -87,7 +90,7 @@ export class BookingService {
    resourceName:String(row.resourceName),
    startsAtUtc:new Date(row.startsAtUtc as string|number|Date).toISOString(),
    endsAtUtc:new Date(row.endsAtUtc as string|number|Date).toISOString(),
-   status:"BOOKED" as const,
+   status:(row.status==="CANCELLED"?"CANCELLED":row.status==="COMPLETED"?"COMPLETED":"BOOKED") as AppointmentView["status"],
   }));
   return {resources,appointments};
  }
@@ -129,5 +132,24 @@ export class BookingService {
   const row=result.recordset?.[0];
   if(!row)throw new ServiceUnavailableException("Appointment creation unavailable");
   return {id:String(row.id),created:Boolean(row.created)};
+ }
+ async changeAppointmentStatus(
+  actor:Actor,token:string,businessId:string,branchId:string,
+  requestId:unknown,bookingId:unknown,body:unknown,
+ ):Promise<StatusChange>{
+  const scope=this.scope(actor,token,businessId,branchId);
+  const key=validId(requestId),id=validId(bookingId);
+  const d=data(body,["status"]);
+  if(d.status!=="CANCELLED"&&d.status!=="COMPLETED")
+   throw new BadRequestException("Invalid status transition");
+  const result=await this.execute(scope,"core.ChangeBookingAppointmentStatus",r=>r
+   .input("ClientRequestId",sql.UniqueIdentifier,key)
+   .input("BookingId",sql.UniqueIdentifier,id)
+   .input("TargetStatus",sql.VarChar(12),d.status));
+  const row=result.recordset?.[0];
+  if(!row||!["CANCELLED","COMPLETED"].includes(String(row.status)))
+   throw new ServiceUnavailableException("Booking transition unavailable");
+  return {id:String(row.id),status:row.status as StatusChange["status"],
+   changed:Boolean(row.changed)};
  }
 }

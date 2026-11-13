@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-14 — S9 three parallel source workstreams merged
+
+- [#99](https://github.com/tarek-saad-dev/drvo-erp/pull/99): private Shared Booking adds locally scoped already-authorized max-200 Customer name/phone search (Arabic/Indic normalization) and prevents stale selection/idempotency; new ESM helper, typing, K5C pure tests. All **9/9** PR head workflows PASS; merged product main SHA `b765b7feec73c3f8b1e8b6f78969b4aa3ed93b8d` all 10/10 post-merge checks PASS including deployment workflow.
+- [#100](https://github.com/tarek-saad-dev/drvo-erp/pull/100): isolated synthetic Salon Demo half-hour times, full-duration interval overlap, cancellation release, end-of-day bound and disabled unbookable choices, with isolated model/UI tests. All **5/5** PR head workflows PASS; merged main `4f8ccd61b61e4c667754ff3036cd1874d3774ac3`.
+- [#101](https://github.com/tarek-saad-dev/drvo-erp/pull/101): bounded redacted S3 preflight-based actionable operator CLI reports ten independent K5F/restore/Origin/ADR-032 items, even 0 missing self-reports remains NO-GO. **2/2** PR head K0/K1 PASS; final merged product/source main `5fd770aa39b52fd3b7621fc5bcf6d78b053e3a46` 3/3 triggered K0/K1/Staging Artifact PASS.
+- No new API/SQL migration or pilot activation. SQL source still 001–017 and VPS SQL 010–017 NOT authorized/applied by S9. Public Auth/paid flags OFF; real root K5F, encrypted offsite restore, live Owner/Staff browser negatives, ADR-031/032 OPEN; no POS POSTED or customer invitation.
+- [S9 integrated handoff](SALON-S9-INTEGRATED-DELIVERY-2026-11-14.md).
+
 ## 2026-11-14 — Salon S8 3 independent product/pilot source workstreams MERGED
 
 - **#95:** private Shared Booking guided CLOSE→CREATE correction using SQL017/016 existing endpoints; no atomicity claim, no auto-reopen, explicit CLOSED gap if second step fails, SQL017 still blocks future BOOKED stranding. K5C Next/typecheck and 9/9 PR workflows PASS.

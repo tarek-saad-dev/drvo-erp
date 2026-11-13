@@ -22,7 +22,8 @@
 ## Verification and handoff
 
 - Pure kernel tests: full A→B→C closure, deterministic sorted lines, all new line fees + explicitly provided tax, existing active prerequisite shown without rebilling, optional exclusion vs explicit inclusion, unsupported market, fabricated active, missing/invalid prices, currency/interval collision, huge number overflow, duplicate source, inconsistent Business scope, conflicting active releases.
-- API unit tests: default OFF before touching auth/DB, explicit 404 cross-scope, invalid key, unauthenticated/forged K5 session boundary and no actual price/approval claims.
+- API unit tests: default OFF before touching auth/DB, explicit simulated 404 branch scope denial, invalid key and no actual price/approval claims.
+- **Real disposable SQL Server + Nest HTTP E2E (expanded K6C):** exact K5 cookie and active Branch read required, no candidate→published conversion, SC-1 response always UNQUOTABLE/no price/approval, same-Tenant other Business/foreign Tenant/unassigned Branch 404, POST 404, live role/membership revocation 404 and revoked session 401. Synthetic fixtures only; no VPS interaction.
 - K0 root test/lint, K1 API test/build and existing K5/Catalog/Customers/Booking regressions should PASS on the exact PR head.
 - Feature PR **stacked on SC-0 PR #104** until SC-0 is reviewed and merged. After SC-0 merge, retarget SC-1 to `main` and review isolated diff before merging. Do not merge SC-1 first.
 - No SQL migrations added, no VPS SQL 010–017, no actual Public Auth, country, price, paid grants or production feature-flag changes. **SC-2 owner approval/payment verification and SC-3 mutation coordinator remain NOT AUTHORIZED.**

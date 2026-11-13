@@ -4,7 +4,7 @@ import {useMemo,useState} from "react";
 import Link from "next/link";
 import {
  DEMO_CUSTOMERS,DEMO_SERVICES,DEMO_STAFF,DEMO_TIMES,
- addDemoCartLine,bookDemoAppointment,demoCustomer,demoMoney,demoService,demoStaff,
+ addDemoCartLine,bookDemoAppointment,demoAvailableTimes,demoCustomer,demoMoney,demoService,demoStaff,
  demoSubtotal,initialDemo,removeDemoCartLine,saveDemoDraft,updateDemoAppointment,
  type DemoAppointment,type DemoCartLine,type DemoSection,
 } from "./demo-model";
@@ -38,6 +38,7 @@ export default function SalonDemoClient(){
  const bookedValue=data.appointments.filter(x=>x.status==="completed")
   .reduce((sum,a)=>sum+demoService(a.serviceId).priceMinor,0);
  const total=useMemo(()=>cart.length?demoSubtotal(cart):0,[cart]);
+ const availableTimes=useMemo(()=>demoAvailableTimes(data,staffId,serviceId),[data,staffId,serviceId]);
  const appointments=useMemo(()=>[...data.appointments].sort((a,b)=>
   a.time.localeCompare(b.time)||a.id-b.id),[data.appointments]);
 
@@ -166,16 +167,32 @@ export default function SalonDemoClient(){
     </>}
 
     {tab==="appointments"&&<>
-     <div className="sd-heading-row"><div><div className="sd-kicker">BOOKING / DEMO DAY</div><h1>إدارة المواعيد</h1><p>أضف موعد، جرّب منع التعارض، وغيّر حالته بنفسك</p></div><span className="sd-date">◷ الخميس 12 نوفمبر 2026 · يوم تجريبي</span></div>
+     <div className="sd-heading-row"><div><div className="sd-kicker">BOOKING / DEMO DAY</div><h1>إدارة المواعيد</h1><p>أضف موعد، وجرّب منع التعارض بالدقائق حسب مدة الخدمة، وغيّر حالته بنفسك</p></div><span className="sd-date">◷ الخميس 12 نوفمبر 2026 · يوم تجريبي</span></div>
      <div className="sd-panels sd-booking-layout">
       <section className="sd-panel"><div className="sd-panel-header"><div><span className="sd-panel-eyebrow">CREATE APPOINTMENT</span><h2>حجز جديد</h2></div></div>
        <form className="sd-book-form" onSubmit={book}>
         <label>العميل التجريبي<select value={customerId} onChange={e=>setCustomerId(e.target.value)}>{DEMO_CUSTOMERS.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
-        <label>الخدمة<select value={serviceId} onChange={e=>setServiceId(e.target.value)}>{DEMO_SERVICES.map(s=><option key={s.id} value={s.id}>{s.name} — {demoMoney(s.priceMinor)}</option>)}</select></label>
-        <label>الحلاق<select value={staffId} onChange={e=>setStaffId(e.target.value)}>{DEMO_STAFF.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></label>
-        <label>الساعة<select value={time} onChange={e=>setTime(e.target.value)}>{DEMO_TIMES.map(t=><option key={t} value={t}>{t}</option>)}</select></label>
+        <label>الخدمة<select value={serviceId} onChange={e=>{
+          const next=e.target.value;setServiceId(next);
+          const slots=demoAvailableTimes(data,staffId,next);
+          setTime(current=>slots.includes(current)?current:(slots[0]??""));
+         }}>{DEMO_SERVICES.map(s=><option key={s.id} value={s.id}>{s.name} — {demoMoney(s.priceMinor)}</option>)}</select></label>
+        <label>الحلاق<select value={staffId} onChange={e=>{
+          const next=e.target.value;setStaffId(next);
+          const slots=demoAvailableTimes(data,next,serviceId);
+          setTime(current=>slots.includes(current)?current:(slots[0]??""));
+         }}>{DEMO_STAFF.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></label>
+        <label>الساعة<select value={time} onChange={e=>setTime(e.target.value)}>
+          {DEMO_TIMES.map(t=><option key={t} value={t} disabled={!availableTimes.includes(t)}>
+            {t} {!availableTimes.includes(t)?"— مشغول / خارج ساعات الديمو":""}
+          </option>)}
+         </select></label>
+         <p className="sd-price-hint" role="status">
+           {availableTimes.length} ميعاد مرشح بنص ساعة، حسب مدة الخدمة والحلاق في يوم الديمو فقط.
+           مفيش حجز حقيقي أو مزامنة مع SQL.
+         </p>
         <div className="sd-price-hint"><span>السعر الاسترشادي</span><strong>{demoMoney(demoService(serviceId).priceMinor)}</strong><small>{demoService(serviceId).duration} دقيقة</small></div>
-        <button className="sd-primary sd-full" type="submit">＋ تأكيد الموعد التجريبي</button>
+        <button className="sd-primary sd-full" type="submit" disabled={!availableTimes.includes(time)}>＋ تأكيد الموعد التجريبي</button>
        </form>
       </section>
       <section className="sd-panel"><div className="sd-panel-header"><div><span className="sd-panel-eyebrow">APPOINTMENT LIST</span><h2>جدول المواعيد <span className="sd-number">{data.appointments.length}</span></h2></div></div>

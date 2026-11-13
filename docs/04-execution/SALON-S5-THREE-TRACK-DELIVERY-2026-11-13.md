@@ -1,5 +1,8 @@
 # Salon S5 — three equally prioritized working product slices (2026-11-13)
 
+> **HISTORICAL S5 NOTE:** S5 at 001–016 accurately described source then. S6 [#88](https://github.com/tarek-saad-dev/drvo-erp/pull/88) added source-only SQL017 for safe closure of dated Booking resource windows. Actual VPS SQL 010–017 remains unauthorized; see [S6](SALON-S6-INTEGRATED-DELIVERY-2026-11-13.md).
+
+
 **GitHub verified:** PRs [#84](https://github.com/tarek-saad-dev/drvo-erp/pull/84), [#85](https://github.com/tarek-saad-dev/drvo-erp/pull/85), [#86](https://github.com/tarek-saad-dev/drvo-erp/pull/86) have MERGED on main, latest product SHA at S5 merge `24c1a2e3338453816ff1820c7f89ac1a703fd38c`.
 
 ## Scope and domain ownership

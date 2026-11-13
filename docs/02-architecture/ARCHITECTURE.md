@@ -1,5 +1,8 @@
 # Architecture baseline
 
+> **2026-11-13 SALON S3 OPERATIONAL GATE BOUNDARY:** The upcoming private Salon pilot is gated by **independent real VPS K5F root-bundle security review, off-host encrypted backup/isolated restore, trusted proxy/Origin validation and explicit scoped entitlements**. A new isolated local-only `tools/salon-pilot/preflight.cjs` can analyze strictly bounded redacted operator-reported history/SHA/control evidence, but is never itself an attestation or an activation/migration engine. Output always forbids VPS SQL, K5, Module flags, user invites and Sale POSTED. Public synthetic `/demo/salon`, private K5 API contracts, SQL migration files and Cashier remain unchanged. ADR-030 accepted baseline; ADR-031/032 and K5F remain OPEN. [S3 operator runbook](../04-execution/SALON-S3-PILOT-ACTIVATION-PREFLIGHT-2026-11-13.md).
+
+
 > **2026-11-13 SALON S2 DOMAIN COMPOSITION VERIFIED (SOURCE/CI ONLY):** Existing Customers, Catalog, Booking and POS Draft independent bounded contexts compose into a real synthetic K5-authenticated SQL2022/Nest HTTP transaction journey (PR #74, 19 CI checks). PR #75 adds independent Web gates and 200-verified POS navigation without creating a Salon backend, bypassing Tenant/Business/Branch SQL scopes or crossing domain ownership; public fake Demo remains separated. Pinned Cashier Booking lock proof PR #76 rejects global numeric EmpID lock-resource reuse in favor of SQL 013 composite Resource/Branch `UPDLOCK,HOLDLOCK`. No real SQL VPS activation, posted GL or approved ADR-031/032; K5F operator signoff OPEN. [S2 handoff](../04-execution/SALON-S2-INTEGRATED-HANDOFF-2026-11-13.md).
 
 

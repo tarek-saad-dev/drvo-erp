@@ -1,5 +1,8 @@
 # Current state
 
+> **2026-11-13 SALON S4 THREE PARALLEL PRODUCT WORKSTREAMS MERGED:** [PR #80](https://github.com/tarek-saad-dev/drvo-erp/pull/80) adds Shared Booking BOOKED→CANCELLED/COMPLETED with isolated forward-only SQL 015, scoped immutable idempotent status audit and real SQL2022/Nest HTTP **24 checks PASS**; [PR #81](https://github.com/tarek-saad-dev/drvo-erp/pull/81) fast POS DRAFT Catalog add + prepare NEW cart from immutable saved Draft; [PR #82](https://github.com/tarek-saad-dev/drvo-erp/pull/82) private SQL/API-backed Salon Branch overview using existing Domain permissions, default K5 Web gates. All PR heads passed triggered CI. **No runtime SQL 010–015 on VPS, no K5/Public Auth/customer business flags, no financial posting, no certified production rollout**. K5F/offhost restore and ADR-031/032 remain OPEN. [S4 integrated handoff](../04-execution/SALON-S4-PARALLEL-DELIVERY-2026-11-13.md).
+
+
 > **2026-11-13 VERIFIED SALON S3 SOURCE PREFLIGHT MERGED:** [PR #78](https://github.com/tarek-saad-dev/drvo-erp/pull/78) is **MERGED** into main as commit `4b010ad30387c41b6c3a915f6e7845330020651b`. The read-only local redacted evidence tool and fail-closed negative test matrix were verified by K0/K1 and DevOps Staging Artifact CI on the merge head. **No K5F root-owned checker executed on VPS, no off-host encrypted backup independently restored, no SQL 010–014 VPS applied, and no K5 or Business Module flags enabled.** Self-reported operator evidence never authorizes SQL/Auth/financial actions; ADR-031/032 remain PROPOSED. [S3 runbook](../04-execution/SALON-S3-PILOT-ACTIVATION-PREFLIGHT-2026-11-13.md).
 
 

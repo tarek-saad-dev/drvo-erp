@@ -1,6 +1,6 @@
 # ADR-032 — Founder / Billing / Security decision packet (2026-11-12)
 
-**Status: FOR REVIEW, NOT ACCEPTED.** This packet prepares concrete choices based on the existing proposed [ADR-032](../05-decisions/ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md) and accepted ADR-007/015/016/017/020/030. **This is not authorization to implement activation, collect a payment, create accounts or grant an entitlement.**
+**Status: ACT-01–ACT-07 FOUNDER-ACCEPTED AS V1 BASELINE on 2026-11-14; all Finance/Security and implementation approvals below remain OPEN.** This packet prepares concrete choices based on the existing proposed [ADR-032](../05-decisions/ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md) and accepted ADR-007/015/016/017/020/030. **Founder now authorizes SC-0/SC-1 as separate READ-ONLY PRs only, not activation, collection, customer accounts, entitlements or VPS changes.**
 
 ## Decisions to approve separately before real activation
 
@@ -77,3 +77,8 @@ A founder may approve **ACT-01–ACT-07 as a product/architecture V1 baseline** 
 **Suggested single decision record:** “أوافق على توصيات ACT-01 إلى ACT-07 كـ ADR-032 V1 Baseline فقط: التفعيل لكل Business، Owner فقط للاعتماد المدفوع، عرض الباقة وسعرها كاملين وموافقة واحدة، PENDING قبل تحقق مالي مستقل، CAS+Idempotency، Default Deny، ومنع إيقاف Required Dependencies؛ وأبقي التسعير والضرائب والتحصيل والتفويض والصلاحيات الدقيقة وVPS Migration/Public Auth لموافقات منفصلة.” Do NOT record as accepted until founder actually says so.
 
 **Next engineering sequence after approval:** [SaaS Commercial Core guarded delivery plan](SAAS-COMMERCIAL-CORE-ENGINEERING-GATES-2026-11-12.md). In the meantime, develop only code-free review plans and isolated tests; do not grant entitlements or emit paid invoices.
+
+
+## Founder decision receipt — 2026-11-14
+
+Founder explicitly chose ACT-01–ACT-07 **as V1 baseline only**, including Owner-only paid approval, separate independently verified DRVO commercial collection and Default Deny. See [ADR-032](../05-decisions/ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md) for bounded acceptance. The prior “questions to close” now mean **detailed policy**, not undecided high-level principles. SC-0 and SC-1 read-only implementation PRs are explicitly authorized; SC-2 / SC-3 remain **UNAUTHORIZED**. No production publication, SQL on VPS, payment processing, entitlement or Public Auth is authorized.

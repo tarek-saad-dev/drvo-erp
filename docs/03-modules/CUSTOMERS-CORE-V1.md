@@ -1,5 +1,7 @@
 # Shared Customers/CRM Core — initial V1 vertical slice
 
+> **2026-11-14 S9 CROSS-OWNER READ ONLY:** [#99](https://github.com/tarek-saad-dev/drvo-erp/pull/99) lets an independently Customer-read-authorized Shared Booking screen locally filter the bounded (max-200) active Customers list by Arabic name/phone. No new customer endpoint, SQL, cross-Tenant read, server search, PII logging or automatically granted Customer permission. Changing search resets Booking CustomerId and request retry ID. Customers Module remains sole data owner and creator; operator pilot release gates unchanged. [S9](../04-execution/SALON-S9-INTEGRATED-DELIVERY-2026-11-14.md).
+
 **Date:** 2026-11-12 · **Status:** Stacked feature PR, NOT deployed, not authorized for real customer data.
 
 ## Domain

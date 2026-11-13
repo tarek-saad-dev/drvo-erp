@@ -142,7 +142,7 @@ async function main(){
    const applied=await applyMigrations(admin,undefined,17);
    assert.equal(applied.length,17)
    assert.ok(applied.every(x=>x.status==='applied'));
-   const replay=await applyMigrations(admin,undefined,16);
+   const replay=await applyMigrations(admin,undefined,17);
    assert.ok(replay.every(x=>x.status==='unchanged'));
    const r=await admin.query("SELECT COUNT(*) AS n FROM core.BookingAppointment");
    assert.equal(r.recordset[0].n,0);

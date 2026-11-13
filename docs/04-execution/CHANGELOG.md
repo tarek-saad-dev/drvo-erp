@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-11-13 — Salon S3 safe operator preflight source tool (review PR)
+
+- Added bounded, read-only local `tools/salon-pilot/preflight.cjs` to inventory redacted reported K5F/DR/export/release evidence and check exact 001–009 observed pre-migration prefix against current SQL 001–014 source hashes. No network/VPS/SQL/SSH operations or secret data are consumed; unknown fields fail closed.
+- Added exhaustive negative tests proving missing controls, drift, extra SQL rows, mismatched SHAs and even full self-asserted evidence cannot authorize SQL migration, feature activation, user invitation or financial posting.
+- [Operator runbook](SALON-S3-PILOT-ACTIVATION-PREFLIGHT-2026-11-13.md) records the remaining independent offhost restore/K5F/Origin/ADR-032 obligations. This PR does **not** implement an authenticated live customer pilot or modify Staging database/flags.
+
+
 ## 2026-11-13 — Salon S2 integrated private E2E verified in disposable SQL CI
 
 - Merged PR #74: real SQL2022 + Nest HTTP CI now covers Customer creation, Catalog service creation, Booking record persisted across GET, POS DRAFT save/replay and SQL price snapshot with cross Tenant/Business/Branch/RBAC/Origin denial; 19 case Shared Booking CI PASS. **No new production migrations or API owner changes.**

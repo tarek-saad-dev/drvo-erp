@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-14 — Salon S8 3 independent product/pilot source workstreams MERGED
+
+- **#95:** private Shared Booking guided CLOSE→CREATE correction using SQL017/016 existing endpoints; no atomicity claim, no auto-reopen, explicit CLOSED gap if second step fails, SQL017 still blocks future BOOKED stranding. K5C Next/typecheck and 9/9 PR workflows PASS.
+- **#96:** public isolated synthetic Salon guided 3-step Booking→COMPLETED→in-memory POS DRAFT journey, local restart, responsive styling and pure model tests; no API, payment, real customer or auth. 5/5 PR workflows PASS.
+- **#97:** portable machine-readable 14-case synthetic Owner/Staff/Tenant/Branch browser **review matrix only, never executed against live staging**; root K0 tests enforce nonauthorization. 2/2 PR workflows PASS.
+- Product merges #95 main 10/10 and #96 main 6/6 PASS. [Staging code deploy #43520194132](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43520194132) SSH receiver verified product release SHA `d07f6a8bd6256f403d25eb15939e38bb259cf4c6`. Final #97 main SHA `94a3f46ab171b84c691e409d13480e6521bd7f48` K0/K1/Staging Artifact 3/3 PASS; #97 only adds local review tooling and docs, not a new live code deployment. External HTTP NOT independently verified.
+- **Release constraints unchanged:** no migration 018; SQL 010–017 VPS NOT approved/applied by this work. Public Auth and commercial flags OFF; K5F root security, independently restored offsite encrypted backup, proxy/Origin/Owner-Staff live tests, ADR-032 activation and ADR-031 financial GL/POSTED remain OPEN. [S8 handoff](SALON-S8-INTEGRATED-DELIVERY-2026-11-14.md).
+
 ## 2026-11-13 — Salon S7 private Booking/POS UX (PRs #92–#93 merged)
 
 - **#92:** Protected Shared Booking shows advisory-only local-day/Resource/Service-duration candidate slots based on returned OPEN windows and booked intervals, never a SQL availability guarantee. Five pure Node tests, K5C Build/typecheck and 404 security CI PASS.

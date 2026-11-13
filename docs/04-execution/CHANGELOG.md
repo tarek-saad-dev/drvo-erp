@@ -1,5 +1,11 @@
 # Project changelog
 
+## 2026-11-14 — ADR-032 V1 Baseline explicitly approved, SC-0/SC-1 read-only authorized
+
+- Founder approved ACT-01–ACT-07 as a bounded architecture/product baseline only: global reviewed/eligible releases, trusted Business scope, immutable full required closure with one consent, independently verified payment before paid Entitlement, per-Business CAS/idempotency, honest ACTIVE truth, Owner-only paid approval and safe dependency disable. No commercial pricing/tax/collection/refund/role privilege specifics, production activation, K5F acceptance or ADR-031 decision implied.
+- Authorized two independent SC-0 and SC-1 **read-only** implementation PRs (source/tests/docs), default OFF and synthetic fixtures. SC-2/SC-3 or SQL 010–017 on VPS, Public Auth and entitlement/payment mutations remain forbidden. [Decision receipt](../05-decisions/ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md) · [Execution gates](SAAS-COMMERCIAL-CORE-ENGINEERING-GATES-2026-11-12.md).
+
+
 ## 2026-11-14 — S9 three parallel source workstreams merged
 
 - [#99](https://github.com/tarek-saad-dev/drvo-erp/pull/99): private Shared Booking adds locally scoped already-authorized max-200 Customer name/phone search (Arabic/Indic normalization) and prevents stale selection/idempotency; new ESM helper, typing, K5C pure tests. All **9/9** PR head workflows PASS; merged product main SHA `b765b7feec73c3f8b1e8b6f78969b4aa3ed93b8d` all 10/10 post-merge checks PASS including deployment workflow.

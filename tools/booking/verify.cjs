@@ -59,7 +59,9 @@ async function addRole(pool,tenant,business,role){
  " VALUES(@t,@b,@r,N'SCHEDULER',N'Scheduler');"+
  "INSERT core.RolePermission(TenantId,BusinessId,RoleId,ActionCode)"+
  " VALUES(@t,@b,@r,'booking.read'),(@t,@b,@r,'booking.manage'),"+
- " (@t,@b,@r,'catalog.read'),(@t,@b,@r,'customers.read')",
+ " (@t,@b,@r,'catalog.read'),(@t,@b,@r,'catalog.manage'),"+
+ " (@t,@b,@r,'customers.read'),(@t,@b,@r,'customers.manage'),"+
+ " (@t,@b,@r,'pos.draft.read'),(@t,@b,@r,'pos.draft.manage')",
  {t:tenant,b:business,r:role});
 }
 async function assign(pool,tenant,business,branch,account,role){
@@ -136,14 +138,15 @@ async function main(){
    "',CHECK_POLICY=ON,CHECK_EXPIRATION=OFF");
   admin=await open({...base,database:db});
   await admin.query("CREATE USER ["+user+"] FOR LOGIN ["+user+"];GRANT CONNECT TO ["+user+"]");
-  await pass('13 forward-only migrations apply and replay, no synthetic appointment seed',async()=>{
-   const applied=await applyMigrations(admin,undefined,13);
-   assert.equal(applied.length,13);
+  await pass('14 forward-only migrations apply and replay, no synthetic appointment or draft seed',async()=>{
+   const applied=await applyMigrations(admin,undefined,14);
+   assert.equal(applied.length,14);
    assert.ok(applied.every(x=>x.status==='applied'));
-   const replay=await applyMigrations(admin,undefined,13);
+   const replay=await applyMigrations(admin,undefined,14);
    assert.ok(replay.every(x=>x.status==='unchanged'));
    const r=await admin.query("SELECT COUNT(*) AS n FROM core.BookingAppointment");
    assert.equal(r.recordset[0].n,0);
+   assert.equal((await admin.query('SELECT COUNT(*) AS n FROM core.PosDraft')).recordset[0].n,0);
   });
   await grantAuth(admin);
   await q(admin,"INSERT core.Tenant(TenantId,DisplayName) VALUES(@t,N'CI')",{t:g.t});
@@ -217,6 +220,8 @@ async function main(){
    DRVO_SQL_HOST:'127.0.0.1',DRVO_SQL_PORT:'1433',
    DRVO_SQL_DATABASE:db,DRVO_SQL_USER:user,DRVO_SQL_PASSWORD:appPass,
    DRVO_K5_AUTH_ENABLED:'YES',DRVO_BOOKING_ENABLED:'YES',
+   DRVO_CUSTOMERS_ENABLED:'YES',DRVO_CATALOG_ENABLED:'YES',
+   DRVO_POS_DRAFTS_ENABLED:'YES',
    DRVO_K5_ORIGIN:origin,
   };
   server=spawn(process.execPath,['apps/api/dist/main.js'],{
@@ -232,6 +237,35 @@ async function main(){
   });
   const cookie=await login('scheduler.booking.ci');
   const otherCookie=await login('foreign.booking.ci');
+  // Salon Pilot CI: prove the real, independent domain APIs work together
+  // using one scoped K5 cookie. We reuse the already deployed domain owners;
+  // there is no fake public demo, customer PII, or new SQL migration.
+  const scopePath=url+'/workspaces/'+g.business+'/branches/'+g.branch;
+  const customerPath=scopePath+'/customers';
+  const catalogPath=scopePath+'/catalog';
+  const draftPath=scopePath+'/pos-drafts';
+  let pilotCustomer,pilotService;
+  await pass('Salon E2E: create synthetic Customer and Catalog service via authenticated HTTP',async()=>{
+   const noCookie=await get(customerPath);
+   assert.equal(noCookie.status,401);
+   assert.equal((await get(catalogPath)).status,401);
+   const customerResponse=await post(customerPath,cookie,guid(),
+     {displayName:'Salon CI Customer',phoneE164:null});
+   assert.equal(customerResponse.status,200);
+   const c=await customerResponse.json();
+   assert.equal(c.created,true);pilotCustomer=c.id;
+   const serviceResponse=await post(catalogPath+'/offerings',cookie,guid(),{
+    kind:'SERVICE',displayName:'Salon CI Haircut',categoryId:null,
+    priceMinor:18000,currency:'EGP',durationMinutes:30,
+   });
+   assert.equal(serviceResponse.status,200);
+   const offering=await serviceResponse.json();
+   assert.equal(offering.created,true);pilotService=offering.id;
+   assert.ok((await (await get(customerPath,cookie)).json()).customers.some(
+    x=>x.customerId===pilotCustomer&&x.displayName==='Salon CI Customer'));
+   assert.ok((await (await get(catalogPath,cookie)).json()).offerings.some(
+    x=>x.offeringId===pilotService&&x.priceMinor===18000));
+  });
   let resourceId,secondResource;
   await pass('resource creation idempotent; payload change gives 409',async()=>{
    const key=guid(),p=path(g.business,g.branch)+'/resources';
@@ -268,6 +302,78 @@ async function main(){
    assert.equal(data.appointments[0].customerName,'CI Customer');
    assert.equal(data.appointments[0].startsAtUtc,start);
    assert.equal(new Date(data.appointments[0].endsAtUtc)-new Date(start),30*60000);
+  });
+  await pass('Salon E2E: real Booking persists Customer/Catalog references after repeat GET',async()=>{
+   const at=future(240);
+   const payload={customerId:pilotCustomer,offeringId:pilotService,
+     resourceId:secondResource,startsAtUtc:at};
+   const p=path(g.business,g.branch)+'/appointments';
+   const created=await post(p,cookie,guid(),payload);
+   assert.equal(created.status,200);
+   const record=await created.json();assert.equal(record.created,true);
+   // Same authenticated HTTP query after another request, not in-memory React state.
+   const refreshed=await get(path(g.business,g.branch),cookie);
+   assert.equal(refreshed.status,200);
+   const row=(await refreshed.json()).appointments.find(x=>x.bookingId===record.id);
+   assert.ok(row);
+   assert.equal(row.customerId,pilotCustomer);
+   assert.equal(row.offeringId,pilotService);
+   assert.equal(row.customerName,'Salon CI Customer');
+   assert.equal(row.offeringName,'Salon CI Haircut');
+   assert.equal(row.startsAtUtc,at);
+   assert.equal((await post(p,cookie,guid(),payload)).status,409);
+  });
+  await pass('Salon E2E: POS saves same Catalog service as DRAFT only, survives HTTP GET',async()=>{
+   assert.equal((await get(draftPath)).status,401);
+   const payload={lines:[{offeringId:pilotService,quantity:2}]};
+   const requestKey=guid();
+   const saved=await post(draftPath,cookie,requestKey,payload);
+   assert.equal(saved.status,200);
+   const d=await saved.json();
+   assert.equal(d.created,true);assert.equal(d.status,'DRAFT');
+   assert.equal(d.posted,false);assert.equal(d.version,1);
+   const replay=await post(draftPath,cookie,requestKey,payload);
+   assert.equal(replay.status,200);
+   assert.equal((await replay.json()).id,d.id);
+   assert.equal((await post(draftPath,cookie,requestKey,{
+    lines:[{offeringId:pilotService,quantity:1}],
+   })).status,409);
+   const resumed=await get(draftPath,cookie);
+   assert.equal(resumed.status,200);
+   const row=(await resumed.json()).drafts.find(x=>x.draftId===d.id);
+   assert.ok(row);assert.equal(row.subtotalMinor,36000);
+   assert.equal(row.currency,'EGP');assert.equal(row.status,'DRAFT');
+   assert.equal(row.lines.length,1);
+   assert.equal(row.lines[0].unitPriceMinor,18000);
+   const stored=await admin.query(
+    "SELECT COUNT(*) AS n FROM core.PosDraft WHERE Status='DRAFT'");
+   assert.equal(stored.recordset[0].n,1);
+   assert.equal((await get(url+'/workspaces/'+g.foreignBusiness+
+     '/branches/'+g.foreignBranch+'/pos-drafts',cookie)).status,404);
+  });
+  await pass('Salon E2E: no Customer/Booking/Draft cross-scope reads or writes',async()=>{
+   for(const suffix of ['/customers','/catalog','/booking','/pos-drafts']){
+    const forged=url+'/workspaces/'+g.foreignBusiness+'/branches/'+g.foreignBranch+suffix;
+    assert.equal((await get(forged,cookie)).status,404,suffix);
+   }
+   assert.equal((await post(draftPath,cookie,guid(),{
+    lines:[{offeringId:g.foreignService,quantity:1}],
+   })).status,400);
+   assert.equal((await post(draftPath,cookie,guid(),{
+    lines:[{offeringId:pilotService,quantity:1}],tenantId:g.t,
+   })).status,400);
+   assert.equal((await post(draftPath,cookie,guid(),{
+    lines:[{offeringId:pilotService,quantity:1}],
+   },{Origin:'https://attacker.invalid'})).status,401);
+  });
+  await pass('Salon E2E: individual POS permission revoked while Booking remains readable',async()=>{
+   await q(admin,"DELETE core.RolePermission WHERE TenantId=@t AND"+
+    " BusinessId=@b AND RoleId=@r AND ActionCode='pos.draft.read'",
+    {t:g.t,b:g.business,r:g.role});
+   assert.equal((await get(draftPath,cookie)).status,404);
+   assert.equal((await get(path(g.business,g.branch),cookie)).status,200);
+   await q(admin,"INSERT core.RolePermission(TenantId,BusinessId,RoleId,ActionCode)"+
+    " VALUES(@t,@b,@r,'pos.draft.read')",{t:g.t,b:g.business,r:g.role});
   });
   await pass('Overlapping resource slot blocked; adjacent and parallel resource allowed',async()=>{
    const p=path(g.business,g.branch)+'/appointments';

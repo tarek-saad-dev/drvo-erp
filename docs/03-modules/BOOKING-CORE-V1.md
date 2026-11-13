@@ -1,5 +1,8 @@
 # Shared Booking Core — first appointment vertical slice
 
+> **2026-11-13 S4 TERMINAL LIFECYCLE EXTENSION MERGED:** PR #80 adds source-only forward migration **015** + `core.BookingStatusChange` audit, strictly scoped `booking.manage` Origin-verified UUID-idempotent BOOKED→CANCELLED/COMPLETED endpoint, new private Web actions. Cancellation frees the resource slot; completion only after start and is **NOT POS paid/posted, invoice or HR service execution**. Real disposable SQL2022/HTTP regression **24 checks PASS** (incl. canceled slot, completed past-start, idempotency, tenant/permission negative). Supersedes original BOOKED-only product-slice status above but NOT real production activation or full rescheduling/availability. SQL 010–015 VPS unauthorised; K5F/ADR-031/032 OPEN. [S4](../04-execution/SALON-S4-PARALLEL-DELIVERY-2026-11-13.md).
+
+
 > **2026-11-13 S2 CI MAINLINE STATUS:** Original Shared Booking code/SQL 013 merged previously; PR #74 additionally proved end-to-end Customer create + Catalog service create + Booking persisted/read again + POS DRAFT saved on disposable SQL2022 with 001–014 migrations, one real K5 Branch HTTP session and cross-scope negative cases (19 checks). PR #75 improved protected private Web workflow; PR #76 audited pinned Cashier lock key behavior, **without replacing** SQL resource-row locking. No salon/real user activation, no SQL 010–014 VPS approval. [Integrated handoff](../04-execution/SALON-S2-INTEGRATED-HANDOFF-2026-11-13.md).
 
 

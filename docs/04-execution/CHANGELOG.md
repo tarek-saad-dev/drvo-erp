@@ -1,5 +1,11 @@
 # Project changelog
 
+## 2026-11-14 — SC-0/SC-1 governance reads merged; first Salon NO-GO tracked
+
+- SC-0 #104 and SC-1 #105 read-only PRs merged to `main`; #105 squash SHA `98470283d7e239567f71e56417f9e9def7130450`. No published production Release, no actual commercial price or Entitlement, no SQL migrations, roles, payment or VPS activation. Detailed check results verified separately; merge CI does not prove a live customer.
+- Created [Salon 7+3 gate acceptance plan](SALON-FIRST-REAL-CUSTOMER-GATES-2026-11-14.md) and [Issue #106](https://github.com/tarek-saad-dev/drvo-erp/issues/106), recording the exact missing K5F/off-host recovery, network/Origin, authorized SQL 010–017, private entitlement, real browser, founder GO, SaaS billing and POS GL decisions. First restricted Salon and first paying Salon both **NO-GO** until independent operational evidence.
+
+
 ## 2026-11-14 — SC-1 read-only technical Business bundle simulation (stacked PR)
 
 - Reuses SC-0 trusted-only release contract and K6A/B pure graph to compute Required closure and selected Optional modules from explicit synthetic evidence; integer minor base+tax quote arithmetic for CI only, `SIMULATION_ONLY`, never approvable. Missing/forged price, revision, market, active state, graph, mixed currency/period and overflow fail closed.

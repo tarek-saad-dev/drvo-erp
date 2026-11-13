@@ -1,5 +1,11 @@
 # Project changelog
 
+## 2026-11-13 — Salon S3 operator-readiness source gate merged
+
+- [PR #78](https://github.com/tarek-saad-dev/drvo-erp/pull/78) **MERGED**, commit `4b010ad30387c41b6c3a915f6e7845330020651b`; K0, K1 and Staging Artifact CI on merge commit PASS. Redacted local report can only identify missing/untrusted operator evidence, not perform a live migration/activation.
+- K5F operational checker execution, offsite encrypted backup and independent restore, trusted proxy/Origin Owner/Staff negative E2E, SQL 010–014 operator authorization, ADR-032 entitlement and ADR-031 financial accounting remain **NOT COMPLETE**. No runtime changes to staging or customer accounts.
+
+
 ## 2026-11-13 — Salon S3 safe operator preflight source tool (review PR)
 
 - Added bounded, read-only local `tools/salon-pilot/preflight.cjs` to inventory redacted reported K5F/DR/export/release evidence and check exact 001–009 observed pre-migration prefix against current SQL 001–014 source hashes. No network/VPS/SQL/SSH operations or secret data are consumed; unknown fields fail closed.

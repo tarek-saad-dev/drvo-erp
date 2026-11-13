@@ -233,6 +233,7 @@ async function main(){
       DRVO_SQL_HOST:'127.0.0.1', DRVO_SQL_PORT:'1433',
       DRVO_SQL_DATABASE:db,DRVO_SQL_USER:appUser,DRVO_SQL_PASSWORD:appPass,
       DRVO_K5_AUTH_ENABLED:'YES',DRVO_K6C_CATALOG_READ_ENABLED:'YES',
+      DRVO_SC0_RELEASE_READ_ENABLED:'YES',DRVO_SC1_PREVIEW_READ_ENABLED:'YES',
       DRVO_K5_ORIGIN:origin,
     };
     server=spawn(process.execPath,['apps/api/dist/main.js'],{
@@ -251,6 +252,46 @@ async function main(){
     });
     const ownerCookie=await login('owner.k6c');
     const outsiderCookie=await login('other.k6c');
+    const releasePath=(b,br)=>url+'/workspaces/'+b+'/branches/'+br+'/modules/releases';
+    const previewPath=(b,br,key='Booking')=>url+'/workspaces/'+b+
+      '/branches/'+br+'/modules/activation-preview?moduleKey='+encodeURIComponent(key);
+    await pass('SC0 and SC1 private URLs require current trusted K5 session',async()=>{
+      for(const path of [releasePath(x.b1,x.br1),previewPath(x.b1,x.br1)]){
+        const r=await get(path);
+        assert.equal(r.status,401);
+        assert.equal(r.headers.get('cache-control'),'no-store');
+      }
+    });
+    await pass('SC0 never exposes candidate metadata as released modules',async()=>{
+      const r=await get(releasePath(x.b1,x.br1),ownerCookie);
+      assert.equal(r.status,200);
+      assert.deepEqual(await r.json(),{status:'NO_VERIFIED_RELEASES',releases:[]});
+      assert.equal((await get(releasePath(x.b3,x.br3),outsiderCookie)).status,200);
+    });
+    await pass('SC1 preview never invents a quote, amount, approval or entitlement',async()=>{
+      const r=await get(previewPath(x.b1,x.br1),ownerCookie);
+      assert.equal(r.status,200);
+      const body=await r.json();
+      assert.equal(body.status,'UNQUOTABLE');
+      assert.equal(body.approvable,false);
+      assert.equal(body.moduleKey,'Booking');
+      assert.ok(body.reasonCodes.includes('PRICES_NOT_APPROVED'));
+      assert.equal('quote' in body,false);
+      assert.equal('activation' in body,false);
+      assert.equal(JSON.stringify(body).includes('1000'),false);
+    });
+    await pass('SC0/SC1 forbid same Tenant other Business, foreign Tenant and other Branch',async()=>{
+      for(const [b,br] of [[x.b2,x.br2],[x.b3,x.br3],[x.b1,x.br1other]]){
+        assert.equal((await get(releasePath(b,br),ownerCookie)).status,404);
+        assert.equal((await get(previewPath(b,br),ownerCookie)).status,404);
+      }
+      assert.equal((await get(previewPath(x.b1,x.br1,'../../spoof'),ownerCookie)).status,400);
+      assert.equal((await get(previewPath(x.b3,x.br3),outsiderCookie)).status,200);
+      for(const path of [releasePath(x.b1,x.br1),previewPath(x.b1,x.br1)]){
+        assert.equal((await fetch(path,{method:'POST',headers:{Cookie:ownerCookie},
+          body:JSON.stringify({approve:true,priceMinor:1})})).status,404);
+      }
+    });
     await pass('authorized HTTP list has ONLY own Business candidates',async()=>{
       const r=await get(candidates(x.b1,x.br1),ownerCookie);
       assert.equal(r.status,200);
@@ -289,6 +330,8 @@ async function main(){
         " AND RoleId=@r AND ActionCode='branch.read'",
         {t:x.t1,b:x.b1,r:x.r1});
       assert.equal((await get(candidates(x.b1,x.br1),ownerCookie)).status,404);
+      assert.equal((await get(releasePath(x.b1,x.br1),ownerCookie)).status,404);
+      assert.equal((await get(previewPath(x.b1,x.br1),ownerCookie)).status,404);
       await executeGuid(admin,
         "INSERT INTO core.RolePermission(TenantId,BusinessId,RoleId,ActionCode)"+
         " VALUES(@t,@b,@r,'branch.read')",
@@ -301,6 +344,8 @@ async function main(){
         " AND BusinessId=@b AND AccountId=@a",
         {t:x.t1,b:x.b1,a:x.owner});
       assert.equal((await get(candidates(x.b1,x.br1),ownerCookie)).status,404);
+      assert.equal((await get(releasePath(x.b1,x.br1),ownerCookie)).status,404);
+      assert.equal((await get(previewPath(x.b1,x.br1),ownerCookie)).status,404);
       await executeGuid(admin,
         "UPDATE core.BusinessMembership SET IsActive=1 WHERE TenantId=@t"+
         " AND BusinessId=@b AND AccountId=@a",
@@ -312,6 +357,8 @@ async function main(){
         " WHERE TenantId=@t AND AccountId=@a AND RevokedAtUtc IS NULL",
         {t:x.t1,a:x.owner});
       assert.equal((await get(candidates(x.b1,x.br1),ownerCookie)).status,401);
+      assert.equal((await get(releasePath(x.b1,x.br1),ownerCookie)).status,401);
+      assert.equal((await get(previewPath(x.b1,x.br1),ownerCookie)).status,401);
     });
     console.log('K6C DISPOSABLE SQL + HTTP ISOLATION PASS: '+count+' checks');
   } finally {

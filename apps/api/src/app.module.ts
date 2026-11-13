@@ -14,6 +14,8 @@ import { BranchInvitationService } from "./identity/branch-invitation.service";
 import { BranchInvitationController } from "./identity/branch-invitation.controller";
 import { ModuleCandidatesController } from "./modules/module-candidates.controller";
 import { ModuleCandidatesService } from "./modules/module-candidates.service";
+import { ReleaseCatalogService } from "./modules/release-catalog.service";
+import { ReleaseCatalogController } from "./modules/release-catalog.controller";
 import { CatalogController } from "./catalog/catalog.controller";
 import { CatalogService } from "./catalog/catalog.service";
 import { CustomersController } from "./customers/customers.controller";
@@ -28,8 +30,8 @@ import { PosDraftsService } from "./pos-drafts/pos-drafts.service";
 @Module({
   controllers: [HealthController, DatabaseHealthController, K3ScopeProofController,
     IdentityController, AuthorizedBranchController, BranchAccessController,
-    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, CatalogController, CustomersController, BookingController, PosPreviewController, PosDraftsController],
+    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, ReleaseCatalogController, CatalogController, CustomersController, BookingController, PosPreviewController, PosDraftsController],
   providers: [FoundationDatabaseService, K3ScopeProofRepository, IdentityService, BranchAccessService,
-    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, CatalogService, CustomersService, BookingService, PosPreviewService, PosDraftsService],
+    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, ReleaseCatalogService, CatalogService, CustomersService, BookingService, PosPreviewService, PosDraftsService],
 })
 export class AppModule {}

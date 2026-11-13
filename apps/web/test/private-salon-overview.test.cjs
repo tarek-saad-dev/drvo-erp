@@ -49,3 +49,18 @@ test('daily operational filters and Booking-to-POS actions honor independent acc
  assert.match(client,/بدون مبيعات أو تحصيل/);
  assert.doesNotMatch(client,/method:"POST"|\/sales\/posted|\.post\(/);
 });
+
+test('resource/status roster filters use authorized list only and never create API access',()=>{
+ const client=read('salon/salon-overview-client.tsx');
+ assert.match(client,/resourceId:string;customerName/);
+ assert.match(client,/resourceFilter,setResourceFilter/);
+ assert.match(client,/statusFilter,setStatusFilter/);
+ assert.match(client,/resourceOptions=Array\.from\(new Map/);
+ assert.match(client,/\.filter\(b=>!resourceFilter\|\|b\.resourceId===resourceFilter\)/);
+ assert.match(client,/\.filter\(b=>statusFilter==="ALL"\|\|b\.status===statusFilter\)/);
+ assert.match(client,/k5-salon-resource-filter/);
+ assert.match(client,/k5-salon-status-filter/);
+ assert.match(client,/filtered\.length/);
+ assert.match(client,/آخر 200 حجز/);
+ assert.doesNotMatch(client,/localStorage|sessionStorage|method:"POST"/);
+});

@@ -138,11 +138,11 @@ async function main(){
    "',CHECK_POLICY=ON,CHECK_EXPIRATION=OFF");
   admin=await open({...base,database:db});
   await admin.query("CREATE USER ["+user+"] FOR LOGIN ["+user+"];GRANT CONNECT TO ["+user+"]");
-  await pass('15 forward-only migrations apply and replay, no synthetic appointment or draft seed',async()=>{
-   const applied=await applyMigrations(admin,undefined,15);
-   assert.equal(applied.length,15);
+  await pass('16 forward-only migrations apply and replay, no synthetic appointment or draft seed',async()=>{
+   const applied=await applyMigrations(admin,undefined,16);
+   assert.equal(applied.length,16);
    assert.ok(applied.every(x=>x.status==='applied'));
-   const replay=await applyMigrations(admin,undefined,14);
+   const replay=await applyMigrations(admin,undefined,16);
    assert.ok(replay.every(x=>x.status==='unchanged'));
    const r=await admin.query("SELECT COUNT(*) AS n FROM core.BookingAppointment");
    assert.equal(r.recordset[0].n,0);
@@ -520,6 +520,83 @@ async function main(){
     "HAS_PERMS_BY_NAME('core.BookingAppointment','OBJECT','UPDATE') AS u,"+
     "HAS_PERMS_BY_NAME('core.ChangeBookingAppointmentStatus','OBJECT','EXECUTE') AS e");
    assert.deepEqual(Object.values(r.recordset[0]).map(Number),[0,0,1]);
+  });
+  const shift=(iso,minutes)=>new Date(Date.parse(iso)+minutes*60000).toISOString();
+  const windowPayload=(resourceId,start,end)=>({
+   resourceId,startsAtUtc:start,endsAtUtc:end,
+  });
+  let hoursResource,hoursStart;
+  await pass('Windows: create scoped UTC working interval, replay safely and read',async()=>{
+   const endpoint=path(g.business,g.branch);
+   const resource=await post(endpoint+'/resources',cookie,guid(),
+    {displayName:'CI Dated Availability',kind:'PERSON'});
+   assert.equal(resource.status,200);hoursResource=(await resource.json()).id;
+   hoursStart=future(2400);
+   const end=shift(hoursStart,60),key=guid();
+   assert.equal((await get(endpoint+'/windows')).status,401);
+   assert.equal((await post(endpoint+'/windows',cookie,key,windowPayload(
+    hoursResource,hoursStart,end))).status,200);
+   const replay=await post(endpoint+'/windows',cookie,key,windowPayload(
+    hoursResource,hoursStart,end));
+   assert.equal(replay.status,200);assert.equal((await replay.json()).created,false);
+   assert.equal((await post(endpoint+'/windows',cookie,key,windowPayload(
+    hoursResource,hoursStart,shift(end,5)))).status,409);
+   const windows=(await (await get(endpoint+'/windows',cookie)).json()).windows;
+   assert.ok(windows.some(x=>x.resourceId===hoursResource&&
+    x.startsAtUtc===hoursStart&&x.endsAtUtc===end));
+  });
+  await pass('Windows: SQL enforces inside-only bookings; overlaps, scope and Origin denied',async()=>{
+   const endpoint=path(g.business,g.branch);
+   const payload=(m)=>({
+    resourceId:hoursResource,customerId:g.customer,offeringId:g.service,
+    startsAtUtc:shift(hoursStart,m),
+   });
+   assert.equal((await post(endpoint+'/appointments',cookie,guid(),payload(-45))).status,409);
+   assert.equal((await post(endpoint+'/appointments',cookie,guid(),payload(75))).status,409);
+   assert.equal((await post(endpoint+'/appointments',cookie,guid(),payload(15))).status,200);
+   assert.equal((await post(endpoint+'/appointments',cookie,guid(),payload(20))).status,409);
+   assert.equal((await post(endpoint+'/windows',cookie,guid(),windowPayload(
+    hoursResource,shift(hoursStart,20),shift(hoursStart,45)))).status,409);
+   assert.equal((await post(endpoint+'/windows',cookie,guid(),{
+    ...windowPayload(hoursResource,hoursStart,shift(hoursStart,60)),tenantId:g.t,
+   })).status,400);
+   assert.equal((await post(endpoint+'/windows',cookie,guid(),windowPayload(
+    hoursResource,hoursStart,shift(hoursStart,60)),{
+     Origin:'https://attacker.invalid',
+   })).status,401);
+   const foreign=path(g.foreignBusiness,g.foreignBranch)+'/windows';
+   assert.equal((await get(foreign,cookie)).status,404);
+   assert.equal((await post(foreign,cookie,guid(),windowPayload(
+    hoursResource,hoursStart,shift(hoursStart,60)))).status,404);
+  });
+  await pass('Windows: first published schedule cannot strand existing future bookings',async()=>{
+   const endpoint=path(g.business,g.branch);
+   const resource=await post(endpoint+'/resources',cookie,guid(),
+    {displayName:'CI Existing Booking Resource',kind:'CHAIR'});
+   assert.equal(resource.status,200);const id=(await resource.json()).id;
+   const oldStart=future(2650);
+   const booked=await post(endpoint+'/appointments',cookie,guid(),{
+    customerId:g.customer,offeringId:g.service,resourceId:id,startsAtUtc:oldStart,
+   });
+   assert.equal(booked.status,200);const bookingId=(await booked.json()).id;
+   const first=windowPayload(id,future(2700),future(2760));
+   assert.equal((await post(endpoint+'/windows',cookie,guid(),first)).status,409);
+   assert.equal((await post(changePath(g.business,g.branch,bookingId),cookie,
+    guid(),{status:'CANCELLED'})).status,200);
+   assert.equal((await post(endpoint+'/windows',cookie,guid(),first)).status,200);
+   assert.equal((await post(endpoint+'/appointments',cookie,guid(),{
+    customerId:g.customer,offeringId:g.service,resourceId:id,startsAtUtc:oldStart,
+   })).status,409);
+  });
+  await pass('Windows: restricted runtime SQL principal only executes procedures',async()=>{
+   const x=await app.query("SELECT "+
+    "HAS_PERMS_BY_NAME('core.BookingResourceWindow','OBJECT','SELECT') AS s,"+
+    "HAS_PERMS_BY_NAME('core.BookingResourceWindow','OBJECT','INSERT') AS i,"+
+    "HAS_PERMS_BY_NAME('core.ReadBookingResourceWindows','OBJECT','EXECUTE') AS r,"+
+    "HAS_PERMS_BY_NAME('core.CreateBookingResourceWindow','OBJECT','EXECUTE') AS w");
+   assert.deepEqual(Object.values(x.recordset[0]).map(Number),[0,0,1,1]);
+   await assert.rejects(()=>app.query("SELECT TOP(1) * FROM core.BookingResourceWindow"),
+    e=>e.number===229);
   });
   await pass('Revoked booking read/write role and Business membership deny next request',async()=>{
    await q(admin,"DELETE core.RolePermission WHERE TenantId=@t"+

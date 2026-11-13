@@ -100,3 +100,38 @@ test("status change endpoint rejects foreign Origin before auth",async()=>{
    GUID(3),GUID(4),GUID(5),{status:"CANCELLED"}),e=>e.getStatus?.()===401);
  }finally{restore();}
 });
+
+
+test("dated availability rejects unknown fields and invalid UTC windows before SQL",async()=>{
+ const restore=on({DRVO_BOOKING_ENABLED:"YES",DRVO_K5_AUTH_ENABLED:"YES"});
+ try{
+  const svc=new BookingService({getInternalPool(){throw Error("no SQL");}});
+  const start="2027-02-01T08:00:00.000Z";
+  for(const body of [
+   {resourceId:GUID(7),startsAtUtc:start,endsAtUtc:start},
+   {resourceId:GUID(7),startsAtUtc:start,endsAtUtc:"2027-02-03T08:00:00.000Z"},
+   {resourceId:GUID(7),startsAtUtc:start,endsAtUtc:"not-a-date"},
+   {resourceId:"bad",startsAtUtc:start,endsAtUtc:"2027-02-01T09:00:00.000Z"},
+   {resourceId:GUID(7),startsAtUtc:start,endsAtUtc:"2027-02-01T09:00:00.000Z",tenantId:GUID(1)},
+  ])await assert.rejects(()=>svc.addWindow(actor,token,GUID(3),GUID(4),
+   GUID(8),body),e=>e.getStatus?.()===400);
+  await assert.rejects(()=>svc.listWindows(actor,"wrong",GUID(3),GUID(4)),
+   e=>e.getStatus?.()===404);
+ }finally{restore();}
+});
+test("window creation rejects forged Origin before reading K5 session",async()=>{
+ const restore=on({DRVO_BOOKING_ENABLED:"YES",DRVO_K5_AUTH_ENABLED:"YES",
+  DRVO_K5_ORIGIN:"https://erp-stage.drvotech.com"});
+ try{
+  const controller=new BookingController(
+   {actorFromToken(){throw Error("should not authorize");}},
+   {addWindow(){throw Error("should not mutate");}},
+  );
+  await assert.rejects(()=>controller.addWindow(
+   "https://attacker.invalid",GUID(8),{headers:{}},{setHeader(){}},
+   GUID(3),GUID(4),{
+    resourceId:GUID(7),startsAtUtc:"2027-02-01T08:00:00.000Z",
+    endsAtUtc:"2027-02-01T09:00:00.000Z",
+   }),e=>e.getStatus?.()===401);
+ }finally{restore();}
+});

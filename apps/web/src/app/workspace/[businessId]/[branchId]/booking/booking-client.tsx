@@ -11,6 +11,7 @@ type Appointment={
   startsAtUtc:string;endsAtUtc:string;status:"BOOKED"|"CANCELLED"|"COMPLETED";
 };
 type BookingRead={resources:Resource[];appointments:Appointment[]};
+type BookingWindow={windowId:string;resourceId:string;startsAtUtc:string;endsAtUtc:string};
 type Customer={customerId:string;displayName:string;isActive:boolean};
 type Offering={offeringId:string;displayName:string;kind:string;durationMinutes:number|null;isActive:boolean};
 const GUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
@@ -22,6 +23,10 @@ export default function BookingClient({businessId,branchId,posWebEnabled}:{
   const router=useRouter();
   const [status,setStatus]=useState<Status>("loading");
   const [data,setData]=useState<BookingRead>({resources:[],appointments:[]});
+  const [windows,setWindows]=useState<BookingWindow[]>([]);
+  const [windowResourceId,setWindowResourceId]=useState("");
+  const [windowLocalStart,setWindowLocalStart]=useState("");
+  const [windowLocalEnd,setWindowLocalEnd]=useState("");
   const [customers,setCustomers]=useState<Customer[]>([]);
   const [services,setServices]=useState<Offering[]>([]);
   const [canOpenPos,setCanOpenPos]=useState(false);
@@ -35,6 +40,7 @@ export default function BookingClient({businessId,branchId,posWebEnabled}:{
   const [localStart,setLocalStart]=useState("");
   const resourceRequest=useRef<string|null>(null);
   const bookingRequest=useRef<string|null>(null);
+  const windowRequest=useRef<string|null>(null);
   const statusKeys=useRef<Map<string,string>>(new Map());
   const scope="/api/workspaces/"+encodeURIComponent(businessId)+"/branches/"+encodeURIComponent(branchId);
   const home="/workspace/"+encodeURIComponent(businessId)+"/"+encodeURIComponent(branchId);
@@ -44,25 +50,30 @@ export default function BookingClient({businessId,branchId,posWebEnabled}:{
     try{
       // Booking may present Customer/Service labels only if independently
       // permitted to read those owning Modules; never bypass their scopes.
-      const [booking,customer,category]=await Promise.all([
+      const [booking,customer,category,windowResult]=await Promise.all([
         fetch(scope+"/booking",{credentials:"same-origin",cache:"no-store"}),
         fetch(scope+"/customers",{credentials:"same-origin",cache:"no-store"}),
         fetch(scope+"/catalog",{credentials:"same-origin",cache:"no-store"}),
+        fetch(scope+"/booking/windows",{credentials:"same-origin",cache:"no-store"}),
       ]);
-      if([booking,customer,category].some(r=>r.status===401)){router.replace("/sign-in");return;}
+      if([booking,customer,category,windowResult].some(r=>r.status===401)){router.replace("/sign-in");return;}
       if(booking.status===403||booking.status===404){setStatus("denied");return;}
       if(!booking.ok){setStatus("unavailable");return;}
       if(!customer.ok||!category.ok){setStatus("prerequisites");return;}
-      const [book,cs,cat]=await Promise.all([
+      if(!windowResult.ok){setStatus("unavailable");return;}
+      const [book,cs,cat,availability]=await Promise.all([
         booking.json() as Promise<BookingRead>,
         customer.json() as Promise<{customers:Customer[]}>,
         category.json() as Promise<{offerings:Offering[]}>,
+        windowResult.json() as Promise<{windows:BookingWindow[]}>,
       ]);
       if(!Array.isArray(book.resources)||!Array.isArray(book.appointments)||
-          !Array.isArray(cs.customers)||!Array.isArray(cat.offerings)){
+          !Array.isArray(cs.customers)||!Array.isArray(cat.offerings)||
+          !Array.isArray(availability.windows)){
         setStatus("unavailable");return;
       }
       setData(book);
+      setWindows(availability.windows);
       setCustomers(cs.customers.filter(c=>c.isActive));
       setServices(cat.offerings.filter(s=>s.isActive&&s.kind==="SERVICE"&&
         typeof s.durationMinutes==="number"&&s.durationMinutes>0));
@@ -112,6 +123,24 @@ export default function BookingClient({businessId,branchId,posWebEnabled}:{
     event.preventDefault();
     const created=await submit("/resources",{displayName:resourceName,kind:resourceKind},resourceRequest);
     if(created)setResourceName("");
+  }
+  async function addAvailability(event:React.FormEvent<HTMLFormElement>){
+    event.preventDefault();
+    if(!GUID.test(windowResourceId)||!windowLocalStart||!windowLocalEnd){
+      setNotice("اختار مورد وبداية ونهاية نافذة التوافر.");return;
+    }
+    const start=new Date(windowLocalStart),end=new Date(windowLocalEnd);
+    if(!Number.isFinite(start.getTime())||!Number.isFinite(end.getTime())||
+       start.getSeconds()!==0||end.getSeconds()!==0||
+       start.getTime()<Date.now()+5*60000||end<=start||
+       end.getTime()-start.getTime()>86400000){
+      setNotice("لازم تحدد نافذة مستقبلية من دقيقة إلى 24 ساعة.");return;
+    }
+    const saved=await submit("/windows",{
+      resourceId:windowResourceId,
+      startsAtUtc:start.toISOString(),endsAtUtc:end.toISOString(),
+    },windowRequest);
+    if(saved){setWindowLocalStart("");setWindowLocalEnd("");}
   }
   async function addBooking(event:React.FormEvent<HTMLFormElement>){
     event.preventDefault();
@@ -203,6 +232,40 @@ export default function BookingClient({businessId,branchId,posWebEnabled}:{
           </select></label>
           <button className="k5-save" disabled={busy}>إضافة المورد</button>
         </form>
+      </section>
+      <section className="k5-admin-card k5-invite-card" aria-label="توافر المورد بالتاريخ">
+        <h2>ساعات العمل والتوافر لمورد حجز</h2>
+        <p className="k5-muted">حدد فترة بتاريخ ووقت واضحين (حسب جهازك، والحفظ UTC).
+          لو نشرت أول فترة لمورد، الحجوزات الجديدة ليه هتحتاج تقع بالكامل داخل فترة منشورة.
+          الأيام من غير فترات بعد أول نشر تعتبر غير متاحة. التاريخ الأقصى 90 يوم.
+          الفترة الحالية لا تمثل جدول أسبوعي متكرر أو حضور موظف HR.</p>
+        <form className="catalog-form" onSubmit={addAvailability}>
+          <label>المورد<select required value={windowResourceId}
+            onChange={e=>{setWindowResourceId(e.target.value);windowRequest.current=null;}}>
+            <option value="">اختر موردًا</option>
+            {data.resources.filter(r=>r.isActive).map(r=>
+              <option key={r.resourceId} value={r.resourceId}>{r.displayName}</option>)}
+          </select></label>
+          <label>بداية الفترة المحلية<input type="datetime-local" step={60} required
+            value={windowLocalStart}
+            onChange={e=>{setWindowLocalStart(e.target.value);windowRequest.current=null;}}/></label>
+          <label>نهاية الفترة المحلية<input type="datetime-local" step={60} required
+            value={windowLocalEnd}
+            onChange={e=>{setWindowLocalEnd(e.target.value);windowRequest.current=null;}}/></label>
+          <button className="k5-save" disabled={busy||!data.resources.some(r=>r.isActive)}>
+            نشر فترة التوافر
+          </button>
+        </form>
+        <div className="k5-table-wrap"><table className="k5-table">
+          <thead><tr><th>المورد</th><th>من</th><th>إلى</th></tr></thead>
+          <tbody>{windows.length===0?<tr><td colSpan={3} className="k5-empty">
+            مفيش فترات منشورة حاليًا؛ الموارد دي بتتبع نظام الحجز السابق.
+          </td></tr>:windows.map(w=><tr key={w.windowId}>
+            <td>{data.resources.find(r=>r.resourceId===w.resourceId)?.displayName??"—"}</td>
+            <td dir="ltr">{new Date(w.startsAtUtc).toLocaleString("ar-EG")}</td>
+            <td dir="ltr">{new Date(w.endsAtUtc).toLocaleString("ar-EG")}</td>
+          </tr>)}</tbody>
+        </table></div>
       </section>
       <section className="k5-admin-card k5-invite-card" id="new-appointment">
         <h2>حجز موعد جديد</h2>

@@ -24,5 +24,5 @@ test('untrusted link ID only pre-fills after independently authorized POS/Catalo
  assert.match(client,/credentials:"same-origin",cache:"no-store"/);
  assert.match(client,/retryKey\.current=null;setLines\(\[\]\);setPreview\(null\)/);
  assert.match(client,/posted!==false/);
- assert.doesNotMatch(client,/localStorage|sessionStorage|POSTED[^A-Z]/);
+ assert.doesNotMatch(client,/localStorage|sessionStorage|method:"POST"[^]*\/sales/);
 });

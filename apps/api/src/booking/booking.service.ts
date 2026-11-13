@@ -93,7 +93,6 @@ export class BookingService {
    resourceName:String(row.resourceName),
    startsAtUtc:new Date(row.startsAtUtc as string|number|Date).toISOString(),
    endsAtUtc:new Date(row.endsAtUtc as string|number|Date).toISOString(),
-   state:row.state==="CLOSED"?"CLOSED" as const:"OPEN" as const,
    status:(row.status==="CANCELLED"?"CANCELLED":row.status==="COMPLETED"?"COMPLETED":"BOOKED") as AppointmentView["status"],
   }));
   return {resources,appointments};
@@ -164,6 +163,7 @@ export class BookingService {
    windowId:String(row.windowId),resourceId:String(row.resourceId),
    startsAtUtc:new Date(row.startsAtUtc as string|number|Date).toISOString(),
    endsAtUtc:new Date(row.endsAtUtc as string|number|Date).toISOString(),
+   state:row.state==="CLOSED"?"CLOSED" as const:"OPEN" as const,
   }));
   return {windows};
  }

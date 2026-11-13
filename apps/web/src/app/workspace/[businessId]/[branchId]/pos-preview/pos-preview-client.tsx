@@ -22,6 +22,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
   const [status,setStatus]=useState<"loading"|"ready"|"denied"|"error">("loading");
   const [offerings,setOfferings]=useState<Offering[]>([]);
   const [offeringId,setOfferingId]=useState("");
+  const [catalogSearch,setCatalogSearch]=useState("");
   const [quantity,setQuantity]=useState(1);
   const [lines,setLines]=useState<Line[]>([]);
   const [preview,setPreview]=useState<Preview|null>(null);
@@ -32,6 +33,8 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
   const [draftBusy,setDraftBusy]=useState(false);
   const retryKey=useRef<string|null>(null);
   const handoffApplied=useRef(false);
+  const matchingOfferings=offerings.filter(o=>o.isActive&&
+    o.displayName.toLocaleLowerCase().includes(catalogSearch.trim().toLocaleLowerCase()));
   const home="/workspace/"+encodeURIComponent(businessId)+"/"+encodeURIComponent(branchId);
   const api="/api/workspaces/"+encodeURIComponent(businessId)+"/branches/"+
     encodeURIComponent(branchId)+"/pos-preview";
@@ -109,6 +112,19 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
     retryKey.current=null;setPreview(null);setMessage("");
     setLines(current=>[...current,{offeringId:offering.offeringId,quantity:1}]);
   }
+  function adjustLineQuantity(selectedOfferingId:string,delta:-1|1){
+    if(busy||draftBusy)return;
+    const existing=lines.find(l=>l.offeringId===selectedOfferingId);
+    if(!existing||existing.quantity+delta<1||existing.quantity+delta>20)return;
+    // A changed cart must never replay a pending immutable DRAFT request or
+    // retain a server-priced preview for different quantities.
+    retryKey.current=null;setPreview(null);setMessage("");
+    setLines(current=>current.map(l=>{
+      if(l.offeringId!==selectedOfferingId)return l;
+      const next=l.quantity+delta;
+      return next>=1&&next<=20?{...l,quantity:next}:l;
+    }));
+  }
   function createNewFromDraft(d:SavedDraft){
     if(busy||draftBusy)return;
     // A saved DRAFT is IMMUTABLE. Preparing a new cart always uses currently
@@ -124,7 +140,9 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
     setMessage("تم تجهيز سلة جديدة من المسودة القديمة. راجع الأسعار الحالية قبل الحفظ؛ المسودة الأصلية لم تتغير.");
   }
   function addLine(event:React.FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setPreview(null);setMessage("");
+    event.preventDefault();
+    if(busy||draftBusy)return;
+    setPreview(null);setMessage("");
     if(!GUID.test(offeringId)||!Number.isSafeInteger(quantity)||quantity<1||quantity>20||
         !offerings.some(o=>o.offeringId===offeringId)||
         lines.some(l=>l.offeringId===offeringId)||lines.length>=20) {
@@ -134,7 +152,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
     setLines(current=>[...current,{offeringId,quantity}]);
   }
   async function calculate() {
-    if(busy||lines.length===0)return;
+    if(busy||draftBusy||lines.length===0)return;
     setBusy(true);setPreview(null);setMessage("");
     try{
       const response=await fetch(api+"/checkout-preview",{
@@ -171,14 +189,19 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
       <section className="k5-admin-card k5-invite-card">
         <h2>إضافة عنصر للمسودة</h2>
         <p className="k5-muted">اختار عنصر من القائمة أو اضغط إضافة سريعة. كل الأسعار استرشادية، والسلة مش فاتورة.</p>
+        <label>ابحث عن خدمة أو منتج للإضافة السريعة
+          <input type="search" maxLength={100} value={catalogSearch}
+            placeholder="اكتب اسم العنصر" onChange={e=>setCatalogSearch(e.target.value)}/>
+        </label>
         <div className="k5-salon-steps" aria-label="إضافة سريعة من الكتالوج">
-          {offerings.filter(o=>o.isActive&&
+          {matchingOfferings.filter(o=>
             !lines.some(l=>l.offeringId===o.offeringId)).slice(0,8).map(o=><button
             key={o.offeringId} type="button" className="k5-salon-refresh"
             disabled={busy||draftBusy||lines.length>=20} onClick={()=>quickAdd(o)}>
             + {o.displayName} — {money(o.priceMinor,o.currency)}
           </button>)}
         </div>
+        {matchingOfferings.length===0&&<p className="k5-muted">مفيش عناصر نشطة مطابقة للبحث الحالي.</p>}
         <form className="catalog-form" onSubmit={addLine}>
           <label>الخدمة أو المنتج<select value={offeringId} required
             onChange={e=>setOfferingId(e.target.value)}>
@@ -188,7 +211,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
           </select></label>
           <label>الكمية<input type="number" min={1} max={20} required
             value={quantity} onChange={e=>setQuantity(Number(e.target.value))}/></label>
-          <button className="k5-save" type="submit" disabled={busy}>أضف للمسودة</button>
+          <button className="k5-save" type="submit" disabled={busy||draftBusy}>أضف للمسودة</button>
         </form>
       </section>
       <section className="k5-admin-card">
@@ -198,14 +221,22 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
             <thead><tr><th>العنصر</th><th>الكمية</th><th>إزالة</th></tr></thead><tbody>
               {lines.map(l=><tr key={l.offeringId}>
                 <td>{offerings.find(o=>o.offeringId===l.offeringId)?.displayName??"—"}</td>
-                <td>{l.quantity}</td>
-                <td><button type="button" disabled={busy} onClick={()=>{
+                <td><div className="k5-booking-actions">
+                  <button type="button" disabled={busy||draftBusy||l.quantity<=1}
+                    aria-label={"تقليل كمية "+(offerings.find(o=>o.offeringId===l.offeringId)?.displayName??"العنصر")}
+                    onClick={()=>adjustLineQuantity(l.offeringId,-1)}>−</button>
+                  <span>{l.quantity}</span>
+                  <button type="button" disabled={busy||draftBusy||l.quantity>=20}
+                    aria-label={"زيادة كمية "+(offerings.find(o=>o.offeringId===l.offeringId)?.displayName??"العنصر")}
+                    onClick={()=>adjustLineQuantity(l.offeringId,1)}>+</button>
+                </div></td>
+                <td><button type="button" disabled={busy||draftBusy} onClick={()=>{
                   setLines(s=>s.filter(x=>x.offeringId!==l.offeringId));setPreview(null);retryKey.current=null;
                 }}>حذف</button></td>
               </tr>)}
             </tbody>
           </table></div>}
-        <button className="k5-save" type="button" disabled={busy||lines.length===0} onClick={()=>void calculate()}>
+        <button className="k5-save" type="button" disabled={busy||draftBusy||lines.length===0} onClick={()=>void calculate()}>
           {busy?"جاري الحساب…":"احسب معاينة الأسعار"}
         </button>
         {draftsEnabled&&draftStatus==="ready"&&

@@ -1,5 +1,8 @@
 # Roadmap
 
+> **2026-11-13 S3 READ-ONLY PILOT PREFLIGHT MERGED/VERIFIED:** [PR #78](https://github.com/tarek-saad-dev/drvo-erp/pull/78) delivered a strict redacted, source-only Go/No-Go operator-evidence CLI + tests; exact post-merge SHA `4b010ad30387c41b6c3a915f6e7845330020651b` K0/K1/Staging Artifact CI PASS. **Next external owner/operator action:** read-only trusted root K5F verification on immutable bundle + genuinely independent encrypted offsite backup/restore, Origin/proxy and isolation proof. Only after explicit security/operator approval can a separately manual SQL migration window 010–014 and private Business test grants be considered. No live Salon Pilot yet; ADR-031/032 pending. [Runbook](SALON-S3-PILOT-ACTIVATION-PREFLIGHT-2026-11-13.md).
+
+
 > **2026-11-13 SALON S3 ACTIVATION GO/NO-GO SOURCE GATE (REVIEW PR):** [Redacted local operator-evidence preflight](SALON-S3-PILOT-ACTIVATION-PREFLIGHT-2026-11-13.md) deterministically rejects missing release SHA/history, unreviewed K5F root checker, off-host restore, Origin/proxy and Tenant negative tests, explicit SQL approval and ADR-032 entitlement. Report is deliberately **read-only and non-authorizing** even when all inputs are marked OPERATOR_REPORTED. Next real task is an authorized administrator's root K5F preflight plus independent encrypted off-host restore, *then* a separately explicitly approved SQL 010–014 Staging window, then a privately authorized Salon browser pilot. Finance ADR-031 before any POS POSTED. No VPS change in this work.
 
 

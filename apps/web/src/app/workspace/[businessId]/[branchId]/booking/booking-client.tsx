@@ -11,7 +11,7 @@ type Appointment={
   startsAtUtc:string;endsAtUtc:string;status:"BOOKED"|"CANCELLED"|"COMPLETED";
 };
 type BookingRead={resources:Resource[];appointments:Appointment[]};
-type BookingWindow={windowId:string;resourceId:string;startsAtUtc:string;endsAtUtc:string};
+type BookingWindow={windowId:string;resourceId:string;startsAtUtc:string;endsAtUtc:string;state:"OPEN"|"CLOSED"};
 type Customer={customerId:string;displayName:string;isActive:boolean};
 type Offering={offeringId:string;displayName:string;kind:string;durationMinutes:number|null;isActive:boolean};
 const GUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
@@ -41,6 +41,7 @@ export default function BookingClient({businessId,branchId,posWebEnabled}:{
   const resourceRequest=useRef<string|null>(null);
   const bookingRequest=useRef<string|null>(null);
   const windowRequest=useRef<string|null>(null);
+  const closeWindowKeys=useRef<Map<string,string>>(new Map());
   const statusKeys=useRef<Map<string,string>>(new Map());
   const scope="/api/workspaces/"+encodeURIComponent(businessId)+"/branches/"+encodeURIComponent(branchId);
   const home="/workspace/"+encodeURIComponent(businessId)+"/"+encodeURIComponent(branchId);
@@ -141,6 +142,42 @@ export default function BookingClient({businessId,branchId,posWebEnabled}:{
       startsAtUtc:start.toISOString(),endsAtUtc:end.toISOString(),
     },windowRequest);
     if(saved){setWindowLocalStart("");setWindowLocalEnd("");}
+  }
+  async function closeAvailability(windowId:string){
+    if(busy||!GUID.test(windowId))return;
+    const existing=windows.find(w=>w.windowId===windowId);
+    if(!existing||existing.state!=="OPEN")return;
+    // A failed network attempt retains the request UUID for safe replay.
+    if(!closeWindowKeys.current.has(windowId))
+      closeWindowKeys.current.set(windowId,crypto.randomUUID());
+    setBusy(true);setNotice("");
+    try{
+      const response=await fetch(scope+"/booking/windows/"+
+        encodeURIComponent(windowId)+"/close",{
+        method:"POST",credentials:"same-origin",cache:"no-store",
+        headers:{"Content-Type":"application/json",
+          "Idempotency-Key":closeWindowKeys.current.get(windowId)!},
+        body:JSON.stringify({}),
+      });
+      if(response.status===401){router.replace("/sign-in");return;}
+      if(response.status===403||response.status===404){setStatus("denied");return;}
+      if(response.status===409){
+        closeWindowKeys.current.delete(windowId);
+        setNotice("مينفعش تقفل الفترة دي وفيها حجز مؤكد لسه قائم، أو هي اتقفلت بالفعل.");
+        await load();return;
+      }
+      if(response.status===400){closeWindowKeys.current.delete(windowId);
+        setNotice("طلب إغلاق الفترة غير صحيح.");return;}
+      if(!response.ok){setNotice("تعذر حفظ الإغلاق. أعد المحاولة بدون تغيير الطلب.");return;}
+      const result=await response.json() as {id:string;state:string};
+      if(result.id.toLowerCase()!==windowId.toLowerCase()||result.state!=="CLOSED"){
+        setNotice("استجابة الإغلاق غير صالحة.");return;
+      }
+      closeWindowKeys.current.delete(windowId);
+      setNotice("الفترة اتقفلت، والمورد لسه مقيد بفترات التوافر المنشورة فقط.");
+      await load();
+    }catch{setNotice("تعذر الاتصال. أعد المحاولة بنفس الطلب.");}
+    finally{setBusy(false);}
   }
   async function addBooking(event:React.FormEvent<HTMLFormElement>){
     event.preventDefault();
@@ -257,13 +294,18 @@ export default function BookingClient({businessId,branchId,posWebEnabled}:{
           </button>
         </form>
         <div className="k5-table-wrap"><table className="k5-table">
-          <thead><tr><th>المورد</th><th>من</th><th>إلى</th></tr></thead>
-          <tbody>{windows.length===0?<tr><td colSpan={3} className="k5-empty">
+          <thead><tr><th>المورد</th><th>من</th><th>إلى</th><th>الحالة</th><th>تصحيح</th></tr></thead>
+          <tbody>{windows.length===0?<tr><td colSpan={5} className="k5-empty">
             مفيش فترات منشورة حاليًا؛ الموارد دي بتتبع نظام الحجز السابق.
           </td></tr>:windows.map(w=><tr key={w.windowId}>
             <td>{data.resources.find(r=>r.resourceId===w.resourceId)?.displayName??"—"}</td>
             <td dir="ltr">{new Date(w.startsAtUtc).toLocaleString("ar-EG")}</td>
             <td dir="ltr">{new Date(w.endsAtUtc).toLocaleString("ar-EG")}</td>
+            <td>{w.state==="OPEN"?"متاحة":"مقفولة"}</td>
+            <td>{w.state==="OPEN"?<button type="button" className="k5-salon-refresh"
+              disabled={busy} onClick={()=>void closeAvailability(w.windowId)}>
+              إغلاق الفترة
+            </button>:<span>—</span>}</td>
           </tr>)}</tbody>
         </table></div>
       </section>

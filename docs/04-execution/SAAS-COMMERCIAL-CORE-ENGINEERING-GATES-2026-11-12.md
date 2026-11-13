@@ -1,7 +1,7 @@
 # SaaS Commercial Core — staged engineering plan and acceptance gates
 
 **Date:** 2026-11-12  
-**Status:** **PROPOSED ONLY — pending ADR-032 founder decision + Finance/Security signoff**. This is a build sequence, **not authorization** for SQL migrations, public access, customer activation, payments, or a production release.
+**Status:** **ACT-01–ACT-07 FOUNDER-ACCEPTED BASELINE (2026-11-14)**. SC-0/SC-1 **READ-ONLY PR CODING AUTHORIZED**; SC-2/SC-3 and financial/security details still need explicit decisions. This is a build sequence, **not authorization** for SQL migrations, public access, customer activation, payments, or a production release.
 
 ## Why now (verified GitHub checkpoint)
 
@@ -65,3 +65,10 @@ PRs #55 Shared Catalog, #57 Customers and #58 Booking are merged into `main`; pr
 6. Only then decide private synthetic staging acceptance, full end-to-end QA and eventually release eligibility per market/industry.
 
 **Operational conclusion:** code-only GitHub PRs can accelerate development but cannot bypass the security gates required to make DRVO ERP an accessible Business Operating System. Full Salon V1 still needs cancellation, staff/shift availability, POS/finance and relevant extension work as separately approved modules.
+
+
+## 2026-11-14 explicit authorization delta
+
+- SC-0 and SC-1 **read-only source/test/docs** on GitHub separate PRs are authorized by founder. The registry must remain empty of real commercially verified releases until country/industry evidence is accepted. Candidate rows/fixtures cannot be interpreted as verified releases.
+- SC-1 must explicitly return `UNQUOTABLE` when price, tax, releases, eligibility, Business revision, active state or entitlement evidence is not trusted/available; no guessed `EGP 0` commercial quote.
+- SC-2 and SC-3 **not authorized**. Finance and Security reviews/approved operator separation, pricing and K5F remain prerequisites. No VPS SQL (010–017), no Public Auth, no customer activation, no payment/entitlement operations.

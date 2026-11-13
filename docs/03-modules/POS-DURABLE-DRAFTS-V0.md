@@ -1,5 +1,8 @@
 # Shared POS Core — persisted DRAFT-only V0
 
+> **2026-11-13 S5 UNSAVED SERVICE HANDOFF MERGED:** PR #85 takes an OPTIONAL untrusted Offering ID from a private Booking-completion link; only after a permitted POS/Catalog HTTP GET and active SERVICE validation, prepares an in-memory cart line. PR #86 displays this link only for COMPLETED Booking with separately granted POS Draft read and POS Preview HTTP 200. **No Booking→POS automatic write, no customer PII in URL, no payment/invoice/GL/posted sale;** POS still owns fresh SQL Catalog price validation at explicit DRAFT save. [S5](../04-execution/SALON-S5-THREE-TRACK-DELIVERY-2026-11-13.md).
+
+
 > **2026-11-13 S4 PRIVATE POS UX FAST PATH MERGED:** PR #81 adds quick active Catalog Offering selection and explicitly preparing a **NEW** cart from an immutable saved DRAFT, requiring currently active authorized Offering references, new UUID and fresh SQL re-price at new DRAFT creation. Existing saved drafts never edited. No sale POSTED, payment, tax, GL or public activation. K5C/Next build and existing POS SQL CI passed. [S4](../04-execution/SALON-S4-PARALLEL-DELIVERY-2026-11-13.md).
 
 

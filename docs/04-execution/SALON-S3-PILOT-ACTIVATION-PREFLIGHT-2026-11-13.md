@@ -1,5 +1,7 @@
 # Salon S3 — Private Pilot operator preflight / explicit Go–No-Go (2026-11-13)
 
+> **2026-11-14 S8 SOURCE PLAN UPDATE:** [S8 #97](SALON-S8-BROWSER-REVIEW-MATRIX-2026-11-14.md) adds a non-executing Owner/Staff/foreign-scope browser review matrix that is *not* VPS K5F attestation, browser execution or SQL authorization. Source SQL remains 001–017; only the legacy K5F pre-migration 001–009 is the accepted observation prefix. SQL 010–017 on VPS still blocked; root K5F, encrypted offhost restore, ADR-032 and Operator+Security acceptance OPEN. [Integrated S8](SALON-S8-INTEGRATED-DELIVERY-2026-11-14.md).
+
 > **2026-11-13 S6 SOURCE UPDATE:** Forward-only source migration count is **17 (001–017)**, newest Booking SQL017 window closure. The legitimate K5F pre-migration observed DB prefix remains **001–009**, not all 17; SQL 010–017 is still **not authorized on VPS**. Redacted evidence CLI stays nonauthorizing. [S6](SALON-S6-INTEGRATED-DELIVERY-2026-11-13.md).
 
 

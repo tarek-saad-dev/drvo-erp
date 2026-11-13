@@ -13,5 +13,8 @@ export default async function BookingPage({
   const {businessId,branchId} = await params;
   return <BookingClient businessId={businessId} branchId={branchId}
     posWebEnabled={process.env.DRVO_POS_PREVIEW_WEB_ENABLED==="YES" &&
+      process.env.DRVO_CATALOG_WEB_ENABLED==="YES"}
+    draftsWebEnabled={process.env.DRVO_POS_DRAFTS_WEB_ENABLED==="YES" &&
+      process.env.DRVO_POS_PREVIEW_WEB_ENABLED==="YES" &&
       process.env.DRVO_CATALOG_WEB_ENABLED==="YES"} />;
 }

@@ -17,8 +17,8 @@ type Offering={offeringId:string;displayName:string;kind:string;durationMinutes:
 const GUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 type Status="loading"|"ready"|"denied"|"unavailable"|"prerequisites";
 
-export default function BookingClient({businessId,branchId,posWebEnabled}:{
-  businessId:string;branchId:string;posWebEnabled:boolean;
+export default function BookingClient({businessId,branchId,posWebEnabled,draftsWebEnabled}:{
+  businessId:string;branchId:string;posWebEnabled:boolean;draftsWebEnabled:boolean;
 }){
   const router=useRouter();
   const [status,setStatus]=useState<Status>("loading");
@@ -30,6 +30,7 @@ export default function BookingClient({businessId,branchId,posWebEnabled}:{
   const [customers,setCustomers]=useState<Customer[]>([]);
   const [services,setServices]=useState<Offering[]>([]);
   const [canOpenPos,setCanOpenPos]=useState(false);
+  const [canPrepareDraft,setCanPrepareDraft]=useState(false);
   const [notice,setNotice]=useState("");
   const [busy,setBusy]=useState(false);
   const [resourceName,setResourceName]=useState("");
@@ -80,16 +81,24 @@ export default function BookingClient({businessId,branchId,posWebEnabled}:{
       // POS preview is a distinct protected owner, never assumed from Booking
       // read or from a Next.js feature flag alone.
       setCanOpenPos(false);
+      setCanPrepareDraft(false);
       if(posWebEnabled){
         const preview=await fetch(scope+"/pos-preview",{
           credentials:"same-origin",cache:"no-store",
         });
         if(preview.status===401){router.replace("/sign-in");return;}
         setCanOpenPos(preview.ok);
+        if(preview.ok&&draftsWebEnabled){
+          const drafts=await fetch(scope+"/pos-drafts",{
+            credentials:"same-origin",cache:"no-store",
+          });
+          if(drafts.status===401){router.replace("/sign-in");return;}
+          setCanPrepareDraft(drafts.ok);
+        }
       }
       setStatus("ready");
     }catch{setStatus("unavailable");}
-  },[businessId,branchId,scope,router,posWebEnabled]);
+  },[businessId,branchId,scope,router,posWebEnabled,draftsWebEnabled]);
   useEffect(()=>{void load();},[load]);
 
   async function submit(path:string,body:unknown,id:React.MutableRefObject<string|null>){
@@ -310,7 +319,10 @@ export default function BookingClient({businessId,branchId,posWebEnabled}:{
               <td dir="ltr">{new Date(b.startsAtUtc).toLocaleString("ar-EG")}</td>
               <td dir="ltr">{new Date(b.endsAtUtc).toLocaleString("ar-EG")}</td>
               <td>{b.status==="BOOKED"?"محجوز":b.status==="CANCELLED"?"ملغي":"مكتمل"}</td>
-              <td>{b.status==="BOOKED"?<div className="k5-booking-actions">
+              <td>{b.status==="COMPLETED"&&canPrepareDraft&&GUID.test(b.offeringId)?
+                <Link href={home+"/pos-preview?offeringId="+encodeURIComponent(b.offeringId)}
+                  className="k5-salon-refresh">جهّز POS Draft من الخدمة</Link>:
+                b.status==="BOOKED"?<div className="k5-booking-actions">
                 <button type="button" disabled={busy} onClick={()=>void changeStatus(b.bookingId,"CANCELLED")}>
                   إلغاء الحجز
                 </button>

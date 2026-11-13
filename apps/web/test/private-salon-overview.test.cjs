@@ -46,6 +46,6 @@ test('daily operational filters and Booking-to-POS actions honor independent acc
  assert.match(client,/overview\.posPreviewAllowed&&b\.status==="COMPLETED"&&GUID\.test\(b\.offeringId\)/);
  assert.match(client,/encodeURIComponent\(b\.offeringId\)/);
  assert.match(client,/root\+"\/pos-preview"/);
- assert.match(client,/لا يوجد/);
+ assert.match(client,/بدون مبيعات أو تحصيل/);
  assert.doesNotMatch(client,/method:"POST"|\/sales\/posted|\.post\(/);
 });

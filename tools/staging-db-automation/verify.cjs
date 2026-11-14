@@ -66,10 +66,22 @@ async function main(){
       GRANT CONTROL ON SCHEMA::core TO [${LOGIN}];
     `);
     restricted=await connect(LOGIN,pass,DB);
+    // P4: recreate EXACT pre-activation K5F 001–009 state using the SAME
+    // restricted migrator, then prove that 010–017 are forward-only and
+    // recoverable. This is disposable CI; NO production migration is invoked.
+    const k5fBaseline=await run(restricted,payload.migrations.slice(0,9),SHA);
+    assert.equal(k5fBaseline.pending,8);
+    const before=await admin.query(
+      "SELECT MigrationId,Checksum FROM core.SchemaMigration ORDER BY MigrationId");
+    assert.equal(before.recordset.length,9);
+    assert.deepEqual(before.recordset.map(x=>x.MigrationId),
+      payload.migrations.slice(0,9).map(x=>x.name));
+    assert.deepEqual(before.recordset.map(x=>x.Checksum),
+      payload.migrations.slice(0,9).map(x=>x.sha256));
     const result=await run(restricted,payload.migrations,SHA);
-    assert.ok(result.pending>=1);
+    assert.equal(result.pending,8,'P4 must apply only migrations 010–017');
     assert.ok(result.backupFile?.startsWith('/var/opt/mssql/data/drvo_erp_stage_auto_'));
-    console.log('PASS: restricted SQL login runs backup then forward-only migrations');
+    console.log('PASS P4: same restricted migration runner upgrades exact K5F 001–009 to 010–017');
     const ownerClaim=await admin.query(`
       SELECT USER_NAME(execute_as_principal_id) AS executor
       FROM sys.sql_modules WHERE object_id=OBJECT_ID(N'core.ClaimApprovedOwner')
@@ -114,14 +126,24 @@ async function main(){
       WITH ${moves.join(', ')},CHECKSUM,RECOVERY`);
     restored=await connect('sa',adminPass,'DrvoDbAutoCIBack');
     const history=await restored.query('SELECT COUNT(*) AS n FROM core.SchemaMigration');
-    assert.equal(history.recordset[0].n,1,'Backup must reflect pre-migration K4 state');
-    console.log('PASS: real SQL COPY_ONLY backup independently RESTORED to second database');
+    assert.equal(history.recordset[0].n,9,'P4 pre-upgrade backup must contain exact K5F 001–009');
+    const preSql=await restored.query(
+      "SELECT MigrationId,Checksum FROM core.SchemaMigration ORDER BY MigrationId");
+    assert.deepEqual(preSql.recordset,before.recordset,
+      'P4 pre-upgrade restore must preserve all nine K5F migration hashes');
+    const noFuture=await restored.query(
+      "SELECT OBJECT_ID(N'core.BookingAppointment',N'U') AS Booking, "+
+      "OBJECT_ID(N'core.CatalogOffering',N'U') AS Catalog, "+
+      "OBJECT_ID(N'core.PosDraft',N'U') AS Draft");
+    assert.ok(Object.values(noFuture.recordset[0]).every(v=>v===null),
+      'P4 pre-010 restore must not contain later Business schema');
+    console.log('PASS P4: isolated pre-010 COPY_ONLY restore preserves exact K5F baseline');
 
     // K5F-3: second, AFTER-migrations independent restore on disposable CI ONLY.
-    // This proves recoverability of the SQL 014 source schema; it is NOT
+    // This proves recoverability of the SQL 017 source schema; it is NOT
     // an offsite/VPS disaster-recovery run or operator authorization.
     const postName='DRVO_ERP_CI_POSTRESTORE';
-    const postFile='/var/opt/mssql/data/drvo_erp_ci_post_014_checksum.bak';
+    const postFile='/var/opt/mssql/data/drvo_erp_ci_post_017_checksum.bak';
     const collision=await master.query("SELECT DB_ID(N'"+postName+"') AS id");
     assert.equal(collision.recordset[0].id,null,'Post-restore target collision');
     await admin.query(`BACKUP DATABASE [${DB}] TO DISK=N'${postFile}'
@@ -133,7 +155,7 @@ async function main(){
       assert.ok(f.LogicalName && ['D','L'].includes(f.Type));
       const ext=f.Type==='L'?'ldf':i===0?'mdf':'ndf';
       return `MOVE N'${f.LogicalName.replaceAll("'","''")}'
-        TO N'/var/opt/mssql/data/drvo_erp_ci_post_014_${i}.${ext}'`;
+        TO N'/var/opt/mssql/data/drvo_erp_ci_post_017_${i}.${ext}'`;
     });
     await master.query(`RESTORE DATABASE [${postName}] FROM DISK=N'${postFile}'
       WITH ${postMoves.join(', ')},CHECKSUM,RECOVERY`);
@@ -167,7 +189,18 @@ async function main(){
       `);
       assert.equal(status.recordset.length,1);
       assert.match(status.recordset[0].definition,/DRAFT/);
-      console.log('PASS: isolated post-014 SQL restore matches history and POS scoped schema');
+      const postBooking=await post.query(
+        "SELECT OBJECT_ID(N'core.BookingWindowCloseAudit',N'U') AS CloseAudit, "+
+        "OBJECT_ID(N'core.BookingResourceWindow',N'U') AS Windows, "+
+        "OBJECT_ID(N'core.CloseBookingResourceWindow',N'P') AS CloseProc, "+
+        "OBJECT_ID(N'core.ChangeBookingAppointmentStatus',N'P') AS LifecycleProc");
+      for(const v of Object.values(postBooking.recordset[0]))
+        assert.ok(v!==null,'Missing post-017 Booking lifecycle/window object');
+      const closedState=await post.query(
+        "SELECT name FROM sys.columns WHERE object_id=OBJECT_ID(N'core.BookingResourceWindow') "+
+        "AND name=N'State'");
+      assert.equal(closedState.recordset.length,1);
+      console.log('PASS P4: independently restored post-017 SQL history, Booking lifecycle, POS DRAFT');
     }finally{
       await post.close();
       await master.query(`ALTER DATABASE [${postName}]

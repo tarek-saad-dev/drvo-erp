@@ -15,7 +15,7 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  const scope=origin+'/workspace/'+business+'/'+branch;
  onPhase('S12 create catalog category through UI');
  await page.goto(scope+'/catalog',{waitUntil:'domcontentloaded',timeout:45000});
- await page.getByRole('heading',{name:'المنتجات والخدمات'}).waitFor();
+ await page.getByRole('heading',{name:'المنتجات والخدمات',exact:true}).waitFor();
  await page.getByLabel('اسم التصنيف').fill(category);
  onPhase('S12 observe real Catalog Category create HTTP');
  const [categoryResponse]=await Promise.all([
@@ -75,7 +75,7 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  await page.getByRole('cell',{name:service,exact:true}).waitFor();
  onPhase('S12 create Customer via UI');
  await page.goto(scope+'/customers',{waitUntil:'domcontentloaded'});
- await page.getByRole('heading',{name:'العملاء'}).waitFor();
+ await page.getByRole('heading',{name:'العملاء',exact:true}).waitFor();
  await page.getByLabel('اسم العميل').fill(customer);
  await page.getByRole('button',{name:'تسجيل العميل'}).click();
  await page.getByRole('cell',{name:customer,exact:true}).waitFor();
@@ -84,7 +84,7 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  await page.getByRole('cell',{name:customer,exact:true}).waitFor();
  onPhase('S12 create Booking Resource through UI');
  await page.goto(scope+'/booking',{waitUntil:'domcontentloaded'});
- await page.getByRole('heading',{name:'المواعيد والحجوزات'}).waitFor();
+ await page.getByRole('heading',{name:'المواعيد والحجوزات',exact:true}).waitFor();
  await page.getByLabel('اسم المورد').fill(resource);
  const [resourceResponse]=await Promise.all([
   page.waitForResponse(r=>r.url().endsWith('/booking/resources')&&
@@ -117,7 +117,7 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  await savedBooking.getByText(service,{exact:true}).waitFor();
  onPhase('S12 POS DRAFT created through UI only');
  await page.goto(scope+'/pos-preview',{waitUntil:'domcontentloaded'});
- await page.getByRole('heading',{name:'مسودة بيع — معاينة الأسعار'}).waitFor();
+ await page.getByRole('heading',{name:'مسودة بيع — معاينة الأسعار',exact:true}).waitFor();
  onPhase('S12 POS preview verified authorized Catalog GET');
  const previewHttp=await page.evaluate(async ({business,branch})=>{
   try{
@@ -143,7 +143,7 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  await page.getByText('المسودة اتحفظت. لم يتم تسجيل بيع أو تحصيل.').waitFor();
  onPhase('S12 POS DRAFT persisted and still unposted');
  await page.reload({waitUntil:'domcontentloaded'});
- await page.getByRole('heading',{name:'مسودات محفوظة — مش فواتير'}).waitFor();
+ await page.getByRole('heading',{name:'مسودات محفوظة — مش فواتير',exact:true}).waitFor();
  const draft=page.getByRole('row').filter({hasText:service+' × 2'});
  await draft.getByText('مسودة فقط',{exact:true}).waitFor();
  return Object.freeze({customer,service,resource});

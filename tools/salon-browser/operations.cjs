@@ -129,7 +129,30 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  },{business,branch});
  assert.equal(previewHttp,200,'CI-only POS Preview API status');
  onPhase('S12 real POS quick cart from authorized Catalog');
- await page.getByPlaceholder('اكتب اسم العنصر').fill(service);
+ const search=page.getByPlaceholder('اكتب اسم العنصر');
+ try {
+  await search.waitFor({timeout:10000});
+ }catch {
+  const inspection=await page.evaluate(async ({business,branch,service})=>{
+   const text=document.body.innerText||'';
+   let api={status:0,state:'UNKNOWN',persisted:null,found:false};
+   try{
+    const response=await fetch('/api/workspaces/'+business+'/branches/'+branch+'/pos-preview',{
+     credentials:'same-origin',cache:'no-store',
+    });
+    const data=response.ok?await response.json():{};
+    api={status:response.status,state:data.state||'UNKNOWN',
+     persisted:data.persisted??null,
+     found:Array.isArray(data.offerings)&&data.offerings.some(o=>o.displayName===service)};
+   }catch{}
+   return {api,loading:text.includes('جاري التحقق من صلاحيات الفرع'),
+    denied:text.includes('المعاينة غير متاحة لحسابك'),
+    error:text.includes('المعاينة غير متاحة حاليًا'),
+    inputCount:document.querySelectorAll('input[type="search"]').length};
+  },{business,branch,service});
+  throw new Error('S12_POS_SEARCH_MISSING '+JSON.stringify(inspection));
+ }
+ await search.fill(service);
  const quickAdd=page.getByRole('button',{name:new RegExp('^\\+ '+service+' —')});
  await quickAdd.waitFor();
  await quickAdd.click();

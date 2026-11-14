@@ -162,12 +162,16 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
     denied:text.includes('المعاينة غير متاحة لحسابك'),
     error:text.includes('المعاينة غير متاحة حاليًا'),
     inputCount:document.querySelectorAll('input[type="search"]').length,
-    scopeValid:document.querySelector('main.k5-workspace')?.getAttribute('data-scope-uuid-valid')};
+    scopeValid:document.querySelector('main.k5-workspace')?.getAttribute('data-scope-uuid-valid'),
+    businessValid:document.querySelector('main.k5-workspace')?.getAttribute('data-business-uuid-valid'),
+    branchValid:document.querySelector('main.k5-workspace')?.getAttribute('data-branch-uuid-valid'),
+    scopeLengths:document.querySelector('main.k5-workspace')?.getAttribute('data-scope-lengths')};
   },{business,branch,service});
   throw new Error('S12_POS_SEARCH_MISSING_NET_'+posGetStatuses.join('-')+
    '_API_'+inspection.api.status+'_FOUND_'+inspection.api.found+
    '_UI_L'+inspection.loading+'D'+inspection.denied+
-   'E'+inspection.error+'I'+inspection.inputCount+'V'+inspection.scopeValid);
+   'E'+inspection.error+'I'+inspection.inputCount+'V'+inspection.scopeValid+
+   'B'+inspection.businessValid+'R'+inspection.branchValid+'L'+inspection.scopeLengths);
  }
  await search.fill(service);
  const quickAdd=page.getByRole('button',{name:new RegExp('^\\+ '+service+' —')});

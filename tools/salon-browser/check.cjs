@@ -36,6 +36,7 @@ async function main(){
  try{
   browser=await chromium.launch({
    headless:true,
+   executablePath:process.env.DRVO_BROWSER_CHROME_PATH,
    args:['--host-resolver-rules=MAP drvo-ci.test 127.0.0.1','--no-proxy-server'],
   });
   const privileged=await browser.newContext({ignoreHTTPSErrors:true});

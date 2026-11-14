@@ -42,8 +42,19 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
     return {status:res.status,found:!!matching,active:matching?.isActive===true};
    }catch{return {status:0,found:false,active:false};}
   },{business,branch,category});
+  const ui=await page.evaluate(cat=>{
+   const selects=Array.from(document.querySelectorAll('select'));
+   const optionLabels=Array.from(document.querySelectorAll('option'));
+   return {
+    selectCount:selects.length,
+    anyOption:optionLabels.some(o=>(o.textContent||'').trim()===cat),
+    hasSaveNotice:(document.body.innerText||'').includes('تم الحفظ بنجاح.'),
+    unavailable:(document.body.innerText||'').includes('الكتالوج غير متاح'),
+   };
+  },category);
   throw new Error('S12_CATEGORY_OPTION_MISSING API_STATUS_'+proof.status+
-   '_FOUND_'+proof.found+'_ACTIVE_'+proof.active);
+   '_FOUND_'+proof.found+'_ACTIVE_'+proof.active+
+   '_UI_'+JSON.stringify(ui));
  }
  const categoryId=await categoryOption.getAttribute('value');
  assert.match(categoryId||'',/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);

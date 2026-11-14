@@ -196,6 +196,45 @@ async function main(){
    await assert.rejects(()=>app.query("SELECT TOP(0) * FROM core.BookingAppointment"),
     e=>e.number===229);
   });
+  await pass('P4: restricted runtime principal has no direct Catalog/Customers/Booking/POS table DML',async()=>{
+   // This proof is disposable SQL2022 ONLY; no K5F root or VPS permission attestation.
+   const objects=[
+    'core.CatalogCategory','core.CatalogOffering','core.Customer',
+    'core.BookingResource','core.BookingAppointment','core.BookingStatusChange',
+    'core.PosDraft','core.PosDraftLine',
+   ];
+   const denied=['SELECT','INSERT','UPDATE','DELETE','ALTER','CONTROL'];
+   for(const object of objects){
+    const query='SELECT '+denied.map(p=>
+     "HAS_PERMS_BY_NAME('"+object+"','OBJECT','"+p+"') AS ["+p+"]"
+    ).join(',');
+    const raw=(await app.query(query)).recordset[0];
+    for(const permission of denied)
+     assert.equal(Number(raw[permission]),0,object+':'+permission);
+    await assert.rejects(()=>app.query('SELECT TOP (0) * FROM '+object),
+     e=>e.number===229,object+' direct SELECT must be denied');
+   }
+   // Only the previously reviewed, constrained SP interfaces are executable.
+   for(const procedure of [
+    'core.ReadCatalog','core.CreateCatalogCategory',
+    'core.CreateCatalogOffering','core.ReadCustomers',
+    'core.CreateCustomer','core.ReadBranchBooking',
+    'core.CreateBookingAppointment','core.ReadBranchPosDrafts',
+    'core.CreateBranchPosDraft',
+   ]){
+    const r=await app.query("SELECT HAS_PERMS_BY_NAME('"+
+     procedure+"','OBJECT','EXECUTE') AS allowed");
+    assert.equal(Number(r.recordset[0].allowed),1,procedure);
+   }
+   for(const guard of [
+    'core.AssertCatalogBranchAction','core.AssertCustomersBranchAction',
+    'core.AssertBookingBranchAction','core.AssertPosDraftBranchAction',
+   ]){
+    const r=await app.query("SELECT HAS_PERMS_BY_NAME('"+
+     guard+"','OBJECT','EXECUTE') AS allowed");
+    assert.equal(Number(r.recordset[0].allowed),0,guard);
+   }
+  });
   await pass('composite Branch/Customer/Service FKs reject cross-business/branch data',async()=>{
    await assert.rejects(()=>q(admin,"INSERT core.BookingResource"+
     "(TenantId,BusinessId,BranchId,ResourceId,ClientRequestId,DisplayName,Kind)"+

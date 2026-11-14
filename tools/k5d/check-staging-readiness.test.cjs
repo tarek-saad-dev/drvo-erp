@@ -65,13 +65,15 @@ test('both missing and divergent HMAC fail closed and never compare secret text'
   assert.ok(badLabels(mockOperator,{...mockApi,
     DRVO_K5_VERIFICATION_HMAC_KEY:'bd'.repeat(32)}).some(x=>x.includes('verification secret')));
 });
-test('every currently implemented K5 + Catalog + Customers + Booking + POS gate stays OFF',()=>{
+test('every K5 + Business + Governance private API/Web flag stays OFF',()=>{
   assert.deepEqual(API_GATES,[
     'DRVO_K5_AUTH_ENABLED','DRVO_K5_OWNER_BOOTSTRAP_ENABLED',
     'DRVO_K5_VERIFY_API_ENABLED','DRVO_K5_INVITATIONS_ENABLED',
     'DRVO_K5_ROLE_ADMIN_ENABLED','DRVO_CATALOG_ENABLED',
     'DRVO_CUSTOMERS_ENABLED','DRVO_BOOKING_ENABLED',
     'DRVO_POS_PREVIEW_ENABLED','DRVO_POS_DRAFTS_ENABLED',
+    'DRVO_K6C_CATALOG_READ_ENABLED',
+    'DRVO_SC0_RELEASE_READ_ENABLED','DRVO_SC1_PREVIEW_READ_ENABLED',
   ]);
   assert.deepEqual(WEB_GATES,[
     'DRVO_K5_WEB_ENABLED','DRVO_K5_VERIFY_UI_ENABLED',
@@ -127,4 +129,25 @@ test('runtime onboarding tables must deny ALL direct DML and control, not just S
 
 test('root execution cannot trust the mutable checkout as its operator bundle',()=>{
   assert.equal(rootBundleSafe(),false);
+});
+
+
+test('K5F flags include every K6C/SC0/SC1 controller gate from current source',()=>{
+  const {readFileSync}=require('node:fs');
+  const {resolve}=require('node:path');
+  const controllers=[
+    'module-candidates.controller.ts',
+    'release-catalog.controller.ts',
+    'activation-preview.controller.ts',
+  ];
+  for(const file of controllers){
+    const source=readFileSync(resolve(__dirname,'../../apps/api/src/modules',file),'utf8');
+    const gates=[...new Set(source.match(/DRVO_[A-Z0-9_]+_ENABLED/g)||[])];
+    assert.ok(gates.length>=2,'missing expected security gates '+file);
+    for(const gate of gates){
+      assert.ok(API_GATES.includes(gate),'K5F missing gate: '+gate+' in '+file);
+      assert.ok(badLabels(mockOperator,{...mockApi,[gate]:'YES'})
+        .some(x=>x.includes('flags remain OFF')),gate);
+    }
+  }
 });

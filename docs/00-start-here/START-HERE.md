@@ -1,5 +1,8 @@
 # Start here — project handoff
 
+> **2026-11-14 P4/P5 READINESS UPDATE + PARALLEL OPERATOR HANDOFF:** [#118](https://github.com/tarek-saad-dev/drvo-erp/pull/118) merged offline fail-closed SQL post-`017` history checksum reviewer; does **not** change root-owned K5F `001–009` or apply SQL. [#119](https://github.com/tarek-saad-dev/drvo-erp/pull/119) merged two-key Ed25519 Publisher+Market **synthetic/untrusted** signature test; no production trust anchors or released Module. [P1–P3 operator parallel handoff](../04-execution/SALON-OPERATOR-P1-P3-PARALLEL-HANDOFF-2026-11-14.md) specifies independently witnessed tasks, not authorization to operate. **All 7 first Salon Pilot gates remain OPEN**, +3 for paid. No VPS SQL010–017, Public Auth, actual private grants or real customer accounts. Older text below is historic.
+
+
 > **2026-11-14 P4/P5 PARALLEL SOURCE PROOF (NO LIVE PILOT):** SQL [PR #115](https://github.com/tarek-saad-dev/drvo-erp/pull/115) merged **real disposable SQL Server 2022 K5F 001–009 → 010–017** with restricted migrator, checksum-validated pre-010 backup restore and separate post-017 restore. P5 [PR #116](https://github.com/tarek-saad-dev/drvo-erp/pull/116) merged **pure synthetic CAS/idempotency/revocation planning**; no actual grant, transaction, audit write or runtime use. These are source/CI tests only; **not** independent VPS K5F, offhost restore, private entitlement or live migration signoff. **7 restricted Salon Pilot gates remain open** in [Issue #106](https://github.com/tarek-saad-dev/drvo-erp/issues/106), and 3 additional for paid Salon. [P4 CI plan](../04-execution/P4-009-017-DISPOSABLE-MIGRATION-RESTORE-PROOF-2026-11-14.md) · [P5 model](../04-execution/P5B-PILOT-GRANT-CAS-IDEMPOTENCY-2026-11-14.md).
 
 

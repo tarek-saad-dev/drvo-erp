@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-11-14 — post-migration history evidence & synthetic independent Release/Market signatures
+
+- [#118](https://github.com/tarek-saad-dev/drvo-erp/pull/118): local-only strict `001–017` source SHA history review, rejects drift, reordered or foreign DB, always labels complete self-reports NOT ATTESTED; K5F immutable root `001–009` remains separate; no SQL/VPS.
+- [#119](https://github.com/tarek-saad-dev/drvo-erp/pull/119): offline synthetic Ed25519 release publisher signature plus separate country/industry market reviewer signature, SC-0 exact canonical payload test, tamper/reused-key/self-review negatives. Keys supplied by untrusted fixture **cannot** validate a production Release or Pilot grant. Production SC-0 Registry EMPTY.
+- Added [P1–P3 independent operator handoff](SALON-OPERATOR-P1-P3-PARALLEL-HANDOFF-2026-11-14.md). No root K5F proof, encrypted offhost restore, external network witness, SQL010–017 VPS approval, P5 SQL-grant writer, Owner/Staff browser or first real Salon. P1–P7 still OPEN in [#106](https://github.com/tarek-saad-dev/drvo-erp/issues/106).
+
+
 ## 2026-11-14 — P4 restricted SQL migration/restore proof + P5 synthetic consistency
 
 - [PR #115](https://github.com/tarek-saad-dev/drvo-erp/pull/115): real disposable SQL Server CI now reconstructs actual K5F migration prefix **001–009** using same restricted SQL migrator, proves pending 010–017 only, pre-upgrade independent restored checksum history and absence of later tables, and isolated post-017 checksum/schema restore; K0/K1/Staging Database Automation CI PASS. This is **not** encrypted offsite recovery or staging-VPS migration approval.

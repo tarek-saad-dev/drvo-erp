@@ -236,6 +236,7 @@ async function main(){
    DRVO_K5_AUTH_ENABLED:'YES',DRVO_BOOKING_ENABLED:'YES',
    DRVO_CUSTOMERS_ENABLED:'YES',DRVO_CATALOG_ENABLED:'YES',
    DRVO_POS_DRAFTS_ENABLED:'YES',
+   DRVO_POS_PREVIEW_ENABLED:process.env.BOOKING_BROWSER_DISPOSABLE==='YES'?'YES':'NO',
    DRVO_K5_ORIGIN:origin,
   };
   server=spawn(process.execPath,['apps/api/dist/main.js'],{

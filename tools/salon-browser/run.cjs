@@ -47,8 +47,11 @@ async function childCheck(env){
   child.once('exit',code=>{
    if(code===0&&stdout.includes('PASS: real disposable HTTPS browser'))
     resolve();
-   else reject(new Error('Chromium check failed: '+
-    (stderr.match(/FAIL: disposable browser phase:[^\n]{1,210}/)?.[0]||'UNKNOWN')));
+   else {
+    const codes=stderr.match(/CI_SAFE_OVERVIEW_DIAGNOSTIC [^\n]{1,220}/)?.[0]||'';
+    const phase=stderr.match(/FAIL: disposable browser phase:[^\n]{1,150}/)?.[0]||'UNKNOWN';
+    reject(new Error('Chromium check failed: '+phase+' '+codes));
+   }
   });
  });
 }

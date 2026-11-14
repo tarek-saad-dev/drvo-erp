@@ -1,5 +1,8 @@
 # First real Salon — bounded Pilot readiness and commercial path (2026-11-14)
 
+> **2026-11-14 P4+P5 SOURCE-ONLY VERIFICATION:** [#118](https://github.com/tarek-saad-dev/drvo-erp/pull/118) adds offline post-017 checksum review, not verified VPS migration; [#119](https://github.com/tarek-saad-dev/drvo-erp/pull/119) tests separate synthetic Ed25519 release/market approvals, not trusted DRVO signers. [Parallel operator P1–P3 handoff](SALON-OPERATOR-P1-P3-PARALLEL-HANDOFF-2026-11-14.md) documents real evidence required. **None of P1–P7 closed**, 3 paid C1–C3 remain separate; no Public Auth, SQL on VPS, customer PII or real Pilot grant.
+
+
 > **2026-11-14 SOURCE PROOF UPDATE — ALL GATES STILL OPEN:** P4 [#115](https://github.com/tarek-saad-dev/drvo-erp/pull/115) proves SQL 009→017 under the restricted migrator with independent restored pre/post backups **ONLY in disposable CI**; P4 actual VPS SQL rollout and independent P1/P2/P3 signoffs remain unauthorized/unverified. P5 [#116](https://github.com/tarek-saad-dev/drvo-erp/pull/116) adds synthetic CAS/idempotency PROPOSED/REVOKED model, **not** scoped durable grants, release publication, active entitlements or K5/SQL enforcement. All **7 private Pilot gates + 3 additional paid gates** remain open. See [P4 plan](P4-009-017-DISPOSABLE-MIGRATION-RESTORE-PROOF-2026-11-14.md) · [P5 model](P5B-PILOT-GRANT-CAS-IDEMPOTENCY-2026-11-14.md) · [Tracker #106](https://github.com/tarek-saad-dev/drvo-erp/issues/106).
 
 

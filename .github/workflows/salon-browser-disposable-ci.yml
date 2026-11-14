@@ -54,12 +54,22 @@ jobs:
           npm ci --prefix apps/web --no-audit --no-fund
           npm run build --prefix apps/web
           npm run typecheck --prefix apps/web
-      - name: Install pinned test-only Chromium runtime
+      - name: Install pinned test-only Playwright package
         shell: bash
         run: |
           set -euo pipefail
           npm install --prefix tools/salon-browser --no-audit --no-fund --ignore-scripts --package-lock=false
-          node tools/salon-browser/node_modules/playwright/cli.js install --with-deps chromium
+          node -e "if(require('./tools/salon-browser/node_modules/playwright/package.json').version !== '1.56.1') process.exit(1)"
+      - name: Download isolated CI Chromium browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/salon-browser/node_modules/playwright/cli.js install chromium
+      - name: Install system dependencies for CI browser
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/salon-browser/node_modules/playwright/cli.js install-deps chromium
       - name: Create strictly temporary HTTPS test origin
         shell: bash
         run: |

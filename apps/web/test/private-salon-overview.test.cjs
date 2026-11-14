@@ -64,3 +64,20 @@ test('resource/status roster filters use authorized list only and never create A
  assert.match(client,/آخر 200 حجز/);
  assert.doesNotMatch(client,/localStorage|sessionStorage|method:"POST"/);
 });
+
+test('Salon overview accepts full UUID identities instead of rejecting valid Branch IDs',()=>{
+ const client=read('salon/salon-overview-client.tsx');
+ const m=client.match(/const GUID=\/(\^[^\n]+\$)\/([a-z]*);/);
+ assert.ok(m,'UUID validator must be present and testable');
+ const guid=new RegExp(m[1],m[2]);
+ const valid='119c8e24-3d9a-44b7-89a1-c2a56b3c8d20';
+ assert.equal(guid.test(valid),true,'normal Business/Branch UUID');
+ assert.equal(guid.test(valid.toUpperCase()),true,'case-insensitive UUID');
+ for(const bad of [
+  '119c8e24-3d9a-44b7-c2a56b3c8d20',
+  '119c8e24-3d9a-44b7-89a1-c2a56b3c8d2',
+  valid+'/extra','../../etc/passwd','',valid.slice(1)
+ ])assert.equal(guid.test(bad),false,bad);
+ assert.match(client,/!GUID\.test\(businessId\)\|\|!GUID\.test\(branchId\)/);
+ assert.match(client,/GUID\.test\(b\.offeringId\)/);
+});

@@ -118,11 +118,26 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  onPhase('S12 POS DRAFT created through UI only');
  await page.goto(scope+'/pos-preview',{waitUntil:'domcontentloaded'});
  await page.getByRole('heading',{name:'مسودة بيع — معاينة الأسعار'}).waitFor();
- const options=page.getByLabel('الخدمة أو المنتج',{exact:true}).locator('option').filter({hasText:service});
+ onPhase('S12 POS preview verified authorized Catalog GET');
+ const previewHttp=await page.evaluate(async ({business,branch})=>{
+  try{
+   const res=await fetch('/api/workspaces/'+business+'/branches/'+branch+'/pos-preview',{
+    credentials:'same-origin',cache:'no-store',
+   });
+   return res.status;
+  }catch{return 0;}
+ },{business,branch});
+ assert.equal(previewHttp,200,'CI-only POS Preview API status');
+ onPhase('S12 scoped POS draft Service select');
+ const cartForm=page.locator('form.catalog-form').filter({
+  has:page.getByRole('button',{name:'أضف للمسودة'}),
+ });
+ const offeringSelect=cartForm.locator('select').first();
+ const options=offeringSelect.locator('option').filter({hasText:service});
  const id=await options.first().getAttribute('value');
- assert.match(id||'',/^[0-9a-f-]{36}$/i);
- await page.getByLabel('الخدمة أو المنتج',{exact:true}).selectOption(id);
- await page.getByLabel('الكمية').fill('2');
+ assert.match(id||'',/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+ await offeringSelect.selectOption(id);
+ await cartForm.locator('input[type="number"]').fill('2');
  await page.getByRole('button',{name:'أضف للمسودة'}).click();
  await page.getByRole('button',{name:'حفظ مسودة فقط (بدون بيع)'}).click();
  await page.getByText('المسودة اتحفظت. لم يتم تسجيل بيع أو تحصيل.').waitFor();

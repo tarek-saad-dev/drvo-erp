@@ -158,11 +158,10 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
     error:text.includes('المعاينة غير متاحة حاليًا'),
     inputCount:document.querySelectorAll('input[type="search"]').length};
   },{business,branch,service});
-  throw new Error('S12_POS_SEARCH_MISSING_HTTP_'+inspection.api.status+
-   '_DATA_'+inspection.api.state+'_FOUND_'+inspection.api.found+
-   '_LOADING_'+inspection.loading+'_DENIED_'+inspection.denied+
-   '_ERROR_'+inspection.error+'_INPUTS_'+inspection.inputCount+
-   '_NET_'+posGetStatuses.join('-'));
+  throw new Error('S12_POS_SEARCH_MISSING_NET_'+posGetStatuses.join('-')+
+   '_API_'+inspection.api.status+'_FOUND_'+inspection.api.found+
+   '_UI_L'+inspection.loading+'D'+inspection.denied+
+   'E'+inspection.error+'I'+inspection.inputCount);
  }
  await search.fill(service);
  const quickAdd=page.getByRole('button',{name:new RegExp('^\\+ '+service+' —')});

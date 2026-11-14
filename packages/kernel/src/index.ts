@@ -10,3 +10,6 @@ export type {ReleaseEvidence,ReleaseMarketApproval,VerifiedReleaseView,VerifiedR
 
 export {previewSyntheticBusinessBundle} from "./sc1-readonly-bundle-preview";
 export type {Sc1PreviewInput,Sc1PriceFact,Sc1ReadOnlyResult,Sc1PreviewLine,Sc1UnquotableReason} from "./sc1-readonly-bundle-preview";
+
+export {evaluateSyntheticPilotAccess,PILOT_ALLOWED_ACTIONS} from "./pilot-access-simulation";
+export type {SyntheticPilotActor,SyntheticPilotGrant,SyntheticPilotPolicyInput,SyntheticPilotDecision,PilotAction,PilotDenyReason} from "./pilot-access-simulation";

@@ -86,7 +86,8 @@ async function main(){
   await staff.getByText(/الحجوزات المعروضة:/).waitFor();
   phase='staff SQL branch label';
   await staff.getByText('CI Business · CI Branch').waitFor();
-  phase='S12 Staff sees SQL-persisted new Booking, not POS';
+  phase='S12 Staff sees SQL-persisted future Booking through authorized upcoming filter';
+  await staff.locator('#k5-salon-day-filter').selectOption('UPCOMING');
   await staff.getByRole('row').filter({hasText:operations.customer})
    .getByText(operations.service,{exact:true}).waitFor();
   assert.equal((await staff.getByText(/مسودات POS المعروضة:/).count()),0);

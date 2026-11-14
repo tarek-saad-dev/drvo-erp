@@ -5,6 +5,7 @@
  */
 const assert=require('node:assert/strict');
 const {chromium}=require('playwright');
+const {exerciseSalonOperations}=require('./operations.cjs');
 assert.equal(process.env.CI,'true');
 assert.equal(process.env.BOOKING_SQL_DISPOSABLE,'YES');
 assert.equal(process.env.BOOKING_BROWSER_DISPOSABLE,'YES');
@@ -65,6 +66,15 @@ async function main(){
   phase='privileged independently authorized POS count';
   await operator.getByText(/مسودات POS المعروضة:/).waitFor();
   assert.equal((await operator.getByText(/مسودات POS المعروضة:/).count()),1);
+  // S11 already proved real read; S12 now clicks actual write forms.
+  const operations=await exerciseSalonOperations(
+   operator,origin,business,branch,value=>{phase=value;});
+  phase='S12 restored Salon Overview after UI writes';
+  await operator.goto(url(business,branch),{
+   waitUntil:'domcontentloaded',timeout:45000,
+  });
+  await operator.getByText(/مسودات POS المعروضة:/).waitFor();
+  await operator.getByText('CI Business · CI Branch').waitFor();
   phase='separate staff login';
   const restricted=await browser.newContext({ignoreHTTPSErrors:true});
   const staff=await signIn(restricted,'staff.read.booking.ci');
@@ -76,6 +86,9 @@ async function main(){
   await staff.getByText(/الحجوزات المعروضة:/).waitFor();
   phase='staff SQL branch label';
   await staff.getByText('CI Business · CI Branch').waitFor();
+  phase='S12 Staff sees SQL-persisted new Booking, not POS';
+  await staff.getByRole('row').filter({hasText:operations.customer})
+   .getByText(operations.service,{exact:true}).waitFor();
   assert.equal((await staff.getByText(/مسودات POS المعروضة:/).count()),0);
   phase='staff POST rejected by actual Nest and SQL rights';
   const status=await staff.evaluate(async ids=>{

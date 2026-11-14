@@ -25,7 +25,12 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  ]);
  assert.equal(categoryResponse.status(),200,'Real Catalog create category HTTP status');
  onPhase('S12 category appears in refreshed Service form');
- const categorySelect=page.getByLabel('التصنيف',{exact:true});
+ // The page has 3 selects in the Service form (kind/category/currency).
+ // Scope by the actual Service form, not an ambiguous label on the page.
+ const serviceForm=page.locator('form.catalog-form').filter({
+  has:page.getByRole('button',{name:'إضافة الخدمة'}),
+ });
+ const categorySelect=serviceForm.locator('select').nth(1);
  const categoryOption=categorySelect.locator('option').filter({hasText:category});
  try {
   await categoryOption.waitFor({state:'attached',timeout:8000});

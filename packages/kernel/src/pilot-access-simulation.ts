@@ -94,11 +94,11 @@ const KEY=/^[A-Za-z][A-Za-z0-9._-]{0,63}$/;
 const REF=/^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$/;
 const COUNTRY=/^[A-Z]{2}$/;
 const INDUSTRY=/^[A-Z][A-Z0-9_]{1,39}$/;
-const CANONICAL_TIME=/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}:\d{2}\.000Z$/;
+const CANONICAL_TIME=/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.000Z$/;
 // A timestamp is interpreted only as a synthetic trusted clock fixture.
 function instant(value:unknown):number|null {
   if(typeof value!=="string"||
-    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.000Z$/.test(value))return null;
+    !CANONICAL_TIME.test(value))return null;
   const d=Date.parse(value);
   return Number.isFinite(d)&&new Date(d).toISOString()===value?d:null;
 }

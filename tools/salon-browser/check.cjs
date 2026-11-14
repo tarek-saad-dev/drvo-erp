@@ -23,11 +23,21 @@ const url=(b,br)=>origin+'/workspace/'+b+'/'+br+'/salon';
 let phase='launch';
 async function signIn(context,username){
  const page=await context.newPage();
+ phase='sign-in page navigation';
  await page.goto(origin+'/sign-in',{waitUntil:'networkidle'});
+ phase='form fields';
  await page.getByLabel('اسم المستخدم').fill(username);
  await page.getByLabel('كلمة المرور').fill(password);
- await page.getByRole('button',{name:'تسجيل الدخول'}).click();
- await page.waitForURL('**/workspaces',{timeout:30000});
+ phase='POST /api/auth/login response';
+ const [loginResponse]=await Promise.all([
+  page.waitForResponse(r=>r.url().endsWith('/api/auth/login'),{timeout:20000}),
+  page.getByRole('button',{name:'تسجيل الدخول'}).click(),
+ ]);
+ const status=loginResponse.status();
+ if(status!==200)throw new Error('LOGIN_HTTP_STATUS_'+status);
+ phase='post-login /workspaces navigation';
+ await page.waitForURL('**/workspaces',{timeout:20000});
+ phase='workspaces heading';
  await page.getByRole('heading',{name:'شركاتك وفروعك'}).waitFor();
  return page;
 }
@@ -86,5 +96,8 @@ async function main(){
   await browser?.close();
  }
 }
-main().catch(()=>{console.error('FAIL: disposable browser phase: '+phase);
- process.exitCode=1;});
+main().catch(error=>{
+ const safe=String(error instanceof Error?error.message:'Unknown failure').split('\n')[0].slice(0,160);
+ console.error('FAIL: disposable browser phase: '+phase+'; '+safe);
+ process.exitCode=1;
+});

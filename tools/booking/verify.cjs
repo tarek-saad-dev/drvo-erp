@@ -21,7 +21,7 @@ const guid=()=>crypto.randomUUID();
 const g={t:guid(),foreignTenant:guid(),business:guid(),otherBusiness:guid(),
  foreignBusiness:guid(),branch:guid(),otherBranch:guid(),
  foreignBranch:guid(),unassignedBranch:guid(),account:guid(),
- foreignAccount:guid(),role:guid(),foreignRole:guid(),customer:guid(),
+ foreignAccount:guid(),staffAccount:guid(),role:guid(),staffRole:guid(),foreignRole:guid(),customer:guid(),
  foreignCustomer:guid(),service:guid(),foreignService:guid(),
  product:guid(),sourceResource:guid(),foreignResource:guid()};
 const pwd='BookingCiStrong!12345';
@@ -63,6 +63,14 @@ async function addRole(pool,tenant,business,role){
  " (@t,@b,@r,'customers.read'),(@t,@b,@r,'customers.manage'),"+
  " (@t,@b,@r,'pos.draft.read'),(@t,@b,@r,'pos.draft.manage')",
  {t:tenant,b:business,r:role});
+}
+// Synthetic Staff role has independently granted reads and NO writes/POS.
+async function addReadOnlyStaffRole(pool,tenant,business,role){
+ await q(pool,"INSERT core.BusinessRole(TenantId,BusinessId,RoleId,RoleCode,DisplayName)"+
+  " VALUES(@t,@b,@r,N'STAFF_READ',N'Synthetic Read Staff');"+
+  " INSERT core.RolePermission(TenantId,BusinessId,RoleId,ActionCode)"+
+  " VALUES(@t,@b,@r,'booking.read'),(@t,@b,@r,'catalog.read'),"+
+  " (@t,@b,@r,'customers.read')",{t:tenant,b:business,r:role});
 }
 async function assign(pool,tenant,business,branch,account,role){
  await q(pool,"INSERT core.BusinessMembership(TenantId,BusinessId,AccountId) VALUES(@t,@b,@a);"+
@@ -158,10 +166,13 @@ async function main(){
    " VALUES(@t,@b,@br,N'Unassigned')",
    {t:g.t,b:g.business,br:g.unassignedBranch});
   await addAccount(admin,g.t,g.account,'scheduler.booking.ci');
+   await addAccount(admin,g.t,g.staffAccount,'staff.read.booking.ci');
   await addAccount(admin,g.foreignTenant,g.foreignAccount,'foreign.booking.ci');
   await addRole(admin,g.t,g.business,g.role);
+   await addReadOnlyStaffRole(admin,g.t,g.business,g.staffRole);
   await addRole(admin,g.foreignTenant,g.foreignBusiness,g.foreignRole);
   await assign(admin,g.t,g.business,g.branch,g.account,g.role);
+   await assign(admin,g.t,g.business,g.branch,g.staffAccount,g.staffRole);
   await assign(admin,g.foreignTenant,g.foreignBusiness,g.foreignBranch,
    g.foreignAccount,g.foreignRole);
   await seedCustomer(admin,g.t,g.business,g.customer,'CI Customer');
@@ -237,6 +248,7 @@ async function main(){
   });
   const cookie=await login('scheduler.booking.ci');
   const otherCookie=await login('foreign.booking.ci');
+   const staffCookie=await login('staff.read.booking.ci');
   // Salon Pilot CI: prove the real, independent domain APIs work together
   // using one scoped K5 cookie. We reuse the already deployed domain owners;
   // there is no fake public demo, customer PII, or new SQL migration.
@@ -374,6 +386,63 @@ async function main(){
    assert.equal((await get(path(g.business,g.branch),cookie)).status,200);
    await q(admin,"INSERT core.RolePermission(TenantId,BusinessId,RoleId,ActionCode)"+
     " VALUES(@t,@b,@r,'pos.draft.read')",{t:g.t,b:g.business,r:g.role});
+  });
+  await pass('P6 Staff session reads persisted scope without POS access',async()=>{
+   const booking=await get(path(g.business,g.branch),staffCookie);
+   assert.equal(booking.status,200);
+   assert.equal(booking.headers.get('cache-control'),'no-store');
+   const data=await booking.json();
+   assert.ok(data.appointments.some(x=>x.customerId===pilotCustomer&&
+    x.offeringId===pilotService));
+   assert.equal((await get(customerPath,staffCookie)).status,200);
+   assert.equal((await get(catalogPath,staffCookie)).status,200);
+   assert.equal((await get(draftPath,staffCookie)).status,404);
+   assert.equal((await get(path(g.business,g.unassignedBranch),staffCookie)).status,404);
+   assert.equal((await get(path(g.foreignBusiness,g.foreignBranch),staffCookie)).status,404);
+   assert.equal((await get(draftPath,cookie)).status,200);
+  });
+  await pass('P6 Staff cannot write Booking, Customers, Catalog or POS',async()=>{
+   const bp=path(g.business,g.branch);
+   assert.equal((await post(bp+'/resources',staffCookie,guid(),
+    {displayName:'Denied Staff Chair',kind:'CHAIR'})).status,404);
+   assert.equal((await post(bp+'/appointments',staffCookie,guid(),{
+    customerId:pilotCustomer,offeringId:pilotService,
+    resourceId:secondResource,startsAtUtc:future(960),
+   })).status,404);
+   assert.equal((await post(customerPath,staffCookie,guid(),
+    {displayName:'Denied Staff Customer',phoneE164:null})).status,404);
+   assert.equal((await post(catalogPath+'/offerings',staffCookie,guid(),{
+    kind:'SERVICE',displayName:'Denied Staff Service',categoryId:null,
+    priceMinor:1000,currency:'EGP',durationMinutes:30,
+   })).status,404);
+   assert.equal((await post(draftPath,staffCookie,guid(),{
+    lines:[{offeringId:pilotService,quantity:1}],
+   })).status,404);
+   assert.equal((await post(bp+'/appointments/'+guid()+'/status',
+    staffCookie,guid(),{status:'CANCELLED'})).status,404);
+  });
+  await pass('P6 Staff action/branch/session revocation denies, operator stays scoped',async()=>{
+   await q(admin,"DELETE core.RolePermission WHERE TenantId=@t AND"+
+    " BusinessId=@b AND RoleId=@r AND ActionCode='booking.read'",
+    {t:g.t,b:g.business,r:g.staffRole});
+   assert.equal((await get(path(g.business,g.branch),staffCookie)).status,404);
+   assert.equal((await get(path(g.business,g.branch),cookie)).status,200);
+   await q(admin,"INSERT core.RolePermission(TenantId,BusinessId,RoleId,ActionCode)"+
+    " VALUES(@t,@b,@r,'booking.read')",
+    {t:g.t,b:g.business,r:g.staffRole});
+   await q(admin,"UPDATE core.BranchAssignment SET IsActive=0"+
+    " WHERE TenantId=@t AND BusinessId=@b AND BranchId=@br AND AccountId=@a",
+    {t:g.t,b:g.business,br:g.branch,a:g.staffAccount});
+   assert.equal((await get(path(g.business,g.branch),staffCookie)).status,404);
+   await q(admin,"UPDATE core.BranchAssignment SET IsActive=1"+
+    " WHERE TenantId=@t AND BusinessId=@b AND BranchId=@br AND AccountId=@a",
+    {t:g.t,b:g.business,br:g.branch,a:g.staffAccount});
+   assert.equal((await get(path(g.business,g.branch),staffCookie)).status,200);
+   await q(admin,"UPDATE core.AuthSession SET RevokedAtUtc=SYSUTCDATETIME()"+
+    " WHERE TenantId=@t AND AccountId=@a AND RevokedAtUtc IS NULL",
+    {t:g.t,a:g.staffAccount});
+   assert.equal((await get(path(g.business,g.branch),staffCookie)).status,401);
+   assert.equal((await get(path(g.business,g.branch),cookie)).status,200);
   });
   await pass('Overlapping resource slot blocked; adjacent and parallel resource allowed',async()=>{
    const p=path(g.business,g.branch)+'/appointments';

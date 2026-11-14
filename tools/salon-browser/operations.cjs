@@ -27,7 +27,24 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  onPhase('S12 category appears in refreshed Service form');
  const categorySelect=page.getByLabel('التصنيف',{exact:true});
  const categoryOption=categorySelect.locator('option').filter({hasText:category});
- await categoryOption.waitFor({state:'attached'});
+ try {
+  await categoryOption.waitFor({state:'attached',timeout:8000});
+ }catch {
+  // No raw response, identifiers, tokens or customer records in failure logs.
+  const proof=await page.evaluate(async ({business,branch,category})=>{
+   try{
+    const res=await fetch('/api/workspaces/'+business+'/branches/'+branch+'/catalog',{
+     credentials:'same-origin',cache:'no-store',
+    });
+    const body=res.ok?await res.json():{};
+    const matching=Array.isArray(body.categories)?
+     body.categories.find(c=>c.displayName===category):null;
+    return {status:res.status,found:!!matching,active:matching?.isActive===true};
+   }catch{return {status:0,found:false,active:false};}
+  },{business,branch,category});
+  throw new Error('S12_CATEGORY_OPTION_MISSING API_STATUS_'+proof.status+
+   '_FOUND_'+proof.found+'_ACTIVE_'+proof.active);
+ }
  const categoryId=await categoryOption.getAttribute('value');
  assert.match(categoryId||'',/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
  onPhase('S12 create service with exact Category ID through UI');

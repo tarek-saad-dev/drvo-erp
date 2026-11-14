@@ -25,7 +25,8 @@ const g={t:guid(),foreignTenant:guid(),business:guid(),otherBusiness:guid(),
  foreignCustomer:guid(),service:guid(),foreignService:guid(),
  product:guid(),sourceResource:guid(),foreignResource:guid()};
 const pwd='BookingCiStrong!12345';
-const origin='https://erp-stage.drvotech.com';
+const origin=process.env.BOOKING_BROWSER_DISPOSABLE==='YES'?
+ 'https://drvo-ci.test':'https://erp-stage.drvotech.com';
 const url='http://127.0.0.1:3403/api';
 let count=0;
 const path=(business,branch)=>url+'/workspaces/'+business+'/branches/'+branch+'/booking';
@@ -58,7 +59,8 @@ async function addRole(pool,tenant,business,role){
  await q(pool,"INSERT core.BusinessRole(TenantId,BusinessId,RoleId,RoleCode,DisplayName)"+
  " VALUES(@t,@b,@r,N'SCHEDULER',N'Scheduler');"+
  "INSERT core.RolePermission(TenantId,BusinessId,RoleId,ActionCode)"+
- " VALUES(@t,@b,@r,'booking.read'),(@t,@b,@r,'booking.manage'),"+
+ " VALUES(@t,@b,@r,'branch.read'),(@t,@b,@r,'booking.read'),"+
+ " (@t,@b,@r,'booking.manage'),"+
  " (@t,@b,@r,'catalog.read'),(@t,@b,@r,'catalog.manage'),"+
  " (@t,@b,@r,'customers.read'),(@t,@b,@r,'customers.manage'),"+
  " (@t,@b,@r,'pos.draft.read'),(@t,@b,@r,'pos.draft.manage')",
@@ -69,7 +71,8 @@ async function addReadOnlyStaffRole(pool,tenant,business,role){
  await q(pool,"INSERT core.BusinessRole(TenantId,BusinessId,RoleId,RoleCode,DisplayName)"+
   " VALUES(@t,@b,@r,N'STAFF_READ',N'Synthetic Read Staff');"+
   " INSERT core.RolePermission(TenantId,BusinessId,RoleId,ActionCode)"+
-  " VALUES(@t,@b,@r,'booking.read'),(@t,@b,@r,'catalog.read'),"+
+  " VALUES(@t,@b,@r,'branch.read'),(@t,@b,@r,'booking.read'),"+
+  " (@t,@b,@r,'catalog.read'),"+
   " (@t,@b,@r,'customers.read')",{t:tenant,b:business,r:role});
 }
 async function assign(pool,tenant,business,branch,account,role){
@@ -421,6 +424,15 @@ async function main(){
    assert.equal((await post(bp+'/appointments/'+guid()+'/status',
     staffCookie,guid(),{status:'CANCELLED'})).status,404);
   });
+  if(process.env.BOOKING_BROWSER_DISPOSABLE==='YES'){
+   await pass('P6 synthetic Chromium: private Next Owner-like/Staff scoped SQL browser',async()=>{
+    await require('../salon-browser/run.cjs').runBrowser({
+     business:g.business,branch:g.branch,
+     foreignBusiness:g.foreignBusiness,foreignBranch:g.foreignBranch,
+     password:pwd,
+    });
+   });
+  }
   await pass('P6 Staff action/branch/session revocation denies, operator stays scoped',async()=>{
    await q(admin,"DELETE core.RolePermission WHERE TenantId=@t AND"+
     " BusinessId=@b AND RoleId=@r AND ActionCode='booking.read'",

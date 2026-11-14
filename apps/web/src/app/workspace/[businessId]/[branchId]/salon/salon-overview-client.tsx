@@ -9,6 +9,10 @@ type Overview={branchName:string;businessName:string;bookings:Booking[];
  customersCount:number;offeringsCount:number;draftCount:number|null;posPreviewAllowed:boolean};
 type Status="loading"|"ready"|"denied"|"unavailable";
 const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const sameScopedGuid=(actual:unknown,requested:unknown):boolean=>
+ typeof actual==="string"&&typeof requested==="string"&&
+ GUID.test(actual)&&GUID.test(requested)&&
+ actual.toLowerCase()===requested.toLowerCase();
 
 export default function SalonOverview({businessId,branchId,draftsAvailable}:{
  businessId:string;branchId:string;draftsAvailable:boolean;
@@ -44,9 +48,12 @@ export default function SalonOverview({businessId,branchId,draftsAvailable}:{
     branch.json() as Promise<{businessId:string;branchId:string;branchName:string}>,
    ]);
    if(account.mustChangePassword){router.replace("/change-password");return;}
-   const matching=assigned.workspaces?.find(x=>x.businessId===businessId&&
-      x.branchId===branchId);
-   if(!matching||branchData.businessId!==businessId||branchData.branchId!==branchId){
+   // SQL Server may serialize the same UUID with uppercase A-F; UUID
+   // identity is case-insensitive, but never compare invalid/unscoped values.
+   const matching=assigned.workspaces?.find(x=>
+      sameScopedGuid(x.businessId,businessId)&&sameScopedGuid(x.branchId,branchId));
+   if(!matching||!sameScopedGuid(branchData.businessId,businessId)||
+      !sameScopedGuid(branchData.branchId,branchId)){
     setStatus("denied");return;
    }
    const [book,customers,catalog]=await Promise.all([

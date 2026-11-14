@@ -1,0 +1,112 @@
+name: Salon Private Browser + Disposable SQL CI
+on:
+  pull_request:
+    paths:
+      - 'tools/salon-browser/**'
+      - 'tools/booking/verify.cjs'
+      - '.github/workflows/salon-browser-disposable-ci.yml'
+      - 'apps/web/src/app/workspace/**'
+      - 'apps/web/src/app/sign-in/**'
+      - 'apps/web/src/app/workspaces/**'
+      - 'apps/api/src/**'
+      - 'db/migrations/**'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/salon-browser/**'
+      - 'tools/booking/verify.cjs'
+      - '.github/workflows/salon-browser-disposable-ci.yml'
+      - 'apps/web/src/app/workspace/**'
+      - 'apps/web/src/app/sign-in/**'
+      - 'apps/web/src/app/workspaces/**'
+      - 'apps/api/src/**'
+      - 'db/migrations/**'
+permissions:
+  contents: read
+jobs:
+  private-browser-disposable-sql:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate inert CI harness boundaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in tools/salon-browser/*.cjs tools/booking/verify.cjs; do node --check "$f"; done
+          test "$(node -p "require('./tools/salon-browser/package.json').devDependencies.playwright")" = '1.56.1'
+      - name: Build isolated Nest and Next
+        shell: bash
+        env:
+          DRVO_K5_WEB_ENABLED: 'YES'
+          DRVO_BOOKING_WEB_ENABLED: 'YES'
+          DRVO_CUSTOMERS_WEB_ENABLED: 'YES'
+          DRVO_CATALOG_WEB_ENABLED: 'YES'
+          DRVO_POS_DRAFTS_WEB_ENABLED: 'YES'
+          DRVO_POS_PREVIEW_WEB_ENABLED: 'YES'
+        run: |
+          set -euo pipefail
+          npm ci --prefix apps/api --no-audit --no-fund
+          npm test --prefix apps/api
+          npm ci --prefix apps/web --no-audit --no-fund
+          npm run build --prefix apps/web
+          npm run typecheck --prefix apps/web
+      - name: Install pinned test-only Playwright package
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix tools/salon-browser --no-audit --no-fund --ignore-scripts --package-lock=false
+          node -e "if(require('./tools/salon-browser/node_modules/playwright/package.json').version !== '1.56.1') process.exit(1)"
+      - name: Use runner-installed Chrome (no browser network download)
+        shell: bash
+        run: |
+          set -euo pipefail
+          browser="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          test -n "$browser" && test -x "$browser"
+          "$browser" --version
+          echo "DRVO_BROWSER_CHROME_PATH=$browser" >> "$GITHUB_ENV"
+      - name: Create strictly temporary HTTPS test origin
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo sysctl -w net.ipv4.ip_unprivileged_port_start=0
+          test "$(sysctl -n net.ipv4.ip_unprivileged_port_start)" = 0
+          install -d -m 0700 "$RUNNER_TEMP/drvo-salon-browser-tls"
+          openssl req -x509 -newkey rsa:2048 -nodes -days 1 \
+            -keyout "$RUNNER_TEMP/drvo-salon-browser-tls/key.pem" \
+            -out "$RUNNER_TEMP/drvo-salon-browser-tls/cert.pem" \
+            -subj "/CN=drvo-ci.test" -addext "subjectAltName=DNS:drvo-ci.test" \
+            >/dev/null 2>&1
+          chmod 0600 "$RUNNER_TEMP/drvo-salon-browser-tls/"*.pem
+          echo "DRVO_BROWSER_TEST_KEY_FILE=$RUNNER_TEMP/drvo-salon-browser-tls/key.pem" >> "$GITHUB_ENV"
+          echo "DRVO_BROWSER_TEST_CERT_FILE=$RUNNER_TEMP/drvo-salon-browser-tls/cert.pem" >> "$GITHUB_ENV"
+      - name: Start isolated loopback SQL Server 2022
+        shell: bash
+        run: |
+          set -euo pipefail
+          pw="DrvoBrowserCI_$(openssl rand -hex 18)!"
+          echo "::add-mask::$pw"
+          echo "SQL_TEST_SA_PASSWORD=$pw" >> "$GITHUB_ENV"
+          docker run --detach --name drvo-salon-browser-ci \
+            -e ACCEPT_EULA=Y -e MSSQL_PID=Developer \
+            -e MSSQL_SA_PASSWORD="$pw" \
+            -p 127.0.0.1:14342:1433 -p 127.0.0.1:1433:1433 \
+            mcr.microsoft.com/mssql/server:2022-latest
+      - name: Verify real Chromium Next K5 Nest SQL same-origin private Salon
+        env:
+          BOOKING_SQL_DISPOSABLE: 'YES'
+          BOOKING_TEST_PORT: '14342'
+          BOOKING_BROWSER_DISPOSABLE: 'YES'
+        run: node tools/booking/verify.cjs
+      - name: SQL diagnostics on failure (no user data)
+        if: failure()
+        run: docker logs --tail 50 drvo-salon-browser-ci || true
+      - name: Destroy disposable SQL and generated HTTPS key
+        if: always()
+        shell: bash
+        run: |
+          docker rm -f drvo-salon-browser-ci || true
+          rm -rf "$RUNNER_TEMP/drvo-salon-browser-tls"

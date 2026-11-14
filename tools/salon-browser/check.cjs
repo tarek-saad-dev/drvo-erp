@@ -21,6 +21,7 @@ assert.ok(typeof password==='string'&&password.length>=12);
 const origin='https://drvo-ci.test';
 const url=(b,br)=>origin+'/workspace/'+b+'/'+br+'/salon';
 let phase='launch';
+let diagnosticPage=null;
 async function signIn(context,username){
  const page=await context.newPage();
  phase='sign-in page navigation';
@@ -52,6 +53,7 @@ async function main(){
   const privileged=await browser.newContext({ignoreHTTPSErrors:true});
   phase='privileged login';
   const operator=await signIn(privileged,'scheduler.booking.ci');
+  diagnosticPage=operator;
   phase='privileged salon navigate';
   await operator.goto(url(business,branch),{waitUntil:'networkidle'});
   phase='privileged salon heading';
@@ -99,6 +101,34 @@ async function main(){
   await guest.goto(url(business,branch),{waitUntil:'networkidle'});
   await guest.waitForURL('**/sign-in',{timeout:30000});
   console.log('PASS: real disposable HTTPS browser + Next + K5 + Nest + SQL scoped Operator/Staff');
+ }catch(error){
+  if(diagnosticPage&&!diagnosticPage.isClosed()){
+   // Diagnostics are only status codes and booleans; NEVER log SQL, cookies or PII.
+   try{
+    const status=await diagnosticPage.evaluate(async ids=>{
+     const path='/api/workspaces/'+ids.b+'/branches/'+ids.br;
+     const urls=['/api/auth/me','/api/auth/workspaces',path,
+      path+'/booking',path+'/customers',path+'/catalog',path+'/pos-drafts'];
+     const codes=await Promise.all(urls.map(async u=>{
+      try{return (await fetch(u,{credentials:'same-origin',cache:'no-store'})).status;}
+      catch{return 0;}
+     }));
+     const w=await fetch('/api/auth/workspaces',{credentials:'same-origin'});
+     const data=w.ok?await w.json():null;
+     return {codes,workspaceCount:Array.isArray(data?.workspaces)?
+      data.workspaces.length:-1,
+      scopePresent:!!data?.workspaces?.some(x=>
+       x.businessId===ids.b&&x.branchId===ids.br)};
+    },{b:business,br:branch});
+    const denied=await diagnosticPage.getByText(
+     'مش مسموح بعرض لوحة الصالون لهذا الفرع.').count();
+    const unavailable=await diagnosticPage.getByText(
+     'تعذر تحميل اللوحة. حاول مرة تانية.').count();
+    console.error('CI_SAFE_OVERVIEW_DIAGNOSTIC '+JSON.stringify({
+     ...status,denied:denied>0,unavailable:unavailable>0}));
+   }catch{console.error('CI_SAFE_OVERVIEW_DIAGNOSTIC unavailable');}
+  }
+  throw error;
  }finally{
   await browser?.close();
  }

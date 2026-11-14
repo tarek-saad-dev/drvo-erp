@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-11-14 — parallel first Salon Pilot prerequisite preparation, NOT live GO
+
+- [PR #108](https://github.com/tarek-saad-dev/drvo-erp/pull/108): root-owned K5F source checker now denies `DRVO_K6C_CATALOG_READ_ENABLED`, `DRVO_SC0_RELEASE_READ_ENABLED`, and `DRVO_SC1_PREVIEW_READ_ENABLED` on pre-activation, plus source-controller inventory regression; exact observed 001–009 SQL prefix unchanged and no trusted root VPS audit executed.
+- [PR #109](https://github.com/tarek-saad-dev/drvo-erp/pull/109): local bounded redacted recovery evidence CLI+Node tests, always non-authorizing; no backup/isolated restore actually performed or claimed.
+- [PR #110](https://github.com/tarek-saad-dev/drvo-erp/pull/110): founder/security decision packet on P5 minimal non-commercial synthetic restricted Salon Pilot, **not approved or implemented**. No Customer accounts, Business rights, SC2/3, paid Entitlement, SQL010–017 VPS, or Public Auth changes. [Salon gates #106](https://github.com/tarek-saad-dev/drvo-erp/issues/106) P1–P7 remain OPEN.
+
+
 ## 2026-11-14 — SC-0/SC-1 governance reads merged; first Salon NO-GO tracked
 
 - SC-0 #104 and SC-1 #105 read-only PRs merged to `main`; #105 squash SHA `98470283d7e239567f71e56417f9e9def7130450`. No published production Release, no actual commercial price or Entitlement, no SQL migrations, roles, payment or VPS activation. Detailed check results verified separately; merge CI does not prove a live customer.

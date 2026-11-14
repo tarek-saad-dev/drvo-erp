@@ -1,5 +1,8 @@
 # S12 — Actual private Salon UI write journey on disposable SQL
 
+> **S12 verified at exact PR HEAD:** [#133](https://github.com/tarek-saad-dev/drvo-erp/pull/133) merged `dc5dfbe1afa6ab8a39435f65013c246b944e2bfc`, 10/10 GitHub CI PASS including actual Chrome+Next/K5/Nest+SQL2022. Booking SQL/HTTP 37 assertions. POS quick Catalog-add qty 2 verified saved DRAFT after Reload, no sale or collection; read-only Staff uses UPCOMING filter for future Booking. Fixed real POS client's six-group GUID false denial to canonical 5 groups and unit regression. Five other clients covered by merged [#135](https://github.com/tarek-saad-dev/drvo-erp/pull/135). No P1–P7/C1–C3 operational gates closed; private Pilot stays NO-GO.
+
+
 **2026-11-14 · Test-only, no live Pilot or VPS access.**
 
 ## Architecture and delivery

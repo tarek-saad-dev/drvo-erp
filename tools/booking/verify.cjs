@@ -59,7 +59,8 @@ async function addRole(pool,tenant,business,role){
  await q(pool,"INSERT core.BusinessRole(TenantId,BusinessId,RoleId,RoleCode,DisplayName)"+
  " VALUES(@t,@b,@r,N'SCHEDULER',N'Scheduler');"+
  "INSERT core.RolePermission(TenantId,BusinessId,RoleId,ActionCode)"+
- " VALUES(@t,@b,@r,'booking.read'),(@t,@b,@r,'booking.manage'),"+
+ " VALUES(@t,@b,@r,'branch.read'),(@t,@b,@r,'booking.read'),"+
+ " (@t,@b,@r,'booking.manage'),"+
  " (@t,@b,@r,'catalog.read'),(@t,@b,@r,'catalog.manage'),"+
  " (@t,@b,@r,'customers.read'),(@t,@b,@r,'customers.manage'),"+
  " (@t,@b,@r,'pos.draft.read'),(@t,@b,@r,'pos.draft.manage')",
@@ -70,7 +71,8 @@ async function addReadOnlyStaffRole(pool,tenant,business,role){
  await q(pool,"INSERT core.BusinessRole(TenantId,BusinessId,RoleId,RoleCode,DisplayName)"+
   " VALUES(@t,@b,@r,N'STAFF_READ',N'Synthetic Read Staff');"+
   " INSERT core.RolePermission(TenantId,BusinessId,RoleId,ActionCode)"+
-  " VALUES(@t,@b,@r,'booking.read'),(@t,@b,@r,'catalog.read'),"+
+  " VALUES(@t,@b,@r,'branch.read'),(@t,@b,@r,'booking.read'),"+
+  " (@t,@b,@r,'catalog.read'),"+
   " (@t,@b,@r,'customers.read')",{t:tenant,b:business,r:role});
 }
 async function assign(pool,tenant,business,branch,account,role){

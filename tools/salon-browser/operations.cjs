@@ -119,9 +119,14 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  // Capture only request status for the same exact private scope; no URL/cookie/body.
  const posGetStatuses=[];
  const posWatcher=response=>{
-  if(response.request().method()==='GET'&&response.url().endsWith(
-   '/api/workspaces/'+business+'/branches/'+branch+'/pos-preview'))
-   posGetStatuses.push(response.status());
+  // Log status + whether scope matched. Never log raw URL/UUID/cookies.
+  if(response.request().method()==='GET'&&
+    response.url().split('?')[0].endsWith('/pos-preview')&&
+    response.url().includes('/api/workspaces/')){
+    const match=response.url().endsWith(
+     '/api/workspaces/'+business+'/branches/'+branch+'/pos-preview');
+    posGetStatuses.push((match?'M':'X')+response.status());
+  }
  };
  page.on('response',posWatcher);
  await page.goto(scope+'/pos-preview',{waitUntil:'domcontentloaded'});

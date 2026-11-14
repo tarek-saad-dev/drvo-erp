@@ -66,10 +66,10 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  onPhase('S12 POS DRAFT created through UI only');
  await page.goto(scope+'/pos-preview',{waitUntil:'domcontentloaded'});
  await page.getByRole('heading',{name:'مسودة بيع — معاينة الأسعار'}).waitFor();
- const options=page.getByLabel('الخدمة أو المنتج').locator('option').filter({hasText:service});
+ const options=page.getByLabel('الخدمة أو المنتج',{exact:true}).locator('option').filter({hasText:service});
  const id=await options.first().getAttribute('value');
  assert.match(id||'',/^[0-9a-f-]{36}$/i);
- await page.getByLabel('الخدمة أو المنتج').selectOption(id);
+ await page.getByLabel('الخدمة أو المنتج',{exact:true}).selectOption(id);
  await page.getByLabel('الكمية').fill('2');
  await page.getByRole('button',{name:'أضف للمسودة'}).click();
  await page.getByRole('button',{name:'حفظ مسودة فقط (بدون بيع)'}).click();

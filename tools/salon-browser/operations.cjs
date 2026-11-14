@@ -17,7 +17,14 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  await page.goto(scope+'/catalog',{waitUntil:'domcontentloaded',timeout:45000});
  await page.getByRole('heading',{name:'المنتجات والخدمات'}).waitFor();
  await page.getByLabel('اسم التصنيف').fill(category);
- await page.getByRole('button',{name:'إضافة التصنيف'}).click();
+ onPhase('S12 observe real Catalog Category create HTTP');
+ const [categoryResponse]=await Promise.all([
+  page.waitForResponse(r=>r.url().endsWith('/catalog/categories')&&
+   r.request().method()==='POST',{timeout:20000}),
+  page.getByRole('button',{name:'إضافة التصنيف'}).click(),
+ ]);
+ assert.equal(categoryResponse.status(),200,'Real Catalog create category HTTP status');
+ onPhase('S12 category appears in refreshed Service form');
  const categorySelect=page.getByLabel('التصنيف',{exact:true});
  const categoryOption=categorySelect.locator('option').filter({hasText:category});
  await categoryOption.waitFor({state:'attached'});

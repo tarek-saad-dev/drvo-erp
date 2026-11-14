@@ -11,7 +11,7 @@ type Preview = {state:"DRAFT_PREVIEW_ONLY";persisted:false;accountingState:"NOT_
   lines:Array<{offeringId:string;displayName:string;quantity:number;unitPriceMinor:number;lineSubtotalMinor:number}>;
   listPriceSubtotalMinor:number};
 type SavedDraft={draftId:string;status:"DRAFT";version:number;currency:string;subtotalMinor:number;createdAtUtc:string;lines:Array<{offeringId:string;displayName:string;quantity:number}>};
-const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function money(minor:number,currency:string):string {
   return (minor/100).toFixed(2)+" "+currency;
 }

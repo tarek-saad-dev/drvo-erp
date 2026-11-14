@@ -116,6 +116,14 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  const savedBooking=page.getByRole('row').filter({hasText:customer});
  await savedBooking.getByText(service,{exact:true}).waitFor();
  onPhase('S12 POS DRAFT created through UI only');
+ // Capture only request status for the same exact private scope; no URL/cookie/body.
+ const posGetStatuses=[];
+ const posWatcher=response=>{
+  if(response.request().method()==='GET'&&response.url().endsWith(
+   '/api/workspaces/'+business+'/branches/'+branch+'/pos-preview'))
+   posGetStatuses.push(response.status());
+ };
+ page.on('response',posWatcher);
  await page.goto(scope+'/pos-preview',{waitUntil:'domcontentloaded'});
  await page.getByRole('heading',{name:'مسودة بيع — معاينة الأسعار',exact:true}).waitFor();
  onPhase('S12 POS preview verified authorized Catalog GET');
@@ -153,7 +161,8 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
   throw new Error('S12_POS_SEARCH_MISSING_HTTP_'+inspection.api.status+
    '_DATA_'+inspection.api.state+'_FOUND_'+inspection.api.found+
    '_LOADING_'+inspection.loading+'_DENIED_'+inspection.denied+
-   '_ERROR_'+inspection.error+'_INPUTS_'+inspection.inputCount);
+   '_ERROR_'+inspection.error+'_INPUTS_'+inspection.inputCount+
+   '_NET_'+posGetStatuses.join('-'));
  }
  await search.fill(service);
  const quickAdd=page.getByRole('button',{name:new RegExp('^\\+ '+service+' —')});

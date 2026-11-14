@@ -40,3 +40,23 @@ test('quantity controls are bounded and invalidate stale preview/idempotency bef
  assert.match(source,/method:"POST",credentials:"same-origin",cache:"no-store"/);
  assert.doesNotMatch(source,/\/sales\/posted|\/payment|localStorage|sessionStorage/);
 });
+
+// Regression: the real S12 Browser+SQL test caught a six-group UUID regex
+// causing POS to deny a valid authorized branch before issuing its GET.
+test('POS requires exactly 5-group UUID scope, accepts SQL hex casing and rejects malformed IDs',()=>{
+ const match=source.match(/const GUID=\/(\^[^\n;]*\$)\/i;/);
+ assert.ok(match,'Expected an anchored case-insensitive UUID literal');
+ const guid=new RegExp(match[1],'i');
+ const valid='b08a369f-4616-4f17-98bf-106a2c9d141a';
+ assert.equal(guid.test(valid),true);
+ assert.equal(guid.test(valid.toUpperCase()),true);
+ for(const bad of [
+  '',valid+'-0000','00000000-0000-0000-0000-0000-000000000000',
+  valid.replace(/-/g,''),valid.replace(/-/,''),
+  'b08a369f-4616-4f17-98bf-106a-2c9d141a',
+  'b08a369f-4616-4f17-98bf-106a2c9d141z',
+ ])assert.equal(guid.test(bad),false,bad);
+ assert.match(source,/!GUID\.test\(businessId\)\|\|!GUID\.test\(branchId\)/);
+ assert.match(source,/setStatus\("denied"\);return/);
+ assert.doesNotMatch(source,/data-scope-uuid-valid/);
+});

@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-14 — Salon S11: real disposable Chrome + Next/K5/Nest/SQL, UUID guard fix
+
+- [PR #130](https://github.com/tarek-saad-dev/drvo-erp/pull/130) MERGED `79a57494a22a857b39816039b442889d2f491e4b`. New localhost HTTPS disposable Chromium browser harness using same SQL2022 Booking test fixture: signed-in privileged **synthetic Scheduler** and separate minimal Staff session, SQL-backed Salon summary, staff POS separation, denied writes/foreign tenant/anonymous session. **10/10 exact-PR GitHub Actions PASS**, Booking SQL/HTTP **36 checks**. No real Owner or live staging browser acceptance.
+- Fixed client false denial of valid Salon Business/Branch UUIDs returned from SQL in different hexadecimal casing; added strict UUID case-independent matching and Node/real Browser regression tests. Does not create any new permission or bypass current server-side scope.
+- No production API, migrations, VPS, deployment, public Auth, scoped Grant or financial POSTED changed. **NO-GO:** P1–P7 and paid C1–C3 remain OPEN in [#106](https://github.com/tarek-saad-dev/drvo-erp/issues/106); real independently witnessed P1 K5F, P2 encrypted off-host recovery, P3 external network/Identity, separately approved P4 VPS SQL010–017, independently trusted and audited real P5 rights, actual authorized staging P6 and P7 Founder/Security signoff remain required. No VPS SQL, Public Auth, production entitlements, real customer records or finance POSTED executed.
+
+
+
 ## 2026-11-14 — Salon S10: independent Staff CI and valid UUID fix
 
 - [#127](https://github.com/tarek-saad-dev/drvo-erp/pull/127), merged `c9874c56deeb322b80ffd472a8cf97cb02bfb82b`: expanded existing disposable SQL2022/Nest authenticated Catalog→Customers→Booking→POS DRAFT CI with a distinct synthetic Staff K5 session, read-only role, negative POST, foreign scope and action/Branch/session revocation. **3/3 PR checks succeeded**; no new production roles or rights.

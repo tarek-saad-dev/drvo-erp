@@ -10,6 +10,10 @@ A separate [disposable browser workflow](../../.github/workflows/salon-browser-d
 
 The gateway forwards fixed paths to **127.0.0.1:3100** Next or **127.0.0.1:3403** Nest, without changing Origin or credentials. The actual K5 API exact-Origin policy is exercised with the synthetic browser origin. K5+Booking+Customers+Catalog+POS web flags are ON **in disposable CI child processes only** and stay OFF in live staging. No Public Auth or production feature flag is touched.
 
+## Product bug discovered by actual Browser+SQL integration
+
+The browser revealed a real private Salon Overview defect not caught by prior Node source guards: SQL Server can return the **same UUID in uppercase hexadecimal**, while a valid lowercase URL is sent by Next. The component originally compared `businessId` / `branchId` via case-sensitive `===`, incorrectly showing `denied` after a valid K5 sign-in and authorized workspace. The code fix uses `sameScopedGuid(actual,requested)` to validate **both** IDs against complete 8-4-4-4-12 UUID syntax before comparing case-insensitively. This does **not** grant access: active K5 Session, Branch membership and scoped SQL permission remain authoritative. `apps/web/test/private-salon-overview.test.cjs` adds regression guards and the live disposable Browser assertion now protects the user-facing path.
+
 ## Browser acceptance assertions (test-only)
 
 1. Privileged synthetic Scheduler authenticates via real Next sign-in UI using a new K5 secure cookie; navigates /workspaces and valid Business/Branch /salon.

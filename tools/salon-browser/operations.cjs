@@ -44,11 +44,11 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  await page.getByLabel('اسم المورد').fill(resource);
  await page.getByRole('button',{name:'إضافة المورد'}).click();
  const form=page.locator('#new-appointment form');
- await form.getByLabel('المورد').locator('option').filter({hasText:resource}).waitFor({state:'attached'});
+ await form.getByLabel('المورد',{exact:true}).locator('option').filter({hasText:resource}).waitFor({state:'attached'});
  onPhase('S12 create scoped Booking via UI');
- await form.getByLabel('العميل').selectOption({label:customer});
- await form.getByLabel('الخدمة').selectOption({label:service+' (30 دقيقة)'});
- await form.getByLabel('المورد').selectOption({label:resource});
+ await form.getByLabel('العميل',{exact:true}).selectOption({label:customer});
+ await form.getByLabel('الخدمة',{exact:true}).selectOption({label:service+' (30 دقيقة)'});
+ await form.getByLabel('المورد',{exact:true}).selectOption({label:resource});
  const local=await page.evaluate(()=>{
   const d=new Date(Date.now()+72*60*60*1000);
   d.setSeconds(0,0);

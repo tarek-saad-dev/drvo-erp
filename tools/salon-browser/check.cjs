@@ -25,7 +25,7 @@ let diagnosticPage=null;
 async function signIn(context,username){
  const page=await context.newPage();
  phase='sign-in page navigation';
- await page.goto(origin+'/sign-in',{waitUntil:'networkidle'});
+ await page.goto(origin+'/sign-in',{waitUntil:'domcontentloaded',timeout:45000});
  phase='form fields';
  await page.getByLabel('اسم المستخدم').fill(username);
  await page.getByLabel('كلمة المرور').fill(password);
@@ -55,7 +55,7 @@ async function main(){
   const operator=await signIn(privileged,'scheduler.booking.ci');
   diagnosticPage=operator;
   phase='privileged salon navigate';
-  await operator.goto(url(business,branch),{waitUntil:'networkidle'});
+  await operator.goto(url(business,branch),{waitUntil:'domcontentloaded',timeout:45000});
   phase='privileged salon heading';
   await operator.getByRole('heading',{name:'لوحة تشغيل الصالون'}).waitFor();
   phase='privileged SQL-backed branch label';
@@ -69,7 +69,7 @@ async function main(){
   const restricted=await browser.newContext({ignoreHTTPSErrors:true});
   const staff=await signIn(restricted,'staff.read.booking.ci');
   phase='staff salon navigate';
-  await staff.goto(url(business,branch),{waitUntil:'networkidle'});
+  await staff.goto(url(business,branch),{waitUntil:'domcontentloaded',timeout:45000});
   phase='staff salon heading';
   await staff.getByRole('heading',{name:'لوحة تشغيل الصالون'}).waitFor();
   phase='staff SQL booking count';
@@ -90,7 +90,7 @@ async function main(){
   },{b:business,br:branch});
   assert.equal(status,404);
   phase='cross tenant Salon Overview denial';
-  await staff.goto(url(foreignBusiness,foreignBranch),{waitUntil:'networkidle'});
+  await staff.goto(url(foreignBusiness,foreignBranch),{waitUntil:'domcontentloaded',timeout:45000});
   await staff.getByRole('alert').filter({
    hasText:'مش مسموح بعرض لوحة الصالون لهذا الفرع.',
   }).waitFor();
@@ -98,7 +98,7 @@ async function main(){
   phase='anonymous session denial';
   const anonymous=await browser.newContext({ignoreHTTPSErrors:true});
   const guest=await anonymous.newPage();
-  await guest.goto(url(business,branch),{waitUntil:'networkidle'});
+  await guest.goto(url(business,branch),{waitUntil:'domcontentloaded',timeout:45000});
   await guest.waitForURL('**/sign-in',{timeout:30000});
   console.log('PASS: real disposable HTTPS browser + Next + K5 + Nest + SQL scoped Operator/Staff');
  }catch(error){

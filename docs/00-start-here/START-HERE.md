@@ -1,5 +1,8 @@
 # Start here — project handoff
 
+> **2026-11-14 OPTION A GITHUB-ONLY DELIVERY (STILL NO LIVE PILOT):** Founder selected Option A for non-commercial Pilot *engineering*, [P5 policy simulation #112](https://github.com/tarek-saad-dev/drvo-erp/pull/112) merged (strict synthetic-only Tenant/Business/Branch action, expiry, revocation and audit preview; **never grants actual access**). [P3 offline Network/Origin reviewer #113](https://github.com/tarek-saad-dev/drvo-erp/pull/113) merged (untrusted reported evidence **not** external security attestation). **P1–P7 all still OPEN** in [Issue #106](https://github.com/tarek-saad-dev/drvo-erp/issues/106), C1–C3 extra for paid. No real release trust anchor, SQL010–017 on VPS, Public Auth, K5F independent root proof, backup restore or real Salon accounts. New [P5A boundary](../04-execution/P5A-SYNTHETIC-PILOT-ACCESS-CONTRACT-2026-11-14.md) and [P3 boundary](../04-execution/P3-NETWORK-SECURITY-OFFLINE-REVIEW-2026-11-14.md) supersede dated prior Pilot rights proposal status.
+
+
 > **2026-11-14 SALON PARALLEL READINESS SOURCE UPDATE:** K5F-3 [#108](https://github.com/tarek-saad-dev/drvo-erp/pull/108) merged guard for K6C/SC-0/SC-1 OFF flags (not a live K5F attestation), P2 local isolated-restore evidence reviewer [#109](https://github.com/tarek-saad-dev/drvo-erp/pull/109) merged (not a restore), and P5 non-commercial Pilot rights **proposal only** [#110](https://github.com/tarek-saad-dev/drvo-erp/pull/110) merged (no grant). **Issue #106 still has 7 OPEN Pilot gates + 3 paid gates**; all VPS SQL 010–017 and Public Auth remain unauthorized. Read [current state](CURRENT-STATE.md) before acting; older snapshots below are historical.
 
 

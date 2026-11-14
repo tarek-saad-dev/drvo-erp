@@ -1,0 +1,9 @@
+{
+  "name": "drvo-salon-browser-disposable-ci",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Disposable CI-only browser integration; no production sign-in",
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
+}

@@ -130,3 +130,24 @@ test('runtime onboarding tables must deny ALL direct DML and control, not just S
 test('root execution cannot trust the mutable checkout as its operator bundle',()=>{
   assert.equal(rootBundleSafe(),false);
 });
+
+
+test('K5F flags include every K6C/SC0/SC1 controller gate from current source',()=>{
+  const {readFileSync}=require('node:fs');
+  const {resolve}=require('node:path');
+  const controllers=[
+    'module-candidates.controller.ts',
+    'release-catalog.controller.ts',
+    'activation-preview.controller.ts',
+  ];
+  for(const file of controllers){
+    const source=readFileSync(resolve(__dirname,'../../apps/api/src/modules',file),'utf8');
+    const gates=[...new Set(source.match(/DRVO_[A-Z0-9_]+_ENABLED/g)||[])];
+    assert.ok(gates.length>=2,'missing expected security gates '+file);
+    for(const gate of gates){
+      assert.ok(API_GATES.includes(gate),'K5F missing gate: '+gate+' in '+file);
+      assert.ok(badLabels(mockOperator,{...mockApi,[gate]:'YES'})
+        .some(x=>x.includes('flags remain OFF')),gate);
+    }
+  }
+});

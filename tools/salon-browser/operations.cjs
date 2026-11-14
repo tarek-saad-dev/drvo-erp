@@ -18,10 +18,14 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  await page.getByRole('heading',{name:'المنتجات والخدمات'}).waitFor();
  await page.getByLabel('اسم التصنيف').fill(category);
  await page.getByRole('button',{name:'إضافة التصنيف'}).click();
- await page.getByRole('option',{name:category}).waitFor({state:'attached'});
- onPhase('S12 create service through UI');
+ const categorySelect=page.getByLabel('التصنيف',{exact:true});
+ const categoryOption=categorySelect.locator('option').filter({hasText:category});
+ await categoryOption.waitFor({state:'attached'});
+ const categoryId=await categoryOption.getAttribute('value');
+ assert.match(categoryId||'',/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+ onPhase('S12 create service with exact Category ID through UI');
  await page.getByLabel('الاسم',{exact:true}).fill(service);
- await page.getByLabel('التصنيف',{exact:true}).selectOption({label:category});
+ await categorySelect.selectOption(categoryId);
  await page.getByLabel('السعر الأساسي').fill('185.00');
  await page.getByLabel('المدة بالدقائق').fill('30');
  await page.getByRole('button',{name:'إضافة الخدمة'}).click();

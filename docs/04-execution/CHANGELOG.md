@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-14 — S12 private Salon UI persisted flow and POS UUID defect fixed
+
+- [#133](https://github.com/tarek-saad-dev/drvo-erp/pull/133) merged `dc5dfbe1afa6ab8a39435f65013c246b944e2bfc`, **10/10 exact-PR CI PASS**: actual synthetic Chrome/private Next/K5/Nest/SQL2022 Catalog Category+Service → Customer → Booking Resource+future Appointment → POS quantity 2 persisted **DRAFT-only**, full Reload, independent Staff future Booking read/no POS, foreign Tenant and anonymous denial. 37 isolated SQL/HTTP Booking assertions. **Not a real staging/P6 operator acceptance.**
+- Fixed POS Preview client wrong 6-group UUID regex which denied valid Business/Branch before API; added case-insensitive canonical five-group positive + malformed negative unit regression, no change to server auth.
+- [#135](https://github.com/tarek-saad-dev/drvo-erp/pull/135) merged `0856055cca824aec7a7c495d08b33bac7fa81570`, K5C tests for five other private scope UUID validators, **4/4 PR CI PASS**.
+- **NO-GO unchanged:** P1–P7 and commercial C1–C3 remain unchecked in [#106](https://github.com/tarek-saad-dev/drvo-erp/issues/106). GitHub CI cannot attest actual VPS root K5F/release [#121](https://github.com/tarek-saad-dev/drvo-erp/issues/121), independently witnessed off-host restore [#122](https://github.com/tarek-saad-dev/drvo-erp/issues/122), external real HTTPS/Origin/Proxy [#123](https://github.com/tarek-saad-dev/drvo-erp/issues/123), separately authorized VPS SQL010–017, real independently trusted Publisher/Market + audited scoped P5 grants, *authorized real* staging Owner/Staff P6, or Founder/Security/Operations P7 signoff. No SQL on VPS, Public Auth, production rights or finance POSTED was activated.
+
+
 ## 2026-11-14 — Next-stage P4 SQL cross-domain permission negative proof
 
 - [#132](https://github.com/tarek-saad-dev/drvo-erp/pull/132) merged `8d0e20ff925af80c01d51089aa5c34e4026d55ee`: 8 Catalog/Customers/Booking/POS Module tables, 6 direct SQL rights denied to disposable runtime principal, direct SELECT SQL229, reviewed domain stored procedures executable, internal guards not executable. K0/K1/Shared Booking/Salon Browser 4/4 PR CI PASS; post-merge main 5/5 CI PASS. No production schema/permissions change.

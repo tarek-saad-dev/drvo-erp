@@ -1,5 +1,8 @@
 # First real Salon — bounded Pilot readiness and commercial path (2026-11-14)
 
+> **S10 2026-11-14 source-only checkpoint:** [#127](https://github.com/tarek-saad-dev/drvo-erp/pull/127) adds disposable K5 read-only Staff separate-account SQL/Nest HTTP negative permission proof; [#128](https://github.com/tarek-saad-dev/drvo-erp/pull/128) fixes private Salon UUID gate and tests default-404 route. They strengthen **preparatory P6 evidence** only, not browser acceptance; an independently onboarded real Owner, actual operator P1–P3, approved P4 migration, real audited P5 grant and P7 consent/support GO are still missing. **NO-GO remains:** P1–P7 and commercial C1–C3 in [Issue #106](https://github.com/tarek-saad-dev/drvo-erp/issues/106) remain OPEN. CI is not actual VPS K5F, off-host disaster recovery, external proxy security, authorized SQL 010–017, real release/grant or a live private browser acceptance. No SQL/Auth/grants/deployment authorized.
+
+
 > **2026-11-14 P4+P5 SOURCE-ONLY VERIFICATION:** [#118](https://github.com/tarek-saad-dev/drvo-erp/pull/118) adds offline post-017 checksum review, not verified VPS migration; [#119](https://github.com/tarek-saad-dev/drvo-erp/pull/119) tests separate synthetic Ed25519 release/market approvals, not trusted DRVO signers. [Parallel operator P1–P3 handoff](SALON-OPERATOR-P1-P3-PARALLEL-HANDOFF-2026-11-14.md) documents real evidence required. **None of P1–P7 closed**, 3 paid C1–C3 remain separate; no Public Auth, SQL on VPS, customer PII or real Pilot grant.
 
 

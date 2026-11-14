@@ -166,3 +166,23 @@ test("P5: input mutation after pure calculation cannot change frozen simulated o
  assert.equal(Object.isFrozen(r),true);
  assert.equal(r.auditPreview.action,"booking.read");
 });
+
+
+test("P5 synthetic policy must NOT be imported by real Nest, Web or worker runtime",()=>{
+ const fs=require("node:fs");
+ const path=require("node:path");
+ const base=path.resolve(__dirname,"..");
+ const dirs=["apps/api/src","apps/web/src","apps/worker/src"];
+ const importing=/(?:from\\s*["']|require\\s*\\(\\s*["'])[^"'\\n]*pilot-access-simulation/;
+ function scan(dir){
+  if(!fs.existsSync(dir))return;
+  for(const entry of fs.readdirSync(dir,{withFileTypes:true})){
+   const p=path.join(dir,entry.name);
+   if(entry.isDirectory()){scan(p);continue;}
+   if(!/\\.(?:ts|tsx|cjs|mjs|js)$/.test(entry.name))continue;
+   assert.doesNotMatch(fs.readFileSync(p,"utf8"),importing,
+    "Pilot simulation wired into runtime: "+path.relative(base,p));
+  }
+ }
+ for(const dir of dirs)scan(path.join(base,dir));
+});

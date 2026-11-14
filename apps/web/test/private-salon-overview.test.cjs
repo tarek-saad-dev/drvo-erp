@@ -17,7 +17,10 @@ test('overview must verify branch session and independently authorized modules',
  const client=read('salon/salon-overview-client.tsx');
  assert.match(client,/\/api\/auth\/me/);
  assert.match(client,/\/api\/auth\/workspaces/);
- assert.match(client,/branchData\.businessId!==businessId/);
+ assert.match(client,/sameScopedGuid\(branchData\.businessId,businessId\)/);
+ assert.match(client,/sameScopedGuid\(branchData\.branchId,branchId\)/);
+ assert.match(client,/sameScopedGuid\(x\.businessId,businessId\)/);
+ assert.match(client,/sameScopedGuid\(x\.branchId,branchId\)/);
  assert.match(client,/matching=assigned\.workspaces\?\.find/);
  for(const endpoint of ['/booking','/customers','/catalog','/pos-drafts']){
   assert.ok(client.includes('root+"'+endpoint+'"'));
@@ -80,4 +83,15 @@ test('Salon overview accepts full UUID identities instead of rejecting valid Bra
  ])assert.equal(guid.test(bad),false,bad);
  assert.match(client,/!GUID\.test\(businessId\)\|\|!GUID\.test\(branchId\)/);
  assert.match(client,/GUID\.test\(b\.offeringId\)/);
+});
+
+test('Salon UUID matching is case-insensitive AFTER validation, never grants new scope',()=>{
+ const client=read('salon/salon-overview-client.tsx');
+ assert.match(client,/const sameScopedGuid=/);
+ assert.match(client,/typeof actual==="string"&&typeof requested==="string"/);
+ assert.match(client,/GUID\.test\(actual\)&&GUID\.test\(requested\)/);
+ assert.match(client,/actual\.toLowerCase\(\)===requested\.toLowerCase\(\)/);
+ assert.doesNotMatch(client,/businessId===businessId&&|branchData\.businessId!==businessId/);
+ // Shared SQL SQL Server CONVERT(UUID) may change hex letter case. The
+ // real SQL/HTTPS/Chromium harness independently verifies one scoped branch.
 });

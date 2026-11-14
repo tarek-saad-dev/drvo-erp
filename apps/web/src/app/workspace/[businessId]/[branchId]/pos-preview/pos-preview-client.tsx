@@ -171,11 +171,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
     }catch{setMessage("تعذر الاتصال بالخادم.");}
     finally{setBusy(false);}
   }
-  return <main className="k5-workspace"
-    data-scope-uuid-valid={GUID.test(businessId)&&GUID.test(branchId)?"yes":"no"}
-    data-business-uuid-valid={GUID.test(businessId)?"yes":"no"}
-    data-branch-uuid-valid={GUID.test(branchId)?"yes":"no"}
-    data-scope-lengths={[String(businessId??"").length,String(branchId??"").length].join("-")}>
+  return <main className="k5-workspace">
     <header className="k5-workspace-header">
       <div className="k5-brand"><span className="brandmark">D</span> DRVO <b>ERP</b></div>
       <nav className="k5-head-actions"><Link href={home}>مساحة الفرع</Link></nav>

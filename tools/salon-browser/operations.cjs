@@ -161,12 +161,13 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
    return {api,loading:text.includes('جاري التحقق من صلاحيات الفرع'),
     denied:text.includes('المعاينة غير متاحة لحسابك'),
     error:text.includes('المعاينة غير متاحة حاليًا'),
-    inputCount:document.querySelectorAll('input[type="search"]').length};
+    inputCount:document.querySelectorAll('input[type="search"]').length,
+    scopeValid:document.querySelector('main.k5-workspace')?.getAttribute('data-scope-uuid-valid')};
   },{business,branch,service});
   throw new Error('S12_POS_SEARCH_MISSING_NET_'+posGetStatuses.join('-')+
    '_API_'+inspection.api.status+'_FOUND_'+inspection.api.found+
    '_UI_L'+inspection.loading+'D'+inspection.denied+
-   'E'+inspection.error+'I'+inspection.inputCount);
+   'E'+inspection.error+'I'+inspection.inputCount+'V'+inspection.scopeValid);
  }
  await search.fill(service);
  const quickAdd=page.getByRole('button',{name:new RegExp('^\\+ '+service+' —')});

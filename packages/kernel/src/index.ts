@@ -13,3 +13,6 @@ export type {Sc1PreviewInput,Sc1PriceFact,Sc1ReadOnlyResult,Sc1PreviewLine,Sc1Un
 
 export {evaluateSyntheticPilotAccess,PILOT_ALLOWED_ACTIONS} from "./pilot-access-simulation";
 export type {SyntheticPilotActor,SyntheticPilotGrant,SyntheticPilotPolicyInput,SyntheticPilotDecision,PilotAction,PilotDenyReason} from "./pilot-access-simulation";
+
+export {planSyntheticPilotChange} from "./pilot-grant-protocol";
+export type {PilotEventType,PilotScope,PilotSyntheticCommand,PilotSyntheticEvent,PilotSyntheticPlan} from "./pilot-grant-protocol";

@@ -1,5 +1,11 @@
 # Project changelog
 
+## 2026-11-14 — Option A synthetic Pilot rights contract + P3 offline security preparation
+
+- Founder approved Option A for GitHub-only bounded non-commercial Pilot engineering, not live grants. [#112](https://github.com/tarek-saad-dev/drvo-erp/pull/112) merged Lean Kernel pure `SYNTHETIC_CI_ONLY` policy checker and negative tests for Trusted Scope, current Session/Role/Membership, SC-0 verified release eligibility/Required closure, expiry/revocation/grant revision and read-only audit preview. Even synthetic allowed outcome **cannot enable runtime or issue grant**, and source test blocks direct use in API/Web/workers. No real Actor/Entitlement or published release.
+- [#113](https://github.com/tarek-saad-dev/drvo-erp/pull/113) merged local P3 Nginx/HTTPS/Origin/SameSite/K5/negative HTTP security evidence reviewer and tests. Complete self-reported evidence still cannot independently attest live proxy/security. [P5A spec](P5A-SYNTHETIC-PILOT-ACCESS-CONTRACT-2026-11-14.md) · [P3 spec](P3-NETWORK-SECURITY-OFFLINE-REVIEW-2026-11-14.md). No SQL010–017 on VPS, Public Auth, payment, real grant, first Salon Pilot or financial POSTED. P1–P7 remain OPEN in Issue #106.
+
+
 ## 2026-11-14 — parallel first Salon Pilot prerequisite preparation, NOT live GO
 
 - [PR #108](https://github.com/tarek-saad-dev/drvo-erp/pull/108): root-owned K5F source checker now denies `DRVO_K6C_CATALOG_READ_ENABLED`, `DRVO_SC0_RELEASE_READ_ENABLED`, and `DRVO_SC1_PREVIEW_READ_ENABLED` on pre-activation, plus source-controller inventory regression; exact observed 001–009 SQL prefix unchanged and no trusted root VPS audit executed.

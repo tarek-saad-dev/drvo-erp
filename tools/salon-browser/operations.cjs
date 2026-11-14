@@ -21,7 +21,7 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  await page.getByRole('option',{name:category}).waitFor({state:'attached'});
  onPhase('S12 create service through UI');
  await page.getByLabel('الاسم',{exact:true}).fill(service);
- await page.getByLabel('التصنيف').selectOption({label:category});
+ await page.getByLabel('التصنيف',{exact:true}).selectOption({label:category});
  await page.getByLabel('السعر الأساسي').fill('185.00');
  await page.getByLabel('المدة بالدقائق').fill('30');
  await page.getByRole('button',{name:'إضافة الخدمة'}).click();

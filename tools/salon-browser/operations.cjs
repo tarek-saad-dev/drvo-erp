@@ -128,17 +128,14 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
   }catch{return 0;}
  },{business,branch});
  assert.equal(previewHttp,200,'CI-only POS Preview API status');
- onPhase('S12 scoped POS draft Service select');
- const cartForm=page.locator('form.catalog-form').filter({
-  has:page.getByRole('button',{name:'أضف للمسودة'}),
- });
- const offeringSelect=cartForm.locator('select').first();
- const options=offeringSelect.locator('option').filter({hasText:service});
- const id=await options.first().getAttribute('value');
- assert.match(id||'',/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
- await offeringSelect.selectOption(id);
- await cartForm.locator('input[type="number"]').fill('2');
- await page.getByRole('button',{name:'أضف للمسودة'}).click();
+ onPhase('S12 real POS quick cart from authorized Catalog');
+ await page.getByPlaceholder('اكتب اسم العنصر').fill(service);
+ const quickAdd=page.getByRole('button',{name:new RegExp('^\\+ '+service+' —')});
+ await quickAdd.waitFor();
+ await quickAdd.click();
+ const increase=page.getByRole('button',{name:'زيادة كمية '+service,exact:true});
+ await increase.waitFor();
+ await increase.click();
  await page.getByRole('button',{name:'حفظ مسودة فقط (بدون بيع)'}).click();
  await page.getByText('المسودة اتحفظت. لم يتم تسجيل بيع أو تحصيل.').waitFor();
  onPhase('S12 POS DRAFT persisted and still unposted');

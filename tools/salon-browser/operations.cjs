@@ -18,7 +18,7 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  await page.getByRole('heading',{name:'المنتجات والخدمات'}).waitFor();
  await page.getByLabel('اسم التصنيف').fill(category);
  await page.getByRole('button',{name:'إضافة التصنيف'}).click();
- await page.getByRole('option',{name:category}).waitFor();
+ await page.getByRole('option',{name:category}).waitFor({state:'attached'});
  onPhase('S12 create service through UI');
  await page.getByLabel('الاسم',{exact:true}).fill(service);
  await page.getByLabel('التصنيف').selectOption({label:category});
@@ -44,7 +44,7 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  await page.getByLabel('اسم المورد').fill(resource);
  await page.getByRole('button',{name:'إضافة المورد'}).click();
  const form=page.locator('#new-appointment form');
- await form.getByLabel('المورد').locator('option').filter({hasText:resource}).waitFor();
+ await form.getByLabel('المورد').locator('option').filter({hasText:resource}).waitFor({state:'attached'});
  onPhase('S12 create scoped Booking via UI');
  await form.getByLabel('العميل').selectOption({label:customer});
  await form.getByLabel('الخدمة').selectOption({label:service+' (30 دقيقة)'});

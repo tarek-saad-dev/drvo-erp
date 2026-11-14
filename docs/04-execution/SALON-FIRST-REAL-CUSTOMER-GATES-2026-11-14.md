@@ -1,5 +1,8 @@
 # First real Salon — bounded Pilot readiness and commercial path (2026-11-14)
 
+> **2026-11-14 SOURCE PROOF UPDATE — ALL GATES STILL OPEN:** P4 [#115](https://github.com/tarek-saad-dev/drvo-erp/pull/115) proves SQL 009→017 under the restricted migrator with independent restored pre/post backups **ONLY in disposable CI**; P4 actual VPS SQL rollout and independent P1/P2/P3 signoffs remain unauthorized/unverified. P5 [#116](https://github.com/tarek-saad-dev/drvo-erp/pull/116) adds synthetic CAS/idempotency PROPOSED/REVOKED model, **not** scoped durable grants, release publication, active entitlements or K5/SQL enforcement. All **7 private Pilot gates + 3 additional paid gates** remain open. See [P4 plan](P4-009-017-DISPOSABLE-MIGRATION-RESTORE-PROOF-2026-11-14.md) · [P5 model](P5B-PILOT-GRANT-CAS-IDEMPOTENCY-2026-11-14.md) · [Tracker #106](https://github.com/tarek-saad-dev/drvo-erp/issues/106).
+
+
 > **2026-11-14 PREPARATION UPDATE, NO GATE CLOSED:** Founder selected **Option A for GitHub-only synthetic policy design**. [P5A #112](https://github.com/tarek-saad-dev/drvo-erp/pull/112) and [P3 #113](https://github.com/tarek-saad-dev/drvo-erp/pull/113) merged source-only policy tests and local network evidence reviewer. They do NOT prove P3 external Nginx/Origin security nor P5 real verified-release scope grants/audit/expiry enforcement, and cannot satisfy P6/P7. All seven Pilot gates below remain **OPEN**, plus paid C1–C3. See [P5A](P5A-SYNTHETIC-PILOT-ACCESS-CONTRACT-2026-11-14.md) and [P3](P3-NETWORK-SECURITY-OFFLINE-REVIEW-2026-11-14.md).
 
 

@@ -1,5 +1,11 @@
 # Project changelog
 
+## 2026-11-14 — P4 restricted SQL migration/restore proof + P5 synthetic consistency
+
+- [PR #115](https://github.com/tarek-saad-dev/drvo-erp/pull/115): real disposable SQL Server CI now reconstructs actual K5F migration prefix **001–009** using same restricted SQL migrator, proves pending 010–017 only, pre-upgrade independent restored checksum history and absence of later tables, and isolated post-017 checksum/schema restore; K0/K1/Staging Database Automation CI PASS. This is **not** encrypted offsite recovery or staging-VPS migration approval.
+- [PR #116](https://github.com/tarek-saad-dev/drvo-erp/pull/116): Kernel pure synthetic `PROPOSED/REVOKED` Pilot change planner models scoped grant revision/CAS, idempotent UUID+payload retries, stale-concurrent request rejection, independent reviewer, immutable simulated audit and no-write/no-activation invariants; K0/K1 CI PASS. Real trusted release signer, SQL grant storage, durable revocation and server/worker access checks remain unimplemented. [P4 details](P4-009-017-DISPOSABLE-MIGRATION-RESTORE-PROOF-2026-11-14.md) · [P5-B](P5B-PILOT-GRANT-CAS-IDEMPOTENCY-2026-11-14.md). Salon P1–P7 all still OPEN; Public Auth and VPS SQL010–017 NOT enabled.
+
+
 ## 2026-11-14 — Option A synthetic Pilot rights contract + P3 offline security preparation
 
 - Founder approved Option A for GitHub-only bounded non-commercial Pilot engineering, not live grants. [#112](https://github.com/tarek-saad-dev/drvo-erp/pull/112) merged Lean Kernel pure `SYNTHETIC_CI_ONLY` policy checker and negative tests for Trusted Scope, current Session/Role/Membership, SC-0 verified release eligibility/Required closure, expiry/revocation/grant revision and read-only audit preview. Even synthetic allowed outcome **cannot enable runtime or issue grant**, and source test blocks direct use in API/Web/workers. No real Actor/Entitlement or published release.

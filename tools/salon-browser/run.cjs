@@ -48,7 +48,7 @@ async function childCheck(env){
    if(code===0&&stdout.includes('PASS: real disposable HTTPS browser'))
     resolve();
    else reject(new Error('Chromium check failed: '+
-    (stderr.match(/FAIL: disposable browser phase: [A-Za-z ]+/)?.[0]||'UNKNOWN')));
+    (stderr.match(/FAIL: disposable browser phase:[^\n]{1,210}/)?.[0]||'UNKNOWN')));
   });
  });
 }

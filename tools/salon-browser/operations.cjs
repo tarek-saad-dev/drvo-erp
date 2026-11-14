@@ -64,10 +64,10 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  const categoryId=await categoryOption.getAttribute('value');
  assert.match(categoryId||'',/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
  onPhase('S12 create service with exact Category ID through UI');
- await page.getByLabel('الاسم',{exact:true}).fill(service);
+ await serviceForm.getByLabel('الاسم',{exact:true}).fill(service);
  await categorySelect.selectOption(categoryId);
- await page.getByLabel('السعر الأساسي').fill('185.00');
- await page.getByLabel('المدة بالدقائق').fill('30');
+ await serviceForm.getByLabel('السعر الأساسي').fill('185.00');
+ await serviceForm.getByLabel('المدة بالدقائق').fill('30');
  await page.getByRole('button',{name:'إضافة الخدمة'}).click();
  await page.getByRole('cell',{name:service,exact:true}).waitFor();
  onPhase('S12 Catalog survives browser reload');

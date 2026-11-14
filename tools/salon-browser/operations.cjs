@@ -86,13 +86,21 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  await page.goto(scope+'/booking',{waitUntil:'domcontentloaded'});
  await page.getByRole('heading',{name:'المواعيد والحجوزات'}).waitFor();
  await page.getByLabel('اسم المورد').fill(resource);
- await page.getByRole('button',{name:'إضافة المورد'}).click();
+ const [resourceResponse]=await Promise.all([
+  page.waitForResponse(r=>r.url().endsWith('/booking/resources')&&
+   r.request().method()==='POST',{timeout:20000}),
+  page.getByRole('button',{name:'إضافة المورد'}).click(),
+ ]);
+ assert.equal(resourceResponse.status(),200,'Booking Resource create HTTP');
  const form=page.locator('#new-appointment form');
- await form.getByLabel('المورد',{exact:true}).locator('option').filter({hasText:resource}).waitFor({state:'attached'});
+ // Exactly 3 selects in this form: Customer / Service / Resource.
+ const selectors=form.locator('select');
+ await selectors.nth(2).locator('option').filter({hasText:resource})
+  .waitFor({state:'attached'});
  onPhase('S12 create scoped Booking via UI');
- await form.getByLabel('العميل',{exact:true}).selectOption({label:customer});
- await form.getByLabel('الخدمة',{exact:true}).selectOption({label:service+' (30 دقيقة)'});
- await form.getByLabel('المورد',{exact:true}).selectOption({label:resource});
+ await selectors.nth(0).selectOption({label:customer});
+ await selectors.nth(1).selectOption({label:service+' (30 دقيقة)'});
+ await selectors.nth(2).selectOption({label:resource});
  const local=await page.evaluate(()=>{
   const d=new Date(Date.now()+72*60*60*1000);
   d.setSeconds(0,0);

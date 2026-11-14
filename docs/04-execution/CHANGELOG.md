@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-11-14 — Next-stage P4 SQL cross-domain permission negative proof
+
+- [#132](https://github.com/tarek-saad-dev/drvo-erp/pull/132) merged `8d0e20ff925af80c01d51089aa5c34e4026d55ee`: 8 Catalog/Customers/Booking/POS Module tables, 6 direct SQL rights denied to disposable runtime principal, direct SELECT SQL229, reviewed domain stored procedures executable, internal guards not executable. K0/K1/Shared Booking/Salon Browser 4/4 PR CI PASS; post-merge main 5/5 CI PASS. No production schema/permissions change.
+- [#133](https://github.com/tarek-saad-dev/drvo-erp/pull/133) *pending* real Chromium UI create Category→Service→Customer→Booking→POS DRAFT and SQL reload, not merged/accepted at this snapshot.
+- Private Pilot gates P1–P7 and commercial C1–C3 still OPEN (real VPS root/security/recovery/P4 approvals/P5 grants/P6/P7 not done); no Public Auth, live SQL, PII or POSTED sale.
+
+
 ## 2026-11-14 — Salon S11: real disposable Chrome + Next/K5/Nest/SQL, UUID guard fix
 
 - [PR #130](https://github.com/tarek-saad-dev/drvo-erp/pull/130) MERGED `79a57494a22a857b39816039b442889d2f491e4b`. New localhost HTTPS disposable Chromium browser harness using same SQL2022 Booking test fixture: signed-in privileged **synthetic Scheduler** and separate minimal Staff session, SQL-backed Salon summary, staff POS separation, denied writes/foreign tenant/anonymous session. **10/10 exact-PR GitHub Actions PASS**, Booking SQL/HTTP **36 checks**. No real Owner or live staging browser acceptance.

@@ -1,7 +1,7 @@
 # Private Salon Pilot — non-commercial rights and operator decision request
 
 **Date:** 2026-11-14  
-**Status:** **PROPOSED / NEEDS FOUNDER + SECURITY + ARCHITECTURE APPROVAL**. This document creates **no** rights, user, real release, prices, billing, Public Auth, SQL migrations, or SC-2/SC-3 implementation approval. Maps to first-Salon [P5 gate #106](https://github.com/tarek-saad-dev/drvo-erp/issues/106).
+**Status:** **FOUNDER APPROVED OPTION A AS DESIGN + GITHUB-ONLY SYNTHETIC IMPLEMENTATION (2026-11-14)**. Security/Architecture policy details and **real Pilot grants remain UNAPPROVED**. This document creates **no** rights, user, real release, prices, billing, Public Auth, SQL migrations, or SC-2/SC-3 implementation approval. Maps to first-Salon [P5 gate #106](https://github.com/tarek-saad-dev/drvo-erp/issues/106).
 
 ## Architecture constraints (accepted)
 - **ADR-030:** only authenticated trusted Tenant→Business→Branch scope; Default Deny; current explicit BusinessMembership + BranchRole action checks, scoped SQL and negative isolation. Pooled SQL RLS still deferred separately.
@@ -21,7 +21,7 @@
 | PILOT-06 Audit | Immutable source + Tenant/Business/Branch + actor + action + grant version/reason, explicit approval and separate technical enablement; no raw PII/passwords in logs | Reviewers, custody, consent, traceability, incident response |
 | PILOT-07 Go/No-Go | Staging first with fabricated synthetic records; P1–P4 + P5 rights negative proof required before P6 live browser test; P7 founder/security GO before first real Salon | Independent K5F bundle proof, encrypted offhost restore, Nginx/Origin/Owner-Staff tests, migration signoff |
 
-## Two options, neither silently approved
+## Founder selected Option A — not a live grant
 
 **Option A — Wait for verified production release + audited Pilot-only grant (recommended).** Finish SC-0 trust anchor/release market approval and a separately reviewed narrowly scoped non-commercial Pilot-rights contract. Pros: consistent governance, never fake or bypass an entitlement; no paid policies required. Cons: additional engineering and independent security approval before real access.
 
@@ -29,7 +29,7 @@
 
 **Not an option:** enabling public K5/Salon flags or seeding `RolePermission` to simulate Entitlement, adding hard-coded privileged Business IDs, declaring SC-0 Candidates paid ACTIVE, or allowing direct SQL/HTTP on VPS without P1–P4.
 
-## Implementation impact if Option A later approved (NOT CODE NOW)
+## Implementation impact for future live Option A (NOT AUTHORIZED)
 
 1. New **small, bounded pilot-grant owner** separate from cash/billing, reviewed country/release evidence and strict `PILOT_NON_COMMERCIAL` scope/expiry, **not** a paid entitlement; must clarify SC-0 release publishing without hard-coding compliance claims.
 2. One scoped, audited operator-authorized creation/revoke workflow with independent reviewer, idempotent Business revision and no public mutation route.
@@ -42,3 +42,8 @@
 **Choose PILOT-01–07 with Option A or Option B, or amend the scope; Finance/Security must approve audit/market policy and specific non-commercial rights.** This packet is for a later explicit decision. It does not alter ADR-032, authorize SC-2/SC-3, move the 7 Salon acceptance gates, authorize collection, or grant customer access.
 
 **Related:** [Salon first real customer gates](SALON-FIRST-REAL-CUSTOMER-GATES-2026-11-14.md), [ADR-032](../05-decisions/ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md), [K5F security](K5F-STAGING-SECURITY-VALIDATION-2026-11-10.md).
+
+
+## Founder explicit selection receipt — 2026-11-14
+
+The founder explicitly **approved Option A for GitHub-only engineering** with Verified Release, trusted Tenant/Business/Branch isolation, Default Deny, expiry, revocation and Audit and requested parallel safe Pilot security preparation. The P5-A **synthetic, non-authoritative** contract is documented at [P5A simulation](P5A-SYNTHETIC-PILOT-ACCESS-CONTRACT-2026-11-14.md). This acceptance does **NOT** decide real grant storage/SQL, enable K5 or approve any Salon data, real release publication, payment, commercial entitlement, production market eligibility, access, rollout, or VPS changes. PILOT-01–07 detailed Security/Architecture and operator review remains required. P5 Gate #106 remains OPEN until independently verified real enforcement and P1–P4 are accepted. Option B is no longer selected but historical discussion above is preserved.

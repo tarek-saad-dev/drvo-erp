@@ -1,5 +1,8 @@
 # First real Salon — bounded Pilot readiness and commercial path (2026-11-14)
 
+> **2026-11-14 PREPARATION UPDATE, NO GATE CLOSED:** Founder selected **Option A for GitHub-only synthetic policy design**. [P5A #112](https://github.com/tarek-saad-dev/drvo-erp/pull/112) and [P3 #113](https://github.com/tarek-saad-dev/drvo-erp/pull/113) merged source-only policy tests and local network evidence reviewer. They do NOT prove P3 external Nginx/Origin security nor P5 real verified-release scope grants/audit/expiry enforcement, and cannot satisfy P6/P7. All seven Pilot gates below remain **OPEN**, plus paid C1–C3. See [P5A](P5A-SYNTHETIC-PILOT-ACCESS-CONTRACT-2026-11-14.md) and [P3](P3-NETWORK-SECURITY-OFFLINE-REVIEW-2026-11-14.md).
+
+
 **Authoritative tracker:** [Issue #106](https://github.com/tarek-saad-dev/drvo-erp/issues/106).  
 **Current decision:** **NO-GO** for real Salon customer accounts or paid operation; no live authentication/private domain activation approved. This document is a portable summary, not runtime/SQL/operational authorization.
 

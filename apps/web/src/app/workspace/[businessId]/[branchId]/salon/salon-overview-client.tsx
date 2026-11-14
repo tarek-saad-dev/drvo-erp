@@ -8,7 +8,7 @@ type Booking={bookingId:string;offeringId:string;resourceId:string;customerName:
 type Overview={branchName:string;businessName:string;bookings:Booking[];
  customersCount:number;offeringsCount:number;draftCount:number|null;posPreviewAllowed:boolean};
 type Status="loading"|"ready"|"denied"|"unavailable";
-const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export default function SalonOverview({businessId,branchId,draftsAvailable}:{
  businessId:string;branchId:string;draftsAvailable:boolean;

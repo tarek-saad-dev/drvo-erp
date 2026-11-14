@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-14 — Salon S10: independent Staff CI and valid UUID fix
+
+- [#127](https://github.com/tarek-saad-dev/drvo-erp/pull/127), merged `c9874c56deeb322b80ffd472a8cf97cb02bfb82b`: expanded existing disposable SQL2022/Nest authenticated Catalog→Customers→Booking→POS DRAFT CI with a distinct synthetic Staff K5 session, read-only role, negative POST, foreign scope and action/Branch/session revocation. **3/3 PR checks succeeded**; no new production roles or rights.
+- [#128](https://github.com/tarek-saad-dev/drvo-erp/pull/128), merged `9ced7f2648f2dac33db49506b7f71296684dc7aa`: corrected a defective 4-segment UUID regex to accepted standard 5-segment UUID for Salon Business/Branch/Offering; Node regression and K5C HTTP smoke verifies /salon 404 when flags OFF. **9/9 PR checks succeeded** (including SQL/API/Web CI).
+- **NO-GO remains:** P1–P7 and commercial C1–C3 in [Issue #106](https://github.com/tarek-saad-dev/drvo-erp/issues/106) remain OPEN. CI is not actual VPS K5F, off-host disaster recovery, external proxy security, authorized SQL 010–017, real release/grant or a live private browser acceptance. No SQL/Auth/grants/deployment authorized.
+
+
+
 ## 2026-11-14 — P5 key-trust source gap: offline tests only
 
 - [PR #124](https://github.com/tarek-saad-dev/drvo-erp/pull/124): approved as **reviewable design document**, not production trust authorization. Publisher/Market independent key custody, issuer revocation, deployment binding and Pilot rights remain separately gated. K0/K1 CI PASS; merged `18a9f38cccca30a0c403fbdad9c70e25d0c8fd0f`.

@@ -1,5 +1,8 @@
 # ADR-032 — Business-Scoped Module Activation, Immutable Bundle Approval & Version Contract
 
+> **2026-11-14 NON-DECISION IMPLEMENTATION NOTE:** [#124](https://github.com/tarek-saad-dev/drvo-erp/pull/124) acceptance checklist and [#125](https://github.com/tarek-saad-dev/drvo-erp/pull/125) offline synthetic signer-to-snapshot tests do NOT amend ACT-01–ACT-07 founder-accepted baseline, approve a production trust anchor, legal market release, P5 persistent rights, SC-2/3, Public Auth or any paid activation. Independent Security/Market/Founder operational decisions remain pending in [#106](https://github.com/tarek-saad-dev/drvo-erp/issues/106). See [P5-C](../04-execution/P5C-SYNTHETIC-TRUST-ANCHOR-BOUNDARY-2026-11-14.md).
+
+
 > **2026-11-14 DECISION UPDATE — FOUNDER-ACCEPTED V1 BASELINE (ACT-01–ACT-07 ONLY):** [Founder/Billing/Security ACT-01–ACT-07 decision packet](../04-execution/ADR-032-FOUNDER-DECISION-PACKET-2026-11-12.md) documents the V1 choices approved on 2026-11-14 and links the [SaaS Commercial Core staged engineering plan](../04-execution/SAAS-COMMERCIAL-CORE-ENGINEERING-GATES-2026-11-12.md). Founder explicitly accepted the seven V1 principles, **NOT** commercial prices, tax, collection procedure, billing operator access, detailed roles, payment/entitlement mutation, Public Auth, VPS migrations or production readiness.
 
 **Date:** 2026-10-30  

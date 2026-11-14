@@ -1,5 +1,14 @@
 # Project changelog
 
+## 2026-11-14 — P5 key-trust source gap: offline tests only
+
+- [PR #124](https://github.com/tarek-saad-dev/drvo-erp/pull/124): approved as **reviewable design document**, not production trust authorization. Publisher/Market independent key custody, issuer revocation, deployment binding and Pilot rights remain separately gated. K0/K1 CI PASS; merged `18a9f38cccca30a0c403fbdad9c70e25d0c8fd0f`.
+- [PR #125](https://github.com/tarek-saad-dev/drvo-erp/pull/125): standalone synthetic-only independent key fixture comparison with signed Packet, issuer/role boundaries, expiration and revocation; adversarial Node tests, K0/K1 CI PASS; merged `79583f8e67cdab3db7f9644fba9f205c9b1a92e8`. No API, SQL, flags, production Release, grants, runtime change.
+- Operator acceptance tickets: P1 [#121](https://github.com/tarek-saad-dev/drvo-erp/issues/121), P2 [#122](https://github.com/tarek-saad-dev/drvo-erp/issues/122), P3 [#123](https://github.com/tarek-saad-dev/drvo-erp/issues/123), each still OPEN pending independently witnessed real evidence.
+- **NO-GO:** All P1–P7 Private Salon Pilot gates + C1–C3 paid gates in [#106](https://github.com/tarek-saad-dev/drvo-erp/issues/106) remain OPEN. No production key enrollments, market release, K5 grants, public login, real customer PII, VPS SQL 010–017, live off-host recovery or external K5F/network acceptance were performed.
+
+
+
 ## 2026-11-14 — post-migration history evidence & synthetic independent Release/Market signatures
 
 - [#118](https://github.com/tarek-saad-dev/drvo-erp/pull/118): local-only strict `001–017` source SHA history review, rejects drift, reordered or foreign DB, always labels complete self-reports NOT ATTESTED; K5F immutable root `001–009` remains separate; no SQL/VPS.

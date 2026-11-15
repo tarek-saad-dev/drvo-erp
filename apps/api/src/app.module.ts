@@ -28,12 +28,14 @@ import { PosPreviewController } from "./pos-preview/pos-preview.controller";
 import { PosPreviewService } from "./pos-preview/pos-preview.service";
 import { PosDraftsController } from "./pos-drafts/pos-drafts.controller";
 import { PosDraftsService } from "./pos-drafts/pos-drafts.service";
+import { HrController } from "./hr/hr.controller";
+import { HrService } from "./hr/hr.service";
 
 @Module({
   controllers: [HealthController, DatabaseHealthController, K3ScopeProofController,
     IdentityController, AuthorizedBranchController, BranchAccessController,
-    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, ReleaseCatalogController, ActivationPreviewController, CatalogController, CustomersController, BookingController, PosPreviewController, PosDraftsController],
+    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, ReleaseCatalogController, ActivationPreviewController, CatalogController, CustomersController, BookingController, PosPreviewController, PosDraftsController, HrController],
   providers: [FoundationDatabaseService, K3ScopeProofRepository, IdentityService, BranchAccessService,
-    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, ReleaseCatalogService, ActivationPreviewService, CatalogService, CustomersService, BookingService, PosPreviewService, PosDraftsService],
+    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, ReleaseCatalogService, ActivationPreviewService, CatalogService, CustomersService, BookingService, PosPreviewService, PosDraftsService, HrService],
 })
 export class AppModule {}

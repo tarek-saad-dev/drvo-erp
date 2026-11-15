@@ -12,7 +12,7 @@ test('private Treasury route gated by K5 and treasury-only feature switch',()=>{
 test('Treasury UI exposes count observations rather than fabricated balances or postings',()=>{
  const client=read('treasury/treasury-client.tsx');
  for(const token of ['NONPOSTING_PHYSICAL_CASH_COUNTS_ONLY','NOT_COMPUTED',
-  'NOT_RECONCILED','NO_SETTLEMENT','NOT_POSTED','Idempotency-Key',
+  'NOT_PERFORMED','NO_SETTLEMENT','NOT_POSTED','Idempotency-Key',
   'crypto.randomUUID()'])
   assert.ok(client.includes(token),'Required: '+token);
  assert.match(client,/credentials:"same-origin"/);

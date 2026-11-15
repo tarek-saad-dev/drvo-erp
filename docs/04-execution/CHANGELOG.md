@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-15 — Cashier Treasury T1 / Operations Shift guard / dev-primary preflight
+
+- [Treasury T1 source](CASHIER-TREASURY-T1-COUNT-AND-PRIMARY-PREFLIGHT-2026-11-15.md): SQL021 scoped `TreasuryCashCountDraft` with idempotent create/cancel, physical count money minor, UTC audit; K5 `treasury.count.read/manage`, SQL runtime EXECUTE-only. Nest Treasury controller/service, private Light count UI and authorized workspace tile added with flags OFF by default. **No actual balance, CashMove, payment, reconciliation, BusinessDay/Shift close, GL or cross-owner write.**
+- Added Treasury real SQL2022/HTTP verifier, API/Web unit source tests, two-job `treasury-counts-ci.yml`, K5C route default-404. [9/9 real SQL HTTP, 95/95 API tests PASS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43675431478), first Web CI failed an incorrect expected `NOT_RECONCILED` test label; corrected to actual `NOT_PERFORMED` and re-run independently pending.
+- Operations `shift-readiness.ts` pure scoped day/shift evidence checks with fixed finance posting deny, tests; read-only local dev-primary migration history/checksum preflight and drift tests. **No primary DB credentials available via GitHub, no restore verification and SQL019–021 not applied by assistant.**
+
+
+
 ## 2026-11-15 — HR Attendance S2 (UTC nonpayroll punch sessions)
 
 - [HR-S2 report](HR-S2-ATTENDANCE-UTC-SESSIONS-2026-11-15.md): Cashier attendance session source reviewed and adapted to independent DRVO HR Employee/EmployeeBranch ownership; SQL020 adds server UTC punches, 1 global OPEN per Business Employee and immutable idempotency/audit, scoped K5 HR role and EXECUTE-only access.

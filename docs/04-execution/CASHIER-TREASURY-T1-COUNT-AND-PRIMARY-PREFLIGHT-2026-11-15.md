@@ -37,6 +37,12 @@ Instructions for authorized operator (not for public CI):
 
 **Private candidate URL (NOT LIVE):** `https://erp-stage.drvotech.com/workspace/{businessId}/{branchId}/treasury`. Actual user-accepted persistence still OPEN; public `/demo/salon` is only synthetic.
 
+## Verified independent run evidence
+- [Treasury two-job CI at source SHA `75fc31f04`](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43675726632): **9/9 real disposable SQL2022/Nest HTTP integration, 95/95 API unit, 3/3 Web tests, Next build/typecheck PASS**.
+- [K5C private default-404 and source check at `75fc31f04`](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43675726649): **PASS**, no public/private gate bypass.
+- [Root K0 at `c7b681093`](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43675688247): **145/145 tests PASS**, including Operations `evaluateShiftReadiness` and primary-development migration-readiness checks. This is source/CI proof and **not** a primary DB read-only operator run or backup/restore.
+- [Staging code deployment at `75fc31f04`](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43675726619): GitHub workflow **SUCCESS**. This **does not** apply SQL021, turn on Treasury flags, verify private K5 Owner UI, or authorize any finance posting. Public synthetic [external preview smoke](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43675827156) **SUCCESS**, which also does not test private financial data.
+
 ## Next Cashier parity
 - Real **Operations BusinessDay/Shift** persistence and local clock configuration with scoped close/catch-up/forced shift review, plus reversible tests.
 - Authoritative Treasury movements/transfer/reconciliation and cash/bank method balances, after ADR-031 settlement/reconciliation policy, independent live DB/backup and appropriate approval.

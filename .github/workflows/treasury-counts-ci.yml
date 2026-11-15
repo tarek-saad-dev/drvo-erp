@@ -1,0 +1,78 @@
+name: Treasury Cash Counts SQL2022 and Private Web CI
+on:
+  pull_request:
+    paths:
+      - 'db/migrations/**'
+      - 'apps/api/src/treasury/**'
+      - 'apps/api/src/app.module.ts'
+      - 'apps/api/test/treasury.test.cjs'
+      - 'apps/web/src/app/workspace/**'
+      - 'apps/web/test/treasury-counts.test.cjs'
+      - 'tools/treasury/**'
+      - '.github/workflows/treasury-counts-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'db/migrations/**'
+      - 'apps/api/src/treasury/**'
+      - 'apps/api/src/app.module.ts'
+      - 'apps/api/test/treasury.test.cjs'
+      - 'apps/web/src/app/workspace/**'
+      - 'apps/web/test/treasury-counts.test.cjs'
+      - 'tools/treasury/**'
+      - '.github/workflows/treasury-counts-ci.yml'
+permissions:
+  contents: read
+jobs:
+  treasury-sql-http:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and test production Nest API
+        run: |
+          set -euo pipefail
+          npm ci --prefix apps/api --no-audit --no-fund
+          npm test --prefix apps/api
+          node --check tools/treasury/verify.cjs
+      - name: Start disposable SQL Server 2022 (no primary DB)
+        shell: bash
+        run: |
+          set -euo pipefail
+          pass="DrvoTreasuryCi_$(openssl rand -hex 18)!"
+          echo "::add-mask::$pass"
+          echo "SQL_TEST_SA_PASSWORD=$pass" >> "$GITHUB_ENV"
+          docker run --detach --name drvo-treasury-ci \
+            -e ACCEPT_EULA=Y -e MSSQL_PID=Developer \
+            -e MSSQL_SA_PASSWORD="$pass" \
+            -p 127.0.0.1:14345:1433 -p 127.0.0.1:1433:1433 \
+            mcr.microsoft.com/mssql/server:2022-latest
+      - name: SQL021 storage, exact replay, K5 branch security and HTTP
+        env:
+          TREASURY_SQL_DISPOSABLE: 'YES'
+          TREASURY_TEST_PORT: '14345'
+        run: node tools/treasury/verify.cjs
+      - name: Disposable SQL logs on failure
+        if: failure()
+        run: docker logs --tail 100 drvo-treasury-ci || true
+      - name: Destroy disposable database
+        if: always()
+        run: docker rm -f drvo-treasury-ci || true
+  treasury-web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Treasury private Light UI source tests, production build and TS
+        run: |
+          set -euo pipefail
+          npm ci --prefix apps/web --no-audit --no-fund
+          node --test apps/web/test/treasury-counts.test.cjs
+          env -u DRVO_K5_WEB_ENABLED -u DRVO_TREASURY_COUNTS_WEB_ENABLED npm run build --prefix apps/web
+          npm run typecheck --prefix apps/web

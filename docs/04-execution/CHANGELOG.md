@@ -4,7 +4,7 @@
 
 - [HR-S2 report](HR-S2-ATTENDANCE-UTC-SESSIONS-2026-11-15.md): Cashier attendance session source reviewed and adapted to independent DRVO HR Employee/EmployeeBranch ownership; SQL020 adds server UTC punches, 1 global OPEN per Business Employee and immutable idempotency/audit, scoped K5 HR role and EXECUTE-only access.
 - Added Nest `apps/api/src/hr/{attendance.controller.ts,attendance.service.ts}`, registered AppModule, private `apps/web/.../hr/attendance` Light UX with attendance link in HR when flag permitted. No payroll/BusinessDay/payment or automatic stale attendance resolution.
-- Tests `apps/api/test/attendance.test.cjs`, `apps/web/test/hr-attendance.test.cjs`, real SQL2022/Nest HTTP `tools/hr/attendance-verify.cjs`, `.github/workflows/hr-attendance-ci.yml`, K5C private route regression. [Run #43674411436](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43674411436) **NOT marked PASS until verified**. Primary DB migration + actual private UI user acceptance OPEN.
+- Tests `apps/api/test/attendance.test.cjs`, `apps/web/test/hr-attendance.test.cjs`, real SQL2022/Nest HTTP `tools/hr/attendance-verify.cjs`, `.github/workflows/hr-attendance-ci.yml`, K5C private route regression. [Run #43674411436](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43674411436) **PASS on exact tested source SHA `5f4a3d2fa` (11 SQL/HTTP groups + 90 unit + 3 Web)**. Primary DB migration + actual private UI user acceptance OPEN.
 
 
 

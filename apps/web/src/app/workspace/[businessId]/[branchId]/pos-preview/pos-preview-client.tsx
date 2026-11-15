@@ -10,10 +10,21 @@ type Preview = {state:"DRAFT_PREVIEW_ONLY";persisted:false;accountingState:"NOT_
   paymentState:"NOT_COLLECTED";currency:string;taxComputed:false;
   lines:Array<{offeringId:string;displayName:string;quantity:number;unitPriceMinor:number;lineSubtotalMinor:number}>;
   listPriceSubtotalMinor:number};
+type Adjustment={state:"DRAFT_ADJUSTMENT_PREVIEW_ONLY";persisted:false;accountingState:"NOT_POSTED";
+  paymentState:"NOT_COLLECTED";taxComputed:false;discountRecorded:false;currency:string;
+  listPriceSubtotalMinor:number;headerDiscountMinor:number;afterDiscountMinor:number;
+  customerPresentedMinor:number;possibleTipMinor:number;shortfallMinor:number};
 type SavedDraft={draftId:string;status:"DRAFT";version:number;currency:string;subtotalMinor:number;createdAtUtc:string;lines:Array<{offeringId:string;displayName:string;quantity:number}>};
 const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function money(minor:number,currency:string):string {
   return (minor/100).toFixed(2)+" "+currency;
+}
+// Minor-unit conversion without binary floating point rounding or a fake payment.
+function readMoneyMinor(value:string):number|null {
+  if(!/^\\d{1,10}(?:\\.\\d{1,2})?$/.test(value.trim()))return null;
+  const [major,decimal=""]=value.trim().split(".");
+  const minor=Number(major)*100+Number(decimal.padEnd(2,"0"));
+  return Number.isSafeInteger(minor)&&minor<=9_000_000_000_000?minor:null;
 }
 export default function PosPreviewClient({businessId,branchId,draftsEnabled,initialOfferingId}:{
   businessId:string;branchId:string;draftsEnabled:boolean;initialOfferingId:string|null;
@@ -26,6 +37,9 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
   const [quantity,setQuantity]=useState(1);
   const [lines,setLines]=useState<Line[]>([]);
   const [preview,setPreview]=useState<Preview|null>(null);
+  const [adjustment,setAdjustment]=useState<Adjustment|null>(null);
+  const [discountText,setDiscountText]=useState("0");
+  const [presentedText,setPresentedText]=useState("0");
   const [busy,setBusy]=useState(false);
   const [message,setMessage]=useState("");
   const [draftStatus,setDraftStatus]=useState<"loading"|"ready"|"denied">("loading");
@@ -35,6 +49,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
   const handoffApplied=useRef(false);
   const matchingOfferings=offerings.filter(o=>o.isActive&&
     o.displayName.toLocaleLowerCase().includes(catalogSearch.trim().toLocaleLowerCase()));
+  const selectedCurrency=offerings.find(o=>lines.some(l=>l.offeringId===o.offeringId))?.currency??"EGP";
   const home="/workspace/"+encodeURIComponent(businessId)+"/"+encodeURIComponent(branchId);
   const api="/api/workspaces/"+encodeURIComponent(businessId)+"/branches/"+
     encodeURIComponent(branchId)+"/pos-preview";
@@ -100,7 +115,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
       if(!r.ok){setMessage("تعذر الحفظ؛ أعد المحاولة بنفس العناصر بدون تكرار.");return;}
       const saved=await r.json() as {status:string;posted:boolean;id:string};
       if(saved.status!=="DRAFT"||saved.posted!==false){setMessage("استجابة الحفظ غير صحيحة.");return;}
-      retryKey.current=null;setLines([]);setPreview(null);
+      retryKey.current=null;setLines([]);setPreview(null);setAdjustment(null);
       setMessage("المسودة اتحفظت. لم يتم تسجيل بيع أو تحصيل.");
       await loadDrafts();
     }catch{setMessage("اتصال غير متاح. أعد المحاولة بنفس البيانات للتأكد من عدم التكرار.");}
@@ -109,7 +124,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
   function quickAdd(offering:Offering){
     if(busy||draftBusy||!offering.isActive||lines.length>=20||
        lines.some(x=>x.offeringId===offering.offeringId))return;
-    retryKey.current=null;setPreview(null);setMessage("");
+    retryKey.current=null;setPreview(null);setAdjustment(null);setMessage("");
     setLines(current=>[...current,{offeringId:offering.offeringId,quantity:1}]);
   }
   function adjustLineQuantity(selectedOfferingId:string,delta:-1|1){
@@ -118,7 +133,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
     if(!existing||existing.quantity+delta<1||existing.quantity+delta>20)return;
     // A changed cart must never replay a pending immutable DRAFT request or
     // retain a server-priced preview for different quantities.
-    retryKey.current=null;setPreview(null);setMessage("");
+    retryKey.current=null;setPreview(null);setAdjustment(null);setMessage("");
     setLines(current=>current.map(l=>{
       if(l.offeringId!==selectedOfferingId)return l;
       const next=l.quantity+delta;
@@ -135,14 +150,14 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
       new Set(d.lines.map(x=>x.offeringId)).size!==d.lines.length){
       setMessage("فيه عناصر قديمة أو غير متاحة. لازم تعمل مسودة جديدة من الكتالوج.");return;
     }
-    retryKey.current=null;setPreview(null);
+    retryKey.current=null;setPreview(null);setAdjustment(null);
     setLines(d.lines.map(x=>({offeringId:x.offeringId,quantity:x.quantity})));
     setMessage("تم تجهيز سلة جديدة من المسودة القديمة. راجع الأسعار الحالية قبل الحفظ؛ المسودة الأصلية لم تتغير.");
   }
   function addLine(event:React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if(busy||draftBusy)return;
-    setPreview(null);setMessage("");
+    setPreview(null);setAdjustment(null);setMessage("");
     if(!GUID.test(offeringId)||!Number.isSafeInteger(quantity)||quantity<1||quantity>20||
         !offerings.some(o=>o.offeringId===offeringId)||
         lines.some(l=>l.offeringId===offeringId)||lines.length>=20) {
@@ -153,7 +168,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
   }
   async function calculate() {
     if(busy||draftBusy||lines.length===0)return;
-    setBusy(true);setPreview(null);setMessage("");
+    setBusy(true);setPreview(null);setAdjustment(null);setMessage("");
     try{
       const response=await fetch(api+"/checkout-preview",{
         method:"POST",credentials:"same-origin",cache:"no-store",
@@ -169,6 +184,33 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
           !Array.isArray(result.lines)){setMessage("استجابة غير صالحة.");return;}
       setPreview(result);
     }catch{setMessage("تعذر الاتصال بالخادم.");}
+    finally{setBusy(false);}
+  }
+  async function previewAdjustments(){
+    if(busy||draftBusy||lines.length===0)return;
+    const headerDiscountMinor=readMoneyMinor(discountText);
+    const customerPresentedMinor=readMoneyMinor(presentedText);
+    if(headerDiscountMinor===null||customerPresentedMinor===null){
+      setAdjustment(null);setMessage("اكتب مبلغين صالحين بالعملة (بحد أقصى رقمين بعد العلامة).");return;
+    }
+    setBusy(true);setAdjustment(null);setMessage("");
+    try{
+      const response=await fetch(api+"/adjustments-preview",{
+        method:"POST",credentials:"same-origin",cache:"no-store",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({lines,headerDiscountMinor,customerPresentedMinor}),
+      });
+      if(response.status===401){router.replace("/sign-in");return;}
+      if(response.status===403||response.status===404){setStatus("denied");return;}
+      if(!response.ok){setMessage("الخصم غير صالح أو أكبر من إجمالي القائمة، أو الخدمة غير متاحة.");return;}
+      const result=await response.json() as Adjustment;
+      if(result.state!=="DRAFT_ADJUSTMENT_PREVIEW_ONLY"||result.persisted!==false||
+          result.discountRecorded!==false||result.accountingState!=="NOT_POSTED"||
+          result.paymentState!=="NOT_COLLECTED"||result.taxComputed!==false){
+        setMessage("استجابة المعاينة غير صحيحة.");return;
+      }
+      setAdjustment(result);
+    }catch{setMessage("تعذر الاتصال بالخادم لحساب الخصم والإكرامية الاسترشادية.");}
     finally{setBusy(false);}
   }
   return <main className="k5-workspace">
@@ -231,7 +273,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
                     onClick={()=>adjustLineQuantity(l.offeringId,1)}>+</button>
                 </div></td>
                 <td><button type="button" disabled={busy||draftBusy} onClick={()=>{
-                  setLines(s=>s.filter(x=>x.offeringId!==l.offeringId));setPreview(null);retryKey.current=null;
+                  setLines(s=>s.filter(x=>x.offeringId!==l.offeringId));setPreview(null);setAdjustment(null);retryKey.current=null;
                 }}>حذف</button></td>
               </tr>)}
             </tbody>
@@ -239,6 +281,18 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
         <button className="k5-save" type="button" disabled={busy||draftBusy||lines.length===0} onClick={()=>void calculate()}>
           {busy?"جاري الحساب…":"احسب معاينة الأسعار"}
         </button>
+        <div className="catalog-form" aria-label="معاينة خصم وإكرامية غير مدفوعة">
+          <label>خصم استرشادي ({selectedCurrency})
+            <input type="text" inputMode="decimal" value={discountText} maxLength={14}
+              onChange={e=>{setDiscountText(e.target.value);setAdjustment(null);}} disabled={busy||draftBusy}/>
+          </label>
+          <label>مبلغ العميل المفترض ({selectedCurrency}) — لم يُحصَّل
+            <input type="text" inputMode="decimal" value={presentedText} maxLength={14}
+              onChange={e=>{setPresentedText(e.target.value);setAdjustment(null);}} disabled={busy||draftBusy}/>
+          </label>
+          <button className="k5-save" type="button" disabled={busy||draftBusy||lines.length===0}
+            onClick={()=>void previewAdjustments()}>معاينة الخصم وفرق المبلغ</button>
+        </div>
         {draftsEnabled&&draftStatus==="ready"&&
           <button className="k5-save" type="button" disabled={draftBusy||busy||lines.length===0}
             onClick={()=>void saveDraft()}>
@@ -261,6 +315,16 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
                 onClick={()=>createNewFromDraft(d)}>جهّز سلة جديدة</button></td>
             </tr>)}</tbody>
           </table></div>}
+      </section>}
+      {adjustment&&<section className="k5-admin-card">
+        <h2>خصم وإكرامية محتملة — معاينة فقط</h2>
+        <p>إجمالي القائمة: <strong>{money(adjustment.listPriceSubtotalMinor,adjustment.currency)}</strong></p>
+        <p>خصم استرشادي غير محفوظ: <strong>{money(adjustment.headerDiscountMinor,adjustment.currency)}</strong></p>
+        <p>بعد الخصم وقبل الضرائب: <strong>{money(adjustment.afterDiscountMinor,adjustment.currency)}</strong></p>
+        <p>المبلغ المفترض من العميل: {money(adjustment.customerPresentedMinor,adjustment.currency)}</p>
+        <p>فرق إيجابي / إكرامية محتملة: {money(adjustment.possibleTipMinor,adjustment.currency)}</p>
+        <p>المبلغ الناقص: {money(adjustment.shortfallMinor,adjustment.currency)}</p>
+        <p className="k5-muted">لا يوجد تحصيل أو إكرامية موزعة أو خصم محفوظ أو فاتورة أو قيد. حفظ المسودة يحفظ العناصر فقط؛ هذه الأرقام مؤقتة ولا تشمل ضريبة.</p>
       </section>}
       {preview&&<section className="k5-admin-card">
         <h2>نتيجة المعاينة — ليست فاتورة</h2>

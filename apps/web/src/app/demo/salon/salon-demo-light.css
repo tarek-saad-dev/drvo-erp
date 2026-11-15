@@ -95,6 +95,7 @@
 .sd-book-form select { background:#fff; border-color:#d9ced9; color:#27242b; }
 .sd-price-hint { color:#77707b; }
 .sd-price-hint strong { color:#116a70; }
+.sd-pos-layout { align-items:start; }
 .sd-number { background:#f1e9f1; color:#74536e; }
 .sd-service-card { background:#fff; border:1px solid #e6e1e8;
   color:#27242b; box-shadow:0 4px 12px #553e5307; }

@@ -1,5 +1,7 @@
 # DRVO ERP
 
+> **2026-11-15 current UX priority:** [ADR-041](docs/05-decisions/ADR-041-CASHIER-UX-DRVO-LIGHT-V1.md) adopts the real Cashier operator UX with the founder-supplied DRVO brand-kit in **Light-only V1**. The first source slice restyles the public synthetic Salon Demo and the K5-authorized Branch launcher with central Plum/Teal tokens and the [approved ADR-038 mark](assets/brand/approved/drvo-symbol-primary.svg). **Build/CI, independent external HTTPS UI, real primary SQL and production readiness require separate confirmation; private modules remain access-gated.** For current executable scope and blockers see [CURRENT-STATE](docs/00-start-here/CURRENT-STATE.md).
+
 Modular, multi-tenant, multi-industry SaaS business operating system.
 
 **Project phase:** Architecture baseline plus **K0 non-production TypeScript scaffold**. This is *not* a functional Web/API/Worker runtime or customer-ready ERP.

@@ -75,7 +75,7 @@ export class ExpensesService {
   const result=await this.execute(this.scope(actor,token,businessId,branchId),
    "core.ReadExpenseWorkspace");
   const sets=result.recordsets;
-  if(!sets||sets.length!==2)throw new ServiceUnavailableException("Expense data unavailable");
+  if(!Array.isArray(sets)||sets.length!==2)throw new ServiceUnavailableException("Expense data unavailable");
   const categories:ExpenseCategory[]=sets[0].map((row:Record<string,unknown>)=>({
    categoryId:String(row.categoryId),displayName:String(row.displayName),isActive:Boolean(row.isActive),
   }));

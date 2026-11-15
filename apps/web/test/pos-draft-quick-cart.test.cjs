@@ -32,7 +32,7 @@ test('quantity controls are bounded and invalidate stale preview/idempotency bef
  assert.match(source,/function adjustLineQuantity\(selectedOfferingId:string,delta:-1\|1\)/);
  assert.match(source,/if\(busy\|\|draftBusy\)return;/);
  assert.match(source,/existing\.quantity\+delta<1\|\|existing\.quantity\+delta>20/);
- assert.match(source,/retryKey\.current=null;setPreview\(null\);setMessage\(""\)/);
+ assert.match(source,/retryKey\.current=null;setPreview\(null\);setAdjustment\(null\);setMessage\(""\)/);
  assert.match(source,/next>=1&&next<=20\?\{\.\.\.l,quantity:next\}:l/);
  assert.match(source,/disabled=\{busy\|\|draftBusy\|\|l\.quantity<=1\}/);
  assert.match(source,/disabled=\{busy\|\|draftBusy\|\|l\.quantity>=20\}/);

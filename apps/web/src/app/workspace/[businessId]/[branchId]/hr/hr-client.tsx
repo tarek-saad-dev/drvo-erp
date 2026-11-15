@@ -8,7 +8,7 @@ type Employee={employeeId:string;employeeCode:string;displayName:string;
  payrollMethod:"hourly"|"daily"|"monthly";isActive:boolean;branchActive:boolean;
  isBookable:boolean;resourceId:string|null;resourceName:string|null};
 type Resource={resourceId:string;displayName:string;kind:string;isActive:boolean};
-const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 // HR and Booking remain separate data owners; binding uses Booking Resource ID only.
 export default function HrClient({businessId,branchId}:{businessId:string;branchId:string}){
  const router=useRouter();

@@ -78,6 +78,47 @@ export function computeListPricePreview(offerings: readonly CatalogOffering[], i
   };
 }
 
+/** Cashier service-line/header discount concept adapted to DRVO minor units.
+ * This is an ephemeral operator quote comparison, not a sale, receivable,
+ * payroll earning, payment confirmation, tax computation or persisted discount.
+ */
+export type AdjustmentPreview = Omit<CheckoutPreview, "state"> & {
+  state: "DRAFT_ADJUSTMENT_PREVIEW_ONLY"; discountRecorded: false;
+  headerDiscountMinor: number; afterDiscountMinor: number;
+  customerPresentedMinor: number; possibleTipMinor: number; shortfallMinor: number;
+};
+export function computeAdjustmentPreview(
+  offerings: readonly CatalogOffering[], input: unknown,
+): AdjustmentPreview {
+  if (!input || typeof input !== "object" || Array.isArray(input) ||
+      Object.keys(input).length !== 3 ||
+      !Object.prototype.hasOwnProperty.call(input, "lines") ||
+      !Object.prototype.hasOwnProperty.call(input, "headerDiscountMinor") ||
+      !Object.prototype.hasOwnProperty.call(input, "customerPresentedMinor")) {
+    throw new BadRequestException("Invalid adjustment preview");
+  }
+  const payload = input as {lines: unknown;headerDiscountMinor: unknown;customerPresentedMinor: unknown};
+  const moneyMinor = (value: unknown): value is number =>
+    typeof value === "number" && Number.isSafeInteger(value) &&
+    value >= 0 && value <= 9_000_000_000_000;
+  if (!moneyMinor(payload.headerDiscountMinor) || !moneyMinor(payload.customerPresentedMinor)) {
+    throw new BadRequestException("Invalid money amount");
+  }
+  const priced = computeListPricePreview(offerings, {lines: payload.lines});
+  if (payload.headerDiscountMinor > priced.listPriceSubtotalMinor) {
+    throw new BadRequestException("Discount exceeds current list subtotal");
+  }
+  const afterDiscountMinor = priced.listPriceSubtotalMinor-payload.headerDiscountMinor;
+  const difference = BigInt(payload.customerPresentedMinor)-BigInt(afterDiscountMinor);
+  return {
+    ...priced, state:"DRAFT_ADJUSTMENT_PREVIEW_ONLY",discountRecorded:false,
+    headerDiscountMinor:payload.headerDiscountMinor,afterDiscountMinor,
+    customerPresentedMinor:payload.customerPresentedMinor,
+    possibleTipMinor:difference>0n?Number(difference):0,
+    shortfallMinor:difference<0n?Number(-difference):0,
+  };
+}
+
 @Injectable()
 export class PosPreviewService {
   constructor(private readonly catalog: CatalogService) {}
@@ -95,5 +136,13 @@ export class PosPreviewService {
     if (!body || typeof body !== "object") throw new BadRequestException("Invalid preview");
     const catalog = await this.catalog.list(actor, token, businessId, branchId);
     return computeListPricePreview(catalog.offerings, body);
+  }
+  async adjustments(actor: Actor, token: string, businessId: string, branchId: string, body: unknown) {
+    enabled();
+    // Pricing is derived ONLY from a freshly authorized scoped Catalog read.
+    // Presented cash is hypothetical; this route has no POS/Treasury/HR writes.
+    if (!body || typeof body !== "object") throw new BadRequestException("Invalid preview");
+    const catalog = await this.catalog.list(actor, token, businessId, branchId);
+    return computeAdjustmentPreview(catalog.offerings, body);
   }
 }

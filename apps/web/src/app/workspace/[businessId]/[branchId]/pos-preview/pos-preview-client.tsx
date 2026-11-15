@@ -21,8 +21,8 @@ function money(minor:number,currency:string):string {
 }
 // Minor-unit conversion without binary floating point rounding or a fake payment.
 function readMoneyMinor(value:string):number|null {
-  if(!/^\d{1,10}(?:\.\d{1,2})?$/.test(value.trim()))return null;
-  const [major,decimal=""]=value.trim().split(".");
+  if(!/^\d{1,10}(?:\.\d{1,2})?$/.test(value))return null;
+  const [major,decimal=""]=value.split(".");
   const minor=Number(major)*100+Number(decimal.padEnd(2,"0"));
   return Number.isSafeInteger(minor)&&minor<=9_000_000_000_000?minor:null;
 }

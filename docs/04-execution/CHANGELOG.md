@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-11-15 — First real Cashier Business Logic Ports and private POS adjustment UI
+
+- [Cashier Owned Runtime Port](https://github.com/tarek-saad-dev/drvo-erp/blob/main/docs/04-execution/CASHIER-FIRST-OWNED-RUNTIME-PORT-2026-11-15.md): three **shared domain production source packages** for Operations BusinessDay planner, HR monthly salary retro preview and POS hypothetical tip/employee candidate math. Domain ID and ISO validation hardened, integer minor currency arithmetic, and root tests compare supported behavior to pinned original Cashier BusinessDay/Payroll source.
+- Extended protected `apps/api/src/pos-preview` with **Cashier-adapted fixed header discount and hypothetical tender surplus/shortfall preview** using fresh scoped Catalog pricing, K5 session and exact HTTPS Origin guard; added visible fields/result to existing private POS Web. `POST .../adjustments-preview` returns **DRAFT_ADJUSTMENT_PREVIEW_ONLY** only, `persisted:false`, `discountRecorded:false`, `NOT_COLLECTED`, `NOT_POSTED`; current saved DRAFT still stores original Cart lines only.
+- Root+API+Web tests include parity/rounding/leap year, invalid Branch evidence, discount/money injection, cross-site origin and stale UI preview invalidation. No SQL, actual DB connection/backup, posting, payment, production activation or VPS deployment claimed; full Cashier migration still far from complete.
+
+
 ## 2026-11-15 — Founder changes target from Salon-only slices to full Cashier functional parity
 
 - **Strategic directive:** [ADR-040](https://github.com/tarek-saad-dev/drvo-erp/blob/main/docs/05-decisions/ADR-040-CASHIER-FULL-FUNCTIONAL-PARITY-MODULAR-ERP.md) records **full source-audited Cashier replacement via DRVO reusable Module architecture**, not copying legacy route/db pools or settling for a narrow Barber UI. **Barber Extension** adds industry-specific behavior to reusable HR/Booking/POS/Catalog/Inventory contracts.

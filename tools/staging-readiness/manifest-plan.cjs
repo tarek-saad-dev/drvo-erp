@@ -4,6 +4,8 @@
  * comparing an untrusted exported record list with immutable LOCAL Git files.
  * It NEVER connects to a database, invokes migrations, creates a backup,
  * executes shell commands, or authorizes a VPS activation.
+ * Preserve original reviewed 001–017 operator baseline; 018+ requires
+ * separate development approval and never expands P4 VPS authorization.
  */
 const {readFileSync,readdirSync}=require('node:fs');
 const {resolve,join}=require('node:path');
@@ -27,8 +29,13 @@ const DATABASE='DRVO_ERP_STAGING';
 
 function sourceManifest(directory=resolve(__dirname,'../../db/migrations')){
  const entries=readdirSync(directory).filter(n=>n.endsWith('.sql')).sort();
- if(entries.length!==SOURCE_TARGET_COUNT)throw new Error('Unexpected source manifest size');
- return Object.freeze(entries.map((filename,index)=>{
+ if(entries.length<SOURCE_TARGET_COUNT)throw new Error('Missing 001–017 source baseline');
+ // Future development SQL must not silently modify the P4 017 approval.
+ for(let i=0;i<entries.length;i++){
+  const match=FILE.exec(entries[i]);
+  if(!match||Number(match[1])!==i+1)throw new Error('Non-consecutive migration sequence');
+ }
+ return Object.freeze(entries.slice(0,SOURCE_TARGET_COUNT).map((filename,index)=>{
   const parsed=FILE.exec(filename);
   if(!parsed||Number(parsed[1])!==index+1)
    throw new Error('Non-consecutive or unknown migration filename');

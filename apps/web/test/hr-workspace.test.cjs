@@ -18,7 +18,7 @@ test('HR UI private Web flag, exact five-group scope and no persistent browser P
 test('private HR creates scoped employee and Salon links only approved PERSON booking resources',()=>{
  assert.match(client,/\/hr\/employees"/);
  assert.match(client,/\/booking"/);
- assert.match(client,/resource\.kind==="PERSON"&&x\.isActive/);
+ assert.match(client,/x\.kind==="PERSON"&&x\.isActive/);
  assert.match(client,/method:"POST",credentials:"same-origin",cache:"no-store"/);
  assert.match(client,/Idempotency-Key/);
  assert.match(client,/payrollMethod==="monthly"/);

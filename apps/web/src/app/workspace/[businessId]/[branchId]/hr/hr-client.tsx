@@ -38,11 +38,12 @@ export default function HrClient({businessId,branchId}:{businessId:string;branch
    if(r.status===403||r.status===404){setState("denied");return;}
    if(!r.ok){setState("unavailable");return;}
    const data=await r.json() as {employees?:Employee[]};
-   if(!Array.isArray(data.employees)){setState("unavailable");return;}
-   setEmployees(data.employees);
+   const employees=data.employees;
+   if(!Array.isArray(employees)){setState("unavailable");return;}
+   setEmployees(employees);
    setSelectedResources(current=>{
     const next={...current};
-    for(const e of data.employees)if(!(e.employeeId in next))next[e.employeeId]=e.resourceId??"";
+    for(const e of employees)if(!(e.employeeId in next))next[e.employeeId]=e.resourceId??"";
     return next;
    });
    setState("ready");

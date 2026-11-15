@@ -5,6 +5,11 @@ const {CURRENT_K5F_PREFIX,sourceManifest,compareHistoryToSource}=require('../too
 const source=sourceManifest();
 const prefix=source.slice(0,9).map(x=>({name:x.name,checksum:x.checksum}));
 const evidence=(rows)=>({database:'DRVO_ERP_STAGING',rows});
+test('migration 018 does not silently expand independently approved P4 017 source target',()=>{
+ const files=require('node:fs').readdirSync(require('node:path').resolve(__dirname,'../db/migrations'));
+ assert.ok(files.includes('018_hr_employee_salon_barber.sql'));
+ assert.equal(sourceManifest().length,17);
+});
 test('staging source manifest enumerates exactly 001–017, with original 001–009 K5F prefix',()=>{
  assert.equal(source.length,17);assert.equal(CURRENT_K5F_PREFIX.length,9);
  assert.deepEqual(source.slice(0,9).map(x=>x.name),[...CURRENT_K5F_PREFIX]);

@@ -7,5 +7,5 @@ export default async function HrPage({params}:{
  if(process.env.DRVO_K5_WEB_ENABLED!=="YES"||
     process.env.DRVO_HR_WEB_ENABLED!=="YES")notFound();
  const {businessId,branchId}=await params;
- return <HrClient businessId={businessId} branchId={branchId}/>;
+ return <HrClient businessId={businessId} branchId={branchId} attendanceWebEnabled={process.env.DRVO_HR_ATTENDANCE_WEB_ENABLED==="YES"}/>;
 }

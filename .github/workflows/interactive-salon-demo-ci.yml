@@ -5,6 +5,10 @@ on:
       - 'apps/web/src/app/demo/salon/**'
       - 'apps/web/src/app/page.tsx'
       - 'apps/web/src/app/globals.css'
+      - 'apps/web/src/app/drvo-light.css'
+      - 'apps/web/src/app/layout.tsx'
+      - 'apps/web/public/brand/**'
+      - 'apps/web/test/drvo-light-ui.test.cjs'
       - 'apps/web/test/salon-demo.test.cjs'
       - 'apps/web/src/app/workspace/**'
       - 'apps/web/test/private-salon-overview.test.cjs'
@@ -15,6 +19,10 @@ on:
       - 'apps/web/src/app/demo/salon/**'
       - 'apps/web/src/app/page.tsx'
       - 'apps/web/src/app/globals.css'
+      - 'apps/web/src/app/drvo-light.css'
+      - 'apps/web/src/app/layout.tsx'
+      - 'apps/web/public/brand/**'
+      - 'apps/web/test/drvo-light-ui.test.cjs'
       - 'apps/web/test/salon-demo.test.cjs'
       - 'apps/web/src/app/workspace/**'
       - 'apps/web/test/private-salon-overview.test.cjs'
@@ -35,6 +43,7 @@ jobs:
           set -euo pipefail
           npm ci --prefix apps/web --no-audit --no-fund
           node --test apps/web/test/salon-demo.test.cjs
+          node --test apps/web/test/drvo-light-ui.test.cjs
           node --test apps/web/test/private-salon-overview.test.cjs
           env -u DRVO_K5_WEB_ENABLED npm run build --prefix apps/web
           npm run typecheck --prefix apps/web

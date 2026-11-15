@@ -32,6 +32,8 @@ For the **temporary pre-customer internal development phase**:
 
 For each change: explain cross-module/architecture impact briefly; commit code and relevant docs **direct to main**; execute/check available tests and CI; report exact changed files/commit SHA, tests, confirmed DB modifications (or **not applied**), deployed status (or **unverified**) and next work. Do not claim a successful live deployment without independent evidence.
 
+**Founder user-visible release requirement (2026-11-15):** after every functional slice, provide a concrete test URL, user steps, exact source and independently evidenced deployed revision, plus persistence/authorization check status. CI success or an SSH receiver log is insufficient to label a feature **LIVE**; when stage/production access or database/feature flags are blocked, label the rollout **NOT VERIFIED** and keep unsafe public paths OFF. Public stage synthetic demo is not production or private feature acceptance. See [release loop](../04-execution/USER-VISIBLE-RELEASE-LOOP-2026-11-15.md).
+
 ## Exit criteria / reactivation
 
 Re-enable **PR review + a separate staging database/environment** when the founder explicitly reverses this decision, **before onboarding the first external Salon or storing real customer data**, or when multi-developer collaboration/paid operation requires approvals and review. Restore the existing architectural process rather than designing it again. Document the reactivation decision in a new ADR or amendment here.

@@ -10,7 +10,7 @@ type Employee={employeeId:string;employeeCode:string;displayName:string;
 type Resource={resourceId:string;displayName:string;kind:string;isActive:boolean};
 const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 // HR and Booking remain separate data owners; binding uses Booking Resource ID only.
-export default function HrClient({businessId,branchId}:{businessId:string;branchId:string}){
+export default function HrClient({businessId,branchId,attendanceWebEnabled}:{businessId:string;branchId:string;attendanceWebEnabled:boolean}){
  const router=useRouter();
  const [state,setState]=useState<"loading"|"ready"|"denied"|"unavailable">("loading");
  const [employees,setEmployees]=useState<Employee[]>([]);
@@ -123,6 +123,7 @@ export default function HrClient({businessId,branchId}:{businessId:string;branch
   {state==="denied"&&<p role="alert" className="k5-error">مش مصرح لك بعرض HR لهذا الفرع.</p>}
   {state==="unavailable"&&<p role="alert" className="k5-error">HR مش متاح حاليًا أو Migration 018 غير مطبّقة.</p>}
   {state==="ready"&&<>
+   {attendanceWebEnabled&&<Link className="k5-verify-link" href={home+"/hr/attendance"}>الحضور والانصراف (HR)</Link>}
    {notice&&<p role="status" className="k5-notice">{notice}</p>}
    <section className="k5-admin-card k5-invite-card">
     <h2>إضافة موظف للفرع</h2>

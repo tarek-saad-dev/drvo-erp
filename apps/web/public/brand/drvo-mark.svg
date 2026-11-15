@@ -1,7 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title">
-<title>DRVO ERP mark</title>
-<defs><linearGradient id="plum" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#74536E"/><stop offset="1" stop-color="#553e53"/></linearGradient><linearGradient id="teal" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#16a1a0"/><stop offset="1" stop-color="#1a7b80"/></linearGradient></defs>
-<path fill="url(#plum)" d="M10 7h38C71 7 88 24 88 47c0 21-16 37-39 37H12l8-15h28c13 0 23-10 23-23S61 22 48 22H26v30L10 65V7z"/>
-<path fill="#553e53" d="M35 51h8v14h-8zM47 42h8v23h-8zM59 32h8v33h-8z"/>
-<path fill="url(#teal)" d="M9 78h40c17 0 28-8 38-19-4 18-17 31-39 31H5z"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" role="img" viewBox="110 100 570 590" width="570" height="590"><title>DRVO ERP official symbol</title><path fill="#74536E" d="M156 121 L399 121 C548 121 655 219 655 348 C655 468 566 539 455 548 C510 518 544 459 544 375 C544 277 493 209 394 209 L269 209 L269 333 L156 447 Z"/><path fill="#74536E" d="M258 430 Q274 421 314 428 L314 514 L258 514 Z"/><path fill="#74536E" d="M339 389 Q353 373 393 371 L393 513 L339 513 Z"/><path fill="#74536E" d="M419 325 L472 305 L472 502 Q447 511 419 515 Z"/><path fill="#1A7B80" d="M157 552 L388 552 C505 551 608 512 644 451 C632 532 561 620 462 646 C363 665 229 663 126 673 Z"/></svg>

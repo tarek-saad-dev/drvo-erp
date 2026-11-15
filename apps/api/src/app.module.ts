@@ -32,12 +32,14 @@ import { HrController } from "./hr/hr.controller";
 import { HrService } from "./hr/hr.service";
 import { ReportsController } from "./reports/reports.controller";
 import { ReportsService } from "./reports/reports.service";
+import { ExpensesController } from "./expenses/expenses.controller";
+import { ExpensesService } from "./expenses/expenses.service";
 
 @Module({
   controllers: [HealthController, DatabaseHealthController, K3ScopeProofController,
     IdentityController, AuthorizedBranchController, BranchAccessController,
-    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, ReleaseCatalogController, ActivationPreviewController, CatalogController, CustomersController, BookingController, PosPreviewController, PosDraftsController, HrController, ReportsController],
+    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, ReleaseCatalogController, ActivationPreviewController, CatalogController, CustomersController, BookingController, PosPreviewController, PosDraftsController, HrController, ReportsController, ExpensesController],
   providers: [FoundationDatabaseService, K3ScopeProofRepository, IdentityService, BranchAccessService,
-    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, ReleaseCatalogService, ActivationPreviewService, CatalogService, CustomersService, BookingService, PosPreviewService, PosDraftsService, HrService, ReportsService],
+    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, ReleaseCatalogService, ActivationPreviewService, CatalogService, CustomersService, BookingService, PosPreviewService, PosDraftsService, HrService, ReportsService, ExpensesService],
 })
 export class AppModule {}

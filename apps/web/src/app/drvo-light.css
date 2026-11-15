@@ -1,0 +1,154 @@
+/* DRVO ERP Light V1 — one shared design vocabulary, ADR-024/026.
+ * Presentation only: never relax K5/SQL rights, feature flags or financial statuses.
+ * Initial release deliberately has NO dark-mode toggle. */
+:root {
+  color-scheme: light;
+  --drvo-plum: #74536e;
+  --drvo-deep: #553e53;
+  --drvo-teal: #1a7b80;
+  --drvo-teal-soft: #e4f5f3;
+  --drvo-page: #f7f6f8;
+  --drvo-panel: #fff;
+  --drvo-border: #e6e1e8;
+  --drvo-text: #27242b;
+  --drvo-muted: #77707b;
+  --drvo-success: #167b53;
+  --bg: var(--drvo-page);
+  --surface: var(--drvo-panel);
+  --stroke: var(--drvo-border);
+  --text: var(--drvo-text);
+  --muted: var(--drvo-muted);
+  --accent: var(--drvo-teal);
+  --purple: var(--drvo-plum);
+  --drvo-font-body: "Cairo", "Noto Sans Arabic", Tahoma, "Segoe UI", system-ui, sans-serif;
+}
+html, body { font-family:var(--drvo-font-body); color:var(--drvo-text); }
+body { background:var(--drvo-page); }
+a { color:var(--drvo-teal); }
+button, input, select, textarea { font-family:inherit; }
+:focus-visible { outline:3px solid #1a7b80; outline-offset:3px; }
+
+/* Brand identity: reusable across anonymous preview and authorized workspaces. */
+.brandmark { display:inline-block; width:43px; height:43px; flex:none;
+  border-radius:0; background:transparent url("/brand/drvo-mark.svg") center/contain no-repeat;
+  color:transparent; font-size:0; box-shadow:none; }
+.brand, .k5-brand { color:var(--drvo-deep); font-weight:800; letter-spacing:-.02em; }
+.brand b, .k5-brand b { color:var(--drvo-plum); font-weight:450; }
+.k5-eyebrow, .eyebrow { color:var(--drvo-plum); letter-spacing:.09em; }
+
+/* Public foundation page: useful preview first, not a dark promotional hero. */
+.shell { max-width:1310px; padding:30px clamp(18px,3vw,45px); }
+.topbar { padding-bottom:22px; border-bottom:1px solid var(--drvo-border); }
+.env { color:var(--drvo-plum); background:#fff; border-color:var(--drvo-border);
+  letter-spacing:.03em; font-weight:700; }
+.hero { padding:clamp(55px,7vw,90px) 0 55px; }
+.hero h1 { color:var(--drvo-deep); font-weight:800; }
+.hero h1 span { color:var(--drvo-plum); }
+.hero p { color:#615966; }
+.status { color:#605a63; background:#fff; box-shadow:0 7px 25px #553e5308; }
+.dot, .mini-dot { background:var(--drvo-teal); box-shadow:none; }
+.section-title h2 { color:var(--drvo-deep); }
+.card { background:#fff; border-color:var(--drvo-border);
+  box-shadow:0 8px 24px #553e5308; }
+.card h3 { color:var(--drvo-deep); }
+.card p, .card-top { color:var(--drvo-muted); }
+.footer { color:#77707b; }
+.demo-hero-primary, .k5-verify-link { background:var(--drvo-teal); color:#fff; box-shadow:none; }
+.demo-hero-primary:hover { background:#12686e; }
+.demo-hero-primary:focus-visible, .k5-verify-link:focus-visible { outline:3px solid var(--drvo-plum); }
+
+/* Private login, workspaces and all functional modules use the same Light V1 tokens. */
+.k5-workspace { max-width:1370px; padding:27px clamp(18px,3vw,43px) 70px; }
+.k5-workspace-header { border-bottom-color:var(--drvo-border); background:#fff;
+  border:1px solid var(--drvo-border); border-radius:15px; padding:12px 20px;
+  box-shadow:0 6px 20px #553e5306; }
+.k5-head-actions a, .k5-head-actions button, .k5-branch-tabs button {
+  background:#fff; border-color:var(--drvo-border); color:var(--drvo-deep); }
+.k5-head-actions a:hover, .k5-head-actions button:hover,
+.k5-branch-tabs button:hover { background:#f1ebf1; border-color:#d7c4d3; }
+.k5-page-title { padding:38px 0 26px; }
+.k5-page-title h1 { color:var(--drvo-deep); font-weight:800; }
+.k5-muted { color:var(--drvo-muted); }
+.k5-branch-label { background:#f1ebf1; border-color:#e4d7e1; }
+.k5-branch-label strong { color:var(--drvo-deep); }
+.k5-branch-label span { color:var(--drvo-plum); }
+.k5-admin-card { background:#fff; border-color:var(--drvo-border);
+  box-shadow:0 5px 22px #553e5308; }
+.k5-admin-summary h2, .k5-admin-card h2 { color:var(--drvo-deep); }
+.k5-count { background:#eff5f4; color:#156c70; }
+.k5-table th { background:#f5f2f6; color:var(--drvo-deep); }
+.k5-table td { border-top-color:var(--drvo-border); }
+.k5-table .k5-role { background:#f2edf2; color:var(--drvo-deep); }
+.k5-empty, .k5-table-state { color:var(--drvo-muted); }
+.k5-workspace-choice { background:#fff; color:var(--drvo-deep);
+  border-color:var(--drvo-border); }
+.k5-workspace-choice:hover { background:#fcf9fc; border-color:var(--drvo-plum); }
+.k5-choice-eyebrow { color:var(--drvo-plum); }
+.k5-choice-action { color:var(--drvo-teal); }
+.k5-error { background:#fff0f1; border-color:#e8a8b0; color:#9b283a; }
+.k5-notice { background:#ecf7f2; border-color:#abd7c1; color:#175d43; }
+.k5-form input,.k5-table select,.k5-invite-form input,.k5-invite-form select,
+.catalog-form input,.catalog-form select,.k5-admin-card input,.k5-admin-card select {
+  background:#fff; border:1px solid #d6cbd8; color:var(--drvo-text);
+  box-shadow:none; }
+.k5-form input:focus,.k5-table select:focus { border-color:var(--drvo-teal);
+  box-shadow:0 0 0 3px #1a7b8024; }
+.k5-form button,.k5-save { background:var(--drvo-teal); color:#fff; }
+.k5-form button:hover:not(:disabled),.k5-save:hover:not(:disabled) { background:#12686e; }
+.k5-footnote { color:var(--drvo-muted); }
+.k5-verify-link { padding:12px 17px; min-height:46px; border-radius:11px;
+  text-align:center; text-decoration:none; }
+.k5-verify-link:hover { background:#12686e; }
+.k5-side { background:linear-gradient(145deg,#74536e,#553e53); }
+.k5-side>span { color:#c2f2eb; }
+.k5-side h2 { color:#fff; }
+.k5-side p, .k5-side-status { color:#fbf7fb; }
+.k5-side-status { border-color:#ffffff55; background:#ffffff14; }
+.k5-salon-steps a { background:#f1ebf1; color:var(--drvo-deep);
+  border-color:#e3d5e1; }
+.k5-salon-steps a:hover { background:#eae0e9; border-color:var(--drvo-plum); }
+.k5-salon-steps > div { min-width:145px; flex:1;
+  background:#f6f1f6; border:1px solid var(--drvo-border);
+  padding:17px; border-radius:12px; color:var(--drvo-deep); }
+.k5-salon-steps > div p { font-size:24px; font-weight:800;
+  color:var(--drvo-plum); margin:8px 0 0; }
+.k5-salon-refresh { background:#e7f3f2; border-color:#b3d7d7;
+  color:#12686e; }
+.k5-salon-refresh:hover { background:#d7edeb; }
+
+/* Reusable launcher on the private Branch Home. It only renders authorized
+ * existing links; zero hardcoded fake KPIs or unavailable module routes. */
+.drvo-workspace-title { display:flex; gap:18px; align-items:center; }
+.drvo-workspace-title::before { content:""; display:block; width:5px;
+  height:68px; background:linear-gradient(var(--drvo-plum),var(--drvo-teal)); border-radius:8px; }
+.drvo-launcher { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:14px; padding:24px; }
+.drvo-launcher-heading { grid-column:1/-1; }
+.drvo-launcher-heading h2 { margin:0 0 8px; }
+.drvo-launcher-heading p { margin:0; }
+.drvo-launcher .k5-verify-link { max-width:none; min-height:100px; margin:0;
+  justify-content:flex-start; align-items:flex-start; display:flex; flex-direction:column;
+  text-align:start; background:#fff; border:1px solid var(--drvo-border);
+  color:var(--drvo-deep); box-shadow:0 5px 15px #553e5308; font-weight:750; }
+.drvo-launcher .k5-verify-link::after { content:"افتح الموديول ←";
+  font-size:11px; font-weight:600; color:var(--drvo-teal); margin-top:auto; }
+.drvo-launcher .k5-verify-link:hover { background:#faf6fa; border-color:var(--drvo-plum); }
+.drvo-workspace-note { grid-column:1/-1; color:var(--drvo-muted); font-size:12px; }
+
+/* Do not allow inaccessible dark form styling to leak into branch modules. */
+.k5-admin-card label { color:var(--drvo-muted); }
+.k5-admin-card select { min-height:43px; padding:8px 12px; border-radius:9px; }
+.k5-admin-card input:focus-visible,.k5-admin-card select:focus-visible {
+  border-color:var(--drvo-teal); outline:3px solid #1a7b8030; }
+@media(max-width:720px) {
+  .shell { padding:18px; }
+  .hero { padding:55px 0 40px; }
+  .k5-workspace { padding:14px 12px 40px; }
+  .k5-workspace-header { padding:10px 12px; }
+  .k5-page-title { padding:25px 0 20px; }
+  .drvo-launcher { padding:16px; grid-template-columns:1fr 1fr; }
+}
+@media(max-width:480px) { .drvo-launcher { grid-template-columns:1fr; } }
+@media(prefers-reduced-motion:reduce) {
+  .drvo-launcher .k5-verify-link { transition:none; }
+}

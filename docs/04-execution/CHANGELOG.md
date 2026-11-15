@@ -1,5 +1,15 @@
 # Project changelog
 
+## 2026-11-15 — Cashier Expenses Core S1 real SQL/HTTP/Light UI slice
+
+- Source reviewed: Cashier `src/app/api/expenses/route.ts` writes legacy `TblCashMove` through Treasury; DRVO now separates Expense **documents** from Treasury **payments**, Accounting **postings** per ADR-040. [Report](CASHIER-EXPENSES-S1-PERSISTENT-NONPOSTING-2026-11-15.md).
+- Added additive SQL019 `db/migrations/019_expenses_documents_draft.sql`: Tenant/Business categories, Tenant/Business/Branch drafts, `DRAFT/CANCELLED` only, audit and idempotency, SQL live K5 `expenses.read/manage`, EXECUTE-only stage principal.
+- New Nest `apps/api/src/expenses/{expenses.controller.ts,expenses.service.ts}` wired into `app.module.ts`; new protected Light `expenses/page.tsx` and `expenses/expenses-client.tsx`, authorized Branch launcher tile, Light styles; flags default OFF.
+- Added API/Web tests, 10-group real SQL2022/Nest HTTP verifier and parallel GitHub `.github/workflows/shared-expenses-ci.yml`; expanded K5C private route default-404 CI.
+- **[Exact source SHA `03142b26` CI SUCCESS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43673599720)**: 10/10 SQL HTTP groups, 86/86 API unit, 4/4 Expenses Web tests and Next build PASS. **[Staging code deploy SUCCESS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43673599733)** and **[public Light Demo external smoke SUCCESS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43673682752)**. Private Expenses/primary DB SQL019, authorized Employee browser, live finance and customer GO **NOT VERIFIED**.
+
+
+
 ## 2026-11-15 — Cashier UX reference + DRVO Light-only Brand Kit V1
 
 - Founder accepted [ADR-041](../05-decisions/ADR-041-CASHIER-UX-DRVO-LIGHT-V1.md): reuse Cashier's daily-operation navigation rhythms and focused Booking/POS screens, use Light/Plum/Teal Brand Kit UI first, defer Dark Mode.

@@ -4,7 +4,7 @@
 
 - Founder accepted [ADR-041](../05-decisions/ADR-041-CASHIER-UX-DRVO-LIGHT-V1.md): reuse Cashier's daily-operation navigation rhythms and focused Booking/POS screens, use Light/Plum/Teal Brand Kit UI first, defer Dark Mode.
 - Added `apps/web/src/app/drvo-light.css`, `apps/web/src/app/demo/salon/salon-demo-light.css`, imported layers in both page layouts; kept synthetic demo data and APIs unchanged.
-- Added `apps/web/public/brand/drvo-mark.svg` as a **temporary source-drawn brand-kit-inspired mark, not verified exact ADR-038 asset**. Restyled private Branch authorized App Launcher without adding routes for unshipped modules or weakening K5.
+- Added `apps/web/public/brand/drvo-mark.svg` as an **exact source copy of `assets/brand/approved/drvo-symbol-primary.svg` (ADR-038)**. Restyled private Branch authorized App Launcher without adding routes for unshipped modules or weakening K5.
 - Added `apps/web/test/drvo-light-ui.test.cjs` and extended Interactive Salon Demo CI with Light contracts. **Results unknown until exact SHA CI; external HTTPS rendering and deployed release SHA are unverified**. No SQL, Auth activation, real finance or customer data changes.
 
 

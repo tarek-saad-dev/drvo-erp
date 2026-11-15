@@ -20,6 +20,8 @@ test('Light V1 is the sole initial presentation mode with centralized ADR-024 pa
 test('synthetic Cashier-like salon experience consumes a later light CSS layer', () => {
   const page = get('demo/salon/page.tsx');
   const css = get('demo/salon/salon-demo-light.css');
+  const client = get('demo/salon/salon-demo-client.tsx');
+  assert.match(client,/data-drvo-ui="light-v1"/);
   assert.match(page,/import "\.\/salon-demo\.css";\s*import "\.\/salon-demo-light\.css";/);
   assert.match(css,/\.sd-sidebar/);
   assert.match(css,/\.sd-pos-layout|\.sd-service-card/);

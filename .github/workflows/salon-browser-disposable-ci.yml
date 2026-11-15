@@ -47,6 +47,7 @@ jobs:
           DRVO_CATALOG_WEB_ENABLED: 'YES'
           DRVO_POS_DRAFTS_WEB_ENABLED: 'YES'
           DRVO_POS_PREVIEW_WEB_ENABLED: 'YES'
+          DRVO_HR_WEB_ENABLED: 'YES'
         run: |
           set -euo pipefail
           npm ci --prefix apps/api --no-audit --no-fund

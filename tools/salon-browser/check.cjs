@@ -6,6 +6,7 @@
 const assert=require('node:assert/strict');
 const {chromium}=require('playwright');
 const {exerciseSalonOperations}=require('./operations.cjs');
+const {exerciseHrOperations}=require('./hr-operations.cjs');
 assert.equal(process.env.CI,'true');
 assert.equal(process.env.BOOKING_SQL_DISPOSABLE,'YES');
 assert.equal(process.env.BOOKING_BROWSER_DISPOSABLE,'YES');
@@ -69,6 +70,8 @@ async function main(){
   // S11 already proved real read; S12 now clicks actual write forms.
   const operations=await exerciseSalonOperations(
    operator,origin,business,branch,value=>{phase=value;});
+  // S13: real private Next UI -> Nest/K5 -> disposable SQL Employee+Barber.
+  const hr=await exerciseHrOperations(operator,origin,business,branch,value=>{phase=value;});
   phase='S12 restored Salon Overview after UI writes';
   await operator.goto(url(business,branch),{
    waitUntil:'domcontentloaded',timeout:45000,
@@ -91,6 +94,29 @@ async function main(){
   await staff.getByRole('row').filter({hasText:operations.customer})
    .getByText(operations.service,{exact:true}).waitFor();
   assert.equal((await staff.getByText(/مسودات POS المعروضة:/).count()),0);
+  phase='S13 independent HR read-only Staff can view same persisted employee';
+  await staff.goto(origin+'/workspace/'+business+'/'+branch+'/hr',{
+   waitUntil:'domcontentloaded',timeout:45000,
+  });
+  await staff.getByRole('heading',{name:'الموظفون والحلاقون'}).waitFor();
+  await staff.getByRole('row').filter({hasText:hr.employee})
+   .getByText('حلاق نشط').waitFor();
+  phase='S13 staff denied HR create and Salon Barber mutation';
+  const hrDenied=await staff.evaluate(async ids=>{
+   const base='/api/workspaces/'+ids.b+'/branches/'+ids.br+'/hr/employees';
+   const input={employeeCode:'DENIED_HR',displayName:'Denied Test',
+    employmentType:'full_time',payrollMethod:'daily'};
+   const create=await fetch(base,{method:'POST',credentials:'same-origin',
+    headers:{'Content-Type':'application/json','Idempotency-Key':crypto.randomUUID()},
+    body:JSON.stringify(input)});
+   const mutate=await fetch(base+'/'+ids.employeeId+'/barber',{
+    method:'POST',credentials:'same-origin',
+    headers:{'Content-Type':'application/json','Idempotency-Key':crypto.randomUUID()},
+    body:JSON.stringify({resourceId:null,isBookable:false})});
+   return {create:create.status,mutate:mutate.status};
+  },{b:business,br:branch,employeeId:hr.employeeId});
+  assert.deepEqual(hrDenied,{create:404,mutate:404});
+
   phase='staff POST rejected by actual Nest and SQL rights';
   const status=await staff.evaluate(async ids=>{
    const response=await fetch('/api/workspaces/'+ids.b+'/branches/'+ids.br+

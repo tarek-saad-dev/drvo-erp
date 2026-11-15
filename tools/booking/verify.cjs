@@ -150,10 +150,11 @@ async function main(){
   admin=await open({...base,database:db});
   await admin.query("CREATE USER ["+user+"] FOR LOGIN ["+user+"];GRANT CONNECT TO ["+user+"]");
   await pass('17 forward-only migrations apply and replay, no synthetic appointment or draft seed',async()=>{
-   const applied=await applyMigrations(admin,undefined,17);
-   assert.equal(applied.length,17)
+   const migrations=process.env.BOOKING_BROWSER_DISPOSABLE==='YES'?18:17;
+   const applied=await applyMigrations(admin,undefined,migrations);
+   assert.equal(applied.length,migrations)
    assert.ok(applied.every(x=>x.status==='applied'));
-   const replay=await applyMigrations(admin,undefined,17);
+   const replay=await applyMigrations(admin,undefined,migrations);
    assert.ok(replay.every(x=>x.status==='unchanged'));
    const r=await admin.query("SELECT COUNT(*) AS n FROM core.BookingAppointment");
    assert.equal(r.recordset[0].n,0);
@@ -174,6 +175,17 @@ async function main(){
   await addRole(admin,g.t,g.business,g.role);
    await addReadOnlyStaffRole(admin,g.t,g.business,g.staffRole);
   await addRole(admin,g.foreignTenant,g.foreignBusiness,g.foreignRole);
+  // Synthetic-only HR rights for the real Browser path, not the regular
+  // Booking CI or any actual production role grant.
+  if(process.env.BOOKING_BROWSER_DISPOSABLE==='YES'){
+   await q(admin,"INSERT core.RolePermission(TenantId,BusinessId,RoleId,ActionCode)"+
+    " VALUES(@t,@b,@r,'hr.read'),(@t,@b,@r,'hr.manage'),"+
+    " (@t,@b,@r,'salon.barber.manage')",
+    {t:g.t,b:g.business,r:g.role});
+   await q(admin,"INSERT core.RolePermission(TenantId,BusinessId,RoleId,ActionCode)"+
+    " VALUES(@t,@b,@r,'hr.read')",
+    {t:g.t,b:g.business,r:g.staffRole});
+  }
   await assign(admin,g.t,g.business,g.branch,g.account,g.role);
    await assign(admin,g.t,g.business,g.branch,g.staffAccount,g.staffRole);
   await assign(admin,g.foreignTenant,g.foreignBusiness,g.foreignBranch,
@@ -276,6 +288,7 @@ async function main(){
    DRVO_CUSTOMERS_ENABLED:'YES',DRVO_CATALOG_ENABLED:'YES',
    DRVO_POS_DRAFTS_ENABLED:'YES',
    DRVO_POS_PREVIEW_ENABLED:process.env.BOOKING_BROWSER_DISPOSABLE==='YES'?'YES':'NO',
+   DRVO_HR_ENABLED:process.env.BOOKING_BROWSER_DISPOSABLE==='YES'?'YES':'NO',
    DRVO_K5_ORIGIN:origin,
   };
   server=spawn(process.execPath,['apps/api/dist/main.js'],{

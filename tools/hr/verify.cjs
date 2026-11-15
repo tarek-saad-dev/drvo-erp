@@ -16,7 +16,7 @@ const base={server:'127.0.0.1',port:14349,user:'sa',
 const api='http://127.0.0.1:3418/api',id=()=>crypto.randomUUID();
 const x={t:id(),otherT:id(),b:id(),otherB:id(),foreignB:id(),
  br:id(),otherBr:id(),foreignBr:id(),unassignedBr:id(),owner:id(),foreignOwner:id(),
- role:id(),foreignRole:id(),person:id(),personOther:id(),room:id(),foreignPerson:id()};
+ role:id(),foreignRole:id(),person:id(),personOther:id(),room:id(),foreignPerson:id(),reportCustomer:id(),reportOffering:id(),reportBooking:id()};
 let check=0;
 async function pass(label,fn){await fn();console.log('PASS HR '+(++check)+' '+label);}
 async function connect(config){const p=new sql.ConnectionPool(config);await p.connect();return p;}
@@ -38,7 +38,7 @@ async function role(pool,t,b,r){
  await query(pool,"INSERT core.BusinessRole(TenantId,BusinessId,RoleId,RoleCode,DisplayName)"+
   " VALUES(@t,@b,@r,N'OWNER',N'Owner');"+
   "INSERT core.RolePermission(TenantId,BusinessId,RoleId,ActionCode)"+
-  " VALUES(@t,@b,@r,'hr.read'),(@t,@b,@r,'hr.manage'),(@t,@b,@r,'salon.barber.manage')",{t,b,r});
+  " VALUES(@t,@b,@r,'hr.read'),(@t,@b,@r,'hr.manage'),(@t,@b,@r,'salon.barber.manage'),(@t,@b,@r,'booking.read')",{t,b,r});
 }
 async function membership(pool,t,b,br,a,r){
  await query(pool,"INSERT core.BusinessMembership(TenantId,BusinessId,AccountId) VALUES(@t,@b,@a);"+
@@ -142,7 +142,8 @@ async function main(){
   const env={...process.env,NODE_ENV:'production',API_HOST:'127.0.0.1',API_PORT:'3418',
    DRVO_SQL_ENABLED:'YES',DRVO_SQL_HOST:'127.0.0.1',DRVO_SQL_PORT:'1433',
    DRVO_SQL_DATABASE:db,DRVO_SQL_USER:appUser,DRVO_SQL_PASSWORD:appPass,
-   DRVO_K5_AUTH_ENABLED:'YES',DRVO_HR_ENABLED:'YES',DRVO_K5_ORIGIN:origin};
+   DRVO_K5_AUTH_ENABLED:'YES',DRVO_HR_ENABLED:'YES',
+   DRVO_BOOKING_ENABLED:'YES',DRVO_REPORTS_ENABLED:'YES',DRVO_K5_ORIGIN:origin};
   server=spawn(process.execPath,['apps/api/dist/main.js'],{env,stdio:['ignore','pipe','pipe']});
   let log='';server.stdout.on('data',d=>{log+=String(d)});
   server.stderr.on('data',d=>{log+=String(d)});
@@ -195,6 +196,51 @@ async function main(){
    const members=(await resp.json()).employees;
    assert.equal(members[0].isBookable,true);
    assert.equal(members[0].resourceId.toLowerCase(),x.person.toLowerCase());
+  });
+  // Isolated synthetic Report fixtures only: Booking/Customer/Catalog owner SQL.
+  await query(admin,
+   "INSERT core.Customer(TenantId,BusinessId,CustomerId,ClientRequestId,DisplayName)"+
+   " VALUES(@t,@b,@customer,@customerReq,N'CI Report Customer');"+
+   "INSERT core.CatalogOffering(TenantId,BusinessId,OfferingId,ClientRequestId,"+
+   "Kind,DisplayName,PriceMinor,Currency,DurationMinutes)"+
+   " VALUES(@t,@b,@service,@serviceReq,'SERVICE',N'CI Haircut',7500,'EGP',30);"+
+   "INSERT core.BookingAppointment(TenantId,BusinessId,BranchId,BookingId,"+
+   "ClientRequestId,CustomerId,OfferingId,ResourceId,StartsAtUtc,EndsAtUtc,Status)"+
+   " VALUES(@t,@b,@br,@booking,@bookingReq,@customer,@service,@person,"+
+   "DATEADD(HOUR,72,SYSUTCDATETIME()),"+
+   "DATEADD(MINUTE,30,DATEADD(HOUR,72,SYSUTCDATETIME())),'BOOKED')",
+   {t:x.t,b:x.b,br:x.br,customer:x.reportCustomer,customerReq:id(),
+    service:x.reportOffering,serviceReq:id(),booking:x.reportBooking,
+    bookingReq:id(),person:x.person});
+  const reportUrl=api+'/workspaces/'+x.b+'/branches/'+x.br+'/reports/barber-operations';
+  await pass('Reports real scoped SQL/HTTP joins Barber Employee and Booking PERSON',async()=>{
+   const response=await get(reportUrl,own);
+   assert.equal(response.status,200);
+   const data=await response.json();
+   assert.equal(data.state,'READ_ONLY_BOOKING_SAMPLE');
+   assert.equal(data.booked,1);assert.equal(data.completed,0);
+   assert.equal(data.appointmentsRead,1);assert.equal(data.barbers.length,1);
+   assert.equal(data.barbers[0].resourceId.toLowerCase(),x.person.toLowerCase());
+   assert.equal(data.barbers[0].booked,1);
+   const serialized=JSON.stringify(data);
+   for(const field of ['customerName','phoneE164','taxComputed','paid','profitMinor','amountMinor'])
+    assert.equal(serialized.includes(field),false,'Forbidden reporting financial/PII field');
+  });
+  await pass('Reports deny foreign Branch and lost Booking read privilege',async()=>{
+   for(const [b,br] of [[x.otherB,x.otherBr],[x.foreignB,x.foreignBr],[x.b,x.unassignedBr]])
+    assert.equal((await get(api+'/workspaces/'+b+'/branches/'+br+
+     '/reports/barber-operations',own)).status,404);
+   assert.equal((await get(reportUrl,foreign)).status,404);
+   await query(admin,
+    "DELETE core.RolePermission WHERE TenantId=@t AND BusinessId=@b"+
+    " AND RoleId=@role AND ActionCode='booking.read'",
+    {t:x.t,b:x.b,role:x.role});
+   assert.equal((await get(reportUrl,own)).status,404);
+   await query(admin,
+    "INSERT core.RolePermission(TenantId,BusinessId,RoleId,ActionCode)"+
+    " VALUES(@t,@b,@role,'booking.read')",
+    {t:x.t,b:x.b,role:x.role});
+   assert.equal((await get(reportUrl,own)).status,200);
   });
   await pass('foreign resource, room, outsider Employee and injected field denied',async()=>{
    for(const resourceId of [x.room,x.foreignPerson,id()]){

@@ -1,0 +1,27 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict');
+const {readFileSync}=require('node:fs'),{join}=require('node:path');
+const root=join(__dirname,'../src/app/workspace/[businessId]/[branchId]');
+const source=readFileSync(join(root,'reports/reports-client.tsx'),'utf8');
+const page=readFileSync(join(root,'reports/page.tsx'),'utf8');
+const home=readFileSync(join(root,'workspace-home-client.tsx'),'utf8');
+test('Reports: private and branch-scope verified before showing read-only booking sample',()=>{
+ assert.match(page,/DRVO_K5_WEB_ENABLED/);assert.match(page,/DRVO_REPORTS_WEB_ENABLED/);
+ const m=source.match(/const GUID=\/(\^[^\n;]*\$)\/i;/);assert.ok(m);
+ const guid=new RegExp(m[1],'i');
+ const valid='ab12cd34-1234-4abc-a890-0123456789ab';
+ assert.equal(guid.test(valid),true);assert.equal(guid.test(valid.toUpperCase()),true);
+ for(const bad of [valid+'-xxxx',valid+'x',valid.replace(/-/g,'')])assert.equal(guid.test(bad),false);
+ assert.match(source,/matchingGuid\(x\.businessId,businessId\)/);
+ assert.match(source,/matchingGuid\(data\.businessId,businessId\)/);
+ assert.match(source,/reports\/barber-operations/);
+ assert.match(source,/credentials:"same-origin",cache:"no-store"/);
+ assert.match(source,/READ_ONLY_BOOKING_SAMPLE/);
+ assert.match(source,/الأعداد تخص أحدث 200 حجز/);
+ assert.doesNotMatch(source,/method:"POST"|localStorage|sessionStorage|IndexedDB/);
+});
+test('Reports link appears only after authorized report API response',()=>{
+ assert.match(home,/if\(reportsWebEnabled\)/);
+ assert.match(home,/setCanViewReports\(reportResult\.ok\)/);
+ assert.match(home,/reportsWebEnabled&&canViewReports/);
+});

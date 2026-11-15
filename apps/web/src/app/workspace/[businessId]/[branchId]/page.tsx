@@ -12,6 +12,7 @@ export default async function WorkspaceHomePage({
   const { businessId, branchId } = await params;
   return <WorkspaceHomeClient businessId={businessId} branchId={branchId}
     hrWebEnabled={process.env.DRVO_HR_WEB_ENABLED==="YES"}
+    reportsWebEnabled={process.env.DRVO_REPORTS_WEB_ENABLED==="YES"}
     salonWebEnabled={process.env.DRVO_BOOKING_WEB_ENABLED==="YES"&&
       process.env.DRVO_CUSTOMERS_WEB_ENABLED==="YES"&&
       process.env.DRVO_CATALOG_WEB_ENABLED==="YES"} />;

@@ -62,8 +62,11 @@ Accepted directions are **not implemented features**.
 | ADR-037 | Lean Platform Kernel owns universal identity/scope, authorization, release/entitlement gates and security/audit contracts; Business Modules own domain workflows and authoritative records | **ACCEPTED — founder** | [ADR-037](ADR-037-LEAN-PLATFORM-KERNEL-BOUNDARY.md) |
 
 | ADR-038 | DRVO ERP master corporate D logo and pictured primary/on-dark/monochrome variations; multi-industry parent identity | **ACCEPTED — founder (2026-11-10)** | [ADR-038](ADR-038-DRVO-MASTER-LOGO-AND-VARIATIONS.md) |
+| ADR-039 | Temporary direct-main fast pre-customer development with bounded primary dev DB safety | **ACCEPTED — founder (2026-11-15)** | [ADR-039](ADR-039-FOUNDER-TEMPORARY-FAST-DEVELOPMENT-MODE.md) |
+| ADR-040 | Full Cashier functionality port to independent shared DRVO Modules plus industry Extensions | **ACCEPTED STRATEGIC GOAL (2026-11-15)** | [ADR-040](ADR-040-CASHIER-FULL-FUNCTIONAL-PARITY-MODULAR-ERP.md) |
+| ADR-041 | Cashier operator UX in DRVO ERP, Light-only Brand Kit V1 | **ACCEPTED DIRECTION; CODED FIRST UI SLICE, LIVE UNVERIFIED (2026-11-15)** | [ADR-041](ADR-041-CASHIER-UX-DRVO-LIGHT-V1.md) |
 
-**Foundation Constitution CONST-01..04:** all four accepted through ADR-033..036; [V1 Final Foundation Review](../02-architecture/CORE-CONSTITUTION-V1-FINAL-FOUNDATION-REVIEW.md) marks stable design direction only. ADR-030 baseline accepted on 2026-11-11 for trusted scope, Default Deny, scoped SQL/referential integrity and negative tests; **RLS/broader security signoff remain open**. ADR-031/032 remain proposed; K6C code/test-only authorization does not permit VPS SQL migrations or public auth activation.
+**Foundation Constitution CONST-01..04:** all four accepted through ADR-033..036; [V1 Final Foundation Review](../02-architecture/CORE-CONSTITUTION-V1-FINAL-FOUNDATION-REVIEW.md) marks stable design direction only. ADR-030 baseline accepted on 2026-11-11 for trusted scope, Default Deny, scoped SQL/referential integrity and negative tests; **RLS/broader security signoff remain open**. ADR-031 remains proposed; ADR-032 has founder-accepted ACT-01–07 V1 baseline but real activation is still unapproved; K6C code/test-only authorization does not permit VPS SQL migrations or public auth activation.
 
 **Product launch and pilot decisions** are recorded in [Product Discovery](../01-product/DISCOVERY-01-FOLLOWUPS.md) and [Roadmap](../04-execution/ROADMAP.md).
 

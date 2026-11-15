@@ -1,0 +1,39 @@
+name: DRVO ERP — External Preview Smoke
+on:
+  workflow_run:
+    workflows: ["DRVO ERP — Staging Deploy"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/external-preview-smoke.yml'
+permissions:
+  contents: read
+jobs:
+  verify-public-preview:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Verify real public Web health and synthetic Salon route
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://erp-stage.drvotech.com"
+          dir="$(mktemp -d)"
+          trap 'rm -rf "$dir"' EXIT
+          echo "Checking DRVO staging externally (GitHub-hosted runner): $base"
+          curl --fail --silent --show-error --location --retry 2 --retry-all-errors --connect-timeout 10 --max-time 30 "$base/health" -o "$dir/health.json"
+          grep -Eq '"service"[[:space:]]*:[[:space:]]*"drvo-web"' "$dir/health.json" || {
+            echo "FAIL: HTTPS health response is not the DRVO Web service"
+            exit 1
+          }
+          curl --fail --silent --show-error --location --retry 2 --retry-all-errors --connect-timeout 10 --max-time 30 "$base/demo/salon" -o "$dir/salon.html"
+          grep -Eiq '<!doctype[[:space:]]+html' "$dir/salon.html" || {
+            echo "FAIL: the public synthetic Salon demo did not return HTML"
+            exit 1
+          }
+          echo "PASS: external HTTPS health and synthetic Salon demo returned expected content"
+          echo "This does NOT attest release SHA, private HR/Booking/POS/Reports, SQL migrations, permissions, or production/customer readiness."

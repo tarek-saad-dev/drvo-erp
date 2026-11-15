@@ -1,5 +1,10 @@
 # Project changelog
 
+## 2026-11-15 — External preview smoke & founder hands-on release acceptance
+
+- Added `.github/workflows/external-preview-smoke.yml` to perform GitHub-hosted public HTTPS Web `/health` and synthetic Salon `/demo/salon` checks after successful Staging Deploy, or via manual workflow dispatch. This is **a code/CI addition only**: no confirmed workflow PASS, production release, real DB or private UI rollout.
+- Added [user-visible release loop](USER-VISIBLE-RELEASE-LOOP-2026-11-15.md): each user-facing slice must be delivered with concrete click-through URL, observed source/deployed SHA, persisted vs synthetic semantics, private authorization/persistence acceptance and honest blocker status. Intentionally leaves P1–P7/C1–C3 OPEN; actual stage hostname was not externally reachable from assistant tools.
+
 ## 2026-11-15 — Reports-R1 scoped Barber performance report from HR + Booking SQL
 
 - **2026-11-15 REPORTS-R1 REAL MODULE ADDITION (NOT FULL CASHIER PARITY):** [Reports-R1 proof](https://github.com/tarek-saad-dev/drvo-erp/blob/main/docs/04-execution/REPORTS-R1-BARBER-OPERATIONS-2026-11-15.md) adds separate Nest **read-only Reports module** from independently K5-scoped HR Employee/Barber and Booking data, plus private Next **/reports** branch view, counters for bookable Barber `BOOKED/COMPLETED/CANCELLED` appointments, capped 200-row sample disclosure, no customer PII, cash/GL write or revenue claims. Reports needs both `hr.read` and `booking.read`, feature flags default OFF. **Actual SQL2022 + Nest HTTP HR/Booking source aggregation [PASS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43670019617)** at code SHA `3778012497b9ffbf26360de8fdb4b3b948aeccf3`, and K5C verified private Web scope at earlier `795aa81e`. Not a primary DRVO database change or verified deployment. S13 actual Browser CI remains independent and must be separately checked. Pilot P1–P7 / commercial C1–C3 OPEN.

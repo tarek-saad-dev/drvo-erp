@@ -1,5 +1,11 @@
 # Project changelog
 
+## 2026-11-15 — Reports-R1 scoped Barber performance report from HR + Booking SQL
+
+- **2026-11-15 REPORTS-R1 REAL MODULE ADDITION (NOT FULL CASHIER PARITY):** [Reports-R1 proof](https://github.com/tarek-saad-dev/drvo-erp/blob/main/docs/04-execution/REPORTS-R1-BARBER-OPERATIONS-2026-11-15.md) adds separate Nest **read-only Reports module** from independently K5-scoped HR Employee/Barber and Booking data, plus private Next **/reports** branch view, counters for bookable Barber `BOOKED/COMPLETED/CANCELLED` appointments, capped 200-row sample disclosure, no customer PII, cash/GL write or revenue claims. Reports needs both `hr.read` and `booking.read`, feature flags default OFF. **Actual SQL2022 + Nest HTTP HR/Booking source aggregation [PASS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43670019617)** at code SHA `3778012497b9ffbf26360de8fdb4b3b948aeccf3`, and K5C verified private Web scope at earlier `795aa81e`. Not a primary DRVO database change or verified deployment. S13 actual Browser CI remains independent and must be separately checked. Pilot P1–P7 / commercial C1–C3 OPEN.
+- Added `apps/api/src/reports` & private `apps/web/.../reports`, reports unit/private-route smoke, permission-checked workspace link, actual SQL2022/Nest HTTP Reports proof in HR CI. Existing 001–018 DB migration source remains unmodified; reports don't own cash/HR/Booking table writes.
+
+
 ## 2026-11-15 — HR-S13 real private Chrome UI persisted flow (CI proof pending at commit)
 
 - **2026-11-15 S13 PRIVATE HR CHROME REGRESSION (SOURCE COMMITTED, CHECK CI):** [S13 HR Browser proof](https://github.com/tarek-saad-dev/drvo-erp/blob/main/docs/04-execution/HR-S13-CHROMIUM-PERSISTENCE-PROOF-2026-11-15.md) extends the disposable Chromium HTTPS→Next→K5/Nest→SQL2022 S12 flow with SQL018, employee creation via private HR UI, PERSON Booking resource creation, Salon Barber mapping, browser reload and independent Staff read/no-write. Runs only under CI `BOOKING_BROWSER_DISPOSABLE=YES` with synthetic HR rights; standard Booking disposable CI remains at SQL001–017. **Do not mark browser PASS until matching exact SHA workflow succeeds.** No real primary SQL/VPS update, new production grant, P4 authorization or customer GO.

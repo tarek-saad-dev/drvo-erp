@@ -9,8 +9,8 @@ type AuthorizedWorkspace = { businessId: string; branchId: string; businessName:
 type Account = { username: string; mustChangePassword: boolean };
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export default function WorkspaceHomeClient({businessId, branchId,salonWebEnabled}: {
-  businessId: string; branchId: string;salonWebEnabled:boolean;
+export default function WorkspaceHomeClient({businessId, branchId,salonWebEnabled,hrWebEnabled}: {
+  businessId: string; branchId: string;salonWebEnabled:boolean;hrWebEnabled:boolean;
 }) {
   const router = useRouter();
   const [branch, setBranch] = useState<Branch | null>(null);
@@ -19,6 +19,7 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
   const [canViewCatalog, setCanViewCatalog] = useState(false);
   const [canViewCustomers, setCanViewCustomers] = useState(false);
   const [canViewBooking, setCanViewBooking] = useState(false);
+  const [canViewHr, setCanViewHr] = useState(false);
   const [canPreviewPos, setCanPreviewPos] = useState(false);
   const [account, setAccount] = useState<Account | null>(null);
   const [status, setStatus] = useState<"loading"|"ready"|"denied"|"error">("loading");
@@ -81,6 +82,11 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
         const posResult=await fetch(base + "/pos-preview", {credentials:"same-origin",cache:"no-store"});
         if (!live) return;
         setCanPreviewPos(posResult.ok && catalogResult.ok);
+        if(hrWebEnabled){
+          const hrResult=await fetch(base+"/hr/employees",{credentials:"same-origin",cache:"no-store"});
+          if(!live)return;
+          setCanViewHr(hrResult.ok);
+        }
         setStatus("ready");
       } catch {
         if (live) setStatus("error");
@@ -88,7 +94,7 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
     }
     void load();
     return () => { live = false; };
-  },[router,businessId,branchId]);
+  },[router,businessId,branchId,hrWebEnabled]);
 
   return <main className="k5-workspace">
     <header className="k5-workspace-header">
@@ -113,6 +119,10 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
         <span className="k5-eyebrow">PLATFORM FOUNDATION</span>
         <h2>مساحة العمل جاهزة للربط بالموديولات</h2>
         <p className="k5-muted">المبيعات والمخزون والحسابات والموظفون هتظهر هنا بعد اكتمال الموديولات وتفعيلها. الوصول للفرع محمي بالصلاحيات الحالية.</p>
+        {hrWebEnabled&&canViewHr && <Link href={"/workspace/" + encodeURIComponent(businessId) +
+          "/" + encodeURIComponent(branchId) + "/hr"} className="k5-verify-link">
+          الموظفون والحلاقون (HR Core)
+        </Link>}
         {canViewCatalog && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/catalog"} className="k5-verify-link">
           المنتجات والخدمات

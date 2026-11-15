@@ -37,6 +37,7 @@ jobs:
           node --test apps/web/test/pos-adjustments-preview.test.cjs
           node --test apps/web/test/booking-pos-handoff.test.cjs
           node --test apps/web/test/private-web-uuid-contract.test.cjs
+          node --test apps/web/test/hr-workspace.test.cjs
       - name: Smoke public preview while private auth remains 404
         shell: bash
         run: |

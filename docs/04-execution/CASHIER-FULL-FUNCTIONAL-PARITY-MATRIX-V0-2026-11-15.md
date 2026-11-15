@@ -1,5 +1,8 @@
 # Cashier → DRVO ERP — full functional inventory and Module parity matrix V0
 
+> **2026-11-15 FIRST ACTUAL CODE PORT UPDATE:** [Cashier Owned Runtime Port](https://github.com/tarek-saad-dev/drvo-erp/blob/main/docs/04-execution/CASHIER-FIRST-OWNED-RUNTIME-PORT-2026-11-15.md). DRVO now has shared **pure production** code for BusinessDay planning, branch-scoped HR retro salary minored preview and POS hypothetical tip/employee candidates; existing private POS UI/API additionally supports authorized fresh-Catalog fixed header discount + hypothetical tender/shortfall preview. These are **partial capabilities only**, not complete module parity, persistent payroll/day shift, saved discount/tip, actual sale or Treasury/Accounting posting. See tests and explicit limitations in the port report.
+
+
 **Created:** 2026-11-15 · **Status:** SOURCE DISCOVERY / WORKING TARGET MAP, not verified complete implementation parity.  
 **Source of functional truth for audit:** [Cashier `main` at `a51101791c52bca90e45bd40ead3a46c08d78adb`](https://github.com/tarek-saad-dev/casher/tree/a51101791c52bca90e45bd40ead3a46c08d78adb), captured 2026-11-15. An inventory based on source tree/routes and selective route code review is a **coverage lead**, not a claim that every route behaves correctly in production. Older detailed audits pinned `7a1d0218` and cover only a few pure functions.  
 **Destination:** DRVO ERP `main`; owner [ADR-040](../05-decisions/ADR-040-CASHIER-FULL-FUNCTIONAL-PARITY-MODULAR-ERP.md), delivery workflow [ADR-039](../05-decisions/ADR-039-FOUNDER-TEMPORARY-FAST-DEVELOPMENT-MODE.md).

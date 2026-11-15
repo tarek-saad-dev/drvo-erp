@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./drvo-light.css";
 
 export const metadata: Metadata = {
   title: "DRVO ERP — Platform Foundation",

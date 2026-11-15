@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-15 — Cashier UX reference + DRVO Light-only Brand Kit V1
+
+- Founder accepted [ADR-041](../05-decisions/ADR-041-CASHIER-UX-DRVO-LIGHT-V1.md): reuse Cashier's daily-operation navigation rhythms and focused Booking/POS screens, use Light/Plum/Teal Brand Kit UI first, defer Dark Mode.
+- Added `apps/web/src/app/drvo-light.css`, `apps/web/src/app/demo/salon/salon-demo-light.css`, imported layers in both page layouts; kept synthetic demo data and APIs unchanged.
+- Added `apps/web/public/brand/drvo-mark.svg` as a **temporary source-drawn brand-kit-inspired mark, not verified exact ADR-038 asset**. Restyled private Branch authorized App Launcher without adding routes for unshipped modules or weakening K5.
+- Added `apps/web/test/drvo-light-ui.test.cjs` and extended Interactive Salon Demo CI with Light contracts. **Results unknown until exact SHA CI; external HTTPS rendering and deployed release SHA are unverified**. No SQL, Auth activation, real finance or customer data changes.
+
+
 ## 2026-11-15 — External preview smoke & founder hands-on release acceptance
 
 - Added `.github/workflows/external-preview-smoke.yml` to perform GitHub-hosted public HTTPS Web `/health` and synthetic Salon `/demo/salon` checks after successful Staging Deploy, or via manual workflow dispatch. This is **a code/CI addition only**: no confirmed workflow PASS, production release, real DB or private UI rollout.

@@ -101,7 +101,7 @@ export default function SalonDemoClient(){
   setTourActive(false);setTourStep(0);setTourBookingId(null);
  }
 
- return <main className="sd-root" dir="rtl">
+ return <main className="sd-root" dir="rtl" data-drvo-ui="light-v1">
   <aside className="sd-sidebar" aria-label="قائمة لوحة تحكم الديمو">
    <div className="sd-brand"><span className="sd-brand-icon">D</span><div>DRVO <b>ERP</b><small>SALON WORKSPACE</small></div></div>
    <div className="sd-workspace"><span className="sd-workspace-icon">✦</span><div><strong>Studio One</strong><small>صالون تجريبي · فرع المعاينة</small></div><span className="sd-chevron">⌄</span></div>

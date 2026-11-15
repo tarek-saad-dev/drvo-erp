@@ -43,6 +43,8 @@ test('branch app launcher links remain derived from existing K5-authorized API c
 });
 test('new DRVO brand mark is served locally, no remote SVG / injected JS', () => {
   const svg=fs.readFileSync(path.join(__dirname,'../public/brand/drvo-mark.svg'),'utf8');
+  const approved=fs.readFileSync(path.join(__dirname,'../../../assets/brand/approved/drvo-symbol-primary.svg'),'utf8');
+  assert.equal(svg,approved,'published mark must match the approved ADR-038 SVG exactly');
   assert.match(svg,/<svg\s/);
   assert.match(svg,/#74536E/i);
   assert.match(svg,/#1A7B80/i);

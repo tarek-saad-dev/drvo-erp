@@ -12,7 +12,7 @@ type Report={state:"READ_ONLY_BOOKING_SAMPLE";businessId:string;branchId:string;
  booked:number;completed:number;cancelled:number;barbers:BarberRow[]};
 type AuthWorkspace={businessId:string;branchId:string;businessName:string};
 type State="loading"|"ready"|"denied"|"unavailable";
-const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const matchingGuid=(a:unknown,b:unknown)=>
  typeof a==="string"&&typeof b==="string"&&GUID.test(a)&&GUID.test(b)&&
  a.toLowerCase()===b.toLowerCase();

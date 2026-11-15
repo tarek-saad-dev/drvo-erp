@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { computeListPricePreview, PosPreviewService } = require("../dist/pos-preview/pos-preview.service");
+const { computeListPricePreview, computeAdjustmentPreview, PosPreviewService } = require("../dist/pos-preview/pos-preview.service");
 const { PosPreviewController } = require("../dist/pos-preview/pos-preview.controller");
 const ID = n => String(n).padStart(8,"0")+"-0000-4000-8000-000000000001";
 const ITEM = (id, priceMinor, currency="EGP", active=true) => ({
@@ -69,4 +69,66 @@ test("Service always uses trusted scoped catalog for read and writes nothing",as
     assert.equal(got.listPriceSubtotalMinor,600); assert.equal(got.persisted,false);
     assert.equal(calls,1);
   }finally{restore();}
+});
+
+test("Cashier-adapted header discount and tentative tip are calculated against fresh catalog, never paid",()=>{
+ const result=computeAdjustmentPreview([ITEM(1,12501),ITEM(2,999)],{
+  ...lines([[1,2],[2,3]]),headerDiscountMinor:999,customerPresentedMinor:30000,
+ });
+ assert.equal(result.state,"DRAFT_ADJUSTMENT_PREVIEW_ONLY");
+ assert.equal(result.listPriceSubtotalMinor,27999);
+ assert.equal(result.headerDiscountMinor,999);
+ assert.equal(result.afterDiscountMinor,27000);
+ assert.equal(result.customerPresentedMinor,30000);
+ assert.equal(result.possibleTipMinor,3000);
+ assert.equal(result.shortfallMinor,0);
+ assert.equal(result.persisted,false);assert.equal(result.discountRecorded,false);
+ assert.equal(result.paymentState,"NOT_COLLECTED");
+ assert.equal(result.accountingState,"NOT_POSTED");
+ assert.equal(result.taxComputed,false);
+});
+test("Adjustment preview refuses client price/scope/tax injection and invalid amounts",()=>{
+ const good={...lines([[1,2]]),headerDiscountMinor:20,customerPresentedMinor:100};
+ for(const bad of [
+  {...good,tenantId:ID(2)}, {...good,taxMinor:0},
+  {...good,headerDiscountMinor:1000}, {...good,headerDiscountMinor:-1},
+  {...good,customerPresentedMinor:-1}, {...good,headerDiscountMinor:0.5},
+  {...good,customerPresentedMinor:NaN}, {...good,lines:[{offeringId:ID(1),quantity:2,priceMinor:1}]},
+ ]){
+  assert.throws(()=>computeAdjustmentPreview([ITEM(1,100)],bad),e=>e.getStatus?.()===400);
+ }
+ const shortfall=computeAdjustmentPreview([ITEM(1,200)],{
+  ...lines([[1,2]]),headerDiscountMinor:0,customerPresentedMinor:100,
+ });
+ assert.equal(shortfall.shortfallMinor,300);
+ assert.equal(shortfall.possibleTipMinor,0);
+});
+test("Adjustment endpoint denies cross-site Origin before any session or Catalog access",async()=>{
+ const restore=setEnv({DRVO_K5_AUTH_ENABLED:"YES",DRVO_CATALOG_ENABLED:"YES",
+   DRVO_POS_PREVIEW_ENABLED:"YES",DRVO_K5_ORIGIN:"https://erp-stage.drvotech.com"});
+ try{
+  const controller=new PosPreviewController({actorFromToken(){throw Error("auth touched");}}, {});
+  await assert.rejects(()=>controller.adjustments("https://attack.example",
+   {headers:{}},{setHeader(){}},ID(2),ID(3),{
+    ...lines([[1,1]]),headerDiscountMinor:0,customerPresentedMinor:100
+   }),e=>e.getStatus?.()===401);
+ }finally{restore();}
+});
+test("Adjustments service checks branch scope via catalog and never persists",async()=>{
+ const restore=setEnv({DRVO_K5_AUTH_ENABLED:"YES",DRVO_CATALOG_ENABLED:"YES",
+  DRVO_POS_PREVIEW_ENABLED:"YES"});
+ let calls=0;
+ const actor={tenantId:ID(1)};
+ const cat={list(a,t,b,br){calls++;assert.equal(a,actor);
+  assert.equal(t,"token");assert.equal(b,ID(2));assert.equal(br,ID(3));
+  return Promise.resolve({offerings:[ITEM(1,500)]});}};
+ try{
+  const svc=new PosPreviewService(cat);
+  const result=await svc.adjustments(actor,"token",ID(2),ID(3),{
+   ...lines([[1,1]]),headerDiscountMinor:100,customerPresentedMinor:450,
+  });
+  assert.equal(result.afterDiscountMinor,400);
+  assert.equal(result.possibleTipMinor,50);
+  assert.equal(result.persisted,false);assert.equal(calls,1);
+ }finally{restore();}
 });

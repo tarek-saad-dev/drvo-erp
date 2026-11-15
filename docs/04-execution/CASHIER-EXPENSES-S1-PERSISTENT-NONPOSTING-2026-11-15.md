@@ -1,7 +1,7 @@
 # Cashier → DRVO Expenses Core S1 — persisted nonposting documents
 
 **Date:** 2026-11-15  
-**Status:** source implementation on `main`; **real SQL2022/Nest CI pending exact SHA**, **primary DRVO dev DB and VPS not applied/verified**, not a complete Cashier Expenses/Treasury parity claim.
+**Status:** SOURCE + disposable **SQL2022/Nest HTTP and Next CI PASSED** on exact source commit `03142b26a569c5b38bf04c57ffda497b19848c6f`, [GitHub run #43673599720](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43673599720). **Primary DRVO dev DB and VPS migration/authorized private UI NOT applied or independently verified**; not complete Expenses/Treasury parity.
 
 ## Cashier source actually reviewed
 - `tarek-saad-dev/casher/src/app/api/expenses/route.ts` from the pinned Cashier audit: `GET` filters legacy `dbo.TblCashMove` by Branch, expense type/category/date/payment; `POST` requires active business day and shift, validates amount/category/method, creates CashMove through a Treasury application port, optionally writes employee advance ledger and schedules WhatsApp. It reuses older integer legacy IDs, DB pool and auth. **DRVO does not reuse these SQL tables/routes/pool**.
@@ -19,7 +19,7 @@
 ## Tests / verification contract
 - `apps/api/test/expenses.test.cjs`: defaults OFF, strict body/Origin/UUID, positive safe integer money, no payment injection, read-model semantic truth.
 - `apps/web/test/expenses-workspace.test.cjs`: K5 gate, no browser data storage, authorized API-based launcher, Light design tokens.
-- `tools/expenses/verify.cjs` + `.github/workflows/shared-expenses-ci.yml`: GitHub-hosted disposable SQL Server 2022, real SQL019 migration/replay, real Nest HTTP session/login, no direct app-principal table DML, category+draft creation/replay/conflict, exact money, cross-Tenant/Branch denial, cancel/replay, role/member/session revocation. Build API/Next separately in CI. **Do not claim PASS until exact matching GitHub workflow results**.
+- `tools/expenses/verify.cjs` + `.github/workflows/shared-expenses-ci.yml`: GitHub-hosted disposable SQL Server 2022, real SQL019 migration/replay, real Nest HTTP session/login, no direct app-principal table DML, category+draft creation/replay/conflict, exact money, cross-Tenant/Branch denial, cancel/replay, role/member/session revocation. Build API/Next separately in CI. **Verified run `#43673599720`: 10/10 real SQL2022/Nest HTTP integration groups PASS; 86/86 Nest unit tests PASS; Web Expenses source tests 4/4 PASS, Next production build + TypeScript PASS.** These are disposable GitHub runner results, not the actual DRVO primary DB.
 - `.github/workflows/k5c-private-ui-ci.yml` checks Expenses is 404 when K5 is OFF. DB migrations and private flags are **never** activated by a normal code deployment.
 
 ## Architecture/operational impacts

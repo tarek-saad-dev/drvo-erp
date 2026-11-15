@@ -1,7 +1,7 @@
 # HR-S2: Cashier attendance → DRVO HR Core UTC punch sessions
 
 **Date:** 2026-11-15  
-**Status:** CODED on `main`; **SQL020 migration + Nest HTTP + private Web CI PENDING exact-SHA verification**. Primary DRVO development DB and actual K5 private browser not verified; not full Cashier attendance/payroll parity.
+**Status:** CODED on `main`; **[SQL2022/Nest HTTP + private Web CI PASS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43674411436)** on exact source SHA `5f4a3d2fa984af6ca650482e9178e4205be4f029` — 11/11 real SQL+HTTP groups, 90/90 API tests, 3/3 Web source tests and Next build/typecheck. Primary DRVO development DB and actual K5 private browser not verified; not full Cashier attendance/payroll parity.
 
 ## Source audit and architectural impact
 

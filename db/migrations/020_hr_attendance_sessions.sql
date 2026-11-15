@@ -83,7 +83,7 @@ AS BEGIN
  SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;BEGIN TRANSACTION;
  EXEC core.AssertHrBranchAction @TenantId,@BusinessId,@BranchId,@AccountId,
   @SessionVersion,@TokenHash,''hr.manage'';
- IF @ClientRequestId IS NULL OR @EmployeeId IS NULL OR @Action NOT IN(''IN'',''OUT'')
+ IF @ClientRequestId IS NULL OR @EmployeeId IS NULL OR @Action IS NULL OR @Action NOT IN(''IN'',''OUT'')
     OR (@Action=''IN'' AND @AttendanceId IS NOT NULL)
     OR (@Action=''OUT'' AND @AttendanceId IS NULL)
    THROW 51382,''Invalid attendance command'',1;

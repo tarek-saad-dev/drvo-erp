@@ -152,3 +152,28 @@ button, input, select, textarea { font-family:inherit; }
 @media(prefers-reduced-motion:reduce) {
   .drvo-launcher .k5-verify-link { transition:none; }
 }
+
+
+/* Expenses Core S1: real K5/SQL-backed document drafts, never paid. */
+.drvo-expenses-banner { display:flex; flex-wrap:wrap; align-items:center; gap:12px;
+ border:1px solid #c5e1df; background:#ebf7f5; border-radius:13px; color:#125c62;
+ padding:15px 20px; margin:0 0 18px; }
+.drvo-expenses-banner strong { font-size:14px; }
+.drvo-expenses-banner span { color:#336b70; font-size:12px; }
+.drvo-expenses-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.5fr); gap:17px; }
+.drvo-expenses-grid .k5-admin-card { margin:0; }
+.drvo-expenses-grid .catalog-form { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.drvo-expenses-grid .catalog-form label { color:var(--drvo-deep); }
+.drvo-expenses-grid .catalog-form button { align-self:end; margin:0; }
+.drvo-expenses-list { margin-top:20px; }
+.drvo-expenses-cancel { cursor:pointer; padding:9px 14px; border:1px solid #e6b9c1;
+ background:#fff0f1; color:#963145; border-radius:9px; font-size:12px; }
+.drvo-expenses-cancel:disabled { opacity:.48; cursor:not-allowed; }
+.drvo-expenses-foot { padding:12px 23px 17px; }
+@media(max-width:920px) {
+ .drvo-expenses-grid { grid-template-columns:1fr; }
+}
+@media(max-width:560px) {
+ .drvo-expenses-grid .catalog-form { grid-template-columns:1fr; }
+ .drvo-expenses-banner { align-items:flex-start; flex-direction:column; }
+}

@@ -112,7 +112,7 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
     {status === "denied" && <p className="k5-error" role="alert">الفرع غير متاح لحسابك أو غير موجود.</p>}
     {status === "error" && <p className="k5-error" role="alert">تعذر تحميل مساحة العمل. حاول مرة أخرى.</p>}
     {status === "ready" && branch && <>
-      <div className="k5-page-title">
+      <div className="k5-page-title drvo-workspace-title">
         <div>
           <span className="k5-eyebrow">BRANCH WORKSPACE</span>
           <h1>{branch.branchName}</h1>
@@ -121,10 +121,10 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
         <div className="k5-branch-label"><strong>{businessName}</strong>
           <span>{branch.branchName}</span></div>
       </div>
-      <section className="k5-admin-card k5-workspace-intro">
-        <span className="k5-eyebrow">PLATFORM FOUNDATION</span>
-        <h2>مساحة العمل جاهزة للربط بالموديولات</h2>
-        <p className="k5-muted">المبيعات والمخزون والحسابات والموظفون هتظهر هنا بعد اكتمال الموديولات وتفعيلها. الوصول للفرع محمي بالصلاحيات الحالية.</p>
+      <section className="k5-admin-card drvo-launcher">
+        <div className="drvo-launcher-heading"><span className="k5-eyebrow">DRVO BUSINESS APPS</span>
+        <h2>تطبيقات الفرع</h2>
+        <p className="k5-muted">زي Cashier: اختار المهمة اللي عاوز تنفذها. هنا بيظهر فقط اللي الـAPI سمح بيه لحسابك في الفرع ده، ومفيش إيرادات أو عمليات بيع مزيفة.</p></div>
         {reportsWebEnabled&&canViewReports && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/reports"} className="k5-verify-link">
           تقارير تشغيل الحلاقين
@@ -157,6 +157,7 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
           "/" + encodeURIComponent(branchId) + "/access"} className="k5-verify-link">
           إدارة أعضاء وصلاحيات الفرع
         </Link>}
+        <p className="drvo-workspace-note">التطبيقات غير المتاحة مش بتظهر. بعض الوظائف لسه مسودات أو Preview، ومفيش نشر مالي حقيقي من الشاشة دي.</p>
       </section>
     </>}
   </main>;

@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-15 — HR Attendance S2 (UTC nonpayroll punch sessions)
+
+- [HR-S2 report](HR-S2-ATTENDANCE-UTC-SESSIONS-2026-11-15.md): Cashier attendance session source reviewed and adapted to independent DRVO HR Employee/EmployeeBranch ownership; SQL020 adds server UTC punches, 1 global OPEN per Business Employee and immutable idempotency/audit, scoped K5 HR role and EXECUTE-only access.
+- Added Nest `apps/api/src/hr/{attendance.controller.ts,attendance.service.ts}`, registered AppModule, private `apps/web/.../hr/attendance` Light UX with attendance link in HR when flag permitted. No payroll/BusinessDay/payment or automatic stale attendance resolution.
+- Tests `apps/api/test/attendance.test.cjs`, `apps/web/test/hr-attendance.test.cjs`, real SQL2022/Nest HTTP `tools/hr/attendance-verify.cjs`, `.github/workflows/hr-attendance-ci.yml`, K5C private route regression. [Run #43674411436](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/43674411436) **NOT marked PASS until verified**. Primary DB migration + actual private UI user acceptance OPEN.
+
+
+
 ## 2026-11-15 — Cashier Expenses Core S1 real SQL/HTTP/Light UI slice
 
 - Source reviewed: Cashier `src/app/api/expenses/route.ts` writes legacy `TblCashMove` through Treasury; DRVO now separates Expense **documents** from Treasury **payments**, Accounting **postings** per ADR-040. [Report](CASHIER-EXPENSES-S1-PERSISTENT-NONPOSTING-2026-11-15.md).

@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-11-15 — Founder changes target from Salon-only slices to full Cashier functional parity
+
+- **Strategic directive:** [ADR-040](https://github.com/tarek-saad-dev/drvo-erp/blob/main/docs/05-decisions/ADR-040-CASHIER-FULL-FUNCTIONAL-PARITY-MODULAR-ERP.md) records **full source-audited Cashier replacement via DRVO reusable Module architecture**, not copying legacy route/db pools or settling for a narrow Barber UI. **Barber Extension** adds industry-specific behavior to reusable HR/Booking/POS/Catalog/Inventory contracts.
+- **Initial source inventory:** [Cashier Functional Parity Matrix V0](https://github.com/tarek-saad-dev/drvo-erp/blob/main/docs/04-execution/CASHIER-FULL-FUNCTIONAL-PARITY-MATRIX-V0-2026-11-15.md) pinned Cashier `main@a51101791c52bca90e45bd40ead3a46c08d78adb`; source route/Code evidence for HR, payroll, attendance, POS/Sales, Booking/Queue, Treasury, shift/day, expenses, other income, budgets, Accounting, Inventory/Purchasing, CRM/Loyalty, Reports and Messaging. **No source-to-target full module parity is claimed**. Older 7a1d source audits remain narrow snapshots.
+- **Execution:** work on real, module-sized parallel domains with integrated vertical slices; continue ADR-039 direct `main` commits and safe incremental primary development DB verification. No database mutation, full financial posting, external customer auth or Pilot activation authorized or performed by this documentation change.
+
+
 ## 2026-11-15 — Founder approves temporary fast development: direct main + primary DB
 
 - **Decision [ADR-039](https://github.com/tarek-saad-dev/drvo-erp/blob/main/docs/05-decisions/ADR-039-FOUNDER-TEMPORARY-FAST-DEVELOPMENT-MODE.md) accepted:** no customers yet; development changes and docs go directly to **main**; normal feature PRs and separate staging DB are **temporarily not required**. Existing staging/PR design is preserved for restoration before live onboarding. Prefer quick, fully working vertical slices and existing CI safety checks.

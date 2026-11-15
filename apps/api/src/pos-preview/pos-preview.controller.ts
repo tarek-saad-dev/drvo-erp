@@ -34,6 +34,18 @@ export class PosPreviewController {
     return this.preview.offerings(actor, token!, businessId, branchId);
   }
 
+  @Post("adjustments-preview") @HttpCode(200)
+  async adjustments(@Headers("origin") origin: string | undefined,
+    @Req() req: IncomingMessage, @Res({ passthrough: true }) res: ServerResponse,
+    @Param("businessId") businessId: string, @Param("branchId") branchId: string,
+    @Body() body: unknown) {
+    res.setHeader("Cache-Control", "no-store");
+    enabled(); originAllowed(origin);
+    const token = extractSessionCookie(req.headers.cookie);
+    const actor = await this.identity.actorFromToken(token);
+    return this.preview.adjustments(actor, token!, businessId, branchId, body);
+  }
+
   @Post("checkout-preview") @HttpCode(200)
   async checkout(@Headers("origin") origin: string | undefined,
     @Req() req: IncomingMessage, @Res({ passthrough: true }) res: ServerResponse,

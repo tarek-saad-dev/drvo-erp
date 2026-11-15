@@ -30,6 +30,8 @@ import { PosDraftsController } from "./pos-drafts/pos-drafts.controller";
 import { PosDraftsService } from "./pos-drafts/pos-drafts.service";
 import { HrController } from "./hr/hr.controller";
 import { HrService } from "./hr/hr.service";
+import { AttendanceController } from "./hr/attendance.controller";
+import { AttendanceService } from "./hr/attendance.service";
 import { ReportsController } from "./reports/reports.controller";
 import { ReportsService } from "./reports/reports.service";
 import { ExpensesController } from "./expenses/expenses.controller";
@@ -38,8 +40,8 @@ import { ExpensesService } from "./expenses/expenses.service";
 @Module({
   controllers: [HealthController, DatabaseHealthController, K3ScopeProofController,
     IdentityController, AuthorizedBranchController, BranchAccessController,
-    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, ReleaseCatalogController, ActivationPreviewController, CatalogController, CustomersController, BookingController, PosPreviewController, PosDraftsController, HrController, ReportsController, ExpensesController],
+    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, ReleaseCatalogController, ActivationPreviewController, CatalogController, CustomersController, BookingController, PosPreviewController, PosDraftsController, HrController, AttendanceController, ReportsController, ExpensesController],
   providers: [FoundationDatabaseService, K3ScopeProofRepository, IdentityService, BranchAccessService,
-    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, ReleaseCatalogService, ActivationPreviewService, CatalogService, CustomersService, BookingService, PosPreviewService, PosDraftsService, HrService, ReportsService, ExpensesService],
+    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, ReleaseCatalogService, ActivationPreviewService, CatalogService, CustomersService, BookingService, PosPreviewService, PosDraftsService, HrService, AttendanceService, ReportsService, ExpensesService],
 })
 export class AppModule {}

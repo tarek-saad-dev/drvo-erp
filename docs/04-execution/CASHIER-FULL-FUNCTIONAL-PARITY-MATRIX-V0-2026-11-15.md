@@ -1,0 +1,102 @@
+# Cashier → DRVO ERP — full functional inventory and Module parity matrix V0
+
+**Created:** 2026-11-15 · **Status:** SOURCE DISCOVERY / WORKING TARGET MAP, not verified complete implementation parity.  
+**Source of functional truth for audit:** [Cashier `main` at `a51101791c52bca90e45bd40ead3a46c08d78adb`](https://github.com/tarek-saad-dev/casher/tree/a51101791c52bca90e45bd40ead3a46c08d78adb), captured 2026-11-15. An inventory based on source tree/routes and selective route code review is a **coverage lead**, not a claim that every route behaves correctly in production. Older detailed audits pinned `7a1d0218` and cover only a few pure functions.  
+**Destination:** DRVO ERP `main`; owner [ADR-040](../05-decisions/ADR-040-CASHIER-FULL-FUNCTIONAL-PARITY-MODULAR-ERP.md), delivery workflow [ADR-039](../05-decisions/ADR-039-FOUNDER-TEMPORARY-FAST-DEVELOPMENT-MODE.md).
+
+**Source overview:** ~5,399 tracked Cashier tree entries and 498 `src/app/api/**` route files at inventory scan; this is codebase size, **not** count of implemented capabilities. E.g. observed `src/app/api/admin/hr/**` 52 routes, `src/lib/hr/**` 105 files, `src/lib/payroll/**` 47, `src/lib/booking/**` 149, `src/app/api/operations/**` 29, `src/app/api/treasury/**` 10, `src/app/api/pos/**` 19. There are partially extracted `src/apps/{booking,pos,treasury,...}` and `src/packs/salon/**`; **do not assume those existing internals already comply with DRVO's Kernel/Module contracts**.
+
+## Status vocabulary
+
+- **Cashier SRC** = actual legacy source entry point located; behavior needs extraction, fixture characterization and negative/failure auditing.
+- **DRVO CI-PARTIAL** = source+real disposable SQL/HTTP/browser proof of subset, **NOT verified running on actual primary DRVO DB**.
+- **DRVO DESIGN** = founder requirements and module specification exist but actual functional runtime capability not verified.
+- **DRVO GAP** = not established in DRVO runtime / needs implementation and acceptance.
+- **PARITY** = **NONE certified** pending module-level feature checklist, actual target-DB activation and operator acceptance.
+
+## Functional module inventory and mapping (source-anchored)
+
+| ID | Core / Extension owner and capabilities to migrate | Cashier source evidence (at pinned commit) | DRVO present vs gap |
+|---|---|---|---|
+| **1** | **HR Core** — employees, branch assignments, attendance, break/absence, leave/policies, shifts, payroll agreements | `src/app/api/employees/**`, `src/lib/hr/**`, `src/app/api/admin/hr/**`, `src/app/api/payroll/**` | **DESIGN/GAP**. HR/commission requirements and partial pure-rule fixtures; no complete employee/attendance/payroll production module |
+| 1.1 | Employee master, active/archive, roles, branch transfer | `src/app/api/employees/route.ts`, `src/app/api/admin/hr/branch-transfer/**` | GAP |
+| 1.2 | Attendance, check-in/out, scheduled breaks, absences and leave | `src/app/api/employees/attendance/**`, `src/lib/hr/attendance-*.ts` | GAP |
+| 1.3 | Payroll salary-only/commission-only/mixed, daily accrual, month close, agreement prorate | `src/app/api/payroll/daily/**`, `src/lib/payroll/payrollAgreementMath.ts`, `src/app/api/admin/hr/daily-payroll/**` | DESIGN; pinned source test snapshots only |
+| 1.4 | Employee earnings, advances, deductions, tips, target plans and payout requests | `src/lib/payroll/employee-target/**`, `src/lib/hr/**`, `src/app/reports/deductions/monthly/page.tsx` | DESIGN/GAP; treasury payout/accounting not approved |
+| **1.B** | **Salon/Barber Extension for HR** — barber skills, service eligibility, pay-plan rate per service/employee, branch-specific targets, opener/executor attribution, tip distribution and barber schedule | `src/app/api/barbers/**`, `src/app/api/services/[id]/barber-durations/**`, `src/lib/pos/tipMath.ts`, payroll targets | GAP; no duplicate Employee tables |
+| **2** | **Catalog Core** — services/products, categories, prices, duration, status, packages | `src/app/api/services/**`, `src/app/api/packages/**`, `src/lib/catalog/**` | **CI-PARTIAL** shared Category+Service through SQL2022 browser; advanced editing, packages and variants GAP |
+| 2.1 | Categories, service/product definitions, price, active/inactive, duration and edit/restore | `src/app/api/services/categories/**`, `src/app/api/services/[id]/**`, `src/app/api/services/resolve-durations/**` | PARTIAL/GAP |
+| 2.2 | Salon packages, duration per barber, service steps and groom/home visit add-ons | `src/app/api/pos/groom-packages/**`, `src/app/api/services/[id]/steps/**`, `src/lib/catalog/**` | **Salon Catalog Extension**, GAP |
+| **3** | **POS / Sales Core** — cart and draft, taxes/discount rules, invoice, split tender, returns, receipt printing, fulfillment identity | `src/app/income/pos/page.tsx`, `src/app/api/sales/**`, `src/app/api/pos/**`, `src/app/api/payment-methods/**` | **CI-PARTIAL** cart and durable **DRAFT only**. No approved posted sale or settlement |
+| 3.1 | Scanned/searched service/product cart, draft save/reload, price snapshots | `src/app/income/pos/page.tsx`, `src/app/api/sales/route.ts` | PARTIAL |
+| 3.2 | Discounts, multiple payment methods/split payment, invoice lifecycle and refunds/reversals | `src/app/api/sales/**`, `src/lib/clearingMethod.ts` and `src/lib/sales/**` | GAP; requires ADR-031 posting model |
+| 3.3 | Salon cashier handoff, barber executor/opener and tip allocation | `src/app/api/pos/barber-handoffs/**`, `src/app/api/bookings/[id]/convert/route.ts`, `src/lib/pos/tipMath.ts` | PARTIAL Booking→DRAFT link; **Salon POS Extension** still GAP |
+| 3.4 | Receipt/print templates and reprint history | `src/app/api/receipt-studio/**`, `src/app/api/sales/recent-invoices/**` | GAP; printing policy needs review |
+| **4** | **Booking Core** — appointments, resources, availability windows, reschedule, cancel, no-show, customer confirmation | `src/app/bookings/**`, `src/app/api/bookings/**`, `src/lib/booking/**`, `src/app/api/public/booking/**` | **CI-PARTIAL** scoped create/lifecycle/resource/working windows, duration and cross-Tenant negatives; advanced parity GAP |
+| 4.1 | Calendar, create/update/cancel, duplicate and interval conflict, resource hours | `src/app/bookings/calendar/page.tsx`, `src/app/api/bookings/**` | PARTIAL; full calendar UI and Cashier parity GAP |
+| 4.2 | Barber scheduling and public self-booking availability/confirmation/cancellation | `src/app/api/public/booking/**`, `src/app/api/barbers/available/**` | **Salon Booking Extension** GAP; **public authentication/access not approved** |
+| 4.3 | Salon walk-in queue, wait estimator, arrive/handoff and affected-booking rescue | `src/app/api/queue/**`, `src/app/api/operations/bookings/**`, `src/lib/queueEstimateEngine.ts` | Booking + Salon Operations Extension GAP |
+| **5** | **BusinessDay / Operations Core** — open/close day, shift lifecycle, reconciliation, cashier custody | `src/app/api/day/**`, `src/app/api/shift/**`, `src/modules/operations/domain/businessDayReconciliation.ts` | pure characterization exists; full persistent BusinessDay + Shift GAP |
+| 5.1 | Business-local day open/close, missed-day catchup, guard active-day writes | `src/app/api/day/close-and-open/**`, `src/app/api/day/rollover-check/**` | DESIGN/GAP |
+| 5.2 | Cashier shifts, opening balance, custody/handover, shift/day close | `src/app/api/shift/open/**`, `src/app/api/shift/close/**`, `src/app/treasury/shift-close/**` | GAP; avoid double-owning Treasury balances |
+| **6** | **Treasury Core / الخزنة** — one Branch treasury, balances, cash/bank movements, branch transfers, approval and reconcile | `src/app/treasury/**`, `src/app/api/treasury/**`, `src/apps/treasury/**` | **DESIGN/GAP**; Treasury spec founder-approved; no verified DRVO core runtime |
+| 6.1 | Branch cash ledger, methods/bank balances, deposits and withdrawals | `src/app/api/treasury/balance/route.ts`, `src/app/api/treasury/movements/**` | GAP |
+| 6.2 | Transfers/approvals, cash differences, reconciliation, day/shift closure | `src/app/api/treasury/transfer/**`, `src/app/api/treasury/reconciliation/**` | GAP; manager approval and double entry boundaries |
+| **7** | **Finance — Expenses / Other Income / Budgets** — expense categories, payable approval, employee advance reason, revenue other than Sales | `src/app/expenses/**`, `src/app/income/**`, `src/app/api/expenses/**`, `src/app/api/incomes/**`, `src/app/api/budget/**` | **DESIGN/GAP**; source classification must avoid double-counting POS sales |
+| 7.1 | Expenses: create, categories, fixed/recurring, employee allocation, review/edit/reversal | `src/app/expenses/new/page.tsx`, `src/app/api/expenses/distribute/**` | Expenses owner GAP; Treasury executes payment |
+| 7.2 | Other income: categories/adjustments, source reference, review | `src/app/income/new/page.tsx`, `src/app/api/incomes/**` | OtherIncome owner GAP; **POS sale revenue is not entered here twice** |
+| 7.3 | Budgets, approvals and finance-period summaries | `src/app/api/budget/**`, `src/app/budget/**` | GAP; Accounting policy dependent |
+| **8** | **Accounting Core** — first journal, ledger, revenue/expense recognition, reversals, trial balance and reconciliation | `src/lib/accounting/**`, `src/app/api/reports/monthly/**`, legacy CashMove sources | **PROPOSED** ADR-031 Option A/B undecided; never label cash inflow as earned revenue |
+| 8.1 | GL Chart of Accounts/Journal, posted immutable sale/refund/expense and traceable reversals | Cashier sale/CashMove/financial classification behavior requires exact audit | **GATED** by explicit Founder+Finance+Architecture ADR-031 |
+| **9** | **Inventory Core** — stocked products, stock ledger, valuation/cost, recipe consumption and transfers | `src/app/api/inventory/**`, `src/lib/inventory/**`, `src/app/api/pos/client-inventory/**` | **DESIGN/GAP**; founder-approved inventory spec, no complete DRVO runtime |
+| 9.1 | Stock on-hand, adjustments, transfers, count, cost policy/reorder | `src/app/api/inventory/transfers/**`, `src/app/api/admin/inventory/**` | GAP |
+| 9.2 | Salon service recipe: materials consumed on *approved* sale/service completion | inventory and POS dependencies in Cashier source audit | **Salon Inventory Extension**, GAP; idempotent consumption |
+| **10** | **Purchasing Core** — supplier, purchase/receipt, supplier return, payable stock reconciliation | `src/app/api/purchases/route.ts` and inventory purchase references | DESIGN/GAP; full supplier/purchase flow needs a separate source pass |
+| **11** | **CRM / Customers & Loyalty Core** — customer profiles and history, consent, loyalty points/tier/ledger | `src/app/api/customers/**`, `src/app/api/loyalty/**`, `src/lib/loyalty/**` | **CI-PARTIAL** customer create/list; loyalty, history and customer statement GAP |
+| 11.1 | Customer creation, lookup, visit/sale/booking history | `src/app/api/customers/[id]/history-summary/**` | PARTIAL/GAP |
+| 11.2 | Earn/redeem/reverse points, tiers, audit and opt-in communications | `src/app/api/loyalty/reverse-sale/**`, `src/app/api/loyalty/tiers/**` | GAP, requires sale source-of-truth |
+| **12** | **Reports / Analytics Core** — authorized read models only (daily/shift, monthly P&L, barber productivity, payroll, customer, sales/inventory) | `src/app/reports/**`, `src/app/income-review/**`, `src/app/api/reports/**`, `src/lib/reports/**` | **CI-PARTIAL** Salon overview counts only; full reports GAP |
+| 12.1 | Daily revenue/sales, expenses, cashier reconciliations | `src/app/income-review/today-sales/**`, `src/app/treasury/daily/**` | GAP; read from own authoritative owners |
+| 12.2 | Monthly profitability, payroll, commission, staff performance and branch drilldown | `src/app/api/reports/monthly/**`, `src/lib/reports/**` | GAP; only truthful data as available; no phantom profit |
+| **13** | **Messaging / Integrations** — opt-in notifications, reminders, outbox retry/audit, WhatsApp / external connectors | `src/modules/messaging/**`, `src/app/api/integrations/**`, `src/app/api/employee-portal/**` | GAP; not financial posting authority |
+| **14** | **Platform / Identity / Tenant / Branch** — cross-industry role permission, business/branch scoping, activation, events, audit and config | `src/platform/**`, Cashier tenant/branch auth routes | **DRVO K5 core CI-PARTIAL**, ADR-030/032 and architecture are authoritative. **Do not copy Cashier sessions/DB adapters** |
+
+## Explicit owner boundaries for the financially ambiguous cases
+
+- **Sale / revenue:** POS creates the sale source document; Accounting validates when the sale qualifies for recognized revenue and owns journal; reporting aggregates approved documents. OtherIncome covers independent non-sale revenues (e.g. misc income) and is NOT an alternate cash register.
+- **Expense:** Expenses owns category, receipt, cost center and approval/document; Treasury owns physical cash/bank **payment**, Accounting owns expense/payable recognition and GL. Recording an expense does not imply it was paid.
+- **Cash balance:** Treasury owns branch cash/bank movement/balance and transfers; POS Shift/BusinessDay manage custody, opening/closing and discrepancies; Reports only present authorized reconciled views. **One treasury per branch** per founder-approved spec.
+- **Payroll:** HR owns agreements, gross earnings, tips/advances attribution, approval and employee ledger; Treasury owns payouts; Accounting records payable/expense; reports derive projections, not write payroll.
+- **Inventory:** Inventory owns movement/quantity, valuation source and consumption; POS emits a scoped, exactly-once source event, not direct stock writes. Purchasing owns purchase order/receipts; Inventory accepts stock changes through approved contracts.
+- **Barber:** HR remains single owner of Employee identity and compensation; the Barber Extension only extends service qualification/availability/capabilities, and consumes Booking, POS and Catalog links.
+
+## Parallel delivery program (vertical and module-oriented)
+
+**W0 — Complete inventory and source-truth lock (first, then ongoing):** audit every Cashier page/API/role, feature toggle and source event; reconcile latest pinned source against prior audits; classify each capability `USE / ADAPT / REBUILD / DEFER / RETIRE` with evidence. Keep a signed parity inventory with feature behavior, test cases, source ownership and user-visible acceptance. Route existence is only initial coverage lead.
+
+**W1 — HR Core + Barber Extension:** employee, branch assignment, attendance, shifts, barber eligibility + rate/target policy; test verified mathematical outputs against pinned Cashier rules with currency minor units and branch scope. Allow preview accrual while posting/payout remains gated.
+
+**W2 — POS Sales + Booking + Operations:** move from persisted DRAFT to a complete nonposting operator UI: service/product selection, discounts/tip modeling, barber assignment and Booking → POS connection, then separately approved sale lifecycle and reversals. Reuse Cashier bill/receipt examples only after terms/policy and ADR-031.
+
+**W3 — Treasury + Expenses + Other Income + BusinessDay:** complete cash/shift/expense documents, projected movement and reconciliation UI; then approved journal/settlement contracts and independent real bank/cash evidence. Avoid direct cross-owner DB writes and false paid status.
+
+**W4 — Inventory + Purchasing + Salon Recipes:** stock, stocktaking, purchase receipts, transfers and service consumption; proof against retries and refunds.
+
+**W5 — CRM/Loyalty + Reports + Messaging:** end-to-end visit/sale/loyalty/source-ledger projection, barber productivity and monthly period views, opt-in communications.
+
+**Integration acceptance per module:** source fixture → independently owned DRVO domain logic → Tenant/Business/Branch negative tests → SQL migrations + validated backup on authorized primary dev DB → real UI test → multi-module real operational scenario → source parity review and status update. **Parallel implementation must respect shared contract dependencies**, not merge unreviewed financial policies.
+
+## Gaps / ground-truth caveats
+
+- Latest Cashier HEAD `a511017...` is **not** previous frozen pure-rule audit HEAD `7a1d021...`. Do not describe older snapshots as complete latest Cashier behavior. Pin reviewed source per migration batch; record commits and diffs.
+- Cashier source includes many routes and legacy SQL auto-migration patterns; existence does **not** prove feature completion, high-quality security, or safe direct migration. Cashier uses legacy numeric IDs in some code; DRVO uses scoped UUIDs.
+- DRVO actual primary SQL state and backup have not been independently verified. This document commits **source+planning to main only**, not database schema/migration/deployment.
+- Private first external customer and paid finances still require independent [Pilot and Commercial Gates #106](https://github.com/tarek-saad-dev/drvo-erp/issues/106). ADR-039 speeds up **internal** dev but does not close trust gates.
+
+## Definition of DONE per tracked feature
+
+1. Cashier source code paths and behavior documented at immutable commit; old-vs-new differences explicit.
+2. Domain ownership, dependencies and Tenant/Business/Branch rights are correct; not a cloned Cashier module.
+3. API + database + test coverage: positive, negative scope, idempotency, financial precision, recovery where applicable.
+4. User-facing operator workflow works on independently verified authorized DRVO primary dev DB, or deployment status explicitly marked **BLOCKED**.
+5. Current State/Roadmap/Changelog updated on `main`; **PARITY** status only with repeatable witnessed evidence.

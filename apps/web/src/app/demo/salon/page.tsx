@@ -1,6 +1,7 @@
 import type {Metadata} from "next";
 import SalonDemoClient from "./salon-demo-client";
 import "./salon-demo.css";
+import "./salon-demo-light.css";
 
 export const metadata:Metadata={
  title:"تجربة إدارة الصالون | DRVO ERP",

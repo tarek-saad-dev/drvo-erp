@@ -30,7 +30,7 @@ Use the **actual Cashier operator experience** as DRVO's first operational UX re
 - No new Node dependencies, SQL, API commands, authentication flags or real customer data.
 
 ## Acceptance checkpoints (NOT yet closed)
-- Exact source-commit CI: Next build/typecheck, original interactive Salon tests, Light contract tests, private K5 default 404 regression.
+- Exact source-commit CI: Next build/typecheck, original interactive Salon tests, Light contract tests, private K5 default 404 regression. Public Salon root now declares `data-drvo-ui="light-v1"`; external stage smoke checks that HTML marker and the official logo resource after a successful deploy. **A smoke PASS still is not a production DB/security/release.sha attestation.**
 - Actual external HTTPS `https://erp-stage.drvotech.com/demo/salon` displays **Light V1**, with browser screenshot review for desktop/mobile, RTL readability, focus, statuses, forms, Booking/POS interactions.
 - Independent exact release SHA and externally visible UI/HTTP evidence. GitHub code changes/CI success alone cannot prove deployment.
 - Private HR/Reports/Booking/POS module visual and workflow parity against actual Cashier pages as modules become live and safe; no claim of full legacy UX parity yet.

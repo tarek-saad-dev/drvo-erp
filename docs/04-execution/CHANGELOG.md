@@ -1,5 +1,12 @@
 # Project changelog
 
+## 2026-11-15 — Founder approves temporary fast development: direct main + primary DB
+
+- **Decision [ADR-039](https://github.com/tarek-saad-dev/drvo-erp/blob/main/docs/05-decisions/ADR-039-FOUNDER-TEMPORARY-FAST-DEVELOPMENT-MODE.md) accepted:** no customers yet; development changes and docs go directly to **main**; normal feature PRs and separate staging DB are **temporarily not required**. Existing staging/PR design is preserved for restoration before live onboarding. Prefer quick, fully working vertical slices and existing CI safety checks.
+- Primary DRVO DB is the approved **development target**; *actual* writes still require confirmed connection/target, restorable backup, reviewed incremental SQL and verification. This documentation commit does **not** perform or attest any SQL migration, restore, deployment or VPS operation.
+- ADR-030/031/032/037, Tenant isolation, Default Deny, no real PII/Public Auth/production entitlements/financial POSTED and actual Pilot P1–P7/paid C1–C3 gates remain in force for external/live use.
+
+
 ## 2026-11-14 — S12 private Salon UI persisted flow and POS UUID defect fixed
 
 - [#133](https://github.com/tarek-saad-dev/drvo-erp/pull/133) merged `dc5dfbe1afa6ab8a39435f65013c246b944e2bfc`, **10/10 exact-PR CI PASS**: actual synthetic Chrome/private Next/K5/Nest/SQL2022 Catalog Category+Service → Customer → Booking Resource+future Appointment → POS quantity 2 persisted **DRAFT-only**, full Reload, independent Staff future Booking read/no POS, foreign Tenant and anonymous denial. 37 isolated SQL/HTTP Booking assertions. **Not a real staging/P6 operator acceptance.**

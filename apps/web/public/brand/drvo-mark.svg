@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title">
+<title>DRVO ERP mark</title>
+<defs><linearGradient id="plum" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#87516f"/><stop offset="1" stop-color="#553e53"/></linearGradient><linearGradient id="teal" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#16a1a0"/><stop offset="1" stop-color="#1a7b80"/></linearGradient></defs>
+<path fill="url(#plum)" d="M10 7h38C71 7 88 24 88 47c0 21-16 37-39 37H12l8-15h28c13 0 23-10 23-23S61 22 48 22H26v30L10 65V7z"/>
+<path fill="#553e53" d="M35 51h8v14h-8zM47 42h8v23h-8zM59 32h8v33h-8z"/>
+<path fill="url(#teal)" d="M9 78h40c17 0 28-8 38-19-4 18-17 31-39 31H5z"/>
+</svg>

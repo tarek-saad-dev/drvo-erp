@@ -1,0 +1,138 @@
+/* Light V1 Salon Demo: Cashier-inspired operational UX; DRVO corporate
+ * Plum/Teal palette from ADR-024 and user-supplied Brand Kit.
+ * This remains PUBLIC SYNTHETIC UI — no customer data, auth or SQL. */
+.sd-root {
+  color-scheme:light;
+  --sd-bg:#f7f6f8; --sd-surface:#fff; --sd-surface2:#f6f3f7;
+  --sd-border:#e6e1e8; --sd-muted:#77707b; --sd-white:#27242b;
+  --sd-green:#1a7b80; --sd-purple:#74536e;
+  color:#27242b; background:#f7f6f8;
+  font-family:var(--drvo-font-body,"Cairo",Tahoma,"Segoe UI",system-ui,sans-serif);
+}
+.sd-root button:focus-visible,.sd-root a:focus-visible,.sd-root select:focus-visible {
+ outline:3px solid #1a7b80; outline-offset:3px;
+}
+.sd-sidebar { background:#fff; border-left:1px solid #e6e1e8;
+  box-shadow:-8px 0 22px #553e5305; }
+.sd-brand { color:#553e53; }
+.sd-brand b { color:#74536e; }
+.sd-brand small { color:#77707b; letter-spacing:.14em; }
+.sd-brand-icon { background:transparent url("/brand/drvo-mark.svg") center/contain no-repeat;
+  border-radius:0; color:transparent; font-size:0; box-shadow:none; }
+.sd-workspace { border-color:#e6e1e8; background:#faf8fa; }
+.sd-workspace strong { color:#553e53; }
+.sd-workspace small { color:#77707b; }
+.sd-workspace-icon { color:#74536e; background:#f1e7f0; }
+.sd-chevron,.sd-nav-title { color:#77707b; }
+.sd-nav-btn { color:#605765; font-weight:600; }
+.sd-nav-btn:hover { background:#f7f3f7; color:#553e53; }
+.sd-nav-btn.sd-selected { background:#f2e9f1; border:1px solid #decadd;
+  color:#553e53; box-shadow:inset -3px 0 0 #74536e; }
+.sd-nav-icon { color:#74536e; }
+.sd-count { background:#ede4ed; color:#553e53; }
+.sd-sandbox { background:#ecf6f5; border-color:#c5e1df; }
+.sd-sandbox strong { color:#126d70; }
+.sd-sandbox small { color:#42787b; }
+.sd-live-dot { background:#1a7b80; box-shadow:0 0 0 4px #1a7b8018; }
+.sd-back { color:#74536e; }
+.sd-page { background:#f7f6f8; }
+.sd-topbar { background:#fff; border-bottom:1px solid #e6e1e8; }
+.sd-topbar-title { color:#77707b; }
+.sd-topbar-title strong { color:#553e53; }
+.sd-crumb { color:#b6a5b4; }
+.sd-chip { background:#e9f4f2; border:1px solid #c5e1df; color:#176c71; }
+.sd-avatar { background:#f1e7f0; border:1px solid #d6bed3; color:#553e53; }
+.sd-disclaimer { background:#fff9ed; color:#805b29; border:1px solid #f1dab1; }
+.sd-disclaimer strong { color:#714720; }
+.sd-toast { background:#ecf7f2; border-color:#abd7c1; color:#175d43; }
+.sd-toast-error { background:#fff0f1; border-color:#e8a8b0; color:#9b283a; }
+.sd-kicker,.sd-panel-eyebrow { color:#74536e; }
+.sd-heading-row h1 { color:#553e53; }
+.sd-heading-row h1 span { color:#1a7b80; }
+.sd-heading-row p { color:#77707b; }
+.sd-primary { background:#1a7b80; color:#fff; box-shadow:0 6px 16px #1a7b801a; }
+.sd-primary:hover { background:#116a70; }
+.sd-primary:disabled { opacity:.48; }
+.sd-stat { background:#fff; border-color:#e6e1e8;
+  box-shadow:0 6px 20px #553e5308; }
+.sd-stat-top { color:#736778; }
+.sd-stat-icon { background:#e8f5f2; color:#1a7b80; }
+.sd-icon-violet { background:#f2e8f1; color:#74536e; }
+.sd-icon-blue { background:#edf3fc; color:#3572ac; }
+.sd-icon-amber { background:#fff4dd; color:#936d26; }
+.sd-stat>strong { color:#553e53; }
+.sd-stat>small { color:#77707b; }
+.sd-panel { background:#fff; border-color:#e6e1e8;
+ box-shadow:0 5px 22px #553e5307; }
+.sd-panel-header { border-bottom-color:#ece7ee; }
+.sd-panel-header h2 { color:#553e53; }
+.sd-text-button { color:#1a7b80; font-weight:700; }
+.sd-appointment { border-bottom-color:#eee8ee; }
+.sd-appt-time { color:#553e53; }
+.sd-appt-avatar { background:#f1e7f0; color:#74536e; }
+.sd-appt-info strong { color:#312a33; }
+.sd-appt-info small { color:#77707b; }
+.sd-status-confirmed { background:#fff3dc; color:#805515; }
+.sd-status-completed { background:#e6f5ed; color:#167b53; }
+.sd-status-cancelled { background:#fff0f1; color:#a42d41; }
+.sd-appt-actions button { background:#eef8f6; border-color:#b8dad5; color:#14696b; }
+.sd-appt-actions button:last-child:not(:first-child) { background:#fff0f1;
+ border-color:#ecc3c8; color:#a42d41; }
+.sd-quick { background:#faf8fa; border-color:#e6e1e8; color:#553e53; }
+.sd-quick:hover { border-color:#74536e; background:#f8f3f8; }
+.sd-quick small { color:#77707b; }
+.sd-quick-arrow { color:#1a7b80; }
+.sd-quick-icon { background:#e6f4f1; color:#1a7b80; }
+.sd-q-violet { background:#f1e7f0; color:#74536e; }
+.sd-team-row { border-bottom-color:#e9e3e9; }
+.sd-staff-avatar { background:#e4f3ed; color:#176944; }
+.sd-staff-1 { background:#f2eaf2; color:#74536e; }
+.sd-staff-2 { background:#fff1e2; color:#98662c; }
+.sd-team-row small { color:#77707b; }
+.sd-available { color:#167b53; }
+.sd-date { background:#f9f7fa; border-color:#e6e1e8; color:#77707b; }
+.sd-book-form label { color:#615763; }
+.sd-book-form select { background:#fff; border-color:#d9ced9; color:#27242b; }
+.sd-price-hint { color:#77707b; }
+.sd-price-hint strong { color:#116a70; }
+.sd-number { background:#f1e9f1; color:#74536e; }
+.sd-service-card { background:#fff; border:1px solid #e6e1e8;
+  color:#27242b; box-shadow:0 4px 12px #553e5307; }
+.sd-service-card:hover { border-color:#74536e; box-shadow:0 9px 25px #553e5315; }
+.sd-service-graphic { background:linear-gradient(135deg,#dcefeb,#e7f4f2); color:#1a7b80; }
+.sd-service-1 { background:linear-gradient(135deg,#f5e7f2,#eee3f0); color:#74536e; }
+.sd-service-2 { background:linear-gradient(135deg,#fff3e2,#fbebd4); color:#93652c; }
+.sd-service-3 { background:linear-gradient(135deg,#e8f4fa,#e0edf8); color:#3a7da1; }
+.sd-service-4 { background:linear-gradient(135deg,#f7ebf3,#f3e1f0); color:#a75b8c; }
+.sd-service-5 { background:linear-gradient(135deg,#eaf7ed,#e2f1e6); color:#327b53; }
+.sd-service-card>small { color:#77707b; }
+.sd-service-bottom { color:#1a7b80; }
+.sd-service-add { background:#e3f2f0; color:#1a7b80; }
+.sd-empty { color:#77707b; }
+.sd-empty>span { color:#74536e; }
+.sd-empty strong { color:#553e53; }
+.sd-cart-row { border-bottom-color:#e9e3e9; }
+.sd-cart-row small { color:#77707b; }
+.sd-cart-row>span { color:#1a7b80; }
+.sd-cart-row button { background:#fff0f1; color:#a42d41; }
+.sd-checkout-bottom { border-top-color:#e6e1e8; }
+.sd-subtotal>strong { color:#116a70; }
+.sd-checkout-bottom p { color:#77707b; }
+.sd-saved, .sd-draft-row { border-color:#e6e1e8; }
+.sd-saved-title span { background:#f1eaf1; color:#553e53; }
+.sd-saved>p,.sd-draft-row span small { color:#77707b; }
+.sd-draft-row strong { color:#116a70; }
+.sd-demo-footer { color:#77707b; }
+.sd-demo-footer button { border-color:#d7cbd6; background:#fff; color:#553e53; }
+.sd-tour { background:linear-gradient(115deg,#f3eaf1,#edf7f6); border-color:#e4d8e4; }
+.sd-tour-title h2 { color:#553e53; }
+.sd-tour-title p { color:#655a66; }
+.sd-tour-progress span { background:#fff; border-color:#e0d3df; color:#553e53; }
+.sd-tour-progress strong { color:#116a70; }
+@media(max-width:900px) {
+ .sd-sidebar { border-bottom:1px solid #e6e1e8; border-left:0; }
+ .sd-nav { padding-bottom:5px; }
+}
+@media(prefers-reduced-motion:reduce) {
+ .sd-service-card:hover { transform:none; }
+}

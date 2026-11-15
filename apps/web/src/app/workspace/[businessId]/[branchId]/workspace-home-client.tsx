@@ -9,8 +9,8 @@ type AuthorizedWorkspace = { businessId: string; branchId: string; businessName:
 type Account = { username: string; mustChangePassword: boolean };
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export default function WorkspaceHomeClient({businessId, branchId,salonWebEnabled,hrWebEnabled,reportsWebEnabled,expensesWebEnabled}: {
-  businessId: string; branchId: string;salonWebEnabled:boolean;hrWebEnabled:boolean;reportsWebEnabled:boolean;expensesWebEnabled:boolean;
+export default function WorkspaceHomeClient({businessId, branchId,salonWebEnabled,hrWebEnabled,reportsWebEnabled,expensesWebEnabled,treasuryWebEnabled}: {
+  businessId: string; branchId: string;salonWebEnabled:boolean;hrWebEnabled:boolean;reportsWebEnabled:boolean;expensesWebEnabled:boolean;treasuryWebEnabled:boolean;
 }) {
   const router = useRouter();
   const [branch, setBranch] = useState<Branch | null>(null);
@@ -22,6 +22,7 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
   const [canViewHr, setCanViewHr] = useState(false);
   const [canViewReports,setCanViewReports]=useState(false);
   const [canViewExpenses,setCanViewExpenses]=useState(false);
+  const [canViewTreasury,setCanViewTreasury]=useState(false);
   const [canPreviewPos, setCanPreviewPos] = useState(false);
   const [account, setAccount] = useState<Account | null>(null);
   const [status, setStatus] = useState<"loading"|"ready"|"denied"|"error">("loading");
@@ -99,6 +100,11 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
           if(!live)return;
           setCanViewExpenses(expenseResult.ok);
         }
+        if(treasuryWebEnabled){
+          const treasuryResult=await fetch(base+"/treasury/counts",{credentials:"same-origin",cache:"no-store"});
+          if(!live)return;
+          setCanViewTreasury(treasuryResult.ok);
+        }
         setStatus("ready");
       } catch {
         if (live) setStatus("error");
@@ -106,7 +112,7 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
     }
     void load();
     return () => { live = false; };
-  },[router,businessId,branchId,hrWebEnabled,reportsWebEnabled,expensesWebEnabled]);
+  },[router,businessId,branchId,hrWebEnabled,reportsWebEnabled,expensesWebEnabled,treasuryWebEnabled]);
 
   return <main className="k5-workspace">
     <header className="k5-workspace-header">
@@ -142,6 +148,10 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
         {expensesWebEnabled&&canViewExpenses && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/expenses"} className="k5-verify-link">
           المصروفات (مسودات غير مدفوعة)
+        </Link>}
+        {treasuryWebEnabled&&canViewTreasury && <Link href={"/workspace/" + encodeURIComponent(businessId) +
+          "/" + encodeURIComponent(branchId) + "/treasury"} className="k5-verify-link">
+          الخزنة — جرد نقدي (مسودات فقط)
         </Link>}
         {canViewCatalog && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/catalog"} className="k5-verify-link">

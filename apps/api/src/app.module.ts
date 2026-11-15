@@ -36,12 +36,14 @@ import { ReportsController } from "./reports/reports.controller";
 import { ReportsService } from "./reports/reports.service";
 import { ExpensesController } from "./expenses/expenses.controller";
 import { ExpensesService } from "./expenses/expenses.service";
+import { TreasuryController } from "./treasury/treasury.controller";
+import { TreasuryService } from "./treasury/treasury.service";
 
 @Module({
   controllers: [HealthController, DatabaseHealthController, K3ScopeProofController,
     IdentityController, AuthorizedBranchController, BranchAccessController,
-    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, ReleaseCatalogController, ActivationPreviewController, CatalogController, CustomersController, BookingController, PosPreviewController, PosDraftsController, HrController, AttendanceController, ReportsController, ExpensesController],
+    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, ReleaseCatalogController, ActivationPreviewController, CatalogController, CustomersController, BookingController, PosPreviewController, PosDraftsController, HrController, AttendanceController, ReportsController, ExpensesController, TreasuryController],
   providers: [FoundationDatabaseService, K3ScopeProofRepository, IdentityService, BranchAccessService,
-    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, ReleaseCatalogService, ActivationPreviewService, CatalogService, CustomersService, BookingService, PosPreviewService, PosDraftsService, HrService, AttendanceService, ReportsService, ExpensesService],
+    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, ReleaseCatalogService, ActivationPreviewService, CatalogService, CustomersService, BookingService, PosPreviewService, PosDraftsService, HrService, AttendanceService, ReportsService, ExpensesService, TreasuryService],
 })
 export class AppModule {}

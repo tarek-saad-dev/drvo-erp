@@ -1,5 +1,7 @@
 # ADR-041 — Cashier operator UX, DRVO Light V1 visual system
 
+> **2026-11-17 FOUNDER UX V1.1 FEEDBACK IMPLEMENTED (source):** Founder reviewed public Salon screenshot and explicitly rejected the large Guided Tour, wanted a denser operational viewport and demanded Cashier's real POS capability audit before continuing. [Source-backed POS audit, delivery and truth boundaries](../04-execution/CASHIER-POS-UX-DENSITY-AND-FUNCTION-PARITY-REVIEW-2026-11-17.md). New public synthetic Light CSS reduces sidebar/header/cards/gaps without CSS `zoom` or scaling; Guided Tour component, logic and dead CSS removed. Added real **synthetic interaction** for service/package/product search and selection, demo customer/Barber, +/- qty, fixed/% discount, NOT_COLLECTED split preview, draft notes/history and keyboard shortcuts. **No real Auth, SQL, POS payment, inventory deduction, Treasury/Accounting posting or declared Cashier parity**. Light-only remains the accepted design; Stage browser/new SHA acceptance must be verified independently. Test/source changes are not new authorization to activate finance.
+
 **Date:** 2026-11-15  
 **Status:** **FOUNDER-ACCEPTED UX DIRECTION; first Light V1 CSS/launcher slice committed, full UX parity and live deployment NOT VERIFIED.**
 

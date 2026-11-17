@@ -113,7 +113,9 @@ export function computeCashierInvoiceQuote(
  if(rawHeader!==undefined&&rawHeader!==null&&rawHeader>0&&
     rawPercent!==undefined&&rawPercent!==null&&rawPercent>0)
   hp=BigInt(rawPercent);
- if(hd>linesNet){hd=linesNet;hp=RATE;}
+ // Original Cashier resolveHeaderDiscount short-circuits an empty/net-zero invoice.
+ if(linesNet===0n){hd=0n;hp=0n;}
+ else if(hd>linesNet){hd=linesNet;hp=RATE;}
  return {
   subtotalMinor:bounded(gross),lineDiscountTotalMinor:bounded(lineDiscount),
   linesNetTotalMinor:bounded(linesNet),

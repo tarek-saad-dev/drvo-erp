@@ -236,7 +236,7 @@ AS BEGIN
  JOIN @Page pg ON pg.DraftId=d.DraftId
  WHERE d.TenantId=@TenantId AND d.BusinessId=@BusinessId AND d.BranchId=@BranchId
  ORDER BY d.CreatedAtUtc DESC,d.DraftId;
- SELECT CONVERT(VARCHAR(36),l.DraftId) AS draftId,l.[LineNo] AS lineNo,
+ SELECT CONVERT(VARCHAR(36),l.DraftId) AS draftId,l.[LineNo] AS [lineNo],
   CONVERT(VARCHAR(36),l.OfferingId) AS offeringId,l.OfferingNameSnapshot AS displayName,
   l.Kind AS kind,l.Quantity AS quantity,l.UnitPriceMinor AS unitPriceMinor,
   l.LineSubtotalMinor AS grossMinor,

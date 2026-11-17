@@ -197,3 +197,21 @@ test('S9 real demo UI disables occupied options, never pretends SQL guarantees',
  assert.match(client,/مفيش حجز حقيقي أو مزامنة مع SQL/);
  assert.doesNotMatch(client,/fetch\s*\(|\/api\/|localStorage|sessionStorage|document\.cookie/);
 });
+
+test('compact Light V1.1 increases visible viewport rather than applying browser zoom',()=>{
+ const client=fs.readFileSync(path.join(root,'demo/salon/salon-demo-client.tsx'),'utf8');
+ const css=fs.readFileSync(path.join(root,'demo/salon/salon-pos-workspace.css'),'utf8');
+ const base=fs.readFileSync(path.join(root,'demo/salon/salon-demo.css'),'utf8');
+ const light=fs.readFileSync(path.join(root,'demo/salon/salon-demo-light.css'),'utf8');
+ assert.match(client,/data-demo-revision="salon-compact-pos-v1-1"/);
+ assert.doesNotMatch(client,/GUIDED TOUR|className="sd-tour"|tourActive/);
+ assert.doesNotMatch(base,/\.sd-tour/);
+ assert.doesNotMatch(light,/\.sd-tour/);
+ for(const rule of [
+  '.sd-content{padding:17px','.sd-topbar{height:57px',
+  '.sd-stat{min-height:114px','.sd-root{grid-template-columns:222px',
+  '@media(max-width:950px)','@media(max-width:620px)',
+ ])
+  assert.ok(css.includes(rule),'Required compact/responsive rule: '+rule);
+ assert.doesNotMatch(css,/\bzoom\s*:|transform\s*:\s*scale\(/);
+});

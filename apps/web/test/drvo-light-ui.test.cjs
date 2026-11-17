@@ -41,7 +41,12 @@ test('branch app launcher links remain derived from existing K5-authorized API c
   assert.match(page,/salonWebEnabled&&canViewBooking/);
   assert.match(page,/canPreviewPos &&/);
   assert.match(page,/canManageMembers &&/);
-  assert.doesNotMatch(page,/\/treasury\/|\/expenses\/|\/payroll\//);
+  // New Expenses and Treasury routes are permitted only after live SQL-backed authorization.
+  assert.match(page,/expensesWebEnabled&&canViewExpenses/);
+  assert.match(page,/treasuryWebEnabled&&canViewTreasury/);
+  assert.match(page,/setCanViewExpenses\(expenseResult\.ok\)/);
+  assert.match(page,/setCanViewTreasury\(treasuryResult\.ok\)/);
+  assert.doesNotMatch(page,/\/payroll\//);
 });
 test('new DRVO brand mark is served locally, no remote SVG / injected JS', () => {
   const svg=fs.readFileSync(path.join(__dirname,'../public/brand/drvo-mark.svg'),'utf8');

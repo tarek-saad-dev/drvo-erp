@@ -31,6 +31,12 @@ A module is **PARITY-VERIFIED** only when every audited user-facing Cashier capa
 
 **Status today:** direction accepted, mapping being inventoried; **zero claims of complete module parity**. Scope covers the *latest* pinned Cashier main and requires ongoing delta checks rather than assuming the older 7a1d021 audit is exhaustive.
 
+## 2026-11-17 Implementation note: POS V2 additive source-preserving draft
+
+Per founder-approved preservation-first directive, **retain SQL014 POS DRAFT V1** and add only isolated, nonposting Cashier canonical snapshots in SQL022–023, as documented in [S2 acceptance](../04-execution/CASHIER-POS-RICH-DRAFT-S2-2026-11-17.md). POS owns price/discount snapshots; Catalog owns price authority; Customer and HR own identity; Salon Barber eligibility remains industry extension, not a duplicate POS employee domain. A quote is not an invoice or payment. SQL transaction re-prices and checks live K5 POS/Catalog/Customer/HR permissions + same Branch. Reviewed total mismatch must fail; no client price may mutate server-owned state. ADR-031 still blocks actual financial posting and cash settlement.
+
+**This records an implemented partial vertical slice, NOT Cashier POS full parity or permission to apply SQL022–023 on a primary development database without ADR-039's independent restorable backup and target verification.** Source/CI evidence and private owner browser sign-off are separate gates.
+
 ## Next execution
 
 1. Source-audit each Cashier functional category and cross-module edges; capture approved/differing/rejected behaviors and existing DRVO contracts.

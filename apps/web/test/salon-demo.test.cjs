@@ -78,33 +78,90 @@ test('demo fixture only and reset does not retain previous state',()=>{
  for(const s of d.DEMO_SERVICES)assert.equal(Number.isSafeInteger(s.priceMinor),true);
 });
 
-test('S8 guided first-visit flow is a real synthetic three-step booking to DRAFT path',()=>{
+test('UI no longer shows Guided Tour; booking to POS DRAFT remains a direct user path',()=>{
  const client=fs.readFileSync(path.join(root,'demo/salon/salon-demo-client.tsx'),'utf8');
- assert.match(client,/function startTour\(\)/);
- assert.match(client,/setData\(initialDemo\(\)\);setCart\(\[\]\);setTab\("appointments"\)/);
- assert.match(client,/setTime\("18:00"\)/);
- assert.match(client,/setTourBookingId\(next\.appointments\[next\.appointments\.length-1\]\.id\)/);
- assert.match(client,/tourBookingId===id&&status==="completed"/);
- assert.match(client,/setCart\(current=>addDemoCartLine\(current,created\.serviceId\)\)/);
- assert.match(client,/setTab\("pos"\);setTourStep\(2\)/);
- assert.match(client,/const next=saveDemoDraft\(data,cart\)/);
- assert.match(client,/if\(tourActive&&tourStep===2\)\{setTourStep\(3\)/);
- assert.match(client,/setTourActive\(false\);setTourStep\(0\);setTourBookingId\(null\)/);
- assert.match(client,/مفيش حساب أو عميل حقيقي أو دفع أو فاتورة/);
- assert.doesNotMatch(client,/fetch\s*\(|localStorage|sessionStorage|document\.cookie|\/api\/|POSTED/);
+ assert.doesNotMatch(client,/GUIDED TOUR|sd-tour|startTour|tourActive|ابدأ الجولة/);
+ assert.match(client,/function fromAppointment\(a:DemoAppointment\)/);
+ assert.match(client,/setTab\("pos"\)/);
+ assert.match(client,/SalonPosWorkspace/);
+ assert.match(client,/نسخة تجريبية تفاعلية/);
+ assert.doesNotMatch(client,/fetch\s*\(|localStorage|sessionStorage|document\.cookie|\/api\//);
  let state=d.initialDemo();
- const before=state;
  state=d.bookDemoAppointment(state,{customerId:'guest',staffId:'mostafa',serviceId:'cut',time:'18:00'});
  const id=state.appointments.at(-1).id;
- assert.equal(before.appointments.length,5);
  state=d.updateDemoAppointment(state,id,'completed');
  const cart=d.addDemoCartLine([],state.appointments.find(a=>a.id===id).serviceId);
  state=d.saveDemoDraft(state,cart);
  assert.equal(state.drafts[0].status,'DRAFT');
- assert.equal(state.drafts[0].subtotalMinor,18000);
+ assert.equal(state.drafts[0].totalMinor,18000);
+ assert.equal(state.drafts[0].discountMinor,0);
  assert.equal(d.initialDemo().drafts.length,0);
 });
 
+test('Cashier-inspired synthetic products, stock and quantity +/- behave safely',()=>{
+ assert.equal(d.DEMO_PRODUCTS.length,3);
+ assert.equal(d.demoPosItem('shampoo').name,'شامبو عناية');
+ assert.equal(d.demoPosItem('cut').name,'قص شعر رجالي');
+ let cart=d.addDemoCartLine([], 'wax');
+ cart=d.changeDemoCartQuantity(cart,'wax',1);
+ assert.equal(cart[0].quantity,2);
+ cart=d.changeDemoCartQuantity(cart,'wax',-1);
+ assert.equal(cart[0].quantity,1);
+ cart=d.changeDemoCartQuantity(cart,'wax',-1);
+ assert.deepEqual(cart,[]);
+ let full=[];
+ for(let i=0;i<8;i++)full=d.addDemoCartLine(full,'wax');
+ assert.throws(()=>d.addDemoCartLine(full,'wax'),/الكمية/);
+ assert.throws(()=>d.demoSubtotal([{serviceId:'wax',quantity:9}]),/المخزون/);
+ assert.throws(()=>d.demoPosItem('not-real'));
+});
+
+test('POS discount math is safe minor money and saved records remain nonposting DRAFT',()=>{
+ const cart=[{serviceId:'cut',quantity:2},{serviceId:'wax',quantity:1}];
+ assert.equal(d.demoSubtotal(cart),50000);
+ assert.deepEqual(d.demoDraftTotals(cart,{mode:'fixed',value:1250}),{
+  subtotalMinor:50000,discountMinor:1250,totalMinor:48750,
+ });
+ assert.deepEqual(d.demoDraftTotals(cart,{mode:'percent',value:10}),{
+  subtotalMinor:50000,discountMinor:5000,totalMinor:45000,
+ });
+ for(const invalid of [
+  {mode:'percent',value:101},{mode:'fixed',value:50001},
+  {mode:'percent',value:12.5},{mode:'none',value:1},
+ ])
+  assert.throws(()=>d.demoDraftTotals(cart,invalid));
+ assert.deepEqual(d.demoSplitPreview(45000,20000),{
+  cashMinor:20000,electronicMinor:25000,state:'NOT_COLLECTED',
+ });
+ assert.throws(()=>d.demoSplitPreview(45000,46000));
+ assert.throws(()=>d.demoSplitPreview(45000,10.1));
+ const old=d.initialDemo();
+ const next=d.saveDemoDraft(old,cart,{
+  discount:{mode:'percent',value:10},customerId:'ali',staffId:'mostafa',note:'note',
+ });
+ assert.equal(next.drafts[0].totalMinor,45000);
+ assert.equal(next.drafts[0].discountMinor,5000);
+ assert.equal(next.drafts[0].customerId,'ali');
+ assert.equal(next.drafts[0].note,'note');
+ assert.equal(next.drafts[0].status,'DRAFT');
+ assert.equal(old.drafts.length,0);
+ assert.throws(()=>d.saveDemoDraft(old,cart,{customerId:'unknown'}));
+ assert.throws(()=>d.saveDemoDraft(old,cart,{note:'x'.repeat(241)}));
+});
+
+test('operator POS shows real functioning synthetic controls and no real API or payment',()=>{
+ const client=fs.readFileSync(path.join(root,'demo/salon/salon-pos-workspace.tsx'),'utf8');
+ const page=fs.readFileSync(path.join(root,'demo/salon/page.tsx'),'utf8');
+ for(const f of [
+  'DEMO_PRODUCTS','DEMO_STAFF','DEMO_CUSTOMERS','demoDraftTotals',
+  'changeDemoCartQuantity','demoSplitPreview','discountMode','cashText',
+  'saveDraft','setSearch','NOT COLLECTED','aria-pressed','F9',
+ ])
+  assert.ok(client.includes(f),'Missing POS control '+f);
+ assert.match(client,/نقدي \+ إلكتروني/);
+ assert.match(page,/import "\.\/salon-pos-workspace\.css"/);
+ assert.doesNotMatch(client,/fetch\s*\(|localStorage|sessionStorage|document\.cookie|\/api\//);
+});
 test('S9 synthetic half-hour intervals reject overlapping durations, allow adjacent and canceled slots',()=>{
  const seed=d.initialDemo();
  assert.equal(d.DEMO_TIMES.length,18);

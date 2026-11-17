@@ -12,9 +12,9 @@ type Stored={draftId:string;currency:string;customerId:string|null;
   netMinor:number;executorEmployeeId:string|null}>};
 const money=(n:number,c:string)=>(n/100).toFixed(2)+" "+c;
 
-export default function CashierRichDraftActions({base,draftApi,lines,header,
+export default function CashierRichDraftActions({apiRoot,draftApi,lines,header,
  quoteTotalMinor,currency,afterSaved}:{
- base:string;draftApi:string;lines:Line[];
+ apiRoot:string;draftApi:string;lines:Line[];
  header:{headerDiscountMinor?:number;headerDiscountPercentBps?:number};
  quoteTotalMinor:number;currency:string;afterSaved:()=>void;
 }){
@@ -28,12 +28,12 @@ export default function CashierRichDraftActions({base,draftApi,lines,header,
  const [message,setMessage]=useState("");
  const [error,setError]=useState(false);
  const retry=useRef<string|null>(null);
- const api="/api/workspaces"+base.replace("/workspace","");
+ const api=apiRoot;
  const load=useCallback(async()=>{
   try{
    const [c,h,d]=await Promise.all([
-    fetch(api+"/branches/__BRANCH__/customers".replace("/branches/__BRANCH__",""),{cache:"no-store",credentials:"same-origin"}),
-    fetch(api+"/branches/__BRANCH__/hr/employees".replace("/branches/__BRANCH__",""),{cache:"no-store",credentials:"same-origin"}),
+    fetch(api+"/customers",{cache:"no-store",credentials:"same-origin"}),
+    fetch(api+"/hr/employees",{cache:"no-store",credentials:"same-origin"}),
     fetch(draftApi+"/cashier",{cache:"no-store",credentials:"same-origin"}),
    ]);
    if(!c.ok||!h.ok||!d.ok){setState("denied");return;}

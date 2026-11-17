@@ -27,5 +27,6 @@ test('No synthetic fixture, postable invoice, payment or login bypass introduced
  assert.doesNotMatch(panel,/DEMO_|localStorage|sessionStorage|IndexedDB|\/sales\/create|\/payment\/charge|\/api\/ledger/);
  assert.match(panel,/POS Draft V2|الخصومات دي مش محفوظة لسه|تقدر تحفظ الخصومات في SQL/);
  const client=read('pos-preview-client.tsx');
- assert.match(client,/key=\{JSON\.stringify\(lines\)\}/);
+ assert.match(client,/key=\{JSON\.stringify\(lines\)\+"-"\+cartRevision\}/);
+ assert.match(client,/setCartRevision\(v=>v\+1\)/);
 });

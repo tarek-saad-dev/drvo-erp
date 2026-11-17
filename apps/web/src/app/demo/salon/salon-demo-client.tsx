@@ -77,7 +77,7 @@ export default function SalonDemoClient(){
   setCustomerId("guest");setStaffId("mostafa");setServiceId("cut");setTime("16:00");
  }
 
- return <main className="sd-root" dir="rtl" data-drvo-ui="light-v1">
+ return <main className="sd-root" dir="rtl" data-drvo-ui="light-v1" data-demo-revision="salon-compact-pos-v1-1">
   <aside className="sd-sidebar" aria-label="قائمة لوحة تحكم الديمو">
    <div className="sd-brand"><span className="sd-brand-icon">D</span><div>DRVO <b>ERP</b><small>SALON WORKSPACE</small></div></div>
    <div className="sd-workspace"><span className="sd-workspace-icon">✦</span><div><strong>Studio One</strong><small>صالون تجريبي · فرع المعاينة</small></div><span className="sd-chevron">⌄</span></div>

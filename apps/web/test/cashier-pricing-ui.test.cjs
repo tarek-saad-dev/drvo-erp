@@ -25,7 +25,7 @@ test('Cashier line+header discount and gross/net calculation are a visible opera
 test('No synthetic fixture, postable invoice, payment or login bypass introduced',()=>{
  const panel=read('cashier-pricing-panel.tsx');
  assert.doesNotMatch(panel,/DEMO_|localStorage|sessionStorage|IndexedDB|\/sales\/create|\/payment\/charge|\/api\/ledger/);
- assert.match(panel,/لا يحفظ الخصومات ولا ينشئ فاتورة أو دفع/);
+ assert.match(panel,/POS Draft V2|الخصومات دي مش محفوظة لسه|تقدر تحفظ الخصومات في SQL/);
  const client=read('pos-preview-client.tsx');
  assert.match(client,/key=\{JSON\.stringify\(lines\)\}/);
 });

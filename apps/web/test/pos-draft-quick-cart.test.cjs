@@ -8,7 +8,8 @@ test('quick POS selections are nonposting and do not write draft without explici
  assert.match(source,/function quickAdd\(offering:Offering\)/);
  assert.match(source,/setLines\(current=>\[\.\.\.current,/);
  assert.match(source,/retryKey\.current=null;setPreview\(null\)/);
- assert.match(source,/function createNewFromDraft\(d:SavedDraft\)/);
+ assert.match(source,/function createNewFromDraft\(d:\{lines:Array<\{offeringId:string;quantity:number\}>\}\)/);
+ assert.match(source,/!Number\.isSafeInteger\(x\.quantity\)/);
  assert.match(source,/d\.lines\.some\(x=>!GUID\.test/);
  assert.match(source,/offerings\.some\(o=>o\.offeringId===x\.offeringId&&o\.isActive\)/);
  assert.match(source,/new Set\(d\.lines\.map\(x=>x\.offeringId\)\)\.size!==d\.lines\.length/);

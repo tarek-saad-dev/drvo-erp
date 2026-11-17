@@ -1,5 +1,8 @@
 # Roadmap
 
+> **2026-11-17 verified source CI:** Exact application/workflow SHA [`01f74a585f6eaad3d00ebf2f7794963212d1dea4`](https://github.com/tarek-saad-dev/drvo-erp/commit/01f74a585f6eaad3d00ebf2f7794963212d1dea4), [Cashier POS Rich SQL2022/Nest/Next run #44177702424](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44177702424) **PASS**: 11/11 disposable SQL2022/Nest HTTP integration groups (full SQL001–023), 110/110 API unit tests, **15/15 private Web source tests** (4 POS Draft V2, 4 new Customer history, 3 Cashier pricing, 4 quick-cart), Next.js build and typecheck. [K5C private default-deny run #44177589913](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44177589913) **PASS** on earlier `b0dcc2d` app code; later workflow-only changes do not affect the private UI behavior. **This is NOT evidence of primary DRVO database migration, independently verified release.sha, authorized private browser access or user-visible live S3.**
+
+
 > **2026-11-17 CASHIER POS S3 SOURCE — SCOPED DRAFT HISTORY:** [S3](CASHIER-POS-CUSTOMER-DRAFT-HISTORY-S3-2026-11-17.md) adds an always-available-within-private-V2-flag customer-filtered history of the latest 50 immutable POS V2 SQL DRAFTs, employee detail and safe new-cart reuse with fresh Catalog checks. No posted customer purchase history, SQL apply, checkout, Barber eligibility or live private browser verified. **NEXT:** after verified primary DB+backup/restore and Owner browser acceptance, separately implement Salon Barber eligibility and Booking/packages handoff; payment/GL remains ADR-031 gated.
 
 

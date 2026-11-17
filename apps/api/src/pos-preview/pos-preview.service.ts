@@ -3,6 +3,7 @@ import {
 } from "@nestjs/common";
 import type { Actor } from "../identity/identity.service";
 import { CatalogService, type CatalogOffering } from "../catalog/catalog.service";
+import { computeCashierInvoiceQuote, type CashierLinePricingInput } from "./cashier-invoice-pricing";
 
 type DraftLine = { offeringId: string; quantity: number };
 type PreviewLine = { offeringId: string; kind: "SERVICE" | "PRODUCT";
@@ -119,6 +120,82 @@ export function computeAdjustmentPreview(
   };
 }
 
+/**
+ * POS core pricing preview: ACTUAL Cashier per-line discounts + header
+ * discount precedence, not a salon demonstration, and never a sale POST.
+ * Catalog prices are always loaded from the signed-in actor's authorized
+ * Business/Branch SQL path; no browser-supplied prices or employee/tenant IDs.
+ */
+export function computeCashierQuotePreview(
+ offerings:readonly CatalogOffering[],body:unknown,
+){
+ if(!body||typeof body!=="object"||Array.isArray(body))
+  throw new BadRequestException("Invalid Cashier invoice quote");
+ const b=body as Record<string,unknown>;
+ const allowed=["lines","headerDiscountMinor","headerDiscountPercentBps"];
+ if(Object.keys(b).some(k=>!allowed.includes(k))||
+    !Object.prototype.hasOwnProperty.call(b,"lines"))
+  throw new BadRequestException("Unknown invoice fields");
+ if(!Array.isArray(b.lines)||b.lines.length<1||b.lines.length>20)
+  throw new BadRequestException("Invalid invoice lines");
+ const seen=new Set<string>();let currency:string|undefined;
+ const lines:Array<CashierLinePricingInput&{
+  offeringId:string;kind:"SERVICE"|"PRODUCT";displayName:string;
+ }>= [];
+ for(const raw of b.lines){
+  if(!raw||typeof raw!=="object"||Array.isArray(raw))
+   throw new BadRequestException("Invalid line");
+  const r=raw as Record<string,unknown>;
+  const accepted=["offeringId","quantity","lineDiscountMinor","lineDiscountPercentBps"];
+  if(Object.keys(r).some(k=>!accepted.includes(k))||
+     !Object.prototype.hasOwnProperty.call(r,"offeringId")||
+     !Object.prototype.hasOwnProperty.call(r,"quantity")||
+     typeof r.offeringId!=="string"||!GUID.test(r.offeringId)||
+     seen.has(r.offeringId.toLowerCase()))
+   throw new BadRequestException("Invalid line fields or duplicate");
+  seen.add(r.offeringId.toLowerCase());
+  const fresh=offerings.find(x=>x.offeringId.toLowerCase()===r.offeringId.toLowerCase());
+  if(!fresh||!fresh.isActive)throw new NotFoundException();
+  if(!TWO_DECIMAL.has(fresh.currency)||!Number.isSafeInteger(fresh.priceMinor)||
+     fresh.priceMinor<0||fresh.priceMinor>9_000_000_000_000)
+   throw new BadRequestException("Invalid authorized Catalog pricing");
+  if(currency!==undefined&&fresh.currency!==currency)
+   throw new BadRequestException("Mixed currency pricing not supported");
+  currency=fresh.currency;
+  lines.push({
+   offeringId:fresh.offeringId,kind:fresh.kind,displayName:fresh.displayName,
+   unitPriceMinor:fresh.priceMinor,quantity:r.quantity as number,
+   ...(r.lineDiscountMinor===undefined?{}:{lineDiscountMinor:r.lineDiscountMinor as number}),
+   ...(r.lineDiscountPercentBps===undefined?{}:{lineDiscountPercentBps:r.lineDiscountPercentBps as number}),
+  });
+ }
+ try{
+  const quote=computeCashierInvoiceQuote(lines,{
+   ...(b.headerDiscountMinor===undefined?{}:{headerDiscountMinor:b.headerDiscountMinor as number}),
+   ...(b.headerDiscountPercentBps===undefined?{}:{
+    headerDiscountPercentBps:b.headerDiscountPercentBps as number}),
+  });
+  return {
+   state:"CASHIER_INVOICE_PRICE_QUOTE_ONLY" as const,
+   sourceRule:"CASHIER_LINE_AND_HEADER_DISCOUNT" as const,
+   priceSource:"FRESH_AUTHORIZED_CATALOG" as const,
+   persisted:false as const,taxComputed:false as const,
+   accountingState:"NOT_POSTED" as const,paymentState:"NOT_COLLECTED" as const,
+   inventoryState:"NOT_DECREMENTED" as const,currency:currency!,
+   ...quote,
+   lines:quote.lines.map((x,i)=>({
+    ...x,offeringId:lines[i]!.offeringId,kind:lines[i]!.kind,
+    displayName:lines[i]!.displayName,unitPriceMinor:lines[i]!.unitPriceMinor,
+    quantity:lines[i]!.quantity,
+   })),
+  };
+ }catch(e){
+  if(e instanceof TypeError||e instanceof RangeError)
+   throw new BadRequestException("Invalid Cashier pricing inputs");
+  throw e;
+ }
+}
+
 @Injectable()
 export class PosPreviewService {
   constructor(private readonly catalog: CatalogService) {}
@@ -137,6 +214,14 @@ export class PosPreviewService {
     const catalog = await this.catalog.list(actor, token, businessId, branchId);
     return computeListPricePreview(catalog.offerings, body);
   }
+  async cashierQuote(actor: Actor, token: string,
+   businessId: string, branchId: string, body: unknown) {
+   enabled();
+   // Real SQL identity, K5 and Catalog permission evaluated at every request.
+   const catalog=await this.catalog.list(actor,token,businessId,branchId);
+   return computeCashierQuotePreview(catalog.offerings,body);
+  }
+
   async adjustments(actor: Actor, token: string, businessId: string, branchId: string, body: unknown) {
     enabled();
     // Pricing is derived ONLY from a freshly authorized scoped Catalog read.

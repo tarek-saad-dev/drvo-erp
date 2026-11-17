@@ -125,11 +125,6 @@
 .sd-draft-row strong { color:#116a70; }
 .sd-demo-footer { color:#77707b; }
 .sd-demo-footer button { border-color:#d7cbd6; background:#fff; color:#553e53; }
-.sd-tour { background:linear-gradient(115deg,#f3eaf1,#edf7f6); border-color:#e4d8e4; }
-.sd-tour-title h2 { color:#553e53; }
-.sd-tour-title p { color:#655a66; }
-.sd-tour-progress span { background:#fff; border-color:#e0d3df; color:#553e53; }
-.sd-tour-progress strong { color:#116a70; }
 @media(max-width:900px) {
  .sd-sidebar { border-bottom:1px solid #e6e1e8; border-left:0; }
  .sd-nav { padding-bottom:5px; }

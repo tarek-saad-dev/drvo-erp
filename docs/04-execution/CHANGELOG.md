@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-17 — Founder UX: remove tour, compact Salon and audit/expand POS
+
+- Removed synthetic Guided Tour UI, tour state and obsolete CSS; retained visible synthetic/in-memory disclaimer. Tightened Light sidebar, header, cards and spacing without `zoom` CSS; responsive breakpoints remain. Added `apps/web/src/app/demo/salon/salon-pos-workspace.{tsx,css}` and wired page import/operator tab.
+- Cashier `src/app/income/pos/page.tsx`, `PosInvoicePanel`, `QuickActionsBar`, `ServiceCatalog` **actually reviewed**; [capability coverage and limits](CASHIER-POS-UX-DENSITY-AND-FUNCTION-PARITY-REVIEW-2026-11-17.md). Extended synthetic `demo-model.ts` with product fixture + safe stock max, qty +/-, minor-unit fixed/% header discount, NOT_COLLECTED cash/card preview, notes and local-only DRAFT history. No real payments/API/SQL/Inventory DML.
+- Updated `apps/web/test/salon-demo.test.cjs` with explicit no-tour, products, discount, split, state reset and privacy tests; replaced stale `drvo-light-ui.test.cjs` assumption that authorized Expenses/Treasury links do not exist with actual K5 permission checks. [Intermediate interactive demo CI PASS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44133707437); final CSS/source HEAD and external staging revision verification separate.
+
+
+
 ## 2026-11-15 — Cashier Treasury T1 / Operations Shift guard / dev-primary preflight
 
 - [Treasury T1 source](CASHIER-TREASURY-T1-COUNT-AND-PRIMARY-PREFLIGHT-2026-11-15.md): SQL021 scoped `TreasuryCashCountDraft` with idempotent create/cancel, physical count money minor, UTC audit; K5 `treasury.count.read/manage`, SQL runtime EXECUTE-only. Nest Treasury controller/service, private Light count UI and authorized workspace tile added with flags OFF by default. **No actual balance, CashMove, payment, reconciliation, BusinessDay/Shift close, GL or cross-owner write.**

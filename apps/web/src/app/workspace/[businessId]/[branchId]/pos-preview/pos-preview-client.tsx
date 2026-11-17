@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import CashierPricingPanel from "./cashier-pricing-panel";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -222,7 +223,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
       <span className="k5-eyebrow">POS / REVIEW-ONLY</span>
       <h1>مسودة بيع — معاينة الأسعار</h1>
       <p className="k5-muted">دي معاينة من كتالوج النشاط، مش فاتورة أو أمر دفع أو حجز مخزون.
-        العناصر الحالية مؤقتة في المتصفح؛ والحفظ (لو مسموح) بيعمل DRAFT فقط، مش فاتورة أو عملية دفع. الضرائب والخصومات لسه مش محسوبين.</p>
+        العناصر الحالية مؤقتة في المتصفح، والحفظ (لو مسموح) بيعمل DRAFT بس. فيه معاينة منفصلة لخصومات Cashier الأصلية على أسعار الكتالوج الحقيقية، لكن الخصومات دي مش محفوظة لسه ولا بتعمل دفع أو فاتورة أو ضريبة.</p>
     </div></div>
     {status==="loading"&&<p role="status">جاري التحقق من صلاحيات الفرع…</p>}
     {status==="denied"&&<p role="alert" className="k5-error">المعاينة غير متاحة لحسابك أو للفرع.</p>}
@@ -316,6 +317,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
             </tr>)}</tbody>
           </table></div>}
       </section>}
+      {lines.length>0&&<CashierPricingPanel key={JSON.stringify(lines)} api={api} lines={lines} offerings={offerings}/>}
       {adjustment&&<section className="k5-admin-card">
         <h2>خصم وإكرامية محتملة — معاينة فقط</h2>
         <p>إجمالي القائمة: <strong>{money(adjustment.listPriceSubtotalMinor,adjustment.currency)}</strong></p>

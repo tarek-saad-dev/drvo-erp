@@ -8,7 +8,7 @@ test('private server flags gate rich POS UI separately from legacy draft',()=>{
  assert.match(page,/DRVO_POS_RICH_WEB_ENABLED==="YES"/);
  assert.match(page,/DRVO_K5_WEB_ENABLED/);
  assert.match(client,/richEnabled=\{draftsEnabled&&richEnabled\}/);
- assert.match(client,/afterSaved=\{\(\)=>void loadDrafts\(\)\}/);
+ assert.match(client,/afterSaved=\{\(\)=>\{void loadDrafts\(\);setRichHistoryRevision\(v=>v\+1\);\}\}/);
 });
 test('only actual K5 authorized Customer and HR rosters, never synthetic fixtures',()=>{
  const rich=read('cashier-rich-draft-actions.tsx');

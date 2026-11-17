@@ -128,9 +128,9 @@ async function main(){
   admin=await connect({...base,database:db});
   await admin.query('CREATE USER ['+principal+'] FOR LOGIN ['+principal+'];'+
    'GRANT CONNECT TO ['+principal+']');
-  await pass('all SQL001–022 migrations apply once and safely replay',async()=>{
-   const a=await applyMigrations(admin,undefined,22);
-   assert.equal(a.length,22);assert.ok(a.every(m=>m.status==='applied'));
+  await pass('all SQL001–023 migrations apply once and safely replay',async()=>{
+   const a=await applyMigrations(admin,undefined,23);
+   assert.equal(a.length,23);assert.ok(a.every(m=>m.status==='applied'));
    const replay=await applyMigrations(admin,undefined,22);
    assert.ok(replay.every(m=>m.status==='unchanged'));
    assert.equal((await admin.query('SELECT COUNT(*) AS n FROM core.PosDraftPriceSnapshot')).recordset[0].n,0);

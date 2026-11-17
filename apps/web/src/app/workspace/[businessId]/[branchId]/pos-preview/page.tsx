@@ -14,5 +14,6 @@ export default async function PosPreviewPage({ params,searchParams }: {
   const requestedOfferingId=typeof query.offeringId==="string"?query.offeringId:null;
   return <PosPreviewClient businessId={businessId} branchId={branchId}
     draftsEnabled={process.env.DRVO_POS_DRAFTS_WEB_ENABLED==="YES"}
+    richEnabled={process.env.DRVO_POS_RICH_WEB_ENABLED==="YES"}
     initialOfferingId={requestedOfferingId}/>;
 }

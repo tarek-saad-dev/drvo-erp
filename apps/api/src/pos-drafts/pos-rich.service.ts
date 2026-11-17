@@ -17,8 +17,8 @@ const TOKEN=/^[A-Za-z0-9_-]{43}$/;
 const MAX=9_000_000_000_000;
 const uuid=(v:unknown):v is string=>typeof v==="string"&&GUID.test(v);
 type InputLine={
- offeringId:string;quantity:number;lineDiscountMinor?:number;
- lineDiscountPercentBps?:number;executorEmployeeId?:string|null;
+ offeringId:string;quantity:number;lineDiscountMinor?:number|null;
+ lineDiscountPercentBps?:number|null;executorEmployeeId?:string|null;
 };
 type RichInput={lines:InputLine[];customerId:string|null;
  headerDiscountMinor:number|null;headerDiscountPercentBps:number|null;

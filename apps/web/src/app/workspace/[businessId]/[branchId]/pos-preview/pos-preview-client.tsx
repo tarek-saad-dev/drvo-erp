@@ -27,8 +27,8 @@ function readMoneyMinor(value:string):number|null {
   const minor=Number(major)*100+Number(decimal.padEnd(2,"0"));
   return Number.isSafeInteger(minor)&&minor<=9_000_000_000_000?minor:null;
 }
-export default function PosPreviewClient({businessId,branchId,draftsEnabled,initialOfferingId}:{
-  businessId:string;branchId:string;draftsEnabled:boolean;initialOfferingId:string|null;
+export default function PosPreviewClient({businessId,branchId,draftsEnabled,richEnabled,initialOfferingId}:{
+  businessId:string;branchId:string;draftsEnabled:boolean;richEnabled:boolean;initialOfferingId:string|null;
 }) {
   const router=useRouter();
   const [status,setStatus]=useState<"loading"|"ready"|"denied"|"error">("loading");
@@ -317,7 +317,9 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,init
             </tr>)}</tbody>
           </table></div>}
       </section>}
-      {lines.length>0&&<CashierPricingPanel key={JSON.stringify(lines)} api={api} lines={lines} offerings={offerings}/>}
+      {lines.length>0&&<CashierPricingPanel key={JSON.stringify(lines)} api={api} draftApi={draftApi}
+  richEnabled={draftsEnabled&&richEnabled} afterSaved={()=>void loadDrafts()}
+  lines={lines} offerings={offerings}/>}
       {adjustment&&<section className="k5-admin-card">
         <h2>خصم وإكرامية محتملة — معاينة فقط</h2>
         <p>إجمالي القائمة: <strong>{money(adjustment.listPriceSubtotalMinor,adjustment.currency)}</strong></p>

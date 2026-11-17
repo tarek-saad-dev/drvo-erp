@@ -151,7 +151,7 @@ export function computeCashierQuotePreview(
      !Object.prototype.hasOwnProperty.call(r,"offeringId")||
      !Object.prototype.hasOwnProperty.call(r,"quantity")||
      typeof r.offeringId!=="string"||!GUID.test(r.offeringId)||
-     seen.has(r.offeringId.toLowerCase()))
+     seen.has(String(r.offeringId).toLowerCase()))
    throw new BadRequestException("Invalid line fields or duplicate");
   seen.add(r.offeringId.toLowerCase());
   const fresh=offerings.find(x=>x.offeringId.toLowerCase()===r.offeringId.toLowerCase());

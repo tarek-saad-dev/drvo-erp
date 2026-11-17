@@ -2,7 +2,7 @@
 
 ## 2026-11-17 — Cashier POS S2: genuine discounted, customer/executor-assigned immutable POS DRAFT
 
-- [S2 read/write contract](CASHIER-POS-RICH-DRAFT-S2-2026-11-17.md): SQL022 additive price/line snapshots extending SQL014 POS Draft V1; single SERIALIZABLE K5 authorizations (POS, Catalog, Customers, HR) and fresh authoritative Catalog money, integer-minor Cashier percent/amount discounts, stale quote 409, Branch-owned Customer/Employee references, immutable idempotent create and read. No payments, GL, invoice status or stock writes.
+- [S2 read/write contract](CASHIER-POS-RICH-DRAFT-S2-2026-11-17.md): SQL022 additive price/line snapshots + SQL023 separate scoped read-EXECUTE grant after metadata commit extending SQL014 POS Draft V1; single SERIALIZABLE K5 authorizations (POS, Catalog, Customers, HR) and fresh authoritative Catalog money, integer-minor Cashier percent/amount discounts, stale quote 409, Branch-owned Customer/Employee references, immutable idempotent create and read. No payments, GL, invoice status or stock writes.
 - Nest `pos-rich.controller.ts/service.ts`, separate feature switch default OFF. Private Light POS customer/employee selector and saved priced draft reader behind server flags, preserving V1. `apps/api/test/pos-rich-draft.test.cjs`, `apps/web/test/pos-rich-draft.test.cjs`, disposable full SQL022 `tools/pos-rich/verify.cjs`, [two-job workflow](https://github.com/tarek-saad-dev/drvo-erp/actions/workflows/pos-rich-ci.yml) added. **Real SQL and K5 browser LIVE status separate from source; do not mark CI PASS until matching run.**
 
 

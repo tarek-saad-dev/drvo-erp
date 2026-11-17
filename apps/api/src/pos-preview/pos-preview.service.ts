@@ -153,8 +153,9 @@ export function computeCashierQuotePreview(
      typeof r.offeringId!=="string"||!GUID.test(r.offeringId)||
      seen.has(String(r.offeringId).toLowerCase()))
    throw new BadRequestException("Invalid line fields or duplicate");
-  seen.add(r.offeringId.toLowerCase());
-  const fresh=offerings.find(x=>x.offeringId.toLowerCase()===r.offeringId.toLowerCase());
+  const id=r.offeringId as string; // validated UUID before scoped Catalog lookup.
+  seen.add(id.toLowerCase());
+  const fresh=offerings.find(x=>x.offeringId.toLowerCase()===id.toLowerCase());
   if(!fresh||!fresh.isActive)throw new NotFoundException();
   if(!TWO_DECIMAL.has(fresh.currency)||!Number.isSafeInteger(fresh.priceMinor)||
      fresh.priceMinor<0||fresh.priceMinor>9_000_000_000_000)

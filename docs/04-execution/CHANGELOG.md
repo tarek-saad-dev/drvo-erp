@@ -1,5 +1,13 @@
 # Project changelog
 
+## 2026-11-17 — Cashier full-function preservation source reset, real POS math port
+
+- Founder requires transporting the mature complete Cashier experience, not simplified lookalike demo. [Preservation-first program](CASHIER-PRESERVATION-FIRST-MIGRATION-2026-11-17.md) updated ADR-040 and roadmap, with latest Cashier `bc9c03fff` source pinned. New [all source Git blobs](../../tools/cashier-reuse/cashier-all-source-blobs-2026-11-17.json) (4,291 files incl SQL/CI/docs), [runtime manifest](../../tools/cashier-reuse/cashier-source-baseline-2026-11-17.json) (2,168 TS/TSX /496 API /128 pages), K0 integrity/source-coverage checks. Auto owner suggestions remain UNVERIFIED, not fictitious completed features.
+- Verbatim real Cashier `src/lib/sales/service-line-totals.ts` Git blob pinned in `tests/fixtures/cashier/service-line-totals-2026-11-17.ts`; adapted into strict minor-unit POS `apps/api/src/pos-preview/cashier-invoice-pricing.ts`. Original source is executed in golden differential tests; parity bug for zero-net header discount was found and fixed.
+- Added protected Nest `POST .../pos-preview/cashier-invoice-quote` using *current scoped Catalog and K5 origin/session*; private `cashier-pricing-panel.tsx` for line/header discount amount/percent preview. Extra API/Web tests + K5C; **no real sale, tax, discount persistence, payment, cash movement, stock decrement or SQL migration**. [K1 Nest runtime CI PASS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44138680258), [K0 baseline integrity CI PASS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44138680284), [K5C private web gate CI PASS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44138300431). Private K5 activated browser/primary DB proof remains missing.
+
+
+
 ## 2026-11-17 — Founder UX: remove tour, compact Salon and audit/expand POS
 
 - Removed synthetic Guided Tour UI, tour state and obsolete CSS; retained visible synthetic/in-memory disclaimer. Tightened Light sidebar, header, cards and spacing without `zoom` CSS; responsive breakpoints remain. Added `apps/web/src/app/demo/salon/salon-pos-workspace.{tsx,css}` and wired page import/operator tab.

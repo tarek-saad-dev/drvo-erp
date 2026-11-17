@@ -28,6 +28,8 @@ import { PosPreviewController } from "./pos-preview/pos-preview.controller";
 import { PosPreviewService } from "./pos-preview/pos-preview.service";
 import { PosDraftsController } from "./pos-drafts/pos-drafts.controller";
 import { PosDraftsService } from "./pos-drafts/pos-drafts.service";
+import { PosRichController } from "./pos-drafts/pos-rich.controller";
+import { PosRichService } from "./pos-drafts/pos-rich.service";
 import { HrController } from "./hr/hr.controller";
 import { HrService } from "./hr/hr.service";
 import { AttendanceController } from "./hr/attendance.controller";
@@ -42,8 +44,8 @@ import { TreasuryService } from "./treasury/treasury.service";
 @Module({
   controllers: [HealthController, DatabaseHealthController, K3ScopeProofController,
     IdentityController, AuthorizedBranchController, BranchAccessController,
-    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, ReleaseCatalogController, ActivationPreviewController, CatalogController, CustomersController, BookingController, PosPreviewController, PosDraftsController, HrController, AttendanceController, ReportsController, ExpensesController, TreasuryController],
+    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, ReleaseCatalogController, ActivationPreviewController, CatalogController, CustomersController, BookingController, PosPreviewController, PosDraftsController, PosRichController, HrController, AttendanceController, ReportsController, ExpensesController, TreasuryController],
   providers: [FoundationDatabaseService, K3ScopeProofRepository, IdentityService, BranchAccessService,
-    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, ReleaseCatalogService, ActivationPreviewService, CatalogService, CustomersService, BookingService, PosPreviewService, PosDraftsService, HrService, AttendanceService, ReportsService, ExpensesService, TreasuryService],
+    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, ReleaseCatalogService, ActivationPreviewService, CatalogService, CustomersService, BookingService, PosPreviewService, PosDraftsService, PosRichService, HrService, AttendanceService, ReportsService, ExpensesService, TreasuryService],
 })
 export class AppModule {}

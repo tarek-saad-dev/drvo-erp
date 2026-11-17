@@ -45,7 +45,7 @@ export default function CashierPricingPanel({api,lines,offerings}:{
  const [error,setError]=useState("");
  function updateLine(id:string,patch:Partial<Discount>){
   setDiscounts(current=>({...current,[id]:{
-   ...current[id]??{mode:"amount",text:"0"},...patch,
+   ...(current[id]??{mode:"amount",text:"0"}),...patch,
   }}));
   setQuote(null);setError("");
  }

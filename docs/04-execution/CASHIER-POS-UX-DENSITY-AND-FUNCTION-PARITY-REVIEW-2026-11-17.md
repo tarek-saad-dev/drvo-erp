@@ -2,7 +2,7 @@
 
 **Date:** 2026-11-17  
 **Owner request:** screenshot of DRVO Salon Demo: remove `GUIDED TOUR · SYNTHETIC DATA` block, increase viewport information density (elements visually overscaled) and review what Cashier's real POS does that DRVO lacks.  
-**Status:** coded on `main`; [first source CI at `6345bdb1a`](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44133707437) PASS for synthetic demo tests, Next build and private K5 route default-404; exact final stylesheet revision CI and public deployed-SHA/browser acceptance remain separate. **No real financial operation activated or primary SQL migrated.**
+**Status:** coded on `main`; [final source SHA `5703db68e` CI PASS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44134433270): 12/12 Salon demo tests, 4/4 Light/brand tests, 7/7 private Salon tests, Next production build/typecheck, public 200 and private K5 404. [Staging code deployment at UI SHA `542d1d4d6` SUCCESS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44134344251) and [independent external HTTPS feature marker/no-tour smoke PASS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44134584953). Final `5703db68e` stage artifact may be newer than independently checked UI code; this does not attest authenticated operator/SQL or exact VPS release.sha. **No real financial operation activated or primary SQL migrated.**
 
 ## Pinned, actually inspected Cashier source
 
@@ -44,7 +44,7 @@ Baseline `tarek-saad-dev/casher@a51101791c52bca90e45bd40ead3a46c08d78adb`:
 
 ## Proof and acceptance
 
-- [Source CI](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44133707437) PASS on intermediate source `6345bdb1a`: synthetic model + no API/storage invariants, private K5 route protections and Next Web production build. Final CSS tidy-up SHA requires distinct CI check.
+- [Latest source Web CI](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44134433270) PASS on `5703db68e`: 12 Salon demo, 4 Light brand, 7 private Salon tests, Next Build/Typecheck; external public marker check [PASS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44134584953) following [successful deploy of UI code SHA `542d1d4d6`](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44134344251). Final deploy SHA and manual browser/mobile layout still separately unverified.
 - Public target (verify exact newest deploy): [DRVO Salon Demo](https://erp-stage.drvotech.com/demo/salon). Check at desktop viewport 1696×863: no tour, dashboard summary and two panel headers visible without unnecessary scrolling; POS search/filter, +/- stock guards, discount, split, F9 and draft history operate. Confirm touch/mobile at <=950 and <=620 px. No hidden click affordances for unavailable real features.
 - **Actual DB/production UI:** None of these demo changes test protected POS persistence, SQL schema, K5 flags or customer/pilot acceptance. Do not label paid/posted or complete Cashier POS.
 

@@ -1,5 +1,6 @@
 "use client";
 import {useState} from "react";
+import CashierRichDraftActions from "./cashier-rich-draft-actions";
 
 /**
  * Real K5 private POS quote. Reuses authenticated Fresh Catalog prices in Nest.
@@ -35,19 +36,26 @@ function basisPoints(text:string):number|null{
  const bps=Number(percent)*100+Number(fraction.padEnd(2,"0"));
  return Number.isSafeInteger(bps)&&bps<=10000?bps:null;
 }
-export default function CashierPricingPanel({api,lines,offerings}:{
- api:string;lines:Line[];offerings:Offering[];
+type QuoteInput={
+ lines:Array<{offeringId:string;quantity:number;lineDiscountMinor?:number;
+  lineDiscountPercentBps?:number}>;
+ headerDiscountMinor?:number;headerDiscountPercentBps?:number;
+};
+export default function CashierPricingPanel({api,draftApi,richEnabled,afterSaved,lines,offerings}:{
+ api:string;draftApi:string;richEnabled:boolean;afterSaved:()=>void;
+ lines:Line[];offerings:Offering[];
 }){
  const [discounts,setDiscounts]=useState<Record<string,Discount>>({});
  const [header,setHeader]=useState<Discount>({mode:"percent",text:"0"});
  const [quote,setQuote]=useState<Quote|null>(null);
+ const [approvedInput,setApprovedInput]=useState<QuoteInput|null>(null);
  const [busy,setBusy]=useState(false);
  const [error,setError]=useState("");
  function updateLine(id:string,patch:Partial<Discount>){
   setDiscounts(current=>({...current,[id]:{
    ...(current[id]??{mode:"amount",text:"0"}),...patch,
   }}));
-  setQuote(null);setError("");
+  setQuote(null);setApprovedInput(null);setError("");
  }
  async function calculate(){
   if(busy||lines.length===0)return;
@@ -69,7 +77,7 @@ export default function CashierPricingPanel({api,lines,offerings}:{
   if(val===null){setError("خصم الفاتورة غير صالح.");return;}
   const body={lines:payload,...(header.mode==="percent"?
    {headerDiscountPercentBps:val}:{headerDiscountMinor:val})};
-  setBusy(true);setQuote(null);setError("");
+  setBusy(true);setQuote(null);setApprovedInput(null);setError("");
   try{
    const response=await fetch(api+"/cashier-invoice-quote",{
     method:"POST",credentials:"same-origin",cache:"no-store",
@@ -86,7 +94,7 @@ export default function CashierPricingPanel({api,lines,offerings}:{
     result.taxComputed!==false||!Array.isArray(result.lines)){
     setError("استجابة المعاينة غير صالحة.");return;
    }
-   setQuote(result);
+   setQuote(result);setApprovedInput(body as QuoteInput);
   }catch{setError("الاتصال بالحساب الآمن غير متاح.");}
   finally{setBusy(false);}
  }
@@ -118,11 +126,11 @@ export default function CashierPricingPanel({api,lines,offerings}:{
    <div className="catalog-form">
     <label>خصم الفاتورة بعد خصومات السطور
      <select value={header.mode} onChange={e=>{
-      setHeader({mode:e.target.value as Mode,text:"0"});setQuote(null);
+      setHeader({mode:e.target.value as Mode,text:"0"});setQuote(null);setApprovedInput(null);
      }}><option value="percent">نسبة %</option><option value="amount">قيمة ثابتة</option></select></label>
     <label>القيمة
      <input type="text" inputMode="decimal" maxLength={14} value={header.text}
-      onChange={e=>{setHeader({...header,text:e.target.value});setQuote(null);setError("");}}/></label>
+      onChange={e=>{setHeader({...header,text:e.target.value});setQuote(null);setApprovedInput(null);setError("");}}/></label>
     <button type="button" className="k5-save" disabled={busy}
      onClick={()=>void calculate()}>{busy?"جاري الحساب…":"احسب وفق Cashier"}</button>
    </div>
@@ -134,7 +142,20 @@ export default function CashierPricingPanel({api,lines,offerings}:{
     <p>خصم الفاتورة: <b>{money(quote.headerDiscountMinor,quote.currency)}</b></p>
     <p><strong>الإجمالي: {money(quote.grandTotalMinor,quote.currency)}</strong></p>
    </div>}
+   {richEnabled&&quote&&approvedInput&&
+    <CashierRichDraftActions
+     apiRoot={api.replace(/\/pos-preview$/,"")}
+     draftApi={draftApi} lines={approvedInput.lines}
+     header={{
+      ...(approvedInput.headerDiscountMinor!==undefined?
+       {headerDiscountMinor:approvedInput.headerDiscountMinor}:{}),
+      ...(approvedInput.headerDiscountPercentBps!==undefined?
+       {headerDiscountPercentBps:approvedInput.headerDiscountPercentBps}:{}),
+     }}
+     quoteTotalMinor={quote.grandTotalMinor} currency={quote.currency}
+     afterSaved={afterSaved}/>
+   }
   </>}
-  <p className="k5-muted">النتيجة للعرض والمراجعة فقط؛ حفظ المسودة الحالي لا يحفظ الخصومات ولا ينشئ فاتورة أو دفع أو حركة مخزون أو قيد.</p>
+  <p className="k5-muted">الـQuote نفسه غير مدفوع. عند تفعيل POS Draft V2 والصلاحيات، تقدر تحفظ الخصومات في SQL كمسودة فقط. الفواتير والتحصيل والمخزون وGL لسه مش مفعّلين.</p>
  </section>;
 }

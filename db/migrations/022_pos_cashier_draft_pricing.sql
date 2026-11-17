@@ -258,6 +258,7 @@ END');
 IF USER_ID(N'drvo_erp_stage_app') IS NOT NULL BEGIN
  DENY SELECT,INSERT,UPDATE,DELETE ON OBJECT::core.PosDraftPriceSnapshot TO [drvo_erp_stage_app];
  DENY SELECT,INSERT,UPDATE,DELETE ON OBJECT::core.PosDraftLinePriceSnapshot TO [drvo_erp_stage_app];
- GRANT EXECUTE ON OBJECT::core.CreateBranchPosCashierDraft TO [drvo_erp_stage_app];
- GRANT EXECUTE ON OBJECT::core.ReadBranchPosCashierDrafts TO [drvo_erp_stage_app];
+ -- Dynamic GRANT resolves procedures after same-batch EXEC(N'CREATE PROCEDURE').
+ EXEC(N'GRANT EXECUTE ON OBJECT::core.CreateBranchPosCashierDraft TO [drvo_erp_stage_app]');
+ EXEC(N'GRANT EXECUTE ON OBJECT::core.ReadBranchPosCashierDrafts TO [drvo_erp_stage_app]');
 END

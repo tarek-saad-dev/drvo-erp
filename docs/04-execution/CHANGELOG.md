@@ -1,5 +1,7 @@
 # Project changelog
 
+- 2026-11-17 — POS S3: added private, customer-filterable, SQL V2 DRAFT-only history with executor/discount details and safe new-cart reuse; source/tests/docs only, no paid sale/SQL schema/deployment claim. [Details](CASHIER-POS-CUSTOMER-DRAFT-HISTORY-S3-2026-11-17.md).
+
 ## 2026-11-17 — Cashier POS S2: genuine discounted, customer/executor-assigned immutable POS DRAFT
 
 - [S2 read/write contract](CASHIER-POS-RICH-DRAFT-S2-2026-11-17.md): SQL022 additive price/line snapshots + SQL023 separate scoped read-EXECUTE grant after metadata commit extending SQL014 POS Draft V1; single SERIALIZABLE K5 authorizations (POS, Catalog, Customers, HR) and fresh authoritative Catalog money, integer-minor Cashier percent/amount discounts, stale quote 409, Branch-owned Customer/Employee references, immutable idempotent create and read. No payments, GL, invoice status or stock writes.

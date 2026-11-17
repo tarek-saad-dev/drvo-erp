@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import CashierPricingPanel from "./cashier-pricing-panel";
+import CashierDraftHistory from "./cashier-draft-history";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -46,6 +47,8 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
   const [draftStatus,setDraftStatus]=useState<"loading"|"ready"|"denied">("loading");
   const [savedDrafts,setSavedDrafts]=useState<SavedDraft[]>([]);
   const [draftBusy,setDraftBusy]=useState(false);
+  const [richHistoryRevision,setRichHistoryRevision]=useState(0);
+  const [cartRevision,setCartRevision]=useState(0);
   const retryKey=useRef<string|null>(null);
   const handoffApplied=useRef(false);
   const matchingOfferings=offerings.filter(o=>o.isActive&&
@@ -141,17 +144,18 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
       return next>=1&&next<=20?{...l,quantity:next}:l;
     }));
   }
-  function createNewFromDraft(d:SavedDraft){
+  function createNewFromDraft(d:{lines:Array<{offeringId:string;quantity:number}>}){
     if(busy||draftBusy)return;
     // A saved DRAFT is IMMUTABLE. Preparing a new cart always uses currently
     // authorized active Catalog references and requires fresh server pricing.
     if(!d.lines.length||d.lines.length>20||
-      d.lines.some(x=>!GUID.test(x.offeringId)||x.quantity<1||x.quantity>20||
+      d.lines.some(x=>!GUID.test(x.offeringId)||!Number.isSafeInteger(x.quantity)||x.quantity<1||x.quantity>20||
         !offerings.some(o=>o.offeringId===x.offeringId&&o.isActive))||
       new Set(d.lines.map(x=>x.offeringId)).size!==d.lines.length){
       setMessage("فيه عناصر قديمة أو غير متاحة. لازم تعمل مسودة جديدة من الكتالوج.");return;
     }
     retryKey.current=null;setPreview(null);setAdjustment(null);
+    setCartRevision(v=>v+1);
     setLines(d.lines.map(x=>({offeringId:x.offeringId,quantity:x.quantity})));
     setMessage("تم تجهيز سلة جديدة من المسودة القديمة. راجع الأسعار الحالية قبل الحفظ؛ المسودة الأصلية لم تتغير.");
   }
@@ -317,8 +321,12 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
             </tr>)}</tbody>
           </table></div>}
       </section>}
-      {lines.length>0&&<CashierPricingPanel key={JSON.stringify(lines)} api={api} draftApi={draftApi}
-  richEnabled={draftsEnabled&&richEnabled} afterSaved={()=>void loadDrafts()}
+      {draftsEnabled&&richEnabled&&<CashierDraftHistory
+        apiRoot={api.replace(/\/pos-preview$/,"")} draftApi={draftApi}
+        revision={richHistoryRevision} disabled={busy||draftBusy}
+        onUseDraft={savedLines=>createNewFromDraft({lines:savedLines})}/>}
+      {lines.length>0&&<CashierPricingPanel key={JSON.stringify(lines)+"-"+cartRevision} api={api} draftApi={draftApi}
+  richEnabled={draftsEnabled&&richEnabled} afterSaved={()=>{void loadDrafts();setRichHistoryRevision(v=>v+1);}}
   lines={lines} offerings={offerings}/>}
       {adjustment&&<section className="k5-admin-card">
         <h2>خصم وإكرامية محتملة — معاينة فقط</h2>

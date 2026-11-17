@@ -46,3 +46,7 @@ Per founder-approved preservation-first directive, **retain SQL014 POS DRAFT V1*
 5. Systematically close the full functional inventory, then open real customer launch gates separately.
 
 **Revisit triggers:** Founder changes goal/scope, Cashier source substantially diverges, or individual module domain boundaries/finance posting policy require a concrete new decision.
+
+## 2026-11-17 S3 limited draft-history implementation note
+
+[S3 scope and acceptance](../04-execution/CASHIER-POS-CUSTOMER-DRAFT-HISTORY-S3-2026-11-17.md) adds private K5-authorized recent Branch Cashier V2 **DRAFT-only** client-filtered history and safe new-cart reuse. POS remains the history source, Customers/HR continue to own their identity records, and new carts revalidate the active Catalog rather than copying old prices/discounts. This is **not customer paid purchase history, full Salon Barber eligibility or full Cashier parity**. No new ADR decision, live flags, SQL schema or financial POSTED behavior is authorized.

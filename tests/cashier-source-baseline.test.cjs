@@ -51,3 +51,33 @@ test('source inventory is not a fictional DRVO parity/prod deployment badge',()=
  assert.ok(!Object.prototype.hasOwnProperty.call(manifest,'fullyMigrated'));
  assert.ok(!Object.prototype.hasOwnProperty.call(manifest,'live'));
 });
+
+test('whole Cashier repository is pinned, including SQL, tests, docs and platform apps',()=>{
+ const all=require('../tools/cashier-reuse/cashier-all-source-blobs-2026-11-17.json');
+ assert.equal(all.sourceRevision,REV);
+ assert.equal(all.files,4291);
+ assert.equal(all.sourceComplete,true);
+ assert.equal(all.blobs.length,all.files);
+ const blobs=new Map();
+ for(const [path,sha,size] of all.blobs){
+  assert.ok(typeof path==='string'&&path.length>0);
+  assert.ok(/^[0-9a-f]{40}$/.test(sha));
+  assert.ok(size===null||(Number.isSafeInteger(size)&&size>=0));
+  assert.equal(blobs.has(path),false,'Duplicate original Cashier file '+path);
+  blobs.set(path,sha);
+ }
+ for(const file of manifest.files){
+  assert.equal(blobs.get(file.path),file.blob,
+   'Runtime inventory must preserve original repo Git blob for '+file.path);
+ }
+ for(const mandatory of [
+  'src/apps/pos/application/createSale.ts',
+  'src/apps/booking/application/convertBooking.ts',
+  'src/apps/treasury/internal/postMovement.ts',
+  'src/app/income/pos/page.tsx',
+  'db/migrations/add-drvo-007-treasury-movement-registry.sql',
+  'db/migrations/add-daily-payroll-dual-cashmove.sql',
+  'db/migrations/create-booking-slot-claims.sql',
+ ])
+  assert.ok(blobs.has(mandatory),'Missing authoritative supporting source '+mandatory);
+});

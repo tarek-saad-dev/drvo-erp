@@ -32,12 +32,12 @@ CREATE TABLE core.PosDraftPriceSnapshot(
 CREATE TABLE core.PosDraftLinePriceSnapshot(
  TenantId UNIQUEIDENTIFIER NOT NULL,BusinessId UNIQUEIDENTIFIER NOT NULL,
  BranchId UNIQUEIDENTIFIER NOT NULL,DraftId UNIQUEIDENTIFIER NOT NULL,
- LineNo INT NOT NULL,ExecutorEmployeeId UNIQUEIDENTIFIER NULL,
+ [LineNo] INT NOT NULL,ExecutorEmployeeId UNIQUEIDENTIFIER NULL,
  DiscountInputMinor BIGINT NULL,DiscountInputBps INT NULL,
  DiscountMinor BIGINT NOT NULL,NetMinor BIGINT NOT NULL,
- CONSTRAINT PK_PosDraftLinePrice PRIMARY KEY(TenantId,BusinessId,BranchId,DraftId,LineNo),
- CONSTRAINT FK_PosDraftLinePrice_Line FOREIGN KEY(TenantId,BusinessId,BranchId,DraftId,LineNo)
- REFERENCES core.PosDraftLine(TenantId,BusinessId,BranchId,DraftId,LineNo),
+ CONSTRAINT PK_PosDraftLinePrice PRIMARY KEY(TenantId,BusinessId,BranchId,DraftId,[LineNo]),
+ CONSTRAINT FK_PosDraftLinePrice_Line FOREIGN KEY(TenantId,BusinessId,BranchId,DraftId,[LineNo])
+ REFERENCES core.PosDraftLine(TenantId,BusinessId,BranchId,DraftId,[LineNo]),
  CONSTRAINT FK_PosDraftLinePrice_Executor FOREIGN KEY(TenantId,BusinessId,BranchId,ExecutorEmployeeId)
  REFERENCES core.HrEmployeeBranch(TenantId,BusinessId,BranchId,EmployeeId),
  CONSTRAINT CK_PosDraftLinePrice_Amounts CHECK(
@@ -97,10 +97,10 @@ AS BEGIN
     AND IsActive=1)
    THROW 51424,''Unknown or inactive customer'',1;
   DECLARE @Parsed TABLE(
-   LineNo INT PRIMARY KEY,OfferingId UNIQUEIDENTIFIER NULL,Quantity INT NULL,
+   [LineNo] INT PRIMARY KEY,OfferingId UNIQUEIDENTIFIER NULL,Quantity INT NULL,
    DiscountInputMinor BIGINT NULL,DiscountInputBps INT NULL,ExecutorEmployeeId UNIQUEIDENTIFIER NULL
   );
-  INSERT @Parsed(LineNo,OfferingId,Quantity,DiscountInputMinor,DiscountInputBps,ExecutorEmployeeId)
+  INSERT @Parsed([LineNo],OfferingId,Quantity,DiscountInputMinor,DiscountInputBps,ExecutorEmployeeId)
    SELECT TRY_CONVERT(INT,j.[key])+1,
     TRY_CONVERT(UNIQUEIDENTIFIER,JSON_VALUE(j.value,''$.offeringId'')),
     TRY_CONVERT(INT,JSON_VALUE(j.value,''$.quantity'')),
@@ -125,16 +125,16 @@ AS BEGIN
     AND (eb.EmployeeId IS NULL OR eb.IsActive<>1 OR e.IsActive<>1))
    THROW 51424,''Unknown or inactive branch executor'',1;
   DECLARE @Priced TABLE(
-   LineNo INT PRIMARY KEY,OfferingId UNIQUEIDENTIFIER NOT NULL,
+   [LineNo] INT PRIMARY KEY,OfferingId UNIQUEIDENTIFIER NOT NULL,
    Kind VARCHAR(7) NOT NULL,DisplayName NVARCHAR(160) NOT NULL,
    Currency CHAR(3) NOT NULL,Quantity INT NOT NULL,UnitPriceMinor BIGINT NOT NULL,
    Gross DECIMAL(38,0) NOT NULL,Discount DECIMAL(38,0) NOT NULL,
    Net DECIMAL(38,0) NOT NULL,DiscountInputMinor BIGINT NULL,
    DiscountInputBps INT NULL,ExecutorEmployeeId UNIQUEIDENTIFIER NULL
   );
-  INSERT @Priced(LineNo,OfferingId,Kind,DisplayName,Currency,Quantity,
+  INSERT @Priced([LineNo],OfferingId,Kind,DisplayName,Currency,Quantity,
     UnitPriceMinor,Gross,Discount,Net,DiscountInputMinor,DiscountInputBps,ExecutorEmployeeId)
-   SELECT p.LineNo,o.OfferingId,o.Kind,o.DisplayName,o.Currency,p.Quantity,o.PriceMinor,
+   SELECT p.[LineNo],o.OfferingId,o.Kind,o.DisplayName,o.Currency,p.Quantity,o.PriceMinor,
     g.Gross,
     CASE WHEN raw.Discount>g.Gross THEN g.Gross ELSE raw.Discount END,
     g.Gross-CASE WHEN raw.Discount>g.Gross THEN g.Gross ELSE raw.Discount END,
@@ -180,9 +180,9 @@ AS BEGIN
    PayloadHash,CreatedByAccountId,Currency,SubtotalMinor)
    VALUES(@TenantId,@BusinessId,@BranchId,@NewId,@ClientRequestId,
     @PayloadHash,@AccountId,@Currency,CONVERT(BIGINT,@Subtotal));
-  INSERT core.PosDraftLine(TenantId,BusinessId,BranchId,DraftId,LineNo,
+  INSERT core.PosDraftLine(TenantId,BusinessId,BranchId,DraftId,[LineNo],
     OfferingId,Kind,OfferingNameSnapshot,Quantity,UnitPriceMinor,LineSubtotalMinor)
-   SELECT @TenantId,@BusinessId,@BranchId,@NewId,LineNo,
+   SELECT @TenantId,@BusinessId,@BranchId,@NewId,[LineNo],
     OfferingId,Kind,DisplayName,Quantity,UnitPriceMinor,CONVERT(BIGINT,Gross) FROM @Priced;
   INSERT core.PosDraftPriceSnapshot(TenantId,BusinessId,BranchId,DraftId,CustomerId,
     HeaderDiscountInputMinor,HeaderDiscountInputBps,HeaderDiscountMinor,
@@ -191,9 +191,9 @@ AS BEGIN
     @HeaderDiscountMinor,@HeaderDiscountBps,
     CONVERT(BIGINT,@Header),CONVERT(BIGINT,@Net),
     CONVERT(BIGINT,@LinesDiscount+@Header),CONVERT(BIGINT,@Grand));
-  INSERT core.PosDraftLinePriceSnapshot(TenantId,BusinessId,BranchId,DraftId,LineNo,
+  INSERT core.PosDraftLinePriceSnapshot(TenantId,BusinessId,BranchId,DraftId,[LineNo],
     ExecutorEmployeeId,DiscountInputMinor,DiscountInputBps,DiscountMinor,NetMinor)
-   SELECT @TenantId,@BusinessId,@BranchId,@NewId,LineNo,
+   SELECT @TenantId,@BusinessId,@BranchId,@NewId,[LineNo],
     ExecutorEmployeeId,DiscountInputMinor,DiscountInputBps,
     CONVERT(BIGINT,Discount),CONVERT(BIGINT,Net) FROM @Priced;
   SELECT CONVERT(VARCHAR(36),@NewId) AS id,CAST(1 AS BIT) AS created,
@@ -236,7 +236,7 @@ AS BEGIN
  JOIN @Page pg ON pg.DraftId=d.DraftId
  WHERE d.TenantId=@TenantId AND d.BusinessId=@BusinessId AND d.BranchId=@BranchId
  ORDER BY d.CreatedAtUtc DESC,d.DraftId;
- SELECT CONVERT(VARCHAR(36),l.DraftId) AS draftId,l.LineNo AS lineNo,
+ SELECT CONVERT(VARCHAR(36),l.DraftId) AS draftId,l.[LineNo] AS lineNo,
   CONVERT(VARCHAR(36),l.OfferingId) AS offeringId,l.OfferingNameSnapshot AS displayName,
   l.Kind AS kind,l.Quantity AS quantity,l.UnitPriceMinor AS unitPriceMinor,
   l.LineSubtotalMinor AS grossMinor,
@@ -244,10 +244,10 @@ AS BEGIN
   p.DiscountMinor AS discountMinor,p.NetMinor AS netMinor
  FROM core.PosDraftLine l JOIN core.PosDraftLinePriceSnapshot p
   ON p.TenantId=l.TenantId AND p.BusinessId=l.BusinessId AND p.BranchId=l.BranchId
-   AND p.DraftId=l.DraftId AND p.LineNo=l.LineNo
+   AND p.DraftId=l.DraftId AND p.[LineNo]=l.[LineNo]
  JOIN @Page pg ON pg.DraftId=l.DraftId
  WHERE l.TenantId=@TenantId AND l.BusinessId=@BusinessId AND l.BranchId=@BranchId
- ORDER BY l.DraftId,l.LineNo;
+ ORDER BY l.DraftId,l.[LineNo];
  COMMIT TRANSACTION;SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
  END TRY BEGIN CATCH
   IF @@TRANCOUNT>0 ROLLBACK TRANSACTION;

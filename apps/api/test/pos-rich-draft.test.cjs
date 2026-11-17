@@ -98,7 +98,7 @@ test('rich read returns separate immutable snapshots instead of paid invoices',a
    [{draftId:ID(10),lineNo:1,offeringId:ID(3),displayName:'Haircut',kind:'SERVICE',
     quantity:2,unitPriceMinor:'10000',grossMinor:'20000',executorEmployeeId:ID(4),
     discountMinor:'2000',netMinor:'18000'}],
-  ]})}}}};
+  ]})}}};
   const svc=new PosRichService({getInternalPool(){return pool}});
   const r=await svc.list(actor,token,ID(7),ID(8));
   assert.equal(r.state,'CASHIER_PRICE_SNAPSHOT_DRAFTS_ONLY');

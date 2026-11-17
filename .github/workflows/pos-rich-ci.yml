@@ -8,7 +8,7 @@ on:
       - 'apps/api/src/app.module.ts'
       - 'apps/api/test/pos-rich-draft.test.cjs'
       - 'apps/web/src/app/workspace/**'
-      - 'apps/web/test/pos-rich-draft.test.cjs'
+      - 'apps/web/test/pos-rich-*.test.cjs'
       - 'tools/pos-rich/**'
       - '.github/workflows/pos-rich-ci.yml'
   pull_request:
@@ -18,7 +18,7 @@ on:
       - 'apps/api/src/app.module.ts'
       - 'apps/api/test/pos-rich-draft.test.cjs'
       - 'apps/web/src/app/workspace/**'
-      - 'apps/web/test/pos-rich-draft.test.cjs'
+      - 'apps/web/test/pos-rich-*.test.cjs'
       - 'tools/pos-rich/**'
       - '.github/workflows/pos-rich-ci.yml'
 permissions:
@@ -74,6 +74,7 @@ jobs:
           set -euo pipefail
           npm ci --prefix apps/web --no-audit --no-fund
           node --test apps/web/test/pos-rich-draft.test.cjs
+          node --test apps/web/test/pos-rich-customer-draft-history.test.cjs
           node --test apps/web/test/cashier-pricing-ui.test.cjs
           env -u DRVO_K5_WEB_ENABLED -u DRVO_POS_RICH_WEB_ENABLED npm run build --prefix apps/web
           npm run typecheck --prefix apps/web

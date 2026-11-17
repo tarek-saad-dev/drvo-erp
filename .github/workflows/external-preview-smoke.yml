@@ -39,11 +39,19 @@ jobs:
             echo "FAIL: latest Light V1 HTML marker is not visible on the public site"
             exit 1
           }
+          grep -Fq 'data-demo-revision="salon-compact-pos-v1-1"' "$dir/salon.html" || {
+            echo "FAIL: compact Salon/POS revision not served by public site"
+            exit 1
+          }
+          if grep -Fq 'GUIDED TOUR' "$dir/salon.html"; then
+            echo "FAIL: removed Guided Tour is still present in public HTML"
+            exit 1
+          fi
           curl --fail --silent --show-error --location --connect-timeout 10 --max-time 30 "$base/brand/drvo-mark.svg" -o "$dir/drvo-mark.svg"
           grep -Fq 'DRVO ERP official symbol' "$dir/drvo-mark.svg" || {
             echo "FAIL: the official DRVO corporate symbol is not deployed"
             exit 1
           }
-          echo "PASS: external HTTPS health, public Light V1 Salon marker and approved symbol are visible"
+          echo "PASS: HTTPS health, compact POS V1.1 marker, no Guided Tour in HTML and approved symbol"
           echo "This is a UI build marker, NOT independent VPS release.sha attestation."
           echo "This does NOT attest release SHA, private HR/Booking/POS/Reports, SQL migrations, permissions, or production/customer readiness."

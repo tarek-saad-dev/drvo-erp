@@ -48,6 +48,13 @@ Baseline `tarek-saad-dev/casher@a51101791c52bca90e45bd40ead3a46c08d78adb`:
 - Public target (verify exact newest deploy): [DRVO Salon Demo](https://erp-stage.drvotech.com/demo/salon). Check at desktop viewport 1696×863: no tour, dashboard summary and two panel headers visible without unnecessary scrolling; POS search/filter, +/- stock guards, discount, split, F9 and draft history operate. Confirm touch/mobile at <=950 and <=620 px. No hidden click affordances for unavailable real features.
 - **Actual DB/production UI:** None of these demo changes test protected POS persistence, SQL schema, K5 flags or customer/pilot acceptance. Do not label paid/posted or complete Cashier POS.
 
+## Final source + stage deployment verification
+
+- [Exact final UI code SHA `5703db68ef80b741ef6de50077c8921e0ca5cac2`: interactive demo CI PASS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44134433270), including 12/12 salon model tests, 4/4 Light brand tests, 7/7 private Salon tests, Next production Build/typecheck, public route 200 and K5 paths 404.
+- [Exact final code SHA `5703db68e`: Staging Deploy SUCCESS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44134432880), followed by [independent HTTPS public compact POS V1.1 + no tour smoke PASS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44134792358). Live HTML carries `data-demo-revision="salon-compact-pos-v1-1"` and does **not** include Guided Tour. This proves the public synthetic UI build is served, **not** private operator UI acceptance, screenshots at screen sizes, SQL migrations, or financial functionality.
+- Source-only later documentation commits on `main` do not modify the deployed UI artifact; the deployed code SHA is the verified `5703db68e` source revision, while documentation `main` HEAD may be newer.
+- Founder manual visual sign-off remains OPEN; user should test desktop/mobile layout, click paths, draft quantities and discount/split preview before calling **UX fully accepted**.
+
 ## Next implementation priority for real DRVO POS
 
 1. Integrate **real Catalog products and Barber attribution** into protected POS DRAFT UI/API with K5 scope and trusted price snapshot. Implement item discount and exact totals as nonposting document fields; test with SQL2022+browser rather than copying synthetic fixtures.

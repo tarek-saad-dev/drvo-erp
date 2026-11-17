@@ -1,12 +1,13 @@
 "use client";
 
 import {useMemo,useState} from "react";
+import SalonPosWorkspace from "./salon-pos-workspace";
 import Link from "next/link";
 import {
  DEMO_CUSTOMERS,DEMO_SERVICES,DEMO_STAFF,DEMO_TIMES,
  addDemoCartLine,bookDemoAppointment,demoAvailableTimes,demoCustomer,demoMoney,demoService,demoStaff,
  demoSubtotal,initialDemo,removeDemoCartLine,saveDemoDraft,updateDemoAppointment,
- type DemoAppointment,type DemoCartLine,type DemoSection,
+ type DemoAppointment,type DemoCartLine,type DemoSection,type DemoDraftOptions,
 } from "./demo-model";
 
 const tabs:{id:DemoSection;label:string;icon:string}[]=[
@@ -28,77 +29,52 @@ export default function SalonDemoClient(){
  const [time,setTime]=useState("16:00");
  const [notice,setNotice]=useState("");
  const [noticeError,setNoticeError]=useState(false);
- const [tourActive,setTourActive]=useState(false);
- const [tourStep,setTourStep]=useState<0|1|2|3>(0);
- const [tourBookingId,setTourBookingId]=useState<number|null>(null);
 
  const confirmed=data.appointments.filter(x=>x.status==="confirmed").length;
  const completed=data.appointments.filter(x=>x.status==="completed").length;
  const booked=data.appointments.filter(x=>x.status!=="cancelled").length;
  const bookedValue=data.appointments.filter(x=>x.status==="completed")
   .reduce((sum,a)=>sum+demoService(a.serviceId).priceMinor,0);
- const total=useMemo(()=>cart.length?demoSubtotal(cart):0,[cart]);
  const availableTimes=useMemo(()=>demoAvailableTimes(data,staffId,serviceId),[data,staffId,serviceId]);
  const appointments=useMemo(()=>[...data.appointments].sort((a,b)=>
   a.time.localeCompare(b.time)||a.id-b.id),[data.appointments]);
 
  function message(text:string,error=false){setNotice(text);setNoticeError(error)}
  function switchTab(next:DemoSection){setTab(next);setNotice("")}
- function startTour(){
-  // Restart solely local synthetic demo, never real Customer/Booking/POS.
-  setData(initialDemo());setCart([]);setTab("appointments");
-  setCustomerId("guest");setStaffId("mostafa");setServiceId("cut");setTime("18:00");
-  setTourBookingId(null);setTourStep(0);setTourActive(true);
-  message("بدأت جولة تجريبية: أكد الحجز المقترح، ثم أكمِل الموعد واحفظ المسودة.");
- }
  function book(e:React.FormEvent<HTMLFormElement>){
   e.preventDefault();
   try{
    const next=bookDemoAppointment(data,{customerId,staffId,serviceId,time});
    setData(next);
-   if(tourActive&&tourStep===0){
-    setTourBookingId(next.appointments[next.appointments.length-1].id);
-    setTourStep(1);
-    message("الخطوة الثانية: اضغط مكتمل على الحجز الجديد علشان نجهز مسودة الخدمة.");
-   }else message("تم إضافة الموعد في السيناريو التجريبي ✓");
+   message("تم إضافة الموعد داخل الديمو فقط ✓");
   }catch(error){message(error instanceof Error?error.message:"تعذر إضافة الموعد",true)}
  }
  function updateAppointment(id:number,status:"completed"|"cancelled"){
   try{
    const next=updateDemoAppointment(data,id,status);
    setData(next);
-   if(tourActive&&tourStep===1&&tourBookingId===id&&status==="completed"){
-    const created=next.appointments.find(a=>a.id===id);
-    if(created){
-     setCart(current=>addDemoCartLine(current,created.serviceId));
-     setTab("pos");setTourStep(2);
-     message("الخطوة الثالثة: الخدمة اتجهزت كمسودة غير مدفوعة. اضغط حفظ مسودة تجريبية.");
-    }
-   }else message(status==="completed"?"اتسجل الموعد مكتمل (تجريبي)":"اتلغى الموعد التجريبي");
+   message(status==="completed"?"الموعد اكتمل داخل الديمو؛ افتح نقطة البيع لإضافة الخدمة.":"اتلغى الموعد التجريبي");
   }catch(e){message(e instanceof Error?e.message:"تعذر التحديث",true)}
- }
- function addService(id:string){
-  try{setCart(current=>addDemoCartLine(current,id));
-   message("اتضافت الخدمة لمسودة البيع");}
-  catch(e){message(e instanceof Error?e.message:"تعذر الإضافة",true)}
  }
  function fromAppointment(a:DemoAppointment){
   try{setCart(current=>addDemoCartLine(current,a.serviceId));
    setTab("pos");message("أضفنا خدمة الموعد إلى مسودة البيع؛ لم يتم تحصيل أي مبلغ");}
   catch(e){message(e instanceof Error?e.message:"تعذر الإضافة",true)}
  }
- function saveDraft(){
+ function saveDraft(options:DemoDraftOptions={}):boolean{
   try{
-   const next=saveDemoDraft(data,cart);setData(next);setCart([]);
-   if(tourActive&&tourStep===2){setTourStep(3);
-    message("اكتملت الجولة التجريبية ✓ حجز ومتابعة ومسودة فقط، بدون عملية بيع أو تحصيل.");
-   }else message("المسودة اتحفظت في جلسة الديمو فقط، من غير فاتورة أو دفع ✓");}
-  catch(e){message(e instanceof Error?e.message:"تعذر حفظ المسودة",true)}
+   const next=saveDemoDraft(data,cart,{customerId,staffId,...options});
+   setData(next);setCart([]);
+   message("مسودة البيع اتحفظت داخل الصفحة فقط · بدون خصم مخزون أو دفع أو فاتورة ✓");
+   return true;
+  }catch(e){
+   message(e instanceof Error?e.message:"تعذر حفظ المسودة",true);
+   return false;
+  }
  }
- function resetDemo(){
+  function resetDemo(){
   setData(initialDemo());setCart([]);setTab("overview");setNotice("");
   setCustomerId("guest");setStaffId("mostafa");setServiceId("cut");setTime("16:00");
-  setTourActive(false);setTourStep(0);setTourBookingId(null);
  }
 
  return <main className="sd-root" dir="rtl" data-drvo-ui="light-v1">
@@ -127,22 +103,6 @@ export default function SalonDemoClient(){
 
    <div className="sd-content">
     <div className="sd-disclaimer"><span className="sd-disclaimer-icon">ⓘ</span><span><strong>نسخة تجريبية تفاعلية</strong> — كل الأسماء والأرقام وهمية. المواعيد والمسودات موجودة في الصفحة دي فقط، وهتتمسح مع التحديث. مفيش تسجيل دخول أو حجز فعلي أو تحصيل أو فواتير.</span></div>
-    <section className="sd-tour" aria-label="جولة تعريفية تجريبية">
-      <div className="sd-tour-title"><span className="sd-panel-eyebrow">GUIDED TOUR · SYNTHETIC DATA</span>
-        <h2>جرّب دورة عمل صالون كاملة في 3 خطوات</h2>
-        <p>احجز موعد → أكمِل الخدمة → احفظ مسودة. بيانات وهمية فقط؛
-          مفيش حساب أو عميل حقيقي أو دفع أو فاتورة.</p>
-      </div>
-      {tourActive&&<div className="sd-tour-progress" role="status">
-        <span>١. حجز {tourStep>=1?"✓":""}</span>
-        <span>٢. إتمام {tourStep>=2?"✓":""}</span>
-        <span>٣. مسودة {tourStep===3?"✓":""}</span>
-        <strong>{tourStep===3?"اكتملت الجولة التجريبية":tourStep===2?"احفظ المسودة":tourStep===1?"أكمِل الحجز":"أكد الموعد"}</strong>
-      </div>}
-      <button type="button" className="sd-primary" onClick={startTour}>
-        {tourActive?"↺ ابدأ الجولة من جديد":"ابدأ الجولة التفاعلية"}
-      </button>
-    </section>
     {notice&&<div role="status" className={"sd-toast"+(noticeError?" sd-toast-error":"")}><span>{noticeError?"!":"✓"}</span>{notice}<button type="button" onClick={()=>setNotice("")} aria-label="إغلاق الرسالة">×</button></div>}
 
     {tab==="overview"&&<>
@@ -203,27 +163,11 @@ export default function SalonDemoClient(){
      </div>
     </>}
 
-    {tab==="pos"&&<>
-     <div className="sd-heading-row"><div><div className="sd-kicker">POS / DRAFT MODE</div><h1>نقطة البيع <span>↗</span></h1><p>اختار خدمات من الكتالوج، احسب الإجمالي، واحفظ مسودة تجريبية</p></div><span className="sd-date">وضع المسودة فقط · بدون تحصيل</span></div>
-     <div className="sd-pos-layout">
-      <section className="sd-panel"><div className="sd-panel-header"><div><span className="sd-panel-eyebrow">SERVICE CATALOG</span><h2>كتالوج الخدمات</h2></div><span className="sd-number">{DEMO_SERVICES.length} خدمات</span></div>
-       <div className="sd-service-grid">{DEMO_SERVICES.map((s,i)=><button key={s.id} type="button" className="sd-service-card" onClick={()=>addService(s.id)}>
-        <span className={"sd-service-graphic sd-service-"+i}>{["✂","◈","✦","◉","⌁","❋"][i]}</span>
-        <small>{s.category} · {s.duration} دقيقة</small><strong>{s.name}</strong>
-        <span className="sd-service-bottom"><span>{demoMoney(s.priceMinor)}</span><span className="sd-service-add">＋</span></span>
-       </button>)}</div>
-      </section>
-      <aside className="sd-panel sd-checkout"><div className="sd-panel-header"><div><span className="sd-panel-eyebrow">DRAFT SUMMARY</span><h2>مسودة البيع</h2></div><span className="sd-number">{cart.reduce((n,x)=>n+x.quantity,0)} عناصر</span></div>
-       {cart.length===0?<div className="sd-empty"><span>◫</span><strong>المسودة فاضية</strong><p>اضغط على أي خدمة لإضافتها للمسودة</p></div>:
-        <div className="sd-cart-items">{cart.map(line=><div key={line.serviceId} className="sd-cart-row"><div><strong>{demoService(line.serviceId).name}</strong><small>الكمية: {line.quantity}</small></div><span>{demoMoney(demoService(line.serviceId).priceMinor*line.quantity)}</span><button type="button" aria-label={"إزالة "+demoService(line.serviceId).name} onClick={()=>{setCart(current=>removeDemoCartLine(current,line.serviceId));message("")}}>×</button></div>)}</div>}
-       <div className="sd-checkout-bottom"><div className="sd-subtotal"><span>إجمالي قائمة الأسعار</span><strong>{demoMoney(total)}</strong></div><p>لا يشمل ضرائب أو خصومات. ليس فاتورة أو مبلغًا مستحقًا.</p><button className="sd-primary sd-full" type="button" disabled={cart.length===0} onClick={saveDraft}>حفظ مسودة تجريبية <span>←</span></button></div>
-       <div className="sd-saved"><div className="sd-saved-title">المسودات المحفوظة داخل الصفحة <span>{data.drafts.length}</span></div>
-        {data.drafts.length===0?<p>لسه مفيش مسودات. جرّب تضيف خدمة وتحفظها.</p>:
-         data.drafts.map(d=><div key={d.id} className="sd-draft-row"><span>مسودة #{String(d.id).padStart(3,"0")} <small>غير مدفوعة</small></span><strong>{demoMoney(d.subtotalMinor)}</strong></div>)}
-       </div>
-      </aside>
-     </div>
-    </>}
+    {tab==="pos"&&<SalonPosWorkspace
+      cart={cart} setCart={setCart} data={data}
+      customerId={customerId} setCustomerId={setCustomerId}
+      staffId={staffId} setStaffId={setStaffId}
+      saveDraft={saveDraft} message={message}/>}
     <div className="sd-demo-footer"><span>DRVO ERP · Interactive Salon Demo · No real transactions</span><button type="button" onClick={resetDemo}>↺ إعادة ضبط الديمو</button></div>
    </div>
   </div>

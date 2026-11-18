@@ -41,9 +41,10 @@ type QuoteInput={
   lineDiscountPercentBps?:number}>;
  headerDiscountMinor?:number;headerDiscountPercentBps?:number;
 };
-export default function CashierPricingPanel({api,draftApi,richEnabled,afterSaved,lines,offerings}:{
+export default function CashierPricingPanel({api,draftApi,richEnabled,afterSaved,lines,offerings,customerId,onCustomerIdChange,customerRevision}:{
  api:string;draftApi:string;richEnabled:boolean;afterSaved:()=>void;
- lines:Line[];offerings:Offering[];
+ lines:Line[];offerings:Offering[];customerId:string;
+ onCustomerIdChange:(id:string)=>void;customerRevision:number;
 }){
  const [discounts,setDiscounts]=useState<Record<string,Discount>>({});
  const [header,setHeader]=useState<Discount>({mode:"percent",text:"0"});
@@ -153,7 +154,8 @@ export default function CashierPricingPanel({api,draftApi,richEnabled,afterSaved
        {headerDiscountPercentBps:approvedInput.headerDiscountPercentBps}:{}),
      }}
      quoteTotalMinor={quote.grandTotalMinor} currency={quote.currency}
-     afterSaved={afterSaved}/>
+     afterSaved={afterSaved} customerId={customerId} onCustomerIdChange={onCustomerIdChange}
+     customerRevision={customerRevision}/>
    }
   </>}
   <p className="k5-muted">الـQuote نفسه غير مدفوع. عند تفعيل POS Draft V2 والصلاحيات، تقدر تحفظ الخصومات في SQL كمسودة فقط. الفواتير والتحصيل والمخزون وGL لسه مش مفعّلين.</p>

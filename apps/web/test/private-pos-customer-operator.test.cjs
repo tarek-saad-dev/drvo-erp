@@ -1,0 +1,31 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict');
+const fs=require('node:fs'),path=require('node:path');
+const root=path.resolve(__dirname,'../src/app/workspace/[businessId]/[branchId]/pos-preview');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+test('authenticated private POS customer phone lookup and idempotent create is not synthetic',()=>{
+ const ui=read('pos-customer-operator.tsx'),parent=read('pos-preview-client.tsx'),page=read('page.tsx');
+ assert.match(parent,/draftsEnabled&&richEnabled&&<PosCustomerOperator/);
+ assert.match(page,/DRVO_K5_WEB_ENABLED/);
+ assert.match(ui,/findAuthorizedCustomers/);
+ assert.match(ui,/credentials:"same-origin"/);
+ assert.match(ui,/cache:"no-store"/);
+ assert.match(ui,/Idempotency-Key/);
+ assert.match(ui,/crypto\.randomUUID/);
+ assert.match(ui,/method:"POST"/);
+ assert.match(ui,/أول 200 عميل/);
+ assert.match(ui,/حفظ واختيار العميل/);
+ assert.doesNotMatch(ui,/DEMO_|localStorage|sessionStorage|\/demo\/salon|\/api\/sales/);
+});
+test('Cashier SQL V2 draft receives parent selected Customer with fresh scope',()=>{
+ const parent=read('pos-preview-client.tsx'),panel=read('cashier-pricing-panel.tsx');
+ const rich=read('cashier-rich-draft-actions.tsx');
+ assert.match(parent,/selectedCustomerId/);
+ assert.match(parent,/customerRevision/);
+ assert.match(panel,/customerId=\{customerId\}/);
+ assert.match(rich,/customerId:customerId\|\|null/);
+ assert.match(rich,/onCustomerIdChange\(e\.target\.value\);resetRetry\(\)/);
+ assert.match(rich,/customerId&&!customers\.some\(c=>c\.customerId===customerId\)/);
+ assert.match(rich,/accountingState!=="NOT_POSTED"/);
+ assert.match(rich,/paymentState!=="NOT_COLLECTED"/);
+});

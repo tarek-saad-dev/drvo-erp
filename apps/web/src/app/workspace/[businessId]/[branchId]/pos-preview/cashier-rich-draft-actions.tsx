@@ -13,14 +13,14 @@ type Stored={draftId:string;currency:string;customerId:string|null;
 const money=(n:number,c:string)=>(n/100).toFixed(2)+" "+c;
 
 export default function CashierRichDraftActions({apiRoot,draftApi,lines,header,
- quoteTotalMinor,currency,afterSaved}:{
+ quoteTotalMinor,currency,afterSaved,customerId,onCustomerIdChange,customerRevision}:{
  apiRoot:string;draftApi:string;lines:Line[];
  header:{headerDiscountMinor?:number;headerDiscountPercentBps?:number};
  quoteTotalMinor:number;currency:string;afterSaved:()=>void;
+ customerId:string;onCustomerIdChange:(id:string)=>void;customerRevision:number;
 }){
  const [customers,setCustomers]=useState<Customer[]>([]);
  const [employees,setEmployees]=useState<Employee[]>([]);
- const [customerId,setCustomerId]=useState("");
  const [executors,setExecutors]=useState<Record<string,string>>({});
  const [state,setState]=useState<"loading"|"ready"|"denied">("loading");
  const [saved,setSaved]=useState<Stored[]>([]);
@@ -48,11 +48,14 @@ export default function CashierRichDraftActions({apiRoot,draftApi,lines,header,
    setEmployees(hx.employees.filter(x=>x.isActive&&x.branchActive));
    setSaved(dx.drafts);setState("ready");
   }catch{setState("denied");}
- },[api,draftApi]);
+ },[api,draftApi,customerRevision]);
  useEffect(()=>{void load();},[load]);
  const resetRetry=()=>{retry.current=null;setMessage("");};
  async function save(){
   if(busy||state!=="ready")return;
+  if(customerId&&!customers.some(c=>c.customerId===customerId)){
+   setError(true);setMessage("العميل غير موجود في دليل Customers المصرّح به حاليًا؛ لا يمكن حفظ المسودة.");return;
+  }
   const body={
    lines:lines.map(l=>({
     ...l,executorEmployeeId:executors[l.offeringId]||null,
@@ -97,7 +100,7 @@ export default function CashierRichDraftActions({apiRoot,draftApi,lines,header,
   {state==="ready"&&<>
    <div className="catalog-form">
     <label>العميل (اختياري)
-     <select value={customerId} onChange={e=>{setCustomerId(e.target.value);resetRetry();}}>
+     <select value={customerId} onChange={e=>{onCustomerIdChange(e.target.value);resetRetry();}}>
       <option value="">عميل نقدي / بدون ربط</option>
       {customers.map(c=><option key={c.customerId} value={c.customerId}>{c.displayName}</option>)}
      </select>

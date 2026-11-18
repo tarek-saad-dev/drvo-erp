@@ -2,6 +2,7 @@
 import Link from "next/link";
 import CashierPricingPanel from "./cashier-pricing-panel";
 import CashierDraftHistory from "./cashier-draft-history";
+import PosCustomerOperator from "./pos-customer-operator";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -49,6 +50,8 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
   const [draftBusy,setDraftBusy]=useState(false);
   const [richHistoryRevision,setRichHistoryRevision]=useState(0);
   const [cartRevision,setCartRevision]=useState(0);
+  const [selectedCustomerId,setSelectedCustomerId]=useState("");
+  const [customerRevision,setCustomerRevision]=useState(0);
   const retryKey=useRef<string|null>(null);
   const handoffApplied=useRef(false);
   const matchingOfferings=offerings.filter(o=>o.isActive&&
@@ -321,13 +324,17 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
             </tr>)}</tbody>
           </table></div>}
       </section>}
+      {draftsEnabled&&richEnabled&&<PosCustomerOperator
+        apiRoot={api.replace(/\/pos-preview$/,"")} customerId={selectedCustomerId}
+        onSelect={setSelectedCustomerId} onCreated={()=>setCustomerRevision(v=>v+1)}/>}
       {draftsEnabled&&richEnabled&&<CashierDraftHistory
         apiRoot={api.replace(/\/pos-preview$/,"")} draftApi={draftApi}
         revision={richHistoryRevision} disabled={busy||draftBusy}
         onUseDraft={savedLines=>createNewFromDraft({lines:savedLines})}/>}
       {lines.length>0&&<CashierPricingPanel key={JSON.stringify(lines)+"-"+cartRevision} api={api} draftApi={draftApi}
   richEnabled={draftsEnabled&&richEnabled} afterSaved={()=>{void loadDrafts();setRichHistoryRevision(v=>v+1);}}
-  lines={lines} offerings={offerings}/>}
+  lines={lines} offerings={offerings} customerId={selectedCustomerId}
+  onCustomerIdChange={setSelectedCustomerId} customerRevision={customerRevision}/>}
       {adjustment&&<section className="k5-admin-card">
         <h2>خصم وإكرامية محتملة — معاينة فقط</h2>
         <p>إجمالي القائمة: <strong>{money(adjustment.listPriceSubtotalMinor,adjustment.currency)}</strong></p>

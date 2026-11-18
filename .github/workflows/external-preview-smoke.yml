@@ -39,8 +39,8 @@ jobs:
             echo "FAIL: latest Light V1 HTML marker is not visible on the public site"
             exit 1
           }
-          grep -Fq 'data-demo-revision="salon-compact-pos-v1-1"' "$dir/salon.html" || {
-            echo "FAIL: compact Salon/POS revision not served by public site"
+          grep -Fq 'data-demo-revision="salon-pos-customer-v1-2"' "$dir/salon.html" || {
+            echo "FAIL: Salon POS customer V1.2 revision not served by public site"
             exit 1
           }
           if grep -Fq 'GUIDED TOUR' "$dir/salon.html"; then
@@ -52,6 +52,6 @@ jobs:
             echo "FAIL: the official DRVO corporate symbol is not deployed"
             exit 1
           }
-          echo "PASS: HTTPS health, compact POS V1.1 marker, no Guided Tour in HTML and approved symbol"
+          echo "PASS: HTTPS health, Salon POS Customer V1.2 marker, no Guided Tour in HTML and approved symbol"
           echo "This is a UI build marker, NOT independent VPS release.sha attestation."
           echo "This does NOT attest release SHA, private HR/Booking/POS/Reports, SQL migrations, permissions, or production/customer readiness."

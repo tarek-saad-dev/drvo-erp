@@ -1,0 +1,72 @@
+# Cashier POS page — source-backed interaction inventory V1 (2026-11-18)
+
+**Status: SOURCE REVIEWED / DRVO FEATURE-PARITY UNVERIFIED.** This is a working **page and immediate dependency** inventory, not a certification of every Cashier runtime branch. Founder identified missing phone search, instant customer registration and “apply last visit”. Do not accept a screenshot, route existence or S2/S3 draft-history as equivalent to the actual Cashier operator journey.
+
+**Frozen inspected Cashier source:** [`tarek-saad-dev/casher@bc9c03fff86074872590ad0fd3525f9a4e416958`](https://github.com/tarek-saad-dev/casher/tree/bc9c03fff86074872590ad0fd3525f9a4e416958). Main orchestration: [`src/app/income/pos/page.tsx`](https://github.com/tarek-saad-dev/casher/blob/bc9c03fff86074872590ad0fd3525f9a4e416958/src/app/income/pos/page.tsx), 1,421 lines. Also inspected its imported immediate components, `src/hooks/useSaleState.ts`, customer history and sale routes, POS handoff/loyalty endpoints. DRVO destination source on review: `f770e7a1059827883c8c26468c5df78f71ba8240`.
+
+**State vocabulary:** `S2/S3 PARTIAL` means DRVO disposable SQL2022+Nest+Web CI has verified a restricted nonposting draft slice, **not LIVE**. `GAP` means the original behavior has no equivalent verified private DRVO workflow. `FINANCE GATED` needs ADR-031 accounting and payments approval in addition to source implementation. `LEGACY REVIEW` means Cashier source contains the UI/hook/route, but its production behavior still requires test characterization.
+
+## A. Customer journey — must preserve all steps, not just clientId
+
+| ID | User-observable Cashier behavior | Concrete legacy source | DRVO truth / required owning module |
+|---|---|---|---|
+| CU-01 | Live customer lookup **by name or mobile** (250 ms debounce); list name+phone, select/clear | `CustomerSearch.tsx` → `GET /api/customers?q=`, SQL TOP 20 Tenant-filtered name/mobile | **GAP in POS**: DRVO Customers Core GET list exists but POS V2 only has a basic dropdown; must add scoped, indexed, paginated/exact-or-fuzzy **server** search for all authorized customers, not filter an arbitrarily capped client list |
+| CU-02 | If no match, show **“register this customer”** with typed phone/name prefilling | `CustomerSearch.tsx` → `QuickCustomerModal.tsx` | **GAP in POS**: DRVO Customers Core create API exists with K5 and UUID idempotency; wire secure quick create/select without injecting PII into query strings |
+| CU-03 | Create client with name, phone, DOB, address, notes, source/referral and explicit opt-in for WhatsApp offers | `QuickCustomerModal.tsx` → `POST /api/customers`; `CustomerSourceFields.tsx` | **PARTIAL Customers Core**: currently only name+E.164 phone are supported. Profile/consent need separately reviewed Customer/CRM contracts, not invented fields in POS |
+| CU-04 | Selected customer card with phone, birth date, notes, source, missing-profile warning; edit or complete without leaving POS | `CustomerSearch.tsx`, `CompleteCustomerModal.tsx`, `PATCH /api/customers/[id]` | **GAP**: full profile write/read, authorization and recency on Customers/CRM owner |
+| CU-05 | Load **real completed sale** history after customer selection: last three sale cards, employee/service/payment/time/user and customer summary based on last eight queried sales | `CustomerHistoryPanel.tsx` → `GET /api/customers/[id]/history-summary`, `CustomerRecentSales.tsx` | **GAP**: DRVO S3 is **latest 50 DRAFTs**, not purchase history; verified posted Sales source is absent |
+| CU-06 | Visit cadence, average spend, repeat service, return/overdue classification and contextual recommendation | `CustomerVisitSummary.tsx`, `CustomerRecommendation.tsx`, history API | **GAP**: CRM/Reports read model needs posted, scoped, audited sale evidence; source metric `totalVisits` counts only last eight queried records, not necessarily lifetime visits |
+| CU-07 | Button **“تطبيق آخر زيارة تلقائياً”** repeats previous service lines, assigns first/dominant barber and chooses previous payment method | `CustomerHistoryPanel.tsx` calls `onAutoFill`; `page.tsx:855-885` | **GAP**: this is a **user-click operation**, not automatically triggered by selection. Legacy copies historical `SPrice` and `Bonus`, resets quantity to 1. DRVO MUST copy IDs/intents only, then revalidate live Catalog, Barber eligibility, booking/stock and fresh price; **never replay payment as collected** |
+| CU-08 | Customer loyalty points, available vouchers, use a discount voucher, other reward kinds | `ClientVouchersModal.tsx`, `/api/pos/client-inventory`, `/use` | **GAP**: separate Loyalty owner/transactional redemption; never consume entitlement on DRAFT |
+| CU-09 | Fast customer-specific WhatsApp action and explicit marketing consent | `QuickWhatsAppModal.tsx`, `/api/pos/whatsapp/quick-send` | **GAP**: Messaging integration with consent, template, audit and module-specific privacy permissions |
+
+## B. Service / cart / booking journey
+
+| ID | Cashier operator capability | Source reference | DRVO target status |
+|---|---|---|---|
+| POS-01 | Compact RTL 3-column desktop workstation and dedicated mobile header, customer picker, bottom cart bar and invoice sheet | `page.tsx`, `mobile/{MobilePosHeader,MobileInvoiceBar,MobileInvoiceSheet}.tsx` | **GAP in private POS** (public Light demo is synthetic; not parity) |
+| POS-02 | Barber carousel, avatars, attendance badges and manual selection of non-Barber employees | `luxury/BarberCarousel.tsx`, `NonBarberEmployeeModal.tsx` | **PARTIAL HR** for Branch Employee and Barber Resource; no full POS parity |
+| POS-03 | Search services, `/` focus, categories, **hot/popular** tab, select Barber before adding service, service cards and duration | `luxury/ServiceCatalog.tsx`, `ServiceSearchInput.tsx` | **PARTIAL Catalog** generic service price; Salon skill/eligibility and full UI **GAP** |
+| POS-04 | Regular and groom packages, included items, optional add-ons, home visits, overlap handling and package prices | `luxury/PackagesSection.tsx`, `lib/pos/groomPackageCart.ts` | **GAP**: Salon Package extension with Catalog/Booking/POS owner contracts |
+| POS-05 | Retail products: search name/code/barcode, branch stock low/out, max available quantity and no Barber line | `luxury/ProductCatalog.tsx`, `page.tsx:450-493` | **GAP** in real Inventory/POS; stock must be checked server-side, not solely in UI |
+| POS-06 | Cart editing: service/employee per line, quantity, line fixed/% discounts and delete a line | `CartPanel.tsx`, `useSaleState.ts` | **S2 PARTIAL** for saved immutable pricing/executor and preview; full interactive Cashier cart edit **GAP** |
+| POS-07 | Grouped groom package cart, edit employee across package group, bundled add-ons and remove whole group | `CartPanel.tsx`, `groomPackageCart.ts` | **GAP** |
+| POS-08 | Per-line amount priority over percentage, invoice-wide discount after line discounts, exact totals | `useSaleState.ts`, `lib/sales/service-line-totals.ts` | **S2 PARTIAL PASS**: source-executed pricing differential + SQL022–023 immutable draft; posted-tax/receipt still **GAP** |
+| POS-09 | Sale notes; shift & BusinessDay context; reset when Branch changes; new sale clears prior context | `page.tsx`, `useSaleState.ts`, `useSession.ts` | **GAP** for complete business day/shift and persistent notes; partial scoped draft exists |
+| POS-10 | Booking→POS selected service and **groom package + optional extras** hydration | `page.tsx:393-436`, `/api/pos/groom-packages/from-booking/[id]` | **GAP** beyond DRVO one-service nonposting handoff |
+| POS-11 | Barber→cashier handoff inbox, claim, attach items/customer, reconcile already-paid invoice without duplicate charge | `BarberHandoffInbox.tsx`, `/api/pos/barber-handoffs/*`, `page.tsx:199-345` | **GAP**: Salon/Booking/Operations plus POS idempotent evidence; financial verification gated |
+| POS-12 | Additional service transfer inbox: proposed staff, availability alternative and assignment | `AddonTransferInbox.tsx`, `/api/pos/addon-transfers/*` | **GAP**: Booking/Salon Extension workflow |
+| POS-13 | Team attendance visibility & check-in/out panel from cashier workstation | `TeamAttendanceWidget.tsx`, `AttendancePanelModal.tsx` | **PARTIAL HR** source-tested UTC sessions, but Cashier POS integration/shift is **GAP** |
+| POS-14 | New/cart quick action and keyboard shortcuts `F9`, `+` to save, service search `/` | `page.tsx:813-848`, `ServiceCatalog.tsx` | **GAP** in private Cashier-style key handling; financial save blocked |
+| POS-15 | Booking, home-visit category exclusivity in cart, shift-aware catalog reload on branch change | `page.tsx:116-132,495-539`, `lib/catalog/groomOptionalAddons.ts` | **GAP** for Salon rules + server-side branch checks |
+
+## C. Invoice / cash desk / back-office journey
+
+| ID | Original Cashier behavior | Source | DRVO truth |
+|---|---|---|---|
+| FIN-01 | Default payment selection (cash if present), single tender, split tender allocation, balance validation and duplicates guard | `page.tsx:541-616`, `PosInvoicePanel.tsx`, `SplitPaymentInput.tsx` | **FINANCE GATED** (can implement strictly noncollecting UI/quote; no fake receipt) |
+| FIN-02 | Save sale, synchronous duplicate-save lock, updated invoice edit, customer association and handoff proof | `page.tsx:578-811,888-981`, `/api/sales`, `/api/sales/[id]`, `src/apps/pos/application/*` | **FINANCE GATED**; only nonposting DRVO drafts currently exist |
+| FIN-03 | Recent invoices drawer: query name/phone/ID, date, payment, employee, amount, completion filters, pagination; invoice details | `RecentInvoicesDrawer.tsx`, `recent-invoices/RecentInvoicesPanel.tsx`, `/api/sales/recent-invoices` | **GAP**: real posted sales read model; S3 DRAFT list isn't a substitute |
+| FIN-04 | Edit, delete/reversal confirmation and updated printed receipt after previous sale | `RecentInvoiceCard.tsx`, `DeleteInvoiceDialog.tsx`, `PrintInvoiceModal.tsx` | **FINANCE GATED**; Cashier top-level `onDeleteSale` callback only logs, but child delete dialog/route must be audited before promising full deletion |
+| FIN-05 | 80mm receipt with salon branding, local print service and browser fallback; package rendering | `PrintInvoiceModal.tsx`, `lib/printService.ts`, `lib/pos/groomPackageCart.ts` | **GAP** real verified receipt/print; no fabricated tax/paid indicators |
+| FIN-06 | Quick transfer between payment methods, expense, other income, tips and quick WhatsApp | `QuickActionsBar.tsx`, `{PaymentTransferModal,QuickExpenseModal,QuickIncomeModal,TipsModal,QuickWhatsAppModal}.tsx` | **GAP / FINANCE GATED** by relevant owner: Treasury, Expenses, Income, HR, Messaging |
+| FIN-07 | Shift-state write checks and BusinessDay rollover/close, staff attendance in operator workspace | `ShiftOperationalGateProvider`, `DayRolloverModal.tsx`, `CloseDayModal.tsx` | **GAP** for authorized real operating shift/day; pure rule and count/attendance draft partial |
+| FIN-08 | Paid sale → stock decrement, Treasury movements, payroll/tips/commission, Loyalty and Accounting effects | `/api/sales`, `src/apps/pos/application/*`, `src/apps/pos/internal/salePostCommitEffects.ts` | **FINANCE GATED**; domain-owned idempotent commands and reconciled GL required |
+
+## Important legacy deviations to correct rather than reproduce
+
+1. **Automatic application is initiated by a button.** Do not silently overwrite a cart when customer is selected. Only after an explicit operator action and with current authorized Catalog and Barber eligibility. The old `handleAutoFill` copies historic `SPrice`/`Bonus` and sets every line `Qty:1`, which is not a safe DRVO replay contract.
+2. **History SQL needs stronger scoping.** The legacy history route authenticates customer row by `TenantId`, but sales and details queries shown in the route filter by client/invoice ID without consistently repeating trusted Tenant+Business+Branch predicates; never port this unmodified. DRVO must use owner-scoped SQL, independently checked relations and Default Deny.
+3. **Legacy visit count isn't lifetime count.** The API reads only TOP 8 sales and calls the length `totalVisits`. DRVO must label bounded metrics accurately or build an actual lifetime aggregate with proven source.
+4. **Currency and tender truth.** Legacy may reuse historical payment method and unit price; DRVO must reprice under current Catalog, leave tender **uncollected**, and enforce ADR-031 before posted invoice, refund, Treasury/GL, stock or point redemption.
+5. **No silent omissions.** This document covers high-level visible UI workflows plus immediate referenced components/routes, not proof every original handler and helper has been characterized. New Cashier source commits and each nested flow must be diffed/tested before declaring any specific parity row complete.
+
+## Execution order and acceptance
+
+**Immediate POS-Customer slice:** New protected scoped Customers read model: type phone/name → reliable server-filtered matches (not latest 50); select existing → no-match quick registration → UUID idempotent `customers.manage` create → selected customer reused in current Cashier V2 nonposting draft; negative Tenant/Business/Branch, duplicate phone policy, session/permission revocation, no PII in logs/URLs. No SQL primary apply without verified target/backups/restore. Owns Customers, not POS copy table.
+
+**Next POS-Repeat slice:** Once a verified Sales posted read owner exists, render selected customer real last-sale history; explicit **apply last visit** builds editable fresh-priced DRAFT without changing historical invoice/payment, rechecks Barber/availability/package rules and handles deleted offerings. Prior to verified posted sale source, **do not** mislabel S3 draft reuse as “last invoice” or fabricate completed history.
+
+**Follow-on:** execute Salon Barber + product/package add-on + Booking/handoff + compact private UI workflows in parallel when contracts are independent; financial tender/posted invoice/reversal/receipt only with ADR-031 decision. Every row needs source characterization, positive+negative SQL/API/UI tests, primary DB target/restore and founder browser review before status `PARITY-VERIFIED`.
+
+**Release:** Neither this inventory nor its commit changes application code, DB, feature flags, public auth or payment posting; actual DRVO primary database, private browser acceptance and first salon Pilot remain unverified.

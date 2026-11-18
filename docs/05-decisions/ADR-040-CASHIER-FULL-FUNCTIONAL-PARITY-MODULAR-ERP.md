@@ -50,3 +50,7 @@ Per founder-approved preservation-first directive, **retain SQL014 POS DRAFT V1*
 ## 2026-11-17 S3 limited draft-history implementation note
 
 [S3 scope and acceptance](../04-execution/CASHIER-POS-CUSTOMER-DRAFT-HISTORY-S3-2026-11-17.md) adds private K5-authorized recent Branch Cashier V2 **DRAFT-only** client-filtered history and safe new-cart reuse. POS remains the history source, Customers/HR continue to own their identity records, and new carts revalidate the active Catalog rather than copying old prices/discounts. This is **not customer paid purchase history, full Salon Barber eligibility or full Cashier parity**. No new ADR decision, live flags, SQL schema or financial POSTED behavior is authorized.
+
+## 2026-11-18 detailed POS workflow correction (no new decision)
+
+[Cashier POS original page and dependency inventory V1](../04-execution/CASHIER-POS-PAGE-WORKFLOW-AUDIT-V1-2026-11-18.md) records founder correction that abbreviated POS migration lists omit phone/name lookup, on-the-spot Customer creation, profile completion, actual visit history and explicit **apply last visit**, together with additional cart, staff, package, stock, handoff, Loyalty, receipt and QuickActions flows. S2/S3 DRVO source-tested SQL **DRAFT** history is **not** Cashier purchase-history or last paid invoice. Do not mark full or customer-flow parity based on its display. Preserve original behavior with DRVO Customers/CRM, POS Sales, HR, Booking, Treasury and Salon Extension ownership, revalidate prices and K5 scope. ADR-031 financial posting remains unapproved.

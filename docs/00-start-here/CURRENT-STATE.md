@@ -1,5 +1,8 @@
 # Current state
 
+> **2026-11-18 CUSTOMER POS CORRECTION / FEATURE GAPS AUDITED:** [Source-backed Cashier POS page inventory](../04-execution/CASHIER-POS-PAGE-WORKFLOW-AUDIT-V1-2026-11-18.md) confirms phone/name lookup, quick customer registration and opt-in/profile capture, visited sales insights, explicit apply-last-visit, vouchers, barcode stock search, packages/add-ons/handoffs, quick finance ops, keyboard/mobile and print workflows, all still **not PARITY-VERIFIED in DRVO**. Existing Customers Core create/list and S2/S3 nonposting Draft are only partial under K5; no real paid visit history or secure full replay. No code/DB/flags altered by this audit.
+
+
 > **2026-11-17 verified source CI:** Exact application/workflow SHA [`01f74a585f6eaad3d00ebf2f7794963212d1dea4`](https://github.com/tarek-saad-dev/drvo-erp/commit/01f74a585f6eaad3d00ebf2f7794963212d1dea4), [Cashier POS Rich SQL2022/Nest/Next run #44177702424](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44177702424) **PASS**: 11/11 disposable SQL2022/Nest HTTP integration groups (full SQL001–023), 110/110 API unit tests, **15/15 private Web source tests** (4 POS Draft V2, 4 new Customer history, 3 Cashier pricing, 4 quick-cart), Next.js build and typecheck. [K5C private default-deny run #44177589913](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44177589913) **PASS** on earlier `b0dcc2d` app code; later workflow-only changes do not affect the private UI behavior. **This is NOT evidence of primary DRVO database migration, independently verified release.sha, authorized private browser access or user-visible live S3.**
 
 

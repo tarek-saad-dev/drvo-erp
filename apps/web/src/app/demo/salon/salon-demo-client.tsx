@@ -6,7 +6,7 @@ import Link from "next/link";
 import {
  DEMO_CUSTOMERS,DEMO_SERVICES,DEMO_STAFF,DEMO_TIMES,
  addDemoCartLine,bookDemoAppointment,demoAvailableTimes,demoCustomer,demoMoney,demoService,demoStaff,
- demoSubtotal,initialDemo,removeDemoCartLine,saveDemoDraft,updateDemoAppointment,
+ demoSubtotal,initialDemo,removeDemoCartLine,saveDemoDraft,updateDemoAppointment,createDemoCustomer,
  type DemoAppointment,type DemoCartLine,type DemoSection,type DemoDraftOptions,
 } from "./demo-model";
 
@@ -40,6 +40,14 @@ export default function SalonDemoClient(){
   a.time.localeCompare(b.time)||a.id-b.id),[data.appointments]);
 
  function message(text:string,error=false){setNotice(text);setNoticeError(error)}
+ function createCustomer(name:string,phone:string):boolean{
+  try{
+   const result=createDemoCustomer(data,name,phone);
+   setData(result.data);setCustomerId(result.customer.id);
+   message("اتسجل العميل التجريبي واتحدد في نقطة البيع ✓");
+   return true;
+  }catch(error){message(error instanceof Error?error.message:"تعذر التسجيل",true);return false;}
+ }
  function switchTab(next:DemoSection){setTab(next);setNotice("")}
  function book(e:React.FormEvent<HTMLFormElement>){
   e.preventDefault();
@@ -77,7 +85,7 @@ export default function SalonDemoClient(){
   setCustomerId("guest");setStaffId("mostafa");setServiceId("cut");setTime("16:00");
  }
 
- return <main className="sd-root" dir="rtl" data-drvo-ui="light-v1" data-demo-revision="salon-compact-pos-v1-1">
+ return <main className="sd-root" dir="rtl" data-drvo-ui="light-v1" data-demo-revision="salon-pos-customer-v1-2">
   <aside className="sd-sidebar" aria-label="قائمة لوحة تحكم الديمو">
    <div className="sd-brand"><span className="sd-brand-icon">D</span><div>DRVO <b>ERP</b><small>SALON WORKSPACE</small></div></div>
    <div className="sd-workspace"><span className="sd-workspace-icon">✦</span><div><strong>Studio One</strong><small>صالون تجريبي · فرع المعاينة</small></div><span className="sd-chevron">⌄</span></div>
@@ -102,7 +110,7 @@ export default function SalonDemoClient(){
    </header>
 
    <div className="sd-content">
-    <div className="sd-disclaimer"><span className="sd-disclaimer-icon">ⓘ</span><span><strong>نسخة تجريبية تفاعلية</strong> — كل الأسماء والأرقام وهمية. المواعيد والمسودات موجودة في الصفحة دي فقط، وهتتمسح مع التحديث. مفيش تسجيل دخول أو حجز فعلي أو تحصيل أو فواتير.</span></div>
+    <div className="sd-disclaimer"><span className="sd-disclaimer-icon">ⓘ</span><span><strong>نسخة تجريبية تفاعلية</strong> — كل الأسماء والأرقام وهمية. المواعيد والمسودات موجودة في الصفحة دي فقط، وهتتمسح مع التحديث. مفيش تسجيل دخول أو حجز فعلي أو تحصيل أو فواتير. بيانات العملاء والزيارات كمان تجريبية فقط.</span></div>
     {notice&&<div role="status" className={"sd-toast"+(noticeError?" sd-toast-error":"")}><span>{noticeError?"!":"✓"}</span>{notice}<button type="button" onClick={()=>setNotice("")} aria-label="إغلاق الرسالة">×</button></div>}
 
     {tab==="overview"&&<>
@@ -116,7 +124,7 @@ export default function SalonDemoClient(){
      <div className="sd-panels">
       <section className="sd-panel sd-main-panel"><div className="sd-panel-header"><div><span className="sd-panel-eyebrow">TODAY'S SCHEDULE</span><h2>مواعيد اليوم</h2></div><button className="sd-text-button" type="button" onClick={()=>switchTab("appointments")}>عرض كل المواعيد ←</button></div>
       <div className="sd-appointment-list">
-       {appointments.filter(a=>a.status!=="cancelled").slice(0,5).map(a=><AppointmentRow key={a.id} row={a} compact onSelect={()=>fromAppointment(a)}/>)}
+       {appointments.filter(a=>a.status!=="cancelled").slice(0,5).map(a=><AppointmentRow key={a.id} row={a} data={data} compact onSelect={()=>fromAppointment(a)}/>)}
       </div></section>
       <section className="sd-panel sd-aside-panel"><div className="sd-panel-header"><div><span className="sd-panel-eyebrow">QUICK ACTIONS</span><h2>ابدأ من هنا</h2></div></div>
        <button className="sd-quick" type="button" onClick={()=>switchTab("appointments")}><span className="sd-quick-icon">▣</span><span><strong>حجز موعد</strong><small>اختر خدمة وحلاق ووقت</small></span><span className="sd-quick-arrow">←</span></button>
@@ -131,7 +139,7 @@ export default function SalonDemoClient(){
      <div className="sd-panels sd-booking-layout">
       <section className="sd-panel"><div className="sd-panel-header"><div><span className="sd-panel-eyebrow">CREATE APPOINTMENT</span><h2>حجز جديد</h2></div></div>
        <form className="sd-book-form" onSubmit={book}>
-        <label>العميل التجريبي<select value={customerId} onChange={e=>setCustomerId(e.target.value)}>{DEMO_CUSTOMERS.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
+        <label>العميل التجريبي<select value={customerId} onChange={e=>setCustomerId(e.target.value)}>{data.customers.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
         <label>الخدمة<select value={serviceId} onChange={e=>{
           const next=e.target.value;setServiceId(next);
           const slots=demoAvailableTimes(data,staffId,next);
@@ -156,7 +164,7 @@ export default function SalonDemoClient(){
        </form>
       </section>
       <section className="sd-panel"><div className="sd-panel-header"><div><span className="sd-panel-eyebrow">APPOINTMENT LIST</span><h2>جدول المواعيد <span className="sd-number">{data.appointments.length}</span></h2></div></div>
-       <div className="sd-appointment-list sd-booking-list">{appointments.map(a=><AppointmentRow key={a.id} row={a}
+       <div className="sd-appointment-list sd-booking-list">{appointments.map(a=><AppointmentRow key={a.id} row={a} data={data}
         onSelect={()=>fromAppointment(a)} onComplete={()=>updateAppointment(a.id,"completed")}
         onCancel={()=>updateAppointment(a.id,"cancelled")}/>)}</div>
       </section>
@@ -167,22 +175,23 @@ export default function SalonDemoClient(){
       cart={cart} setCart={setCart} data={data}
       customerId={customerId} setCustomerId={setCustomerId}
       staffId={staffId} setStaffId={setStaffId}
-      saveDraft={saveDraft} message={message}/>}
+      saveDraft={saveDraft} onCreateCustomer={createCustomer} message={message}/>}
     <div className="sd-demo-footer"><span>DRVO ERP · Interactive Salon Demo · No real transactions</span><button type="button" onClick={resetDemo}>↺ إعادة ضبط الديمو</button></div>
    </div>
   </div>
  </main>;
 }
 
-function AppointmentRow({row,compact=false,onSelect,onComplete,onCancel}:{
- row:DemoAppointment;compact?:boolean;onSelect:()=>void;onComplete?:()=>void;onCancel?:()=>void;
+function AppointmentRow({row,data,compact=false,onSelect,onComplete,onCancel}:{
+ row:DemoAppointment;data:ReturnType<typeof initialDemo>;compact?:boolean;
+ onSelect:()=>void;onComplete?:()=>void;onCancel?:()=>void;
 }){
  const staff=demoStaff(row.staffId);
  const service=demoService(row.serviceId);
  return <article className={"sd-appointment"+(row.status==="cancelled"?" sd-appt-cancelled":"")}>
   <span className="sd-appt-time">{row.time}</span>
   <span className="sd-appt-avatar">{staff.initials}</span>
-  <div className="sd-appt-info"><strong>{demoCustomer(row.customerId).name}</strong><small>{service.name} · {staff.name}</small></div>
+  <div className="sd-appt-info"><strong>{demoCustomer(row.customerId,data).name}</strong><small>{service.name} · {staff.name}</small></div>
   <span className={"sd-status sd-status-"+row.status}>{statusText(row.status)}</span>
   <div className="sd-appt-actions">
    {row.status!=="cancelled"&&<button type="button" onClick={onSelect} title="إضافة الخدمة لمسودة البيع">{compact?"مسودة":"أضف للبيع"}</button>}

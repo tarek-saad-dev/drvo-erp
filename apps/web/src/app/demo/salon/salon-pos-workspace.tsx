@@ -1,8 +1,9 @@
 "use client";
 import {useEffect,useMemo,useRef,useState} from "react";
 import type {Dispatch,SetStateAction} from "react";
+import SalonPosCustomerFlow from "./salon-pos-customer-flow";
 import {
- DEMO_CUSTOMERS,DEMO_PRODUCTS,DEMO_SERVICES,DEMO_STAFF,
+ DEMO_PRODUCTS,DEMO_SERVICES,DEMO_STAFF,repeatDemoLastVisit,
  addDemoCartLine,changeDemoCartQuantity,demoDraftTotals,demoMoney,
  demoPosItem,demoSplitPreview,removeDemoCartLine,
  type DemoCartLine,type DemoData,type DemoDiscount,type DemoDraftOptions,
@@ -12,6 +13,7 @@ type Props={
  cart:DemoCartLine[];setCart:Dispatch<SetStateAction<DemoCartLine[]>>;
  data:DemoData;customerId:string;setCustomerId:(v:string)=>void;
  staffId:string;setStaffId:(v:string)=>void;
+ onCreateCustomer:(name:string,phone:string)=>boolean;
  saveDraft:(options:DemoDraftOptions)=>boolean;
  message:(text:string,error?:boolean)=>void;
 };
@@ -36,7 +38,7 @@ function toDiscount(mode:DiscountMode,raw:string):DemoDiscount|null{
  return value===null?null:{mode,value};
 }
 export default function SalonPosWorkspace({
- cart,setCart,data,customerId,setCustomerId,staffId,setStaffId,saveDraft,message,
+ cart,setCart,data,customerId,setCustomerId,staffId,setStaffId,saveDraft,onCreateCustomer,message,
 }:Props){
  const [category,setCategory]=useState<Category>("all");
  const [search,setSearch]=useState("");
@@ -77,6 +79,14 @@ export default function SalonPosWorkspace({
   catch(e){message(e instanceof Error?e.message:"الكمية غير متاحة",true);}
  }
  function remove(id:string){setCart(removeDemoCartLine(cart,id));message("");}
+ function useLastVisit(){
+  try{
+   const visit=repeatDemoLastVisit(data,customerId);
+   setCart(visit.lines);setStaffId(visit.staffId);
+   setDiscountMode("none");setDiscountText("");setSplit(false);setCashText("");setNotes("");
+   message("تم تطبيق آخر زيارة تجريبية بأسعار الكتالوج الحالية. دي مسودة فقط بدون تحصيل.");
+  }catch(error){message(error instanceof Error?error.message:"تعذر تطبيق الزيارة",true);}
+ }
  function save(){
   if(!ready||!discount){message("راجع السعر والخصم وتقسيم الدفع التجريبي.",true);return;}
   // Split values are a visual NOT_COLLECTED preview, never persisted as real payment.
@@ -108,11 +118,8 @@ export default function SalonPosWorkspace({
    <p>اختار العميل والحلاق، أضف خدمات أو منتجات، راجع الخصم والدفع، واحفظ مسودة فقط.</p>
   </div><span className="sd-date">تجربة واجهة · لا يوجد بيع أو تحصيل فعلي</span></div>
   <div className="sd-pos-toolbar" aria-label="بيانات المسودة">
-   <label>العميل
-    <select value={customerId} onChange={e=>setCustomerId(e.target.value)}>
-     {DEMO_CUSTOMERS.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}
-    </select>
-   </label>
+   <SalonPosCustomerFlow data={data} customerId={customerId} onSelect={setCustomerId}
+    onCreate={onCreateCustomer} onRepeat={useLastVisit} hasCart={cart.length>0}/>
    <label>الحلاق / منفذ الخدمة (تجريبي)
     <select value={staffId} onChange={e=>setStaffId(e.target.value)}>
      {DEMO_STAFF.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
@@ -243,7 +250,7 @@ export default function SalonPosWorkspace({
         <span aria-hidden="true">{expandedDraft===d.id?"▴":"▾"}</span>
        </button>
        {expandedDraft===d.id&&<div className="sd-pos-draft-details">
-        <span>العميل: {DEMO_CUSTOMERS.find(c=>c.id===d.customerId)?.name}</span>
+        <span>العميل: {data.customers.find(c=>c.id===d.customerId)?.name}</span>
         <span>الحلاق: {DEMO_STAFF.find(s=>s.id===d.staffId)?.name}</span>
         <span>الخصم: {demoMoney(d.discountMinor)}</span>
         {d.lines.map(line=><span key={line.serviceId}>

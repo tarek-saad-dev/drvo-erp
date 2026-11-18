@@ -1,5 +1,8 @@
 # Start here — project handoff
 
+> **2026-11-18 PUBLIC SALON DEMO V1.2 CODED:** [Visible Customer/phone search + quick create + sample last visit](../04-execution/SALON-PUBLIC-DEMO-CUSTOMER-POS-V1-2-2026-11-18.md) are now implemented directly on `/demo/salon` source. Public in-memory sandbox only; real Customers history, invoice, primary SQL and finance remain OPEN. Exact CI/HTTPS verification separate.
+
+
 > **2026-11-18 CASHIER POS DEEP PAGE AUDIT — NOT MORE PARITY:** [Detailed original POS interaction inventory](../04-execution/CASHIER-POS-PAGE-WORKFLOW-AUDIT-V1-2026-11-18.md) tracks Customer name/phone search, instant create, profile completion, actual customer visit intelligence, explicit 'apply last visit' button, loyalty/vouchers, service/product/package/cart, handoffs, shifts, receipts and QuickActions to actual original source files. S3 remains **DRAFT-only**, not paid customer history. Next private slice: scoped server search + quick registration; repeat of a **posted** last invoice requires verified Sales read owner and fresh pricing. No live/DB/payment activation.
 
 

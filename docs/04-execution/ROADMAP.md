@@ -1,5 +1,8 @@
 # Roadmap
 
+> **2026-11-18 SALON DEMO V1.2 SOURCE DELIVERY:** [Customer phone lookup/quick-create/last sample visit repeat](SALON-PUBLIC-DEMO-CUSTOMER-POS-V1-2-2026-11-18.md) added to public demo for immediate founder review, while real private Customers query/create and posted Sales history still need modular implementation. Never present synthetic visits as real invoices; ADR-031 remains gated.
+
+
 > **2026-11-18 POS FOUNDER GAP RECHECK:** [Customer+POS end-to-end operator inventory](CASHIER-POS-PAGE-WORKFLOW-AUDIT-V1-2026-11-18.md) supersedes any abbreviated POS feature list: Cashier source has live phone search, no-match register + auto select, full Customer visit context, click-to-apply last visit, and many additional POS subflows. **Priority next:** Customers Core server-scoped phone/name search + quick create/select with idempotency and negative scope tests; then real posted history and fresh-priced repeat only when a verified Sales source exists; packages/Barber/Booking, finance safely separated. No full parity claim.
 
 

@@ -1,5 +1,8 @@
 # Current state
 
+> **2026-11-18 USER-VISIBLE DEMO FEATURE:** [Public POS customer flow V1.2](../04-execution/SALON-PUBLIC-DEMO-CUSTOMER-POS-V1-2-2026-11-18.md) adds name/phone search, quick-create-and-select, synthetic last-visit/DRAFT repeat and cart replace confirmation. **Not real paid Cashier parity, no primary DB, no private POS activation.** Verify exact commit CI and live staging separately.
+
+
 > **2026-11-18 CUSTOMER POS CORRECTION / FEATURE GAPS AUDITED:** [Source-backed Cashier POS page inventory](../04-execution/CASHIER-POS-PAGE-WORKFLOW-AUDIT-V1-2026-11-18.md) confirms phone/name lookup, quick customer registration and opt-in/profile capture, visited sales insights, explicit apply-last-visit, vouchers, barcode stock search, packages/add-ons/handoffs, quick finance ops, keyboard/mobile and print workflows, all still **not PARITY-VERIFIED in DRVO**. Existing Customers Core create/list and S2/S3 nonposting Draft are only partial under K5; no real paid visit history or secure full replay. No code/DB/flags altered by this audit.
 
 

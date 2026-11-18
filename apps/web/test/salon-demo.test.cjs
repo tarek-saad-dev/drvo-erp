@@ -153,7 +153,7 @@ test('operator POS shows real functioning synthetic controls and no real API or 
  const client=fs.readFileSync(path.join(root,'demo/salon/salon-pos-workspace.tsx'),'utf8');
  const page=fs.readFileSync(path.join(root,'demo/salon/page.tsx'),'utf8');
  for(const f of [
-  'DEMO_PRODUCTS','DEMO_STAFF','DEMO_CUSTOMERS','demoDraftTotals',
+  'DEMO_PRODUCTS','DEMO_STAFF','SalonPosCustomerFlow','demoDraftTotals',
   'changeDemoCartQuantity','demoSplitPreview','discountMode','cashText',
   'saveDraft','setSearch','NOT COLLECTED','aria-pressed','F9',
  ])
@@ -203,7 +203,7 @@ test('compact Light V1.1 increases visible viewport rather than applying browser
  const css=fs.readFileSync(path.join(root,'demo/salon/salon-pos-workspace.css'),'utf8');
  const base=fs.readFileSync(path.join(root,'demo/salon/salon-demo.css'),'utf8');
  const light=fs.readFileSync(path.join(root,'demo/salon/salon-demo-light.css'),'utf8');
- assert.match(client,/data-demo-revision="salon-compact-pos-v1-1"/);
+ assert.match(client,/data-demo-revision="salon-pos-customer-v1-2"/);
  assert.doesNotMatch(client,/GUIDED TOUR|className="sd-tour"|tourActive/);
  assert.doesNotMatch(base,/\.sd-tour/);
  assert.doesNotMatch(light,/\.sd-tour/);
@@ -214,4 +214,64 @@ test('compact Light V1.1 increases visible viewport rather than applying browser
  ])
   assert.ok(css.includes(rule),'Required compact/responsive rule: '+rule);
  assert.doesNotMatch(css,/\bzoom\s*:|transform\s*:\s*scale\(/);
+});
+
+
+test('Salon demo V1.2 Customer search supports name, phone and Arabic digits',()=>{
+ const data=d.initialDemo();
+ assert.deepEqual(d.searchDemoCustomers(data,'عمر').map(x=>x.id),['omar']);
+ assert.deepEqual(d.searchDemoCustomers(data,'01000000002').map(x=>x.id),['ali']);
+ assert.deepEqual(d.searchDemoCustomers(data,'٠١٠٠٠٠٠٠٠٠١').map(x=>x.id),['omar']);
+ assert.deepEqual(d.searchDemoCustomers(data,'not found'),[]);
+ assert.deepEqual(d.searchDemoCustomers(data,''),[]);
+});
+test('Salon demo V1.2 quick customer register selects and links Booking/DRAFT, rejects duplicate',()=>{
+ const base=d.initialDemo();
+ const {customer,data}=d.createDemoCustomer(base,'  زيارة جديدة  ','01000000005');
+ assert.equal(customer.name,'زيارة جديدة');
+ assert.equal(customer.phone,'01000000005');
+ assert.equal(data.customers.length,6);
+ assert.equal(base.customers.length,5);
+ assert.deepEqual(d.searchDemoCustomers(data,'000005').map(x=>x.id),[customer.id]);
+ assert.throws(()=>d.createDemoCustomer(data,'آخر','01000000005'),/موجود بالفعل/);
+ assert.throws(()=>d.createDemoCustomer(data,'آخر','121'),/11 رقم/);
+ assert.throws(()=>d.createDemoCustomer(data,' ','01000000006'),/اسم العميل/);
+ const linked=d.saveDemoDraft(data,[{serviceId:'cut',quantity:1}],{customerId:customer.id});
+ assert.equal(linked.drafts[0].customerId,customer.id);
+ const booked=d.bookDemoAppointment(data,{customerId:customer.id,staffId:'mostafa',serviceId:'cut',time:'16:00'});
+ assert.equal(booked.appointments.at(-1).customerId,customer.id);
+ assert.equal(d.initialDemo().customers.length,5);
+});
+test('Salon demo V1.2 last visit is explicit, synthetic and repriced from fixture without payment',()=>{
+ const base=d.initialDemo();
+ const history=d.demoCustomerVisits(base,'omar');
+ assert.equal(history[0].kind,'SAMPLE');
+ const last=d.repeatDemoLastVisit(base,'omar');
+ assert.deepEqual(last,{lines:[{serviceId:'cut',quantity:1},{serviceId:'beard',quantity:1}],staffId:'mostafa'});
+ last.lines[0].quantity=7;
+ assert.equal(d.DEMO_SAMPLE_VISITS[0].lines[0].quantity,1,'repeat must clone immutable original');
+ assert.throws(()=>d.repeatDemoLastVisit(base,'guest'),/مفيش زيارة/);
+ const next=d.saveDemoDraft(base,[{serviceId:'wax',quantity:1}],{
+  customerId:'omar',staffId:'youssef',discount:{mode:'fixed',value:100},
+ });
+ assert.equal(d.demoCustomerVisits(next,'omar')[0].kind,'DRAFT');
+ assert.deepEqual(d.repeatDemoLastVisit(next,'omar'),{
+  lines:[{serviceId:'wax',quantity:1}],staffId:'youssef',
+ });
+ assert.equal(next.drafts[0].status,'DRAFT');
+ assert.equal(base.drafts.length,0);
+});
+test('Salon demo V1.2 renders Customer lookup/create/last visit with fail-closed sandbox UX',()=>{
+ const flow=fs.readFileSync(path.join(root,'demo/salon/salon-pos-customer-flow.tsx'),'utf8');
+ const pos=fs.readFileSync(path.join(root,'demo/salon/salon-pos-workspace.tsx'),'utf8');
+ const client=fs.readFileSync(path.join(root,'demo/salon/salon-demo-client.tsx'),'utf8');
+ for(const t of ['بحث بالاسم أو رقم الموبايل','تسجيل هذا العميل','حفظ واختيار العميل',
+  'آخر زيارة للعميل','تطبيق آخر زيارة في السلة','استبدال السلة'])
+  assert.ok(flow.includes(t),'Missing customer UX '+t);
+ assert.match(pos,/repeatDemoLastVisit/);
+ assert.match(pos,/setCart\(visit\.lines\);setStaffId\(visit\.staffId\)/);
+ assert.match(client,/createDemoCustomer/);
+ assert.match(client,/data\.customers\.map/);
+ for(const code of [flow,pos,client])
+  assert.doesNotMatch(code,/fetch\s*\(|localStorage|sessionStorage|document\.cookie|\/api\//);
 });

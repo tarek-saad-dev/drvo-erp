@@ -155,3 +155,54 @@
  .sd-pos-search{min-width:100%;max-width:none}
  .sd-pos-finance-preview{padding:12px}
 }
+
+
+/* Salon POS V1.2: customer lookup, sample-visit repeat and quick create; Light compact. */
+.sd-pos-customer-picker{min-width:0;position:relative}
+.sd-pos-customer-picker>label{display:block;font-size:11px;font-weight:750;color:#665b69;margin-bottom:5px}
+.sd-pos-customer-picker>input,.sd-pos-create-dialog input{min-height:38px;width:100%;min-width:0;border:1px solid #ded5e0;
+ border-radius:8px;padding:8px 10px;background:white;color:#27242b;font-size:12px}
+.sd-pos-customer-results{position:absolute;z-index:50;top:100%;right:0;left:0;margin-top:4px;
+ overflow:auto;max-height:230px;background:white;border:1px solid #dfd5e1;border-radius:10px;
+ box-shadow:0 14px 25px #31253825}
+.sd-pos-customer-results button{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;
+ padding:10px 11px;text-align:right;border:0;background:white;font-size:12px;cursor:pointer;color:#524252}
+.sd-pos-customer-results button:hover,.sd-pos-customer-results button:focus-visible{background:#ecf7f5}
+.sd-pos-customer-results button span{font-size:11px;color:#777}
+.sd-pos-customer-results p{padding:8px 10px;margin:0;font-size:11px;color:#756d77}
+.sd-pos-customer-results button.sd-pos-create-link{color:#15737a;font-weight:750;border-top:1px solid #f0ebf1}
+.sd-pos-picked{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;
+ color:#665b69;font-size:11px;margin-top:7px}
+.sd-pos-picked strong{color:#2d4f53}
+.sd-pos-picked small{display:inline;margin-right:6px;color:#888}
+.sd-pos-picked button{cursor:pointer;background:#eaf6f5;color:#166b70;border:1px solid #c7dedc;
+ border-radius:7px;padding:6px 8px;font-size:10px}
+.sd-pos-customer-visit{grid-column:1/-1;padding:11px 13px;border:1px solid #d9eae6;
+ border-radius:10px;background:#f6faf9;display:grid;gap:10px}
+.sd-pos-visit-title{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.sd-pos-visit-title strong{font-size:12px;color:#345a58}
+.sd-pos-visit-title span{font-size:10px;color:#77817f}
+.sd-pos-customer-visit>p{font-size:11px;color:#77817f;margin:0}
+.sd-pos-visit-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.sd-pos-visit-row>div{display:flex;flex-direction:column;gap:4px;min-width:0;color:#675e68;font-size:11px}
+.sd-pos-visit-row>div strong{color:#285b5e;font-size:12px}
+.sd-pos-visit-row small{color:#7c7d81;font-size:10px}
+.sd-pos-visit-row>button,.sd-pos-visit-confirm button{border:1px solid #b7d8d4;background:#e5f4f2;
+ color:#126f74;border-radius:8px;padding:9px 12px;font-size:11px;font-weight:750;cursor:pointer}
+.sd-pos-visit-confirm{display:flex;align-items:center;flex-wrap:wrap;gap:9px;padding-top:9px;
+ border-top:1px solid #ddece9;color:#726243;font-size:11px}
+.sd-pos-create-overlay{position:fixed;inset:0;z-index:110;background:#161b269c;
+ display:grid;place-items:center;padding:16px}
+.sd-pos-create-dialog{width:min(100%,430px);background:white;padding:21px;border-radius:14px;
+ border:1px solid #e5dfe5;box-shadow:0 20px 50px #18131b44}
+.sd-pos-create-dialog h2{color:#43384a;font-size:18px;margin:0 0 6px}
+.sd-pos-create-dialog>p{color:#756b77;font-size:11px;line-height:1.7;margin:0 0 14px}
+.sd-pos-create-dialog form{display:grid;gap:12px}
+.sd-pos-create-dialog label{display:grid;gap:5px;color:#5d5361;font-size:12px}
+.sd-pos-create-buttons{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px}
+.sd-pos-create-buttons button{border:1px solid #e1d8e2;border-radius:8px;background:#faf8fa;
+ padding:9px 13px;color:#554b57;font-size:12px;cursor:pointer}
+.sd-pos-create-buttons button[type=submit]{background:#16777b;border-color:#16777b;color:white}
+@media(max-width:950px){.sd-pos-toolbar{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.sd-pos-toolbar-note{display:none}}
+@media(max-width:620px){.sd-pos-toolbar{grid-template-columns:minmax(0,1fr)}
+ .sd-pos-customer-visit{grid-column:1}.sd-pos-visit-row>button{width:100%}}

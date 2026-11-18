@@ -1,5 +1,8 @@
 # Start here — project handoff
 
+> **2026-11-18 FOUNDER ACTIVE-PRODUCT DIRECTION:** [Cut Salon private real-data pilot / Live Development contract](../04-execution/CUT-SALON-REAL-PRODUCT-LIVE-DEVELOPMENT-2026-11-18.md). Public /demo/salon is not the product. Private K5 POS now supports real Customers read/name-phone filter (first 200 ONLY), inline idempotent registration and SQL V2 DRAFT Customer handoff. **No Cut Salon records imported or private live flags enabled.** Next: verified server-side phone search/dedupe, secure read-only last-month Cut extract, isolated pilot target/restore, then read-only historical sales and live operator walkthrough.
+
+
 > **2026-11-18 PUBLIC SALON DEMO V1.2 CODED:** [Visible Customer/phone search + quick create + sample last visit](../04-execution/SALON-PUBLIC-DEMO-CUSTOMER-POS-V1-2-2026-11-18.md) are now implemented directly on `/demo/salon` source. Public in-memory sandbox only; real Customers history, invoice, primary SQL and finance remain OPEN. Exact CI/HTTPS verification separate.
 
 

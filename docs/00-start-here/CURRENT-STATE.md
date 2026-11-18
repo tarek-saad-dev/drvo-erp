@@ -1,5 +1,8 @@
 # Current state
 
+> **VERIFIED 2026-11-18 (exact deployed application SHA `7095d8de647924e8377d2e42dfce332ae6c5b812`):** [Interactive Salon Demo CI #44327848014](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44327848014) **PASS**: 16/16 Salon model/UI tests; additional 4/4 Light UI and 7/7 private Salon tests; Next.js build/typecheck, public /demo/salon 200 and private K5 404. [Staging Deploy #44327847934](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44327847934) **SUCCESS** with receiver confirming the exact SHA. [External independent HTTPS marker smoke #44328217272](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44328217272) **PASS**, confirming `data-demo-revision="salon-pos-customer-v1-2"` visible at `https://erp-stage.drvotech.com/demo/salon`. Previous smoke #44328099520 failed because it expected the obsolete V1.1 marker; workflow corrected by commit `39c6646`. External evidence checks HTML marker, NOT browser-click interaction, exact VPS `release.sha` attestation, private SQL, or full Cashier POS.
+
+
 > **2026-11-18 USER-VISIBLE DEMO FEATURE:** [Public POS customer flow V1.2](../04-execution/SALON-PUBLIC-DEMO-CUSTOMER-POS-V1-2-2026-11-18.md) adds name/phone search, quick-create-and-select, synthetic last-visit/DRAFT repeat and cart replace confirmation. **Not real paid Cashier parity, no primary DB, no private POS activation.** Verify exact commit CI and live staging separately.
 
 

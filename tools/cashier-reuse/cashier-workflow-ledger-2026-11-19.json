@@ -292,8 +292,8 @@
       "DataProof": "OPEN",
       "PilotProof": "OPEN",
       "Status": "PORTING",
-      "Blocker": "Optional add-ons / mutually exclusive groom groups / booking hydration still OPEN; primary DB 025 not applied",
-      "NextAction": "CI green on SQL025; optional extras next; keep finance gated"
+      "Blocker": "Mutually exclusive groom groups / booking package identity still OPEN; primary DB 025 not applied",
+      "NextAction": "Add exclusive groom groups after Catalog contract; keep finance gated"
     },
     {
       "ID": "POS-EXEC",

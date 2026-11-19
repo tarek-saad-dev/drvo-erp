@@ -4,14 +4,14 @@
 
 | Layer | State | Evidence |
 | --- | --- | --- |
-| Code committed locally | YES | HEAD `34c56fc` |
-| Code on GitHub `main` | YES | `34c56fcb61994462811862283c588d66d11f7605` = `git ls-remote origin refs/heads/main` |
-| Customers SQL024 CI | PASS | https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44563649332 (`537005b`) · https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44564799543 (`04c00dc`) |
+| Code committed locally | YES | tip advances with optional-extras slice |
+| Code on GitHub `main` | YES | must match `git ls-remote` after push |
+| Customers SQL024 CI | PASS | https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44563649332 (`537005b`) |
 | Catalog SQL025 packages CI | PASS | https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44566865041 (`492b4d3`) |
-| K5C on `34c56fc` | PASS | https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44569681994 |
-| POS Rich on `34c56fc` | PASS | https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44569682128 |
-| K1 + Staging Artifact + Deploy on `34c56fc` | PASS | K1 https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44569681961 · Artifact https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44569682055 · Deploy https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44569682103 |
-| Deployed / private usable | Staging Deploy SUCCESS on `34c56fc`; Owner browser OPEN | Feature flags OFF for finance/rich as configured; SQL024/025 **not** applied to primary/VPS |
+| K5C on `34c56fc` | PASS | https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44569387987 |
+| POS Rich on `34c56fc` | PASS | https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44569387941 |
+| K1 + Artifact + Deploy on `34c56fc` | PASS | K1 https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44569388027 · Artifact https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44569388041 · Deploy https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44569387936 |
+| Deployed / private usable | Staging Deploy SUCCESS on `34c56fc`; Owner browser OPEN | Flags OFF; SQL024/025 **not** on primary/VPS |
 | Full Cashier parity | NO | Migration incomplete |
 
 ## Source lock (PR0)

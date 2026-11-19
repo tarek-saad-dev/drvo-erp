@@ -6,8 +6,10 @@ const root=path.resolve(__dirname,'../src/app/workspace/[businessId]/[branchId]/
 test('packages section expands required SERVICE includes without payment APIs',()=>{
  const ui=fs.readFileSync(path.join(root,'cashier-packages-section.tsx'),'utf8');
  assert.match(ui,/data-cashier-pos="packages-section"/);
+ assert.match(ui,/data-cashier-pos="package-extras"/);
  assert.match(ui,/\/catalog\/packages/);
  assert.match(ui,/expandPackageToDraftLines/);
+ assert.match(ui,/optionalOfferingIds/);
  assert.match(ui,/kind!=="SERVICE"/);
  assert.match(ui,/maxLines\?\?20/);
  assert.match(ui,/مفيش استرداد باقة ولا دفع/);

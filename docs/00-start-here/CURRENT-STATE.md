@@ -1,5 +1,7 @@
 # Current state
 
+> **2026-11-19 CURSOR DELIVERY CONTRACT, NOT A PARITY CLAIM:** [Full-source/full-UX execution directive](../04-execution/CURSOR-CASHIER-FULL-MIGRATION-EXECUTION-2026-11-19.md) and [agent prompt](../04-execution/CURSOR-CASHIER-AGENT-KICKOFF.md) prepared for multi-PR execution. DRVO primary Cut Salon parity, source data copy, authenticated browser and financial posting remain OPEN. This handoff performed no application/DB/deployment changes.
+
 > **2026-11-18 PRIVATE PRODUCT, NOT DEMO:** [Cut Salon live-development execution contract](../04-execution/CUT-SALON-REAL-PRODUCT-LIVE-DEVELOPMENT-2026-11-18.md) records real usage as the product goal. Actual protected POS code change [7a3189e](https://github.com/tarek-saad-dev/drvo-erp/commit/7a3189e69df0eb8985abf9f220e5800f36bb2ebb) integrates Customers Core selection and inline create into SQL-backed Cashier V2 nonposting Draft. **Search is limited to first 200; no server duplicate-phone proof; do not bulk-import Cut customers yet. No live Cut data/migration/flags/financial posting.**
 
 

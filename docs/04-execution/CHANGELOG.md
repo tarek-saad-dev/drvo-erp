@@ -1,5 +1,7 @@
 # Project changelog
 
+- **2026-11-19 — CURSOR FULL CASHIER PORT HANDOFF (DOCS ONLY):** Added [full executable parity migration contract](CURSOR-CASHIER-FULL-MIGRATION-EXECUTION-2026-11-19.md), [Agent kickoff](CURSOR-CASHIER-AGENT-KICKOFF.md) and `.cursor/rules/cashier-full-parity.mdc`. Canonical ADR-040 shared-core/Salon extensions and Cashier UX preservation remain required; ADR-031 payment/GL gating unchanged. **No actual app/SQL/deployment/data import in this docs-only change.**
+
 - 2026-11-18 — Shifted DRVO delivery target to a private real-data Cut Salon pilot; implemented Customer name/mobile search and inline SQL-backed quick create/select in Cashier V2 private POS, with 200-entity limit and no live enablement. No Cut import, SQL migration or financial posting. [Operating contract](CUT-SALON-REAL-PRODUCT-LIVE-DEVELOPMENT-2026-11-18.md).
 
 

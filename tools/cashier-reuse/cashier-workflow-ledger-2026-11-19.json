@@ -214,17 +214,21 @@
       "OwnedModule": "POS/Sales",
       "SalonExtension": "Barber/packages/queue",
       "TargetPaths": [
-        "apps/web/.../pos-preview/**"
+        "apps/web/.../pos-preview/pos-preview-client.tsx",
+        "apps/web/.../pos-preview/cashier-catalog-browser.tsx",
+        "apps/web/.../pos-preview/cashier-cart-panel.tsx",
+        "apps/web/.../pos-preview/cashier-quick-actions.tsx",
+        "apps/web/.../pos-preview/pos-customer-operator.tsx"
       ],
       "UIProof": "OPEN",
-      "DomainTest": "PARTIAL pricing",
+      "DomainTest": "PARTIAL pricing + workstation source tests",
       "SQLHTTPTest": "PARTIAL S2/S3",
       "BrowserProof": "OPEN",
       "DataProof": "OPEN",
       "PilotProof": "OPEN",
-      "Status": "SOURCE_IDENTIFIED",
-      "Blocker": "Full component tree not yet transplanted into private workspace",
-      "NextAction": "PR2 Cashier POS UX transplant after CU-01"
+      "Status": "PORTING",
+      "Blocker": "Barber carousel, packages, handoffs, print, paid invoice still missing; finance buttons blocked",
+      "NextAction": "Port Barber/HR selector + packages section next; keep finance gated"
     },
     {
       "ID": "PR0-SOURCE-LOCK",

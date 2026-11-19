@@ -3,6 +3,9 @@ import Link from "next/link";
 import CashierPricingPanel from "./cashier-pricing-panel";
 import CashierDraftHistory from "./cashier-draft-history";
 import PosCustomerOperator from "./pos-customer-operator";
+import CashierCatalogBrowser from "./cashier-catalog-browser";
+import CashierCartPanel from "./cashier-cart-panel";
+import CashierQuickActions from "./cashier-quick-actions";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -36,7 +39,6 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
   const [status,setStatus]=useState<"loading"|"ready"|"denied"|"error">("loading");
   const [offerings,setOfferings]=useState<Offering[]>([]);
   const [offeringId,setOfferingId]=useState("");
-  const [catalogSearch,setCatalogSearch]=useState("");
   const [quantity,setQuantity]=useState(1);
   const [lines,setLines]=useState<Line[]>([]);
   const [preview,setPreview]=useState<Preview|null>(null);
@@ -54,8 +56,6 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
   const [customerRevision,setCustomerRevision]=useState(0);
   const retryKey=useRef<string|null>(null);
   const handoffApplied=useRef(false);
-  const matchingOfferings=offerings.filter(o=>o.isActive&&
-    o.displayName.toLocaleLowerCase().includes(catalogSearch.trim().toLocaleLowerCase()));
   const selectedCurrency=offerings.find(o=>lines.some(l=>l.offeringId===o.offeringId))?.currency??"EGP";
   const home="/workspace/"+encodeURIComponent(businessId)+"/"+encodeURIComponent(branchId);
   const api="/api/workspaces/"+encodeURIComponent(businessId)+"/branches/"+
@@ -221,39 +221,36 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
     }catch{setMessage("تعذر الاتصال بالخادم لحساب الخصم والإكرامية الاسترشادية.");}
     finally{setBusy(false);}
   }
-  return <main className="k5-workspace">
+  return <main className="k5-workspace" data-cashier-pos="private-workstation-v1">
     <header className="k5-workspace-header">
       <div className="k5-brand"><span className="brandmark">D</span> DRVO <b>ERP</b></div>
       <nav className="k5-head-actions"><Link href={home}>مساحة الفرع</Link></nav>
     </header>
     <div className="k5-page-title"><div>
-      <span className="k5-eyebrow">POS / REVIEW-ONLY</span>
-      <h1>مسودة بيع — معاينة الأسعار</h1>
-      <p className="k5-muted">دي معاينة من كتالوج النشاط، مش فاتورة أو أمر دفع أو حجز مخزون.
-        العناصر الحالية مؤقتة في المتصفح، والحفظ (لو مسموح) بيعمل DRAFT بس. فيه معاينة منفصلة لخصومات Cashier الأصلية على أسعار الكتالوج الحقيقية، لكن الخصومات دي مش محفوظة لسه ولا بتعمل دفع أو فاتورة أو ضريبة.</p>
+      <span className="k5-eyebrow">POS / CASHIER UX · NONPOSTING</span>
+      <h1>نقطة البيع — مسودة تشغيل</h1>
+      <p className="k5-muted">واجهة Cashier مكيّفة على Light الخاص: عميل + كتالوج + سلة على APIs DRVO.
+        مفيش تحصيل أو فاتورة أو مخزون أو ترحيل — أي زر مالي ظاهر ومقفول بصراحة.</p>
     </div></div>
     {status==="loading"&&<p role="status">جاري التحقق من صلاحيات الفرع…</p>}
     {status==="denied"&&<p role="alert" className="k5-error">المعاينة غير متاحة لحسابك أو للفرع.</p>}
     {status==="error"&&<p role="alert" className="k5-error">المعاينة غير متاحة حاليًا.</p>}
     {status==="ready"&&<>
-      <section className="k5-admin-card k5-invite-card">
-        <h2>إضافة عنصر للمسودة</h2>
-        <p className="k5-muted">اختار عنصر من القائمة أو اضغط إضافة سريعة. كل الأسعار استرشادية، والسلة مش فاتورة.</p>
-        <label>ابحث عن خدمة أو منتج للإضافة السريعة
-          <input type="search" maxLength={100} value={catalogSearch}
-            placeholder="اكتب اسم العنصر" onChange={e=>setCatalogSearch(e.target.value)}/>
-        </label>
-        <div className="k5-salon-steps" aria-label="إضافة سريعة من الكتالوج">
-          {matchingOfferings.filter(o=>
-            !lines.some(l=>l.offeringId===o.offeringId)).slice(0,8).map(o=><button
-            key={o.offeringId} type="button" className="k5-salon-refresh"
-            disabled={busy||draftBusy||lines.length>=20} onClick={()=>quickAdd(o)}>
-            + {o.displayName} — {money(o.priceMinor,o.currency)}
-          </button>)}
-        </div>
-        {matchingOfferings.length===0&&<p className="k5-muted">مفيش عناصر نشطة مطابقة للبحث الحالي.</p>}
+      {draftsEnabled&&richEnabled&&<PosCustomerOperator
+        apiRoot={api.replace(/\/pos-preview$/,"")} customerId={selectedCustomerId}
+        onSelect={setSelectedCustomerId} onCreated={()=>setCustomerRevision(v=>v+1)}/>}
+      <CashierCatalogBrowser offerings={offerings} disabled={busy||draftBusy||lines.length>=20}
+       onAdd={o=>quickAdd(o)}/>
+      <CashierCartPanel lines={lines} offerings={offerings} disabled={busy||draftBusy}
+       onAdjust={adjustLineQuantity}
+       onRemove={id=>{
+        setLines(s=>s.filter(x=>x.offeringId!==id));setPreview(null);setAdjustment(null);retryKey.current=null;
+       }}/>
+      <CashierQuickActions/>
+      <section className="k5-admin-card">
+        <h2>حساب المعاينة وحفظ المسودة</h2>
         <form className="catalog-form" onSubmit={addLine}>
-          <label>الخدمة أو المنتج<select value={offeringId} required
+          <label>إضافة يدوية<select value={offeringId}
             onChange={e=>setOfferingId(e.target.value)}>
             <option value="">اختر من الكتالوج</option>
             {offerings.filter(o=>o.isActive).map(o=>
@@ -261,31 +258,8 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
           </select></label>
           <label>الكمية<input type="number" min={1} max={20} required
             value={quantity} onChange={e=>setQuantity(Number(e.target.value))}/></label>
-          <button className="k5-save" type="submit" disabled={busy||draftBusy}>أضف للمسودة</button>
+          <button className="k5-save" type="submit" disabled={busy||draftBusy||!offeringId}>أضف للمسودة</button>
         </form>
-      </section>
-      <section className="k5-admin-card">
-        <h2>عناصر المسودة (غير محفوظة)</h2>
-        {lines.length===0?<p className="k5-muted">لسه مفيش عناصر.</p>:
-          <div className="k5-table-wrap"><table className="k5-table">
-            <thead><tr><th>العنصر</th><th>الكمية</th><th>إزالة</th></tr></thead><tbody>
-              {lines.map(l=><tr key={l.offeringId}>
-                <td>{offerings.find(o=>o.offeringId===l.offeringId)?.displayName??"—"}</td>
-                <td><div className="k5-booking-actions">
-                  <button type="button" disabled={busy||draftBusy||l.quantity<=1}
-                    aria-label={"تقليل كمية "+(offerings.find(o=>o.offeringId===l.offeringId)?.displayName??"العنصر")}
-                    onClick={()=>adjustLineQuantity(l.offeringId,-1)}>−</button>
-                  <span>{l.quantity}</span>
-                  <button type="button" disabled={busy||draftBusy||l.quantity>=20}
-                    aria-label={"زيادة كمية "+(offerings.find(o=>o.offeringId===l.offeringId)?.displayName??"العنصر")}
-                    onClick={()=>adjustLineQuantity(l.offeringId,1)}>+</button>
-                </div></td>
-                <td><button type="button" disabled={busy||draftBusy} onClick={()=>{
-                  setLines(s=>s.filter(x=>x.offeringId!==l.offeringId));setPreview(null);setAdjustment(null);retryKey.current=null;
-                }}>حذف</button></td>
-              </tr>)}
-            </tbody>
-          </table></div>}
         <button className="k5-save" type="button" disabled={busy||draftBusy||lines.length===0} onClick={()=>void calculate()}>
           {busy?"جاري الحساب…":"احسب معاينة الأسعار"}
         </button>
@@ -324,9 +298,6 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
             </tr>)}</tbody>
           </table></div>}
       </section>}
-      {draftsEnabled&&richEnabled&&<PosCustomerOperator
-        apiRoot={api.replace(/\/pos-preview$/,"")} customerId={selectedCustomerId}
-        onSelect={setSelectedCustomerId} onCreated={()=>setCustomerRevision(v=>v+1)}/>}
       {draftsEnabled&&richEnabled&&<CashierDraftHistory
         apiRoot={api.replace(/\/pos-preview$/,"")} draftApi={draftApi}
         revision={richHistoryRevision} disabled={busy||draftBusy}

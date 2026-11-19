@@ -108,33 +108,64 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  // Service + Resource selects; Customer is server Business search (SQL024), not a select.
  await form.getByLabel('المورد').locator('option').filter({hasText:resource})
   .waitFor({state:'attached',timeout:20000});
- onPhase('S12 create scoped Booking via UI');
+ onPhase('S12 customer Business search via UI');
  const searchWait=page.waitForResponse(r=>r.request().method()==='GET'&&
   r.url().includes('/customers?q=')&&r.url().includes('/api/workspaces/'),{timeout:20000});
- await form.getByLabel(/ابحث عن العميل/).fill(customer);
+ await form.getByLabel(/ابحث عن العميل/).fill(customer,{timeout:20000});
  const searchResponse=await searchWait;
  assert.equal(searchResponse.status(),200,'Customer Business search HTTP');
  const pick=form.getByRole('button',{name:new RegExp(customer.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'))});
  await pick.first().waitFor({state:'visible',timeout:20000});
- await pick.first().click();
- await form.getByLabel('الخدمة').selectOption({label:service+' (30 دقيقة)'});
- await form.getByLabel('المورد').selectOption({label:resource});
+ await pick.first().click({timeout:20000});
+ await form.getByLabel('الخدمة').selectOption({label:service+' (30 دقيقة)'},{timeout:20000});
+ await form.getByLabel('المورد').selectOption({label:resource},{timeout:20000});
  const local=await page.evaluate(()=>{
   const d=new Date(Date.now()+72*60*60*1000);
   d.setSeconds(0,0);
   return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
  });
- // datetime-local fill can hang in headless Chrome; set value via DOM + input event.
+ // datetime-local Playwright fill can hang in headless Chrome. Use the native
+ // value setter so React controlled onChange updates localStart (plain
+ // el.value= does not — submit then exits without POST).
  await form.getByLabel('الموعد المحلي').evaluate((el,value)=>{
-  el.value=value;
+  const setter=Object.getOwnPropertyDescriptor(
+   window.HTMLInputElement.prototype,'value').set;
+  setter.call(el,value);
   el.dispatchEvent(new Event('input',{bubbles:true}));
   el.dispatchEvent(new Event('change',{bubbles:true}));
  },local);
- const [bookingResponse]=await Promise.all([
-  page.waitForResponse(r=>r.request().method()==='POST'&&
-   r.url().endsWith('/booking/appointments'),{timeout:20000}),
-  form.getByRole('button',{name:'تأكيد الحجز'}).click({timeout:20000}),
- ]);
+ const preSubmit=await form.evaluate(f=>{
+  const dt=f.querySelector('input[type="datetime-local"]');
+  const hidden=f.querySelector('input[type="hidden"]');
+  const btn=f.querySelector('button.k5-save');
+  return {
+   datetime:dt instanceof HTMLInputElement?dt.value:'',
+   customerId:hidden instanceof HTMLInputElement?hidden.value:'',
+   disabled:btn instanceof HTMLButtonElement?btn.disabled:true,
+  };
+ });
+ assert.ok(preSubmit.datetime.length>=16,'React localStart must receive datetime');
+ assert.match(preSubmit.customerId,
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+  'Customer GUID selected before booking submit');
+ assert.equal(preSubmit.disabled,false,'Confirm booking enabled before click');
+ onPhase('S12 create scoped Booking via UI');
+ let bookingResponse;
+ try{
+  [bookingResponse]=await Promise.all([
+   page.waitForResponse(r=>r.request().method()==='POST'&&
+    r.url().endsWith('/booking/appointments'),{timeout:20000}),
+   form.getByRole('button',{name:'تأكيد الحجز'}).click({timeout:20000}),
+  ]);
+ }catch(err){
+  const notice=await page.evaluate(()=>{
+   const nodes=[...document.querySelectorAll('.k5-notice,.k5-error,[role="alert"]')];
+   return nodes.map(n=>(n.textContent||'').trim()).filter(Boolean).slice(0,3);
+  });
+  throw new Error('S12_BOOKING_POST_MISSING notices='+JSON.stringify(notice)+
+   ' pre='+JSON.stringify(preSubmit)+' cause='+
+   String(err instanceof Error?err.message:err).split('\n')[0].slice(0,120));
+ }
  assert.equal(bookingResponse.status(),200,'Booking appointment create HTTP');
  const bookingRow=page.getByRole('row').filter({hasText:customer});
  await bookingRow.getByText(service,{exact:true}).waitFor({timeout:20000});

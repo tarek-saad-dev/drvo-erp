@@ -1,56 +1,47 @@
-# PR0–PR2+ packages progress — Cashier migration (2026-11-19)
+# PR0–PR2+ packages/handoff progress — Cashier migration (2026-11-19)
 
 ## Delivery status matrix (do not collapse)
 
 | Layer | State | Evidence |
 | --- | --- | --- |
-| Code committed locally | YES | HEAD `5ccb249` |
-| Code on GitHub `main` | YES | `git ls-remote` = `5ccb2498432c68aa4dc55352e964d7b21ab3ff83` |
+| Code committed locally | YES | HEAD `34c56fc` |
+| Code on GitHub `main` | YES | `34c56fcb61994462811862283c588d66d11f7605` = `git ls-remote origin refs/heads/main` |
 | Customers SQL024 CI | PASS | https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44563649332 (`537005b`) · https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44564799543 (`04c00dc`) |
-| K5C + POS Rich on `2103d50` | PASS | K5C https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44565099095 · POS Rich https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44565099330 |
-| Catalog SQL025 on `492b4d3` | PASS | https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44566865041 |
-| K5C/POS Rich/K1 on `492b4d3`/`d313531` | FAIL then fixed | Outdated pricing key assertion + TS handoff seed + Staging P4 pending count; fix `5ccb249` |
-| Deployed / private usable | Staging Deploy may follow green web; Owner browser OPEN | Flags OFF; SQL024/025 **not** applied to primary/VPS |
+| Catalog SQL025 packages CI | PASS | https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44566865041 (`492b4d3`) |
+| K5C on `34c56fc` | PASS | https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44569681994 |
+| POS Rich on `34c56fc` | PASS | https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44569682128 |
+| K1 + Staging Artifact + Deploy on `34c56fc` | PASS | K1 https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44569681961 · Artifact https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44569682055 · Deploy https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44569682103 |
+| Deployed / private usable | Staging Deploy SUCCESS on `34c56fc`; Owner browser OPEN | Feature flags OFF for finance/rich as configured; SQL024/025 **not** applied to primary/VPS |
 | Full Cashier parity | NO | Migration incomplete |
 
 ## Source lock (PR0)
 
 | Field | Value |
 | --- | --- |
-| Prior pin | `bc9c03fff86074872590ad0fd3525f9a4e416958` (retained) |
-| New immutable pin | `046bf19b0d5833a07fe4b2891cbf3032d03b7cef` |
-| Inventories | `tools/cashier-reuse/*-2026-11-19.*` |
+| Immutable pin | `046bf19b0d5833a07fe4b2891cbf3032d03b7cef` |
 | Workflow ledger | `tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json` |
 
-## Customer search (PR1)
-
-| Piece | Detail |
-| --- | --- |
-| SQL024 | `SearchCustomers`, phone index, create-time phone conflict |
-| API | `GET .../customers?q=` Business TOP 20 |
-| Private POS + Booking | Server search UI |
-| Concurrency | verify.cjs parallel duplicate-phone race |
-
-## POS UX (PR2+)
+## Delivered vertical slices (verified in CI, not Owner-browser)
 
 | Slice | Detail |
 | --- | --- |
-| Catalog/cart/quick-actions | Cashier-adapted private Light shell; finance buttons disabled + labeled |
-| Barber → executor | `selectedBarberId` seeds SERVICE line executors on rich DRAFT save; PRODUCT forced null; cart shows context |
-| Packages (SQL025) | `CatalogPackage` + items; `GET/POST .../catalog/packages`; POS expand → DRAFT SERVICE lines; live Catalog prices on quote |
-| Optional groom add-ons / booking package hydration / print / paid history | Still OPEN |
-| CU-05 paid visit history | Still BLOCKED (no posted Sales owner) |
+| Customer search | SQL024 + `?q=` + POS/Booking server search + duplicate-phone concurrency |
+| POS shell | Catalog/cart/quick-actions (finance gated) + PRODUCT tab id-prefix search |
+| Barber → executor | `selectedBarberId` seeds SERVICE rich-draft executors; PRODUCT null |
+| Packages SQL025 | Catalog packages + POS expand-to-DRAFT SERVICE lines |
+| Booking→POS | `customerId`+`offeringId` handoff; optional `packageId` expand when cart empty |
 
 ## Explicit OPEN / gated
 
 - Primary DB SQL024/025 apply + backup/restore
-- Owner authenticated browser
-- Cut import
-- ADR-031 posting / fake payments forbidden
-- Remaining HR/Booking/Queue/Treasury/Expenses/Inventory/Loyalty/Reports workflows
+- Owner authenticated browser proof
+- CU-05 paid visit history (no posted Sales owner)
+- Optional groom package extras / booking package identity on appointments
+- Print/receipt, tips settlement, split tender, ADR-031 posting
+- Cut import; remaining HR/Queue/Treasury/Expenses/Inventory/Loyalty/Reports full workflows
 
 ## Next
 
-1. Confirm Shared Catalog + K5C/POS Rich CI green after packages push.
-2. Optional package extras + Booking→POS multi-line handoff.
-3. Expand ledger; keep finance gated.
+1. Optional package extras + barcode/stock only after Catalog schema owns them.
+2. Keep CU-05 BLOCKED until posted Sales read owner or audited Cut read adapter.
+3. Expand ledger; never fake payments.

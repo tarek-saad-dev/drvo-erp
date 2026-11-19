@@ -4,6 +4,8 @@
  * Does NOT run against external hosts or attest production access.
  */
 const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
 const {chromium}=require('playwright');
 const {exerciseSalonOperations}=require('./operations.cjs');
 const {exerciseHrOperations}=require('./hr-operations.cjs');
@@ -22,68 +24,77 @@ for(const id of [business,branch,foreignBusiness,foreignBranch])
 assert.ok(typeof password==='string'&&password.length>=12);
 const origin='https://drvo-ci.test';
 const url=(b,br)=>origin+'/workspace/'+b+'/'+br+'/salon';
+const heartbeatPath=process.env.DRVO_BROWSER_HEARTBEAT_FILE||
+ path.join(process.env.RUNNER_TEMP||require('node:os').tmpdir(),'drvo-s12-phase.txt');
 let phase='launch';
 let diagnosticPage=null;
+function setPhase(next){
+ phase=next;
+ try{fs.writeFileSync(heartbeatPath,next,'utf8');}catch{}
+ process.stderr.write('S12_PHASE '+next+'\n');
+}
 async function signIn(context,username){
  const page=await context.newPage();
- phase='sign-in page navigation';
+ setPhase('sign-in page navigation');
  await page.goto(origin+'/sign-in',{waitUntil:'domcontentloaded',timeout:45000});
- phase='form fields';
- await page.getByLabel('اسم المستخدم').fill(username);
- await page.getByLabel('كلمة المرور').fill(password);
- phase='POST /api/auth/login response';
+ setPhase('form fields');
+ await page.getByLabel('اسم المستخدم').fill(username,{timeout:20000});
+ await page.getByLabel('كلمة المرور').fill(password,{timeout:20000});
+ setPhase('POST /api/auth/login response');
  const [loginResponse]=await Promise.all([
   page.waitForResponse(r=>r.url().endsWith('/api/auth/login'),{timeout:20000}),
-  page.getByRole('button',{name:'تسجيل الدخول'}).click(),
+  page.getByRole('button',{name:'تسجيل الدخول'}).click({timeout:20000}),
  ]);
  const status=loginResponse.status();
  if(status!==200)throw new Error('LOGIN_HTTP_STATUS_'+status);
- phase='post-login /workspaces navigation';
+ setPhase('post-login /workspaces navigation');
  await page.waitForURL('**/workspaces',{timeout:20000});
- phase='workspaces heading';
- await page.getByRole('heading',{name:'شركاتك وفروعك'}).waitFor();
+ setPhase('workspaces heading');
+ await page.getByRole('heading',{name:'شركاتك وفروعك'}).waitFor({timeout:20000});
  return page;
 }
 async function main(){
  let browser;
  try{
+  setPhase('chromium launch');
   browser=await chromium.launch({
    headless:true,
+   timeout:60000,
    executablePath:process.env.DRVO_BROWSER_CHROME_PATH,
    args:['--host-resolver-rules=MAP drvo-ci.test 127.0.0.1','--no-proxy-server'],
   });
   const privileged=await browser.newContext({ignoreHTTPSErrors:true});
   // Explicit ceilings prevent indefinite waits if a locator never resolves.
-  privileged.setDefaultTimeout(45000);
+  privileged.setDefaultTimeout(30000);
   privileged.setDefaultNavigationTimeout(45000);
-  phase='privileged login';
+  setPhase('privileged login');
   const operator=await signIn(privileged,'scheduler.booking.ci');
   diagnosticPage=operator;
-  phase='privileged salon navigate';
+  setPhase('privileged salon navigate');
   await operator.goto(url(business,branch),{waitUntil:'domcontentloaded',timeout:45000});
-  phase='privileged salon heading';
-  await operator.getByRole('heading',{name:'لوحة تشغيل الصالون'}).waitFor();
-  phase='privileged SQL-backed branch label';
-  await operator.getByText('CI Business · CI Branch').waitFor();
-  phase='privileged SQL-backed booking count';
-  await operator.getByText(/الحجوزات المعروضة:/).waitFor();
-  phase='privileged independently authorized POS count';
-  await operator.getByText(/مسودات POS المعروضة:/).waitFor();
+  setPhase('privileged salon heading');
+  await operator.getByRole('heading',{name:'لوحة تشغيل الصالون'}).waitFor({timeout:30000});
+  setPhase('privileged SQL-backed branch label');
+  await operator.getByText('CI Business · CI Branch').waitFor({timeout:30000});
+  setPhase('privileged SQL-backed booking count');
+  await operator.getByText(/الحجوزات المعروضة:/).waitFor({timeout:30000});
+  setPhase('privileged independently authorized POS count');
+  await operator.getByText(/مسودات POS المعروضة:/).waitFor({timeout:30000});
   assert.equal((await operator.getByText(/مسودات POS المعروضة:/).count()),1);
   // S11 already proved real read; S12 now clicks actual write forms.
   const operations=await exerciseSalonOperations(
-   operator,origin,business,branch,value=>{phase=value;});
+   operator,origin,business,branch,value=>{setPhase(value);});
   // S13: real private Next UI -> Nest/K5 -> disposable SQL Employee+Barber.
-  const hr=await exerciseHrOperations(operator,origin,business,branch,value=>{phase=value;});
-  phase='S12 restored Salon Overview after UI writes';
+  const hr=await exerciseHrOperations(operator,origin,business,branch,value=>{setPhase(value);});
+  setPhase('S12 restored Salon Overview after UI writes');
   await operator.goto(url(business,branch),{
    waitUntil:'domcontentloaded',timeout:45000,
   });
-  await operator.getByText(/مسودات POS المعروضة:/).waitFor();
-  await operator.getByText('CI Business · CI Branch').waitFor();
-  phase='separate staff login';
+  await operator.getByText(/مسودات POS المعروضة:/).waitFor({timeout:30000});
+  await operator.getByText('CI Business · CI Branch').waitFor({timeout:30000});
+  setPhase('separate staff login');
   const restricted=await browser.newContext({ignoreHTTPSErrors:true});
-  restricted.setDefaultTimeout(45000);
+  restricted.setDefaultTimeout(30000);
   restricted.setDefaultNavigationTimeout(45000);
   const staff=await signIn(restricted,'staff.read.booking.ci');
   phase='staff salon navigate';

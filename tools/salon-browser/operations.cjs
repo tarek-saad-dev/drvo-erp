@@ -124,20 +124,25 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
   d.setSeconds(0,0);
   return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
  });
- await form.getByLabel('الموعد المحلي').fill(local);
+ // datetime-local fill can hang in headless Chrome; set value via DOM + input event.
+ await form.getByLabel('الموعد المحلي').evaluate((el,value)=>{
+  el.value=value;
+  el.dispatchEvent(new Event('input',{bubbles:true}));
+  el.dispatchEvent(new Event('change',{bubbles:true}));
+ },local);
  const [bookingResponse]=await Promise.all([
   page.waitForResponse(r=>r.request().method()==='POST'&&
    r.url().endsWith('/booking/appointments'),{timeout:20000}),
-  form.getByRole('button',{name:'تأكيد الحجز'}).click(),
+  form.getByRole('button',{name:'تأكيد الحجز'}).click({timeout:20000}),
  ]);
  assert.equal(bookingResponse.status(),200,'Booking appointment create HTTP');
  const bookingRow=page.getByRole('row').filter({hasText:customer});
  await bookingRow.getByText(service,{exact:true}).waitFor({timeout:20000});
  await bookingRow.getByText(resource,{exact:true}).waitFor({timeout:20000});
  onPhase('S12 Booking survives browser reload');
- await page.reload({waitUntil:'domcontentloaded'});
+ await page.reload({waitUntil:'domcontentloaded',timeout:45000});
  const savedBooking=page.getByRole('row').filter({hasText:customer});
- await savedBooking.getByText(service,{exact:true}).waitFor();
+ await savedBooking.getByText(service,{exact:true}).waitFor({timeout:20000});
  onPhase('S12 POS DRAFT created through UI only');
  // Capture only request status for the same exact private scope; no URL/cookie/body.
  const posGetStatuses=[];
@@ -152,10 +157,11 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
   }
  };
  page.on('response',posWatcher);
- await page.goto(scope+'/pos-preview',{waitUntil:'domcontentloaded'});
+ await page.goto(scope+'/pos-preview',{waitUntil:'domcontentloaded',timeout:45000});
  // Cashier-adapted private POS title (not the older preview-only heading).
- await page.getByRole('heading',{name:'نقطة البيع — مسودة تشغيل',exact:true}).waitFor();
- await page.locator('[data-cashier-pos="private-workstation-v1"]').waitFor();
+ await page.getByRole('heading',{name:'نقطة البيع — مسودة تشغيل',exact:true})
+  .waitFor({timeout:30000});
+ await page.locator('[data-cashier-pos="private-workstation-v1"]').waitFor({timeout:30000});
  onPhase('S12 POS preview verified authorized Catalog GET');
  const previewHttp=await page.evaluate(async ({business,branch})=>{
   try{
@@ -167,6 +173,8 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  },{business,branch});
  assert.equal(previewHttp,200,'CI-only POS Preview API status');
  onPhase('S12 real POS quick cart from authorized Catalog');
+ // Wait until Catalog browser is ready (status===ready), not only page shell.
+ await page.locator('[data-cashier-pos="catalog-browser"]').waitFor({timeout:30000});
  const search=page.getByLabel('بحث سريع في الكتالوج');
  try {
   await search.waitFor({timeout:10000});
@@ -196,23 +204,24 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
    'E'+inspection.error+'I'+inspection.inputCount+
    'W'+inspection.workstation+'C'+inspection.catalog);
  }
- await search.fill(service);
+ await search.fill(service,{timeout:20000});
  const serviceEsc=service.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
  const quickAdd=page.locator('[data-cashier-pos="catalog-browser"]')
   .getByRole('button',{name:new RegExp('خدمة · '+serviceEsc)});
- await quickAdd.waitFor();
- await quickAdd.click();
+ await quickAdd.waitFor({timeout:20000});
+ await quickAdd.click({timeout:20000});
  const increase=page.locator('[data-cashier-pos="cart-panel"]')
   .getByRole('button',{name:'زيادة الكمية',exact:true});
- await increase.waitFor();
- await increase.click();
- await page.getByRole('button',{name:'حفظ مسودة فقط (بدون بيع)'}).click();
- await page.getByText('المسودة اتحفظت. لم يتم تسجيل بيع أو تحصيل.').waitFor();
+ await increase.waitFor({timeout:20000});
+ await increase.click({timeout:20000});
+ await page.getByRole('button',{name:'حفظ مسودة فقط (بدون بيع)'}).click({timeout:20000});
+ await page.getByText('المسودة اتحفظت. لم يتم تسجيل بيع أو تحصيل.').waitFor({timeout:30000});
  onPhase('S12 POS DRAFT persisted and still unposted');
- await page.reload({waitUntil:'domcontentloaded'});
- await page.getByRole('heading',{name:'مسودات محفوظة — مش فواتير',exact:true}).waitFor();
+ await page.reload({waitUntil:'domcontentloaded',timeout:45000});
+ await page.getByRole('heading',{name:'مسودات محفوظة — مش فواتير',exact:true})
+  .waitFor({timeout:30000});
  const draft=page.getByRole('row').filter({hasText:service+' × 2'});
- await draft.getByText('مسودة فقط',{exact:true}).waitFor();
+ await draft.getByText('مسودة فقط',{exact:true}).waitFor({timeout:20000});
  return Object.freeze({customer,service,resource});
 }
 module.exports={exerciseSalonOperations};

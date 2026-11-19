@@ -36,12 +36,18 @@ async function waitForGateway(){
  throw new Error('Disposable HTTPS gateway unavailable');
 }
 async function childCheck(env){
- // Hard ceiling: attempt-3 hung for hours because Playwright child never exited.
+ // Hard ceiling: Playwright child can hang despite locator timeouts (e.g. Chrome IPC).
  // Fail closed well under the 45m workflow budget so SQL diagnostics still run.
- const MAX_MS=12*60*1000;
+ const MAX_MS=8*60*1000;
+ const fs=require('node:fs');
+ const path=require('node:path');
+ const heartbeat=path.join(process.env.RUNNER_TEMP||require('node:os').tmpdir(),
+  'drvo-s12-phase.txt');
+ try{fs.writeFileSync(heartbeat,'boot','utf8');}catch{}
  return new Promise((resolve,reject)=>{
   const child=spawn(process.execPath,['tools/salon-browser/check.cjs'],{
-   env,stdio:['ignore','pipe','pipe'],
+   env:{...env,DRVO_BROWSER_HEARTBEAT_FILE:heartbeat},
+   stdio:['ignore','pipe','pipe'],
   });
   let stdout='',stderr='',settled=false;
   const finish=(fn,arg)=>{
@@ -51,17 +57,21 @@ async function childCheck(env){
    fn(arg);
   };
   const timer=setTimeout(()=>{
-   finish(reject,new Error('Chromium check exceeded '+MAX_MS+'ms hard ceiling'));
+   let last='unread';
+   try{last=fs.readFileSync(heartbeat,'utf8').trim().slice(0,120);}catch{}
+   finish(reject,new Error('Chromium check exceeded '+MAX_MS+
+    'ms hard ceiling lastPhase='+last));
   },MAX_MS);
-  child.stdout.on('data',data=>{stdout=(stdout+String(data)).slice(-600);});
-  child.stderr.on('data',data=>{stderr=(stderr+String(data)).slice(-600);});
+  child.stdout.on('data',data=>{stdout=(stdout+String(data)).slice(-1200);});
+  child.stderr.on('data',data=>{stderr=(stderr+String(data)).slice(-1200);});
   child.once('error',()=>finish(reject,new Error('Chromium check process start failed')));
   child.once('exit',code=>{
    if(code===0&&stdout.includes('PASS: real disposable HTTPS browser'))
     finish(resolve);
    else {
-    const codes=stderr.match(/CI_SAFE_OVERVIEW_DIAGNOSTIC [^\n]{1,220}/)?.[0]||'';
-    const phase=stderr.match(/FAIL: disposable browser phase:[^\n]{1,150}/)?.[0]||'UNKNOWN';
+    const codes=stderr.match(/CI_SAFE_OVERVIEW_DIAGNOSTIC [^\n]{1,280}/)?.[0]||'';
+    const phase=stderr.match(/FAIL: disposable browser phase:[^\n]{1,180}/)?.[0]||
+     stderr.match(/S12_PHASE [^\n]{1,120}/)?.[0]||'UNKNOWN';
     finish(reject,new Error('Chromium check failed: '+phase+' '+codes));
    }
   });

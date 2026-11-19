@@ -211,6 +211,51 @@ async function main(){
    assert.equal(data.offerings.find(x=>x.kind==='SERVICE').priceMinor,12000);
    assert.equal(data.offerings.find(x=>x.kind==='SERVICE').durationMinutes,30);
   });
+  await pass('025 Catalog packages migration applies after 011 and grants EXECUTE-only',async()=>{
+   const more=await applyMigrations(admin,undefined,25);
+   assert.ok(more.length>=25);
+   assert.ok(more.slice(11).every(x=>x.status==='applied'));
+   assert.ok((await applyMigrations(admin,undefined,25)).every(x=>x.status==='unchanged'));
+   const perms=await app.query(
+    "SELECT HAS_PERMS_BY_NAME('core.CatalogPackage','OBJECT','SELECT') AS r,"+
+    " HAS_PERMS_BY_NAME('core.CatalogPackageItem','OBJECT','INSERT') AS w,"+
+    " HAS_PERMS_BY_NAME('core.ReadCatalogPackages','OBJECT','EXECUTE') AS execRead,"+
+    " HAS_PERMS_BY_NAME('core.CreateCatalogPackage','OBJECT','EXECUTE') AS execWrite");
+   assert.deepEqual(Object.values(perms.recordset[0]).map(Number),[0,0,1,1]);
+  });
+  await pass('authorized package create/read expands only active SERVICE includes',async()=>{
+   const listed=await get(root(s.b,s.br),cookie);
+   const offerings=(await listed.json()).offerings;
+   const haircut=offerings.find(x=>x.displayName==='Haircut');
+   const cream=offerings.find(x=>x.displayName==='Cream');
+   assert.ok(haircut&&cream);
+   const req=id();
+   const body={
+    kind:'REGULAR',displayName:'Cut Pack',description:'Two haircuts',
+    priceMinor:20000,currency:'EGP',durationMinutes:60,isPopular:true,
+    items:[{offeringId:haircut.offeringId,sortOrder:0,isRequired:true}],
+   };
+   const first=await post(root(s.b,s.br)+'/packages',cookie,req,body);
+   assert.equal(first.status,200);assert.equal((await first.json()).created,true);
+   const replay=await post(root(s.b,s.br)+'/packages',cookie,req,body);
+   assert.equal(replay.status,200);assert.equal((await replay.json()).created,false);
+   const conflict=await post(root(s.b,s.br)+'/packages',cookie,req,{...body,priceMinor:1});
+   assert.equal(conflict.status,409);
+   const productOnly=await post(root(s.b,s.br)+'/packages',cookie,id(),{
+    kind:'GROOM',displayName:'Bad Pack',priceMinor:1000,currency:'EGP',
+    items:[{offeringId:cream.offeringId,sortOrder:0,isRequired:true}],
+   });
+   assert.equal(productOnly.status,400);
+   const packages=await get(root(s.b,s.br)+'/packages',cookie);
+   assert.equal(packages.status,200);
+   const data=await packages.json();
+   assert.equal(data.packages.length,1);
+   assert.equal(data.packages[0].displayName,'Cut Pack');
+   assert.equal(data.packages[0].kind,'REGULAR');
+   assert.equal(data.packages[0].items.length,1);
+   assert.equal(data.packages[0].items[0].offeringId,haircut.offeringId);
+   assert.equal((await get(root(s.otherB,s.otherBr)+'/packages',cookie)).status,404);
+  });
   // PL-1 intentionally reuses the disposable Catalog SQL + real HTTP authorization proof.
   // This does not authorize customer access or produce invoice, payment, tax, GL or stock writes.
   const previewRoot=(b,br)=>url+'/workspaces/'+b+'/branches/'+br+'/pos-preview';

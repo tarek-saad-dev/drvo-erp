@@ -4,14 +4,16 @@ const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'../src/app/workspace/[businessId]/[branchId]/pos-preview');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 
-test('private POS workstation hosts Cashier catalog/cart/barber/quick-actions shell',()=>{
+test('private POS workstation hosts Cashier catalog/cart/barber/packages/quick-actions shell',()=>{
  const client=read('pos-preview-client.tsx');
  assert.match(client,/data-cashier-pos="private-workstation-v1"/);
  assert.match(client,/CashierCatalogBrowser/);
+ assert.match(client,/CashierPackagesSection/);
  assert.match(client,/CashierCartPanel/);
  assert.match(client,/CashierQuickActions/);
  assert.match(client,/CashierBarberSelector/);
  assert.match(client,/PosCustomerOperator/);
+ assert.match(client,/defaultExecutorEmployeeId=\{selectedBarberId/);
  assert.doesNotMatch(client,/\/api\/sales|localStorage|DEMO_/);
 });
 test('barber selector reads HR roster and never posts payroll',()=>{

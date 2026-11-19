@@ -13,11 +13,14 @@ type Stored={draftId:string;currency:string;customerId:string|null;
 const money=(n:number,c:string)=>(n/100).toFixed(2)+" "+c;
 
 export default function CashierRichDraftActions({apiRoot,draftApi,lines,header,
- quoteTotalMinor,currency,afterSaved,customerId,onCustomerIdChange,customerRevision}:{
+ quoteTotalMinor,currency,afterSaved,customerId,onCustomerIdChange,customerRevision,
+ defaultExecutorEmployeeId,lineKinds}:{
  apiRoot:string;draftApi:string;lines:Line[];
  header:{headerDiscountMinor?:number;headerDiscountPercentBps?:number};
  quoteTotalMinor:number;currency:string;afterSaved:()=>void;
  customerId:string;onCustomerIdChange:(id:string)=>void;customerRevision:number;
+ defaultExecutorEmployeeId?:string;
+ lineKinds?:Record<string,"SERVICE"|"PRODUCT">;
 }){
  const [customers,setCustomers]=useState<Customer[]>([]);
  const [employees,setEmployees]=useState<Employee[]>([]);
@@ -50,6 +53,25 @@ export default function CashierRichDraftActions({apiRoot,draftApi,lines,header,
   }catch{setState("denied");}
  },[api,draftApi,customerRevision]);
  useEffect(()=>{void load();},[load]);
+ useEffect(()=>{
+  const seed=defaultExecutorEmployeeId??"";
+  setExecutors(current=>{
+   const next={...current};
+   let changed=false;
+   for(const l of lines){
+    const kind=lineKinds?.[l.offeringId];
+    if(kind==="PRODUCT"){
+     if(next[l.offeringId]){delete next[l.offeringId];changed=true;}
+     continue;
+    }
+    if(!next[l.offeringId]&&seed){next[l.offeringId]=seed;changed=true;}
+   }
+   for(const key of Object.keys(next)){
+    if(!lines.some(l=>l.offeringId===key)){delete next[key];changed=true;}
+   }
+   return changed?next:current;
+  });
+ },[defaultExecutorEmployeeId,lines,lineKinds]);
  const resetRetry=()=>{retry.current=null;setMessage("");};
  async function save(){
   if(busy||state!=="ready")return;
@@ -58,7 +80,10 @@ export default function CashierRichDraftActions({apiRoot,draftApi,lines,header,
   }
   const body={
    lines:lines.map(l=>({
-    ...l,executorEmployeeId:executors[l.offeringId]||null,
+    ...l,
+    executorEmployeeId:lineKinds?.[l.offeringId]==="PRODUCT"
+     ?null
+     :(executors[l.offeringId]||null),
    })),
    customerId:customerId||null,...header,expectedTotalMinor:quoteTotalMinor,
   };
@@ -111,13 +136,16 @@ export default function CashierRichDraftActions({apiRoot,draftApi,lines,header,
    </div>
    <div className="k5-table-wrap"><table className="k5-table">
     <thead><tr><th>الصنف</th><th>منفذ الخدمة / الموظف (اختياري)</th></tr></thead>
-    <tbody>{lines.map(l=><tr key={l.offeringId}><td>{l.offeringId.slice(0,8)}…</td>
-     <td><select value={executors[l.offeringId]??""} aria-label={"منفذ سطر "+l.offeringId}
+    <tbody>{lines.map(l=>{
+     const isProduct=lineKinds?.[l.offeringId]==="PRODUCT";
+     return <tr key={l.offeringId}><td>{l.offeringId.slice(0,8)}…</td>
+     <td>{isProduct?<span className="k5-muted">منتج — بدون منفذ</span>:
+      <select value={executors[l.offeringId]??""} aria-label={"منفذ سطر "+l.offeringId}
       onChange={e=>{setExecutors(v=>({...v,[l.offeringId]:e.target.value}));resetRetry();}}>
       <option value="">بدون تعيين</option>
       {employees.map(emp=><option key={emp.employeeId} value={emp.employeeId}>{emp.displayName}</option>)}
-     </select></td>
-    </tr>)}</tbody>
+     </select>}</td>
+    </tr>;})}</tbody>
    </table></div>
    <button type="button" className="k5-save" disabled={busy} onClick={()=>void save()}>
     {busy?"جاري الحفظ داخل SQL…":"احفظ مسودة Cashier المحسوبة"}

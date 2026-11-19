@@ -13,7 +13,17 @@ export type CatalogOffering = {
   displayName: string; priceMinor: number; currency: string;
   durationMinutes: number | null; isActive: boolean;
 };
+export type CatalogPackageItem = {
+  offeringId: string; sortOrder: number; isRequired: boolean;
+};
+export type CatalogPackage = {
+  packageId: string; kind: "REGULAR" | "GROOM"; displayName: string;
+  description: string | null; priceMinor: number; currency: string;
+  durationMinutes: number | null; isPopular: boolean; isActive: boolean;
+  items: CatalogPackageItem[];
+};
 export type CatalogData = { categories: CatalogCategory[]; offerings: CatalogOffering[] };
+export type CatalogPackagesData = { packages: CatalogPackage[] };
 export type CatalogCreateResult = { id: string; created: boolean };
 
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -158,6 +168,114 @@ export class CatalogService {
       .input("PriceMinor",sql.BigInt,priceMinor)
       .input("Currency",sql.Char(3),currency)
       .input("DurationMinutes",sql.Int,duration));
+    return resultRow(result.recordset?.[0]);
+  }
+
+  async listPackages(actor: Actor, token: string, businessId: string, branchId: string
+  ): Promise<CatalogPackagesData> {
+    const scope=this.scope(actor,token,businessId,branchId);
+    const result=await this.execute(scope,"core.ReadCatalogPackages");
+    const headers=(result.recordsets?.[0] ?? []).map(row=>({
+      packageId:String(row.packageId),
+      kind:row.kind as "REGULAR"|"GROOM",
+      displayName:String(row.displayName),
+      description:row.description==null?null:String(row.description),
+      priceMinor:Number(row.priceMinor),
+      currency:String(row.currency).trim(),
+      durationMinutes:row.durationMinutes==null?null:Number(row.durationMinutes),
+      isPopular:Boolean(row.isPopular),
+      isActive:Boolean(row.isActive),
+      items:[] as CatalogPackageItem[],
+    }));
+    const byId=new Map(headers.map(p=>[p.packageId,p]));
+    for(const row of result.recordsets?.[1] ?? []){
+      const pkg=byId.get(String(row.packageId));
+      if(!pkg)continue;
+      pkg.items.push({
+        offeringId:String(row.offeringId),
+        sortOrder:Number(row.sortOrder),
+        isRequired:Boolean(row.isRequired),
+      });
+    }
+    for(const pkg of headers){
+      pkg.items.sort((a,b)=>a.sortOrder-b.sortOrder||a.offeringId.localeCompare(b.offeringId));
+    }
+    return {packages:headers};
+  }
+
+  async addPackage(actor:Actor,token:string,businessId:string,branchId:string,
+    requestId:unknown,body:unknown):Promise<CatalogCreateResult> {
+    const scope=this.scope(actor,token,businessId,branchId);
+    const reqId=guid(requestId,true)!;
+    const obj=exactObject(body,[
+      "kind","displayName","priceMinor","currency","items",
+      "description","durationMinutes","isPopular",
+    ],["kind","displayName","priceMinor","currency","items"]);
+    if(obj.kind!=="REGULAR"&&obj.kind!=="GROOM"){
+      throw new BadRequestException("Invalid package kind");
+    }
+    const kind=obj.kind;
+    const displayName=name(obj.displayName,160);
+    const priceMinor=obj.priceMinor;
+    if(typeof priceMinor!=="number"||!Number.isSafeInteger(priceMinor)||
+        priceMinor<0||priceMinor>9000000000000){
+      throw new BadRequestException("Invalid price");
+    }
+    if(typeof obj.currency!=="string"||!/^[A-Z]{3}$/.test(obj.currency)){
+      throw new BadRequestException("Invalid currency");
+    }
+    const currency=obj.currency;
+    let description:string|null=null;
+    if(obj.description!==undefined&&obj.description!==null){
+      if(typeof obj.description!=="string"||obj.description!==obj.description.trim()||
+          obj.description.length<1||obj.description.length>400){
+        throw new BadRequestException("Invalid description");
+      }
+      description=obj.description;
+    }
+    const duration=obj.durationMinutes??null;
+    if(duration!==null&&(typeof duration!=="number"||!Number.isInteger(duration)||
+        duration<1||duration>1440)){
+      throw new BadRequestException("Invalid duration");
+    }
+    const isPopular=obj.isPopular===undefined?false:obj.isPopular===true;
+    if(obj.isPopular!==undefined&&typeof obj.isPopular!=="boolean"){
+      throw new BadRequestException("Invalid popular flag");
+    }
+    if(!Array.isArray(obj.items)||obj.items.length<1||obj.items.length>20){
+      throw new BadRequestException("Invalid package items");
+    }
+    const items:Array<{offeringId:string;sortOrder:number;isRequired:boolean}>=[];
+    const seen=new Set<string>();
+    for(const raw of obj.items){
+      const item=exactObject(raw,["offeringId","sortOrder","isRequired"],
+        ["offeringId","sortOrder"]);
+      const offeringId=guid(item.offeringId,true)!;
+      if(seen.has(offeringId.toLowerCase())){
+        throw new BadRequestException("Duplicate package offering");
+      }
+      seen.add(offeringId.toLowerCase());
+      const sortOrder=item.sortOrder;
+      if(typeof sortOrder!=="number"||!Number.isInteger(sortOrder)||
+          sortOrder<0||sortOrder>40){
+        throw new BadRequestException("Invalid sort order");
+      }
+      const isRequired=item.isRequired===undefined?true:item.isRequired===true;
+      if(item.isRequired!==undefined&&typeof item.isRequired!=="boolean"){
+        throw new BadRequestException("Invalid required flag");
+      }
+      items.push({offeringId,sortOrder,isRequired});
+    }
+    const result=await this.execute(scope,"core.CreateCatalogPackage",r=>r
+      .input("ClientRequestId",sql.UniqueIdentifier,reqId)
+      .input("Kind",sql.VarChar(7),kind)
+      .input("DisplayName",sql.NVarChar(160),displayName)
+      .input("Description",sql.NVarChar(400),description)
+      .input("PriceMinor",sql.BigInt,priceMinor)
+      .input("Currency",sql.Char(3),currency)
+      .input("DurationMinutes",sql.Int,duration)
+      .input("IsPopular",sql.Bit,isPopular)
+      .input("ItemsJson",sql.NVarChar(sql.MAX),JSON.stringify(items)));
     return resultRow(result.recordset?.[0]);
   }
 }

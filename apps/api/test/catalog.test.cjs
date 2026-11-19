@@ -65,11 +65,44 @@ test("Controller blocks invalid Origin before session/SQL access",async()=>{
   await assert.rejects(()=>control.addCategory("https://attacker.example",id(6),
     {headers:{}},{setHeader(){}},id(3),id(4),{displayName:"Hair"}),
     e=>e.getStatus?.()===401);
+  await assert.rejects(()=>control.addPackage("https://attacker.example",id(6),
+    {headers:{}},{setHeader(){}},id(3),id(4),{
+      kind:"REGULAR",displayName:"Cut Pack",priceMinor:100,currency:"EGP",
+      items:[{offeringId:id(8),sortOrder:0}],
+    }),e=>e.getStatus?.()===401);
  }finally{
   for(const [key,value] of [
     ["DRVO_K5_AUTH_ENABLED",previousAuth],
     ["DRVO_CATALOG_ENABLED",previous],
     ["DRVO_K5_ORIGIN",prevOrigin],
   ]){if(value===undefined)delete process.env[key];else process.env[key]=value;}
+ }
+});
+
+test("Package create rejects invalid fields before SQL",async()=>{
+ const previousAuth=process.env.DRVO_K5_AUTH_ENABLED;
+ const previous=process.env.DRVO_CATALOG_ENABLED;
+ process.env.DRVO_K5_AUTH_ENABLED="YES";process.env.DRVO_CATALOG_ENABLED="YES";
+ try{
+  const service=new CatalogService({getInternalPool(){throw Error("must not query");}});
+  for(const body of [
+    {kind:"OFFER",displayName:"Pack",priceMinor:100,currency:"EGP",
+     items:[{offeringId:id(8),sortOrder:0}]},
+    {kind:"REGULAR",displayName:"Pack",priceMinor:-1,currency:"EGP",
+     items:[{offeringId:id(8),sortOrder:0}]},
+    {kind:"REGULAR",displayName:"Pack",priceMinor:100,currency:"egp",
+     items:[{offeringId:id(8),sortOrder:0}]},
+    {kind:"REGULAR",displayName:"Pack",priceMinor:100,currency:"EGP",items:[]},
+    {kind:"REGULAR",displayName:"Pack",priceMinor:100,currency:"EGP",
+     items:[{offeringId:"bad",sortOrder:0}]},
+    {kind:"GROOM",displayName:"Pack",priceMinor:100,currency:"EGP",
+     items:[{offeringId:id(8),sortOrder:0},{offeringId:id(8),sortOrder:1}]},
+  ])await assert.rejects(()=>service.addPackage(actor,token,id(3),id(4),id(5),body),
+    e=>e.getStatus?.()===400);
+ }finally{
+  if(previousAuth===undefined)delete process.env.DRVO_K5_AUTH_ENABLED;
+  else process.env.DRVO_K5_AUTH_ENABLED=previousAuth;
+  if(previous===undefined)delete process.env.DRVO_CATALOG_ENABLED;
+  else process.env.DRVO_CATALOG_ENABLED=previous;
  }
 });

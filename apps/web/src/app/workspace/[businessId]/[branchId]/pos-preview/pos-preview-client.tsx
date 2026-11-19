@@ -7,6 +7,7 @@ import CashierCatalogBrowser from "./cashier-catalog-browser";
 import CashierCartPanel from "./cashier-cart-panel";
 import CashierQuickActions from "./cashier-quick-actions";
 import CashierBarberSelector from "./cashier-barber-selector";
+import CashierPackagesSection from "./cashier-packages-section";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -245,13 +246,21 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
        selectedId={selectedBarberId} onSelect={setSelectedBarberId}/>
       <CashierCatalogBrowser offerings={offerings} disabled={busy||draftBusy||lines.length>=20}
        onAdd={o=>quickAdd(o)}/>
+      <CashierPackagesSection
+       apiRoot={api.replace(/\/pos-preview$/,"")}
+       offerings={offerings} lines={lines} disabled={busy||draftBusy||lines.length>=20}
+       selectedBarberId={selectedBarberId}
+       onExpand={next=>{
+        setLines(next);setPreview(null);setAdjustment(null);retryKey.current=null;setCartRevision(v=>v+1);
+       }}/>
       <CashierCartPanel lines={lines} offerings={offerings} disabled={busy||draftBusy}
+       selectedExecutorEmployeeId={selectedBarberId}
        onAdjust={adjustLineQuantity}
        onRemove={id=>{
         setLines(s=>s.filter(x=>x.offeringId!==id));setPreview(null);setAdjustment(null);retryKey.current=null;
        }}/>
       {selectedBarberId&&<p className="k5-muted" data-cashier-pos="barber-context">
-       المنفذ المختار للمسودة: {selectedBarberId} — يُمرَّر لسطور الحفظ الغني عند التوفر؛ مفيش عمولة.</p>}
+       المنفذ المختار للمسودة: {selectedBarberId} — يُمرَّر افتراضيًا لسطور الخدمة في الحفظ الغني؛ المنتجات بدون منفذ؛ مفيش عمولة.</p>}
       <CashierQuickActions/>
       <section className="k5-admin-card">
         <h2>حساب المعاينة وحفظ المسودة</h2>
@@ -308,10 +317,11 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
         apiRoot={api.replace(/\/pos-preview$/,"")} draftApi={draftApi}
         revision={richHistoryRevision} disabled={busy||draftBusy}
         onUseDraft={savedLines=>createNewFromDraft({lines:savedLines})}/>}
-      {lines.length>0&&<CashierPricingPanel key={JSON.stringify(lines)+"-"+cartRevision} api={api} draftApi={draftApi}
+      {lines.length>0&&<CashierPricingPanel key={JSON.stringify(lines)+"-"+cartRevision+"-"+selectedBarberId} api={api} draftApi={draftApi}
   richEnabled={draftsEnabled&&richEnabled} afterSaved={()=>{void loadDrafts();setRichHistoryRevision(v=>v+1);}}
   lines={lines} offerings={offerings} customerId={selectedCustomerId}
-  onCustomerIdChange={setSelectedCustomerId} customerRevision={customerRevision}/>}
+  onCustomerIdChange={setSelectedCustomerId} customerRevision={customerRevision}
+  defaultExecutorEmployeeId={selectedBarberId||undefined}/>}
       {adjustment&&<section className="k5-admin-card">
         <h2>خصم وإكرامية محتملة — معاينة فقط</h2>
         <p>إجمالي القائمة: <strong>{money(adjustment.listPriceSubtotalMinor,adjustment.currency)}</strong></p>

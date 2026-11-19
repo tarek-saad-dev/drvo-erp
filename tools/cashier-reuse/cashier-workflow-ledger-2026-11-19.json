@@ -227,8 +227,75 @@
       "DataProof": "OPEN",
       "PilotProof": "OPEN",
       "Status": "PORTING",
-      "Blocker": "Barber carousel, packages, handoffs, print, paid invoice still missing; finance buttons blocked",
-      "NextAction": "Port Barber/HR selector + packages section next; keep finance gated"
+      "Blocker": "Groom optional add-ons, booking package handoff, print, paid invoice still missing; finance buttons blocked",
+      "NextAction": "Add optional package extras + Booking→POS package hydration; keep finance gated"
+    },
+    {
+      "ID": "POS-04",
+      "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
+      "SourcePaths+BlobSHA": [
+        "src/components/pos/luxury/PackagesSection.tsx",
+        "src/lib/pos/groomPackageCart.ts",
+        "src/app/api/pos/packages/route.ts"
+      ],
+      "OriginalScreen": "POS packages / groom packs",
+      "UserAction": "Browse regular/groom packages and expand required services into cart",
+      "AuthRole": "catalog.read + pos.draft",
+      "TenantBusinessBranchScope": "Business Catalog; Branch RBAC",
+      "Preconditions": "SQL025 packages; active SERVICE includes",
+      "Reads": "core.ReadCatalogPackages",
+      "Writes": "none on expand; optional CreateCatalogPackage via catalog.manage",
+      "Effects": "DRAFT cart lines only; NOT_COLLECTED; no redemption ledger",
+      "FailureAndRaceCases": "inactive include; PRODUCT include rejected; cart max 20; cross-business 404",
+      "OwnedModule": "Catalog Core",
+      "SalonExtension": "GROOM kind + future optional extras",
+      "TargetPaths": [
+        "db/migrations/025_catalog_packages.sql",
+        "apps/api/src/catalog/catalog.service.ts",
+        "apps/web/.../pos-preview/cashier-packages-section.tsx"
+      ],
+      "UIProof": "OPEN",
+      "DomainTest": "apps/api/test/catalog.test.cjs + apps/web/test/cashier-packages-expand.test.cjs",
+      "SQLHTTPTest": "tools/catalog/verify.cjs package cases (pending CI URL)",
+      "BrowserProof": "OPEN",
+      "DataProof": "OPEN",
+      "PilotProof": "OPEN",
+      "Status": "PORTING",
+      "Blocker": "Optional add-ons / mutually exclusive groom groups / booking hydration still OPEN; primary DB 025 not applied",
+      "NextAction": "CI green on SQL025; optional extras next; keep finance gated"
+    },
+    {
+      "ID": "POS-EXEC",
+      "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
+      "SourcePaths+BlobSHA": [
+        "src/components/pos/luxury/BarberCarousel.tsx",
+        "src/components/pos/CartPanel.tsx"
+      ],
+      "OriginalScreen": "Selected Barber stamps service lines",
+      "UserAction": "Pick Barber/HR executor; SERVICE lines inherit default executor on rich DRAFT save; PRODUCT stays null",
+      "AuthRole": "hr.read + pos.draft.manage",
+      "TenantBusinessBranchScope": "Branch HR roster",
+      "Preconditions": "selectedBarberId; SQL022 ExecutorEmployeeId",
+      "Reads": "HR roster",
+      "Writes": "DRAFT executorEmployeeId only",
+      "Effects": "no payroll/commission",
+      "FailureAndRaceCases": "inactive employee; PRODUCT forced null executor",
+      "OwnedModule": "POS/Sales + HR",
+      "SalonExtension": "Barber bookable flag",
+      "TargetPaths": [
+        "apps/web/.../pos-preview/cashier-barber-selector.tsx",
+        "apps/web/.../pos-preview/cashier-rich-draft-actions.tsx",
+        "apps/web/.../pos-preview/cashier-cart-panel.tsx"
+      ],
+      "UIProof": "OPEN",
+      "DomainTest": "apps/web/test/cashier-pos-workstation.test.cjs + cashier-packages-expand",
+      "SQLHTTPTest": "existing pos-rich executor cases",
+      "BrowserProof": "OPEN",
+      "DataProof": "OPEN",
+      "PilotProof": "OPEN",
+      "Status": "PORTING",
+      "Blocker": "Private Owner browser not verified; commission still gated",
+      "NextAction": "Owner browser after flags; package-group shared executor next"
     },
     {
       "ID": "PR0-SOURCE-LOCK",

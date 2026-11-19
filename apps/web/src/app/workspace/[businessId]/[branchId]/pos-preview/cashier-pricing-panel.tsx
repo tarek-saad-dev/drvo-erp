@@ -41,10 +41,11 @@ type QuoteInput={
   lineDiscountPercentBps?:number}>;
  headerDiscountMinor?:number;headerDiscountPercentBps?:number;
 };
-export default function CashierPricingPanel({api,draftApi,richEnabled,afterSaved,lines,offerings,customerId,onCustomerIdChange,customerRevision}:{
+export default function CashierPricingPanel({api,draftApi,richEnabled,afterSaved,lines,offerings,customerId,onCustomerIdChange,customerRevision,defaultExecutorEmployeeId}:{
  api:string;draftApi:string;richEnabled:boolean;afterSaved:()=>void;
  lines:Line[];offerings:Offering[];customerId:string;
  onCustomerIdChange:(id:string)=>void;customerRevision:number;
+ defaultExecutorEmployeeId?:string;
 }){
  const [discounts,setDiscounts]=useState<Record<string,Discount>>({});
  const [header,setHeader]=useState<Discount>({mode:"percent",text:"0"});
@@ -155,7 +156,9 @@ export default function CashierPricingPanel({api,draftApi,richEnabled,afterSaved
      }}
      quoteTotalMinor={quote.grandTotalMinor} currency={quote.currency}
      afterSaved={afterSaved} customerId={customerId} onCustomerIdChange={onCustomerIdChange}
-     customerRevision={customerRevision}/>
+     customerRevision={customerRevision}
+     defaultExecutorEmployeeId={defaultExecutorEmployeeId}
+     lineKinds={Object.fromEntries(offerings.map(o=>[o.offeringId,o.kind]))}/>
    }
   </>}
   <p className="k5-muted">الـQuote نفسه غير مدفوع. عند تفعيل POS Draft V2 والصلاحيات، تقدر تحفظ الخصومات في SQL كمسودة فقط. الفواتير والتحصيل والمخزون وGL لسه مش مفعّلين.</p>

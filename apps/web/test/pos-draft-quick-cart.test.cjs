@@ -2,8 +2,11 @@
 const test=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
-const source=fs.readFileSync(require('node:path').join(__dirname,
- '../src/app/workspace/[businessId]/[branchId]/pos-preview/pos-preview-client.tsx'),'utf8');
+const path=require('node:path');
+const root=path.join(__dirname,'../src/app/workspace/[businessId]/[branchId]/pos-preview');
+const source=fs.readFileSync(path.join(root,'pos-preview-client.tsx'),'utf8');
+const catalog=fs.readFileSync(path.join(root,'cashier-catalog-browser.tsx'),'utf8');
+const cart=fs.readFileSync(path.join(root,'cashier-cart-panel.tsx'),'utf8');
 test('quick POS selections are nonposting and do not write draft without explicit save',()=>{
  assert.match(source,/function quickAdd\(offering:Offering\)/);
  assert.match(source,/setLines\(current=>\[\.\.\.current,/);
@@ -21,12 +24,14 @@ test('quick POS selections are nonposting and do not write draft without explici
 });
 
 test('search narrows only authorized active Catalog suggestions, never new API scope',()=>{
- assert.match(source,/const \[catalogSearch,setCatalogSearch\]=useState\(""\)/);
- assert.match(source,/const matchingOfferings=offerings\.filter\(o=>o\.isActive&&/);
- assert.match(source,/o\.displayName\.toLocaleLowerCase\(\)\.includes\(catalogSearch\.trim\(\)\.toLocaleLowerCase\(\)\)/);
- assert.match(source,/type="search" maxLength=\{100\}/);
- assert.match(source,/matchingOfferings\.filter\(o=>/);
- assert.match(source,/\.slice\(0,8\)\.map\(o=><button/);
+ assert.match(source,/CashierCatalogBrowser/);
+ assert.match(catalog,/data-cashier-pos="catalog-browser"/);
+ assert.match(catalog,/offerings\.filter\(o=>\{/);
+ assert.match(catalog,/if\(!o\.isActive\)return false;/);
+ assert.match(catalog,/o\.displayName\.toLocaleLowerCase\("en"\)\.includes\(q\)/);
+ assert.match(catalog,/type="search" maxLength=\{100\}/);
+ assert.match(catalog,/\.slice\(0,40\)\.map\(o=><button/);
+ assert.doesNotMatch(catalog,/fetch\(/);
  assert.doesNotMatch(source,/fetch\([^)]*catalogSearch/);
 });
 test('quantity controls are bounded and invalidate stale preview/idempotency before save',()=>{
@@ -35,8 +40,9 @@ test('quantity controls are bounded and invalidate stale preview/idempotency bef
  assert.match(source,/existing\.quantity\+delta<1\|\|existing\.quantity\+delta>20/);
  assert.match(source,/retryKey\.current=null;setPreview\(null\);setAdjustment\(null\);setMessage\(""\)/);
  assert.match(source,/next>=1&&next<=20\?\{\.\.\.l,quantity:next\}:l/);
- assert.match(source,/disabled=\{busy\|\|draftBusy\|\|l\.quantity<=1\}/);
- assert.match(source,/disabled=\{busy\|\|draftBusy\|\|l\.quantity>=20\}/);
+ assert.match(source,/CashierCartPanel/);
+ assert.match(cart,/disabled=\{disabled\|\|l\.quantity<=1\}/);
+ assert.match(cart,/disabled=\{disabled\|\|l\.quantity>=20\}/);
  assert.match(source,/if\(busy\|\|draftBusy\|\|lines\.length===0\)return;/);
  assert.match(source,/method:"POST",credentials:"same-origin",cache:"no-store"/);
  assert.doesNotMatch(source,/\/sales\/posted|\/payment|localStorage|sessionStorage/);

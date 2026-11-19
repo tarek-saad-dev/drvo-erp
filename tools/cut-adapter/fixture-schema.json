@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "drvo.cut-adapter.fixture.customers-services.v1",
+  "title": "Cut Salon exported JSON fixture (customers + services sample)",
+  "description": "Synthetic or redacted offline export only. No connection strings, credentials, hostnames, or live SQL payloads. Live Cut/Cashier DB access requires founder-approved connection + explicit Tenant/Branch/time scope in a separate authorized channel.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "meta", "customers", "services"],
+  "properties": {
+    "schema": {
+      "const": "drvo.cut-adapter.fixture.customers-services.v1"
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "sourceSystem",
+        "datasetId",
+        "exportedAt",
+        "liveConnectionAuthorized"
+      ],
+      "properties": {
+        "mode": {
+          "const": "EXPORTED_JSON_FIXTURE_ONLY"
+        },
+        "sourceSystem": {
+          "const": "CUT_CASHIER"
+        },
+        "datasetId": {
+          "type": "string",
+          "pattern": "^FIX-[A-Z0-9-]{3,40}$"
+        },
+        "exportedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sourceTenantKey": {
+          "type": "string",
+          "pattern": "^SYN-TENANT-[A-Z0-9-]{1,30}$"
+        },
+        "sourceBranchKey": {
+          "type": "string",
+          "pattern": "^SYN-BRANCH-[A-Z0-9-]{1,30}$"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "liveConnectionAuthorized": {
+          "const": false
+        }
+      }
+    },
+    "customers": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sourceCustomerId", "displayNameToken", "phoneToken"],
+        "properties": {
+          "sourceCustomerId": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "displayNameToken": {
+            "type": "string",
+            "pattern": "^CUST-[A-Z0-9-]{2,40}$",
+            "description": "Pseudonym token only; never real legal names in repo fixtures"
+          },
+          "phoneToken": {
+            "type": "string",
+            "pattern": "^PHONE-[A-Z0-9-]{2,40}$",
+            "description": "Pseudonym token only; never real E.164 phones in repo fixtures"
+          },
+          "sourceBranchKey": {
+            "type": "string",
+            "pattern": "^SYN-BRANCH-[A-Z0-9-]{1,30}$"
+          },
+          "lastVisitDate": {
+            "type": ["string", "null"],
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          }
+        }
+      }
+    },
+    "services": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sourceServiceId", "serviceCode", "nameToken", "priceMinor"],
+        "properties": {
+          "sourceServiceId": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "serviceCode": {
+            "type": "string",
+            "pattern": "^SVC-[A-Z0-9-]{2,40}$"
+          },
+          "nameToken": {
+            "type": "string",
+            "pattern": "^NAME-[A-Z0-9-]{2,40}$",
+            "description": "Pseudonym catalog label token"
+          },
+          "priceMinor": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100000000
+          },
+          "active": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

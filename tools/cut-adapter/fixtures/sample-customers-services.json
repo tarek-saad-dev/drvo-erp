@@ -1,0 +1,45 @@
+{
+  "schema": "drvo.cut-adapter.fixture.customers-services.v1",
+  "meta": {
+    "mode": "EXPORTED_JSON_FIXTURE_ONLY",
+    "sourceSystem": "CUT_CASHIER",
+    "datasetId": "FIX-CUT-SAMPLE-A",
+    "exportedAt": "2026-11-19T00:00:00.000Z",
+    "sourceTenantKey": "SYN-TENANT-CUT-01",
+    "sourceBranchKey": "SYN-BRANCH-01",
+    "notes": "Synthetic offline sample for characterization/reconciliation planner unit tests. Not live Cut data.",
+    "liveConnectionAuthorized": false
+  },
+  "customers": [
+    {
+      "sourceCustomerId": 1001,
+      "displayNameToken": "CUST-ALPHA-01",
+      "phoneToken": "PHONE-EG-01",
+      "sourceBranchKey": "SYN-BRANCH-01",
+      "lastVisitDate": "2026-11-01"
+    },
+    {
+      "sourceCustomerId": 1002,
+      "displayNameToken": "CUST-BETA-02",
+      "phoneToken": "PHONE-EG-02",
+      "sourceBranchKey": "SYN-BRANCH-01",
+      "lastVisitDate": null
+    }
+  ],
+  "services": [
+    {
+      "sourceServiceId": 501,
+      "serviceCode": "SVC-HAIRCUT",
+      "nameToken": "NAME-HAIRCUT",
+      "priceMinor": 15000,
+      "active": true
+    },
+    {
+      "sourceServiceId": 502,
+      "serviceCode": "SVC-BEARD",
+      "nameToken": "NAME-BEARD",
+      "priceMinor": 8000,
+      "active": true
+    }
+  ]
+}

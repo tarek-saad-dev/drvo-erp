@@ -158,11 +158,11 @@
       "DomainTest": "OPEN",
       "SQLHTTPTest": "OPEN",
       "BrowserProof": "OPEN",
-      "DataProof": "OPEN",
+      "DataProof": "OPEN — live Cut history BLOCKED; fixture-only planner at tools/cut-adapter (CUT-01)",
       "PilotProof": "OPEN",
       "Status": "BLOCKED",
-      "Blocker": "No verified posted Sales read owner; S3 DRAFT history is not purchase history",
-      "NextAction": "PR3 safe source read adapter after CU-01"
+      "Blocker": "No verified posted Sales read owner; live Cut/Cashier SQL read BLOCKED without founder-approved connection + scope; S3 DRAFT history is not purchase history",
+      "NextAction": "Keep CUT-02 live access BLOCKED; use CUT-01 fixture characterization only until approved export + Sales owner"
     },
     {
       "ID": "CU-07",
@@ -3022,6 +3022,71 @@
       "Effects": "changes AI booking dialogue behavior",
       "FailureAndRaceCases": "bad artifact; unsafe auto-approve",
       "OwnedModule": "Messaging/AI"
+    },
+    {
+      "ID": "CUT-01",
+      "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
+      "SourcePaths+BlobSHA": [
+        "tools/cut-adapter/README.md",
+        "tools/cut-adapter/reconciliation-planner.cjs",
+        "tools/cut-adapter/fixture-schema.json",
+        "tools/cut-adapter/fixtures/sample-customers-services.json"
+      ],
+      "OriginalScreen": "n/a (offline Cut export characterization)",
+      "UserAction": "Characterize/reconcile exported Cut customers+services JSON fixtures only",
+      "AuthRole": "n/a (local dry-run tooling)",
+      "TenantBusinessBranchScope": "synthetic FIX-/SYN-* fixture keys only",
+      "Preconditions": "offline JSON fixture; no live DB credentials",
+      "Reads": "exported JSON fixture object in memory",
+      "Writes": "none (dry-run plan only)",
+      "Effects": "digest + unassigned id-map preflight; zero network DB calls",
+      "FailureAndRaceCases": "connection strings/hostnames/PII tokens must fail closed",
+      "OwnedModule": "Platform tooling / Cut import preflight",
+      "SalonExtension": "Cut Salon pilot data track",
+      "TargetPaths": [
+        "tools/cut-adapter/**",
+        "tests/cut-adapter.test.cjs"
+      ],
+      "UIProof": "n/a",
+      "DomainTest": "tests/cut-adapter.test.cjs",
+      "SQLHTTPTest": "n/a (fixture-only; no SQL)",
+      "BrowserProof": "n/a",
+      "DataProof": "OPEN (synthetic sample only; not real Cut export)",
+      "PilotProof": "OPEN",
+      "Status": "SOURCE_IDENTIFIED",
+      "Blocker": "Real Cut export + approved import ledger + destination pilot gates still missing",
+      "NextAction": "Accept only founder-authorized offline exports into fixture schema; never open live SQL from this package"
+    },
+    {
+      "ID": "CUT-02",
+      "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
+      "SourcePaths+BlobSHA": [
+        "tools/cut-adapter/README.md",
+        "tools/cut-adapter/connection-gates.cjs"
+      ],
+      "OriginalScreen": "n/a (live Cut/Cashier SQL source)",
+      "UserAction": "Connect read-only to live Cut/Cashier SQL for historical import",
+      "AuthRole": "founder-approved Cut admin + DRVO operator",
+      "TenantBusinessBranchScope": "verified SourceTenant + SourceBranch + time window required",
+      "Preconditions": "founder-approved connection + explicit scope + secure credential channel",
+      "Reads": "blocked until gates pass",
+      "Writes": "none from DRVO toward Cut production",
+      "Effects": "none while BLOCKED",
+      "FailureAndRaceCases": "default connection discovery; VPS SQL; secrets in repo/chat",
+      "OwnedModule": "Platform tooling / Cut import",
+      "SalonExtension": "Cut Salon pilot data track",
+      "TargetPaths": [
+        "tools/cut-adapter/connection-gates.cjs"
+      ],
+      "UIProof": "n/a",
+      "DomainTest": "tests/cut-adapter.test.cjs refuses live hosts/DSNs",
+      "SQLHTTPTest": "BLOCKED (no live Cut/Cashier/VPS SQL)",
+      "BrowserProof": "n/a",
+      "DataProof": "BLOCKED",
+      "PilotProof": "OPEN",
+      "Status": "BLOCKED",
+      "Blocker": "No founder-approved connection + scope; tools/cut-adapter refuses live connection strings/hostnames",
+      "NextAction": "Keep BLOCKED until founder-approved read-only connection + Tenant/Branch/time scope recorded outside this repo"
     }
   ]
 }

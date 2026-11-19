@@ -6,6 +6,12 @@ import { createHash } from "node:crypto";
 import * as sql from "mssql";
 import { FoundationDatabaseService } from "../data/foundation-database.service";
 import type { Actor } from "../identity/identity.service";
+import {
+  PackageResolveError,
+  buildPackageCartItems,
+  resolvePackageCommercial,
+  type PackageCartLine,
+} from "./package-cart";
 
 export type CatalogCategory = { categoryId: string; displayName: string; isActive: boolean };
 export type CatalogOffering = {
@@ -25,6 +31,31 @@ export type CatalogPackage = {
 export type CatalogData = { categories: CatalogCategory[]; offerings: CatalogOffering[] };
 export type CatalogPackagesData = { packages: CatalogPackage[] };
 export type CatalogCreateResult = { id: string; created: boolean };
+export type CatalogPackageResolveResult = {
+  ok: true;
+  packageId: string;
+  kind: "REGULAR" | "GROOM";
+  name: string;
+  packagePriceMinor: number;
+  currency: string;
+  packageDurationMinutes: number;
+  totalDurationMinutes: number;
+  requiredOfferingIds: string[];
+  addonOfferingIds: string[];
+  totalPriceMinor: number;
+  services: Array<{
+    offeringId: string; displayName: string; priceMinor: number; durationMinutes: number;
+  }>;
+  optionalGroups: Array<{
+    key: "groom_addons" | "home_visit";
+    labelEn: string; labelAr: string;
+    multiSelect: boolean; mutuallyExclusive: boolean;
+    offeringIds: string[];
+  }>;
+  cartLines: PackageCartLine[];
+  /** Draft SQL022 still Catalog-reprices; group keys are client/resolve only until SQL026. */
+  draftGroupPersistence: "OPEN";
+};
 
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const TOKEN = /^[A-Za-z0-9_-]{43}$/;
@@ -201,6 +232,75 @@ export class CatalogService {
       pkg.items.sort((a,b)=>a.sortOrder-b.sortOrder||a.offeringId.localeCompare(b.offeringId));
     }
     return {packages:headers};
+  }
+
+  async resolvePackage(actor:Actor,token:string,businessId:string,branchId:string,
+    packageId:unknown,body:unknown):Promise<CatalogPackageResolveResult> {
+    const scope=this.scope(actor,token,businessId,branchId);
+    const pkgId=guid(packageId,true)!;
+    let addonOfferingIds:string[]=[];
+    if(body!==undefined&&body!==null){
+      const obj=exactObject(body,["addonOfferingIds"],[]);
+      if(obj.addonOfferingIds!==undefined){
+        if(!Array.isArray(obj.addonOfferingIds)||obj.addonOfferingIds.length>20){
+          throw new BadRequestException("Invalid package addons");
+        }
+        const seen=new Set<string>();
+        for(const raw of obj.addonOfferingIds){
+          const id=guid(raw,true)!;
+          const key=id.toLowerCase();
+          if(seen.has(key))continue;
+          seen.add(key);
+          addonOfferingIds.push(id);
+        }
+      }
+    }
+    const [packages,catalog]=await Promise.all([
+      this.listPackages(actor,token,businessId,branchId),
+      this.list(actor,token,businessId,branchId),
+    ]);
+    const pkg=packages.packages.find(p=>p.packageId.toLowerCase()===pkgId.toLowerCase());
+    if(!pkg)throw new NotFoundException();
+    const categoriesById:Record<string,string>={};
+    for(const c of catalog.categories){
+      categoriesById[c.categoryId]=c.displayName;
+      categoriesById[c.categoryId.toLowerCase()]=c.displayName;
+    }
+    try{
+      const {resolved,optionalGroups,optionalGroupByOfferingId}=resolvePackageCommercial({
+        pkg,offerings:catalog.offerings,categoriesById,addonOfferingIds,
+      });
+      const cartLines=buildPackageCartItems({resolved,optionalGroupByOfferingId});
+      const totalPriceMinor=resolved.services.reduce((s,l)=>s+l.priceMinor,0);
+      return {
+        ok:true,
+        packageId:resolved.packageId,
+        kind:pkg.kind,
+        name:resolved.packageName,
+        packagePriceMinor:resolved.packagePriceMinor,
+        currency:pkg.currency,
+        packageDurationMinutes:resolved.packageDurationMinutes,
+        totalDurationMinutes:resolved.totalDurationMinutes,
+        requiredOfferingIds:[...resolved.requiredOfferingIds],
+        addonOfferingIds:[...resolved.addonOfferingIds],
+        totalPriceMinor,
+        services:resolved.services.map(s=>({
+          offeringId:s.offeringId,displayName:s.displayName,
+          priceMinor:s.priceMinor,durationMinutes:s.durationMinutes,
+        })),
+        optionalGroups,
+        cartLines,
+        draftGroupPersistence:"OPEN",
+      };
+    }catch(error){
+      if(error instanceof PackageResolveError){
+        if(error.code==="PACKAGE_NOT_FOUND"||error.code==="PACKAGE_NOT_ACTIVE"){
+          throw new NotFoundException();
+        }
+        throw new BadRequestException(error.code);
+      }
+      throw error;
+    }
   }
 
   async addPackage(actor:Actor,token:string,businessId:string,branchId:string,

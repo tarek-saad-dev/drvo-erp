@@ -13,7 +13,12 @@ import { useRouter } from "next/navigation";
 
 type Offering = {offeringId:string;kind:"SERVICE"|"PRODUCT";displayName:string;
   priceMinor:number;currency:string;isActive:boolean};
-type Line = {offeringId:string;quantity:number};
+type Line = {offeringId:string;quantity:number;lineId?:string;displayName?:string;
+  displayUnitPriceMinor?:number;packageMeta?:{
+    packageId:string;packageName:string;role:"anchor"|"included"|"addon";
+    groupKey:string;includedCount:number;commercialPackagePriceMinor:number;
+    optionalGroup?:"groom_addons"|"home_visit"|null;
+  }};
 type Preview = {state:"DRAFT_PREVIEW_ONLY";persisted:false;accountingState:"NOT_POSTED";
   paymentState:"NOT_COLLECTED";currency:string;taxComputed:false;
   lines:Array<{offeringId:string;displayName:string;quantity:number;unitPriceMinor:number;lineSubtotalMinor:number}>;
@@ -293,7 +298,14 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
        selectedExecutorEmployeeId={selectedBarberId}
        onAdjust={adjustLineQuantity}
        onRemove={id=>{
-        setLines(s=>s.filter(x=>x.offeringId!==id));setPreview(null);setAdjustment(null);retryKey.current=null;
+        setLines(s=>{
+         const target=s.find(x=>x.offeringId===id);
+         if(target?.packageMeta){
+          return s.filter(x=>x.packageMeta?.groupKey!==target.packageMeta!.groupKey);
+         }
+         return s.filter(x=>x.offeringId!==id);
+        });
+        setPreview(null);setAdjustment(null);retryKey.current=null;
        }}/>
       {selectedBarberId&&<p className="k5-muted" data-cashier-pos="barber-context">
        المنفذ المختار للمسودة: {selectedBarberId} — يُمرَّر افتراضيًا لسطور الخدمة في الحفظ الغني؛ المنتجات بدون منفذ؛ مفيش عمولة.</p>}

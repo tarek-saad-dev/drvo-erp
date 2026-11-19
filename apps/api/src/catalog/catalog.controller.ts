@@ -6,6 +6,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { IdentityService, extractSessionCookie } from "../identity/identity.service";
 import {
   CatalogService, type CatalogCreateResult, type CatalogData, type CatalogPackagesData,
+  type CatalogPackageResolveResult,
 } from "./catalog.service";
 
 function enabled(): void {
@@ -78,6 +79,21 @@ export class CatalogController {
     const token=extractSessionCookie(req.headers.cookie);
     const actor=await this.identity.actorFromToken(token);
     return this.catalog.listPackages(actor,token!,businessId,branchId);
+  }
+
+  @Post("packages/:packageId/resolve")
+  @HttpCode(200)
+  async resolvePackage(
+    @Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,
+    @Param("businessId") businessId:string,@Param("branchId") branchId:string,
+    @Param("packageId") packageId:string,
+    @Body() body:unknown,
+  ):Promise<CatalogPackageResolveResult> {
+    res.setHeader("Cache-Control","no-store");
+    enabled();
+    const token=extractSessionCookie(req.headers.cookie);
+    const actor=await this.identity.actorFromToken(token);
+    return this.catalog.resolvePackage(actor,token!,businessId,branchId,packageId,body??{});
   }
 
   @Post("packages")

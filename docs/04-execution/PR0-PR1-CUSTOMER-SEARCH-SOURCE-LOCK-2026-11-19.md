@@ -4,7 +4,7 @@
 
 | Layer | State | Evidence |
 | --- | --- | --- |
-| Code committed locally | YES | tip advances with optional-extras slice |
+| Code committed locally | YES | tip advances with package commercial semantics |
 | Code on GitHub `main` | YES | must match `git ls-remote` after push |
 | Customers SQL024 CI | PASS | https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44563649332 (`537005b`) |
 | Catalog SQL025 packages CI | PASS | https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44566865041 (`492b4d3`) |
@@ -29,19 +29,20 @@
 | POS shell | Catalog/cart/quick-actions (finance gated) + PRODUCT tab id-prefix search |
 | Barber → executor | `selectedBarberId` seeds SERVICE rich-draft executors; PRODUCT null |
 | Packages SQL025 | Catalog packages + POS expand-to-DRAFT SERVICE lines |
+| Package commercial | Shared `package-cart` + Catalog `POST .../packages/:id/resolve` + cart grouping + home-visit exclusivity (NONPOSTING) |
 | Booking→POS | `customerId`+`offeringId` handoff; optional `packageId` expand when cart empty |
 
 ## Explicit OPEN / gated
 
 - Primary DB SQL024/025 apply + backup/restore
+- **SQL026** draft persistence of `packageId` / `packageGroupKey` / `packageRole` / `commercialPackagePriceMinor` (deferred: Nest/SQL022 strict line shape + Catalog reprice; resolve returns `draftGroupPersistence:"OPEN"`)
 - Owner authenticated browser proof
 - CU-05 paid visit history (no posted Sales owner)
-- Optional groom package extras / booking package identity on appointments
 - Print/receipt, tips settlement, split tender, ADR-031 posting
 - Cut import; remaining HR/Queue/Treasury/Expenses/Inventory/Loyalty/Reports full workflows
 
 ## Next
 
-1. Optional package extras + barcode/stock only after Catalog schema owns them.
+1. Additive SQL026 draft package snapshots only when POS Rich CI contract can accept them without Catalog-reprice breakage.
 2. Keep CU-05 BLOCKED until posted Sales read owner or audited Cut read adapter.
-3. Expand ledger; never fake payments.
+3. Expand ledger; never fake payments; never apply VPS SQL from this slice.

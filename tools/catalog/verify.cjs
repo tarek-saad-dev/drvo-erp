@@ -255,6 +255,19 @@ async function main(){
    assert.equal(data.packages[0].items.length,1);
    assert.equal(data.packages[0].items[0].offeringId,haircut.offeringId);
    assert.equal((await get(root(s.otherB,s.otherBr)+'/packages',cookie)).status,404);
+   const resolved=await post(
+    root(s.b,s.br)+'/packages/'+data.packages[0].packageId+'/resolve',cookie,id(),{});
+   assert.equal(resolved.status,200);
+   const priced=await resolved.json();
+   assert.equal(priced.ok,true);
+   assert.equal(priced.packagePriceMinor,20000);
+   assert.equal(priced.draftGroupPersistence,'OPEN');
+   assert.equal(priced.cartLines.length,1);
+   assert.equal(priced.cartLines[0].packageMeta.role,'anchor');
+   assert.equal(priced.cartLines[0].unitPriceMinor,20000);
+   assert.equal((await post(
+    root(s.otherB,s.otherBr)+'/packages/'+data.packages[0].packageId+'/resolve',
+    cookie,id(),{})).status,404);
   });
   // PL-1 intentionally reuses the disposable Catalog SQL + real HTTP authorization proof.
   // This does not authorize customer access or produce invoice, payment, tax, GL or stock writes.

@@ -33,6 +33,7 @@ test('every workflow row has required fields and honest non-complete statuses',(
   seen.add(row.ID);
   assert.ok(STATUS.has(row.Status),row.ID+' invalid status '+row.Status);
   assert.notEqual(row.Status,'PILOT_VERIFIED');
+  assert.notEqual(row.Status,'PRIVATE_BROWSER_VERIFIED');
   assert.ok(Array.isArray(row['SourcePaths+BlobSHA']));
   let rowHasBlob=false;
   for(const entry of row['SourcePaths+BlobSHA']){
@@ -42,13 +43,12 @@ test('every workflow row has required fields and honest non-complete statuses',(
    if(p.includes('*')||p.startsWith('tools/'))continue;
    assert.ok(runtime.has(p)||p.endsWith('.json'),
     row.ID+' source path not in locked runtime inventory: '+p);
-   if(blob){
-    assert.match(blob,/^[0-9a-f]{40}$/,row.ID+' invalid blob sha: '+blob);
-    if(runtime.has(p)){
-     assert.equal(blob,runtime.get(p),
-      row.ID+' blob mismatch for '+p+': ledger='+blob+' baseline='+runtime.get(p));
-     rowHasBlob=true;
-    }
+   assert.ok(blob,row.ID+' Cashier source path missing immutable #blobsha: '+entry);
+   assert.match(blob,/^[0-9a-f]{40}$/,row.ID+' invalid blob sha: '+blob);
+   if(runtime.has(p)){
+    assert.equal(blob,runtime.get(p),
+     row.ID+' blob mismatch for '+p+': ledger='+blob+' baseline='+runtime.get(p));
+    rowHasBlob=true;
    }
   }
   if(rowHasBlob)rowsWithBlobEvidence++;
@@ -59,10 +59,13 @@ test('every workflow row has required fields and honest non-complete statuses',(
     row.ID+' cannot claim closed proofs while incomplete');
   }
  }
- assert.ok(rowsWithBlobEvidence>=90,
-  'expected >=90 rows with path#blob evidence, got '+rowsWithBlobEvidence);
+ assert.ok(rowsWithBlobEvidence>=100,
+  'expected >=100 rows with path#blob evidence, got '+rowsWithBlobEvidence);
  assert.ok(seen.has('CU-01'));
  assert.ok(seen.has('CU-02'));
  assert.ok(seen.has('POS-01'));
  assert.ok(seen.has('PR0-SOURCE-LOCK'));
+ assert.ok(seen.has('SYS-08'));
+ assert.ok(seen.has('HR-13'));
+ assert.ok(seen.has('TR-10'));
 });

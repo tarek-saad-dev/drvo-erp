@@ -18,7 +18,7 @@ test('workflow ledger exposes mandatory columns and status vocabulary',()=>{
  assert.equal(ledger.schema,'drvo.cashier.workflow-ledger.v1');
  assert.equal(ledger.sourceRevision,'046bf19b0d5833a07fe4b2891cbf3032d03b7cef');
  assert.deepEqual(ledger.columns,REQUIRED);
- assert.ok(Array.isArray(ledger.workflows)&&ledger.workflows.length>=7);
+ assert.ok(Array.isArray(ledger.workflows)&&ledger.workflows.length>=40);
  for(const s of ledger.statusVocabulary)assert.ok(STATUS.has(s));
 });
 

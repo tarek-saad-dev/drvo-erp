@@ -30,6 +30,7 @@ test('private Booking uses server Business customer search, not first-200 local 
  assert.doesNotMatch(booking,/findAuthorizedCustomers\(/);
  assert.doesNotMatch(booking,/أول 200 عميل/);
  assert.match(booking,/customers\?q=/);
+ assert.match(booking,/fetch\(scope\+"\/customers",\{credentials:"same-origin"/);
  assert.match(booking,/searchScope!=="BUSINESS"/);
  assert.match(booking,/data-customer-search="business-server"/);
  assert.match(booking,/setCustomerId\(""\);setSelectedCustomer\(null\);bookingRequest\.current=null;/);

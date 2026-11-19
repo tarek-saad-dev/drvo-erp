@@ -85,6 +85,15 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  onPhase('S12 create Booking Resource through UI');
  await page.goto(scope+'/booking',{waitUntil:'domcontentloaded'});
  await page.getByRole('heading',{name:'المواعيد والحجوزات',exact:true}).waitFor();
+ // Fail closed with page-state evidence instead of a blind label timeout.
+ const resourceHeading=page.getByRole('heading',{name:'إضافة مورد حجز',exact:true});
+ const blocked=page.getByRole('alert').filter({hasText:/صلاحية قراءة|مش متاحة|تعذر تحميل/});
+ await Promise.race([
+  resourceHeading.waitFor({state:'visible',timeout:30000}),
+  blocked.first().waitFor({state:'visible',timeout:30000}).then(async()=>{
+   throw new Error('BOOKING_UI_NOT_READY '+((await blocked.first().textContent())||'').slice(0,80));
+  }),
+ ]);
  await page.getByLabel('اسم المورد').fill(resource);
  const [resourceResponse]=await Promise.all([
   page.waitForResponse(r=>r.url().endsWith('/booking/resources')&&
@@ -93,14 +102,19 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  ]);
  assert.equal(resourceResponse.status(),200,'Booking Resource create HTTP');
  const form=page.locator('#new-appointment form');
- // Exactly 3 selects in this form: Customer / Service / Resource.
- const selectors=form.locator('select');
- await selectors.nth(2).locator('option').filter({hasText:resource})
+ // Service + Resource selects; Customer is server Business search (SQL024), not a select.
+ await form.getByLabel('المورد').locator('option').filter({hasText:resource})
   .waitFor({state:'attached'});
  onPhase('S12 create scoped Booking via UI');
- await selectors.nth(0).selectOption({label:customer});
- await selectors.nth(1).selectOption({label:service+' (30 دقيقة)'});
- await selectors.nth(2).selectOption({label:resource});
+ const searchWait=page.waitForResponse(r=>r.request().method()==='GET'&&
+  r.url().includes('/customers?q=')&&r.url().includes('/api/workspaces/'),{timeout:20000});
+ await form.getByLabel(/ابحث عن العميل/).fill(customer);
+ const searchResponse=await searchWait;
+ assert.equal(searchResponse.status(),200,'Customer Business search HTTP');
+ await form.getByRole('button',{name:new RegExp('^'+customer.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'))})
+  .click();
+ await form.getByLabel('الخدمة').selectOption({label:service+' (30 دقيقة)'});
+ await form.getByLabel('المورد').selectOption({label:resource});
  const local=await page.evaluate(()=>{
   const d=new Date(Date.now()+72*60*60*1000);
   d.setSeconds(0,0);

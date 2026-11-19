@@ -148,17 +148,25 @@ async function main(){
     const status=await diagnosticPage.evaluate(async ids=>{
      const path='/api/workspaces/'+ids.b+'/branches/'+ids.br;
      const urls=['/api/auth/me','/api/auth/workspaces',path,
-      path+'/booking',path+'/customers',path+'/catalog',path+'/pos-drafts'];
+      path+'/booking',path+'/customers',path+'/customers?q=a',path+'/catalog',
+      path+'/pos-drafts'];
      const codes=await Promise.all(urls.map(async u=>{
       try{return (await fetch(u,{credentials:'same-origin',cache:'no-store'})).status;}
       catch{return 0;}
      }));
      const w=await fetch('/api/auth/workspaces',{credentials:'same-origin'});
      const data=w.ok?await w.json():null;
+     const bookingReady=!!document.querySelector('label')&&
+      Array.from(document.querySelectorAll('label')).some(l=>
+       (l.textContent||'').includes('اسم المورد'));
+     const bookingBlocked=[...document.querySelectorAll('[role="alert"]')]
+      .map(n=>(n.textContent||'').trim()).filter(Boolean).slice(0,2);
      return {codes,workspaceCount:Array.isArray(data?.workspaces)?
       data.workspaces.length:-1,
       scopePresent:!!data?.workspaces?.some(x=>
-       x.businessId===ids.b&&x.branchId===ids.br)};
+       String(x.businessId).toLowerCase()===String(ids.b).toLowerCase()&&
+       String(x.branchId).toLowerCase()===String(ids.br).toLowerCase()),
+      bookingReady,bookingBlocked};
     },{b:business,br:branch});
     const denied=await diagnosticPage.getByText(
      'مش مسموح بعرض لوحة الصالون لهذا الفرع.').count();

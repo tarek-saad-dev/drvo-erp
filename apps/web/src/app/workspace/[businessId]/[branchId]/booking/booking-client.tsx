@@ -68,8 +68,9 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
       // permitted to read those owning Modules; never bypass their scopes.
       const [booking,customerProbe,category,windowResult]=await Promise.all([
         fetch(scope+"/booking",{credentials:"same-origin",cache:"no-store"}),
-        // Probe Customers independently; full search is server-side via ?q=.
-        fetch(scope+"/customers?q="+encodeURIComponent("a"),{credentials:"same-origin",cache:"no-store"}),
+        // Prerequisites prove customers.read via browse list; Business ?q= search
+        // is a separate SQL024 capability used only after the operator types.
+        fetch(scope+"/customers",{credentials:"same-origin",cache:"no-store"}),
         fetch(scope+"/catalog",{credentials:"same-origin",cache:"no-store"}),
         fetch(scope+"/booking/windows",{credentials:"same-origin",cache:"no-store"}),
       ]);

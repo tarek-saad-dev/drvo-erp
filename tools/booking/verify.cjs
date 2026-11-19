@@ -149,10 +149,12 @@ async function main(){
    "',CHECK_POLICY=ON,CHECK_EXPIRATION=OFF");
   admin=await open({...base,database:db});
   await admin.query("CREATE USER ["+user+"] FOR LOGIN ["+user+"];GRANT CONNECT TO ["+user+"]");
-  await pass('17 forward-only migrations apply and replay, no synthetic appointment or draft seed',async()=>{
-   const migrations=process.env.BOOKING_BROWSER_DISPOSABLE==='YES'?18:17;
+  await pass('forward-only migrations apply and replay, no synthetic appointment or draft seed',async()=>{
+   // Browser path needs SQL018 HR + SQL024 Customer search for Cashier-parity Booking UX.
+   // Non-browser Booking HTTP CI stays at SQL017 Booking foundation tip.
+   const migrations=process.env.BOOKING_BROWSER_DISPOSABLE==='YES'?24:17;
    const applied=await applyMigrations(admin,undefined,migrations);
-   assert.equal(applied.length,migrations)
+   assert.equal(applied.length,migrations);
    assert.ok(applied.every(x=>x.status==='applied'));
    const replay=await applyMigrations(admin,undefined,migrations);
    assert.ok(replay.every(x=>x.status==='unchanged'));
@@ -227,13 +229,17 @@ async function main(){
      e=>e.number===229,object+' direct SELECT must be denied');
    }
    // Only the previously reviewed, constrained SP interfaces are executable.
-   for(const procedure of [
+   const procedures=[
     'core.ReadCatalog','core.CreateCatalogCategory',
     'core.CreateCatalogOffering','core.ReadCustomers',
     'core.CreateCustomer','core.ReadBranchBooking',
     'core.CreateBookingAppointment','core.ReadBranchPosDrafts',
     'core.CreateBranchPosDraft',
-   ]){
+   ];
+   if(process.env.BOOKING_BROWSER_DISPOSABLE==='YES'){
+    procedures.push('core.SearchCustomers');
+   }
+   for(const procedure of procedures){
     const r=await app.query("SELECT HAS_PERMS_BY_NAME('"+
      procedure+"','OBJECT','EXECUTE') AS allowed");
     assert.equal(Number(r.recordset[0].allowed),1,procedure);

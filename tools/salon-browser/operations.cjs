@@ -83,18 +83,21 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  await page.reload({waitUntil:'domcontentloaded'});
  await page.getByRole('cell',{name:customer,exact:true}).waitFor();
  onPhase('S12 create Booking Resource through UI');
- await page.goto(scope+'/booking',{waitUntil:'domcontentloaded'});
- await page.getByRole('heading',{name:'المواعيد والحجوزات',exact:true}).waitFor();
- // Fail closed with page-state evidence instead of a blind label timeout.
- const resourceHeading=page.getByRole('heading',{name:'إضافة مورد حجز',exact:true});
- const blocked=page.getByRole('alert').filter({hasText:/صلاحية قراءة|مش متاحة|تعذر تحميل/});
- await Promise.race([
-  resourceHeading.waitFor({state:'visible',timeout:30000}),
-  blocked.first().waitFor({state:'visible',timeout:30000}).then(async()=>{
+ await page.goto(scope+'/booking',{waitUntil:'domcontentloaded',timeout:45000});
+ await page.getByRole('heading',{name:'المواعيد والحجوزات',exact:true}).waitFor({timeout:45000});
+ // Prefer ready form; if blocked alert appears first, fail with its text.
+ try{
+  await page.getByRole('heading',{name:'إضافة مورد حجز',exact:true})
+   .waitFor({state:'visible',timeout:45000});
+ }catch(err){
+  const blocked=page.getByRole('alert').filter({hasText:/صلاحية قراءة|مش متاحة|تعذر تحميل/});
+  if(await blocked.count()){
    throw new Error('BOOKING_UI_NOT_READY '+((await blocked.first().textContent())||'').slice(0,80));
-  }),
- ]);
+  }
+  throw err;
+ }
  await page.getByLabel('اسم المورد').fill(resource);
+ // Default kind PERSON is fine for unrestricted-until-window Booking resources.
  const [resourceResponse]=await Promise.all([
   page.waitForResponse(r=>r.url().endsWith('/booking/resources')&&
    r.request().method()==='POST',{timeout:20000}),
@@ -104,15 +107,16 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  const form=page.locator('#new-appointment form');
  // Service + Resource selects; Customer is server Business search (SQL024), not a select.
  await form.getByLabel('المورد').locator('option').filter({hasText:resource})
-  .waitFor({state:'attached'});
+  .waitFor({state:'attached',timeout:20000});
  onPhase('S12 create scoped Booking via UI');
  const searchWait=page.waitForResponse(r=>r.request().method()==='GET'&&
   r.url().includes('/customers?q=')&&r.url().includes('/api/workspaces/'),{timeout:20000});
  await form.getByLabel(/ابحث عن العميل/).fill(customer);
  const searchResponse=await searchWait;
  assert.equal(searchResponse.status(),200,'Customer Business search HTTP');
- await form.getByRole('button',{name:new RegExp('^'+customer.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'))})
-  .click();
+ const pick=form.getByRole('button',{name:new RegExp(customer.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'))});
+ await pick.first().waitFor({state:'visible',timeout:20000});
+ await pick.first().click();
  await form.getByLabel('الخدمة').selectOption({label:service+' (30 دقيقة)'});
  await form.getByLabel('المورد').selectOption({label:resource});
  const local=await page.evaluate(()=>{
@@ -121,10 +125,15 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
   return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
  });
  await form.getByLabel('الموعد المحلي').fill(local);
- await form.getByRole('button',{name:'تأكيد الحجز'}).click();
+ const [bookingResponse]=await Promise.all([
+  page.waitForResponse(r=>r.request().method()==='POST'&&
+   r.url().endsWith('/booking/appointments'),{timeout:20000}),
+  form.getByRole('button',{name:'تأكيد الحجز'}).click(),
+ ]);
+ assert.equal(bookingResponse.status(),200,'Booking appointment create HTTP');
  const bookingRow=page.getByRole('row').filter({hasText:customer});
- await bookingRow.getByText(service,{exact:true}).waitFor();
- await bookingRow.getByText(resource,{exact:true}).waitFor();
+ await bookingRow.getByText(service,{exact:true}).waitFor({timeout:20000});
+ await bookingRow.getByText(resource,{exact:true}).waitFor({timeout:20000});
  onPhase('S12 Booking survives browser reload');
  await page.reload({waitUntil:'domcontentloaded'});
  const savedBooking=page.getByRole('row').filter({hasText:customer});

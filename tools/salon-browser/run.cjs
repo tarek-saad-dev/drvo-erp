@@ -36,21 +36,33 @@ async function waitForGateway(){
  throw new Error('Disposable HTTPS gateway unavailable');
 }
 async function childCheck(env){
+ // Hard ceiling: attempt-3 hung for hours because Playwright child never exited.
+ // Fail closed well under the 45m workflow budget so SQL diagnostics still run.
+ const MAX_MS=12*60*1000;
  return new Promise((resolve,reject)=>{
   const child=spawn(process.execPath,['tools/salon-browser/check.cjs'],{
    env,stdio:['ignore','pipe','pipe'],
   });
-  let stdout='',stderr='';
+  let stdout='',stderr='',settled=false;
+  const finish=(fn,arg)=>{
+   if(settled)return;
+   settled=true;clearTimeout(timer);
+   try{child.kill('SIGKILL');}catch{}
+   fn(arg);
+  };
+  const timer=setTimeout(()=>{
+   finish(reject,new Error('Chromium check exceeded '+MAX_MS+'ms hard ceiling'));
+  },MAX_MS);
   child.stdout.on('data',data=>{stdout=(stdout+String(data)).slice(-600);});
   child.stderr.on('data',data=>{stderr=(stderr+String(data)).slice(-600);});
-  child.once('error',()=>reject(new Error('Chromium check process start failed')));
+  child.once('error',()=>finish(reject,new Error('Chromium check process start failed')));
   child.once('exit',code=>{
    if(code===0&&stdout.includes('PASS: real disposable HTTPS browser'))
-    resolve();
+    finish(resolve);
    else {
     const codes=stderr.match(/CI_SAFE_OVERVIEW_DIAGNOSTIC [^\n]{1,220}/)?.[0]||'';
     const phase=stderr.match(/FAIL: disposable browser phase:[^\n]{1,150}/)?.[0]||'UNKNOWN';
-    reject(new Error('Chromium check failed: '+phase+' '+codes));
+    finish(reject,new Error('Chromium check failed: '+phase+' '+codes));
    }
   });
  });

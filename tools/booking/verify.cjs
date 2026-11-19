@@ -152,7 +152,11 @@ async function main(){
   await pass('forward-only migrations apply and replay, no synthetic appointment or draft seed',async()=>{
    // Browser path needs SQL018 HR + SQL024 Customer search for Cashier-parity Booking UX.
    // Non-browser Booking HTTP CI stays at SQL017 Booking foundation tip.
+   // Browser path: SQL018 HR + SQL024 SearchCustomers (required for Booking Business search UX).
    const migrations=process.env.BOOKING_BROWSER_DISPOSABLE==='YES'?24:17;
+   if(process.env.BOOKING_BROWSER_DISPOSABLE==='YES'){
+    assert.ok(migrations>=24,'disposable browser SQL must include SearchCustomers');
+   }
    const applied=await applyMigrations(admin,undefined,migrations);
    assert.equal(applied.length,migrations);
    assert.ok(applied.every(x=>x.status==='applied'));

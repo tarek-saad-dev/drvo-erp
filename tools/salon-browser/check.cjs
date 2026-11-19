@@ -53,6 +53,9 @@ async function main(){
    args:['--host-resolver-rules=MAP drvo-ci.test 127.0.0.1','--no-proxy-server'],
   });
   const privileged=await browser.newContext({ignoreHTTPSErrors:true});
+  // Explicit ceilings prevent indefinite waits if a locator never resolves.
+  privileged.setDefaultTimeout(45000);
+  privileged.setDefaultNavigationTimeout(45000);
   phase='privileged login';
   const operator=await signIn(privileged,'scheduler.booking.ci');
   diagnosticPage=operator;
@@ -80,6 +83,8 @@ async function main(){
   await operator.getByText('CI Business · CI Branch').waitFor();
   phase='separate staff login';
   const restricted=await browser.newContext({ignoreHTTPSErrors:true});
+  restricted.setDefaultTimeout(45000);
+  restricted.setDefaultNavigationTimeout(45000);
   const staff=await signIn(restricted,'staff.read.booking.ci');
   phase='staff salon navigate';
   await staff.goto(url(business,branch),{waitUntil:'domcontentloaded',timeout:45000});

@@ -8,6 +8,9 @@ on:
       - 'apps/api/test/attendance.test.cjs'
       - 'apps/web/src/app/workspace/**'
       - 'apps/web/test/hr-attendance.test.cjs'
+      - 'tests/hr-attendance-source.test.cjs'
+      - 'tests/fixtures/cashier/attendanceSessionPolicy.ts'
+      - 'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json'
       - 'tools/hr/attendance-verify.cjs'
       - '.github/workflows/hr-attendance-ci.yml'
   push:
@@ -19,6 +22,9 @@ on:
       - 'apps/api/test/attendance.test.cjs'
       - 'apps/web/src/app/workspace/**'
       - 'apps/web/test/hr-attendance.test.cjs'
+      - 'tests/hr-attendance-source.test.cjs'
+      - 'tests/fixtures/cashier/attendanceSessionPolicy.ts'
+      - 'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json'
       - 'tools/hr/attendance-verify.cjs'
       - '.github/workflows/hr-attendance-ci.yml'
 permissions:
@@ -73,6 +79,8 @@ jobs:
         run: |
           set -euo pipefail
           npm ci --prefix apps/web --no-audit --no-fund
+          npm ci --no-audit --no-fund
           node --test apps/web/test/hr-attendance.test.cjs
+          node --test tests/hr-attendance-source.test.cjs
           env -u DRVO_K5_WEB_ENABLED -u DRVO_HR_ATTENDANCE_WEB_ENABLED npm run build --prefix apps/web
           npm run typecheck --prefix apps/web

@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import {useCallback,useEffect,useRef,useState} from "react";
+import {useCallback,useEffect,useMemo,useRef,useState} from "react";
 import {useRouter} from "next/navigation";
 
 type Employee={employeeId:string;displayName:string;isActive:boolean;branchActive:boolean};
@@ -16,6 +16,11 @@ function time(value:string|null){
   dateStyle:"medium",timeStyle:"short",timeZone:"Africa/Cairo",
  }).format(parsed);
 }
+function matchesQuery(name:string,id:string,query:string){
+ const q=query.trim().toLowerCase();
+ if(!q)return true;
+ return name.toLowerCase().includes(q)||id.toLowerCase().startsWith(q);
+}
 export default function AttendanceClient({businessId,branchId}:{
  businessId:string;branchId:string;
 }){
@@ -27,6 +32,8 @@ export default function AttendanceClient({businessId,branchId}:{
  const [data,setData]=useState<Attendance|null>(null);
  const [employees,setEmployees]=useState<Employee[]>([]);
  const [employeeId,setEmployeeId]=useState("");
+ const [employeeQuery,setEmployeeQuery]=useState("");
+ const [sessionQuery,setSessionQuery]=useState("");
  const [busy,setBusy]=useState("");
  const [notice,setNotice]=useState("");
  const [error,setError]=useState(false);
@@ -78,7 +85,13 @@ export default function AttendanceClient({businessId,branchId}:{
   }catch{setError(true);setNotice("الاتصال انقطع؛ إعادة نفس الطلب آمنة ضد التكرار.");}
   finally{setBusy("");}
  }
+ const openSessions=useMemo(()=>data?.sessions.filter(s=>s.status==="OPEN")??[],[data]);
+ const filteredEmployees=useMemo(()=>employees.filter(e=>
+  matchesQuery(e.displayName,e.employeeId,employeeQuery)),[employees,employeeQuery]);
+ const filteredSessions=useMemo(()=>data?.sessions.filter(s=>
+  matchesQuery(s.employeeName,s.employeeId,sessionQuery))??[],[data,sessionQuery]);
  const activeOpen=data?.sessions.find(s=>s.employeeId.toLowerCase()===employeeId.toLowerCase()&&s.status==="OPEN");
+ const selectedName=employees.find(e=>e.employeeId===employeeId)?.displayName??"";
  return <main className="k5-workspace" dir="rtl">
   <header className="k5-workspace-header">
    <div className="k5-brand"><span className="brandmark">D</span> DRVO <b>ERP</b></div>
@@ -86,46 +99,85 @@ export default function AttendanceClient({businessId,branchId}:{
     <Link href={root}>مساحة الفرع</Link></nav>
   </header>
   <div className="k5-page-title"><div>
-   <span className="k5-eyebrow">HR CORE / SERVER-SIDE ATTENDANCE</span>
+   <span className="k5-eyebrow">HR CORE / BRANCH ATTENDANCE OPERATOR</span>
    <h1>الحضور والانصراف</h1>
-   <p className="k5-muted">نبدأ بحضور وانصراف فعليين بوقت من SQL Server، مش بوقت يحدده المتصفح.
-    عرض الوقت بتوقيت القاهرة، من غير تقفيل BusinessDay أو راتب أو خصومات تأخير.</p>
+   <p className="k5-muted">تسجيل حضور وانصراف فعليين للفرع عبر SQL020 / Nest، بوقت السيرفر UTC.
+    عرض القاهرة للمشغّل فقط — من غير تقفيل BusinessDay أو راتب أو إجازات أو تصحيح يومي.</p>
   </div></div>
   {status==="loading"&&<p className="k5-table-state" role="status">جاري تحميل جلسات الحضور…</p>}
   {status==="denied"&&<p className="k5-error" role="alert">مش مصرح لك بحضور موظفي الفرع.</p>}
   {status==="unavailable"&&<p className="k5-error" role="alert">الحضور غير متاح أو SQL020 لسه مش مطبّقة.</p>}
   {status==="ready"&&data&&<>
-   <div className="drvo-expenses-banner"><strong>حضور فعلي · بدون Payroll</strong>
-    <span>UTC SERVER TIME · NOT LINKED TO BUSINESS DAY · NOT CALCULATED</span>
+   <div className="drvo-expenses-banner" role="status"><strong>حضور فعلي · بدون Payroll</strong>
+    <span>UTC SERVER TIME · NOT LINKED TO BUSINESS DAY · NOT CALCULATED · ADR-031 OUT OF SCOPE</span>
    </div>
+   <section className="k5-admin-card drvo-attendance-deferred" aria-label="حدود الشريحة الحالية">
+    <h2>مفتوح لاحقًا (مش في الشريحة دي)</h2>
+    <ul className="drvo-attendance-deferred-list">
+     <li>لوحة يوم العمل / Day-off / Work-on-day-off / Bulk (Cashier AttendancePanel)</li>
+     <li>التأخير والخصومات والورديات والاستراحات</li>
+     <li>حساب أو ترحيل راتب يومي/شهري (HR-03/04 · ADR-031)</li>
+     <li>درج حضور فريق الـPOS (POS-14)</li>
+    </ul>
+   </section>
    {notice&&<p className={error?"k5-error":"k5-notice"} role={error?"alert":"status"}>{notice}</p>}
+   <section className="k5-admin-card drvo-attendance-open" aria-label="جلسات مفتوحة الآن">
+    <div className="k5-admin-summary"><div>
+     <h2>مفتوح الآن في الفرع</h2>
+     <p className="k5-muted">{openSessions.length} جلسة بدون انصراف — جلسة مفتوحة واحدة لكل موظف عبر الأعمال</p>
+    </div><button className="k5-salon-refresh" type="button" onClick={()=>void load()}>تحديث</button></div>
+    {openSessions.length===0?<p className="k5-table-state">مفيش حد متسجل حضوره دلوقتي.</p>:
+     <ul className="drvo-attendance-open-list">{openSessions.map(s=><li key={s.attendanceId}>
+      <div><strong>{s.employeeName}</strong>
+       <span className="k5-muted">منذ {time(s.checkedInAtUtc)}</span></div>
+      <button type="button" className="drvo-attendance-out" disabled={!!busy}
+       onClick={()=>void punch("OUT",s.employeeId,s.attendanceId)}>
+       {busy==="OUT:"+s.attendanceId?"جاري الانصراف…":"تسجيل انصراف"}
+      </button>
+     </li>)}</ul>}
+   </section>
    <section className="k5-admin-card k5-invite-card">
-    <h2>سجّل حضور الموظف</h2>
+    <h2>سجّل حضور / انصراف موظف</h2>
     <div className="drvo-attendance-controls">
+     <label>بحث موظف
+      <input value={employeeQuery} placeholder="اسم أو بداية المعرّف"
+       onChange={e=>setEmployeeQuery(e.target.value)}/>
+     </label>
      <label>الموظف
       <select value={employeeId} onChange={e=>setEmployeeId(e.target.value)}>
-       {employees.length===0&&<option value="">مفيش موظفين نشطين</option>}
-       {employees.map(e=><option key={e.employeeId} value={e.employeeId}>{e.displayName}</option>)}
+       {filteredEmployees.length===0&&<option value="">مفيش موظفين مطابقين</option>}
+       {filteredEmployees.map(e=><option key={e.employeeId} value={e.employeeId}>{e.displayName}</option>)}
       </select></label>
      <button className="k5-save" type="button" disabled={!!busy||!employeeId||!!activeOpen}
       onClick={()=>void punch("IN",employeeId,null)}>
       {busy.startsWith("IN:")?"جاري تسجيل الحضور…":"تسجيل حضور"}
      </button>
-     {activeOpen&&<span className="k5-muted">الموظف عنده جلسة مفتوحة منذ {time(activeOpen.checkedInAtUtc)}</span>}
+     <button className="drvo-attendance-out" type="button"
+      disabled={!!busy||!employeeId||!activeOpen}
+      onClick={()=>activeOpen&&void punch("OUT",employeeId,activeOpen.attendanceId)}>
+      {busy.startsWith("OUT:")&&activeOpen&&busy==="OUT:"+activeOpen.attendanceId
+       ?"جاري الانصراف…":"تسجيل انصراف"}
+     </button>
     </div>
-    <p className="k5-muted">مفيش تصحيح تواريخ أو قفل يوم من الواجهة دي؛ الجلسة المفتوحة القديمة لازم تتقفل بإجراء مصرح به.</p>
+    {selectedName&&activeOpen&&<p className="k5-muted">{selectedName} عنده جلسة مفتوحة منذ {time(activeOpen.checkedInAtUtc)}</p>}
+    <p className="k5-muted">مفيش تصحيح تواريخ أو قفل يوم من الواجهة دي؛ الوقت من SQL Server فقط، وإعادة الطلب محمية بـIdempotency-Key.</p>
    </section>
    <section className="k5-admin-card drvo-expenses-list">
     <div className="k5-admin-summary"><div>
      <h2>آخر جلسات الحضور</h2>
      <p className="k5-muted">آخر {data.sessions.length} جلسة في الفرع، مش كشف راتب أو تقرير ساعات نهائي</p>
-    </div><button className="k5-salon-refresh" type="button" onClick={()=>void load()}>تحديث</button></div>
+    </div>
+     <label className="drvo-attendance-filter">تصفية القائمة
+      <input value={sessionQuery} placeholder="اسم الموظف"
+       onChange={e=>setSessionQuery(e.target.value)}/>
+     </label></div>
     {data.mayBeTruncated&&<p className="k5-notice">العرض محدود بآخر 200 جلسة.</p>}
-    {data.sessions.length===0?<p className="k5-table-state">لسه مفيش حضور مسجل في الفرع.</p>:
+    {filteredSessions.length===0?<p className="k5-table-state">
+     {data.sessions.length===0?"لسه مفيش حضور مسجل في الفرع.":"مفيش نتائج للتصفية."}</p>:
      <div className="k5-table-wrap"><table className="k5-table">
       <thead><tr><th>الموظف</th><th>الحضور (القاهرة)</th><th>الانصراف</th>
        <th>الحالة</th><th>الإجراء</th></tr></thead>
-      <tbody>{data.sessions.map(s=><tr key={s.attendanceId}>
+      <tbody>{filteredSessions.map(s=><tr key={s.attendanceId}>
        <td>{s.employeeName}</td><td>{time(s.checkedInAtUtc)}</td>
        <td>{time(s.checkedOutAtUtc)}</td><td>{s.status==="OPEN"?"مفتوحة":"مقفولة"}</td>
        <td>{s.status==="OPEN"&&<button type="button" className="drvo-attendance-out"

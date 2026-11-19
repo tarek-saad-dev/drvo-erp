@@ -9,8 +9,8 @@ type AuthorizedWorkspace = { businessId: string; branchId: string; businessName:
 type Account = { username: string; mustChangePassword: boolean };
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export default function WorkspaceHomeClient({businessId, branchId,salonWebEnabled,hrWebEnabled,reportsWebEnabled,expensesWebEnabled,treasuryWebEnabled,inventoryWebEnabled}: {
-  businessId: string; branchId: string;salonWebEnabled:boolean;hrWebEnabled:boolean;reportsWebEnabled:boolean;expensesWebEnabled:boolean;treasuryWebEnabled:boolean;inventoryWebEnabled:boolean;
+export default function WorkspaceHomeClient({businessId, branchId,salonWebEnabled,hrWebEnabled,attendanceWebEnabled,reportsWebEnabled,expensesWebEnabled,treasuryWebEnabled,inventoryWebEnabled}: {
+  businessId: string; branchId: string;salonWebEnabled:boolean;hrWebEnabled:boolean;attendanceWebEnabled:boolean;reportsWebEnabled:boolean;expensesWebEnabled:boolean;treasuryWebEnabled:boolean;inventoryWebEnabled:boolean;
 }) {
   const router = useRouter();
   const [branch, setBranch] = useState<Branch | null>(null);
@@ -20,6 +20,7 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
   const [canViewCustomers, setCanViewCustomers] = useState(false);
   const [canViewBooking, setCanViewBooking] = useState(false);
   const [canViewHr, setCanViewHr] = useState(false);
+  const [canViewAttendance, setCanViewAttendance] = useState(false);
   const [canViewReports,setCanViewReports]=useState(false);
   const [canViewExpenses,setCanViewExpenses]=useState(false);
   const [canViewTreasury,setCanViewTreasury]=useState(false);
@@ -91,6 +92,11 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
           if(!live)return;
           setCanViewHr(hrResult.ok);
         }
+        if(attendanceWebEnabled){
+          const attendanceResult=await fetch(base+"/hr/attendance",{credentials:"same-origin",cache:"no-store"});
+          if(!live)return;
+          setCanViewAttendance(attendanceResult.ok);
+        }
         if(reportsWebEnabled){
           const reportResult=await fetch(base+"/reports/barber-operations",{credentials:"same-origin",cache:"no-store"});
           if(!live)return;
@@ -117,7 +123,7 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
     }
     void load();
     return () => { live = false; };
-  },[router,businessId,branchId,hrWebEnabled,reportsWebEnabled,expensesWebEnabled,treasuryWebEnabled,inventoryWebEnabled]);
+  },[router,businessId,branchId,hrWebEnabled,attendanceWebEnabled,reportsWebEnabled,expensesWebEnabled,treasuryWebEnabled,inventoryWebEnabled]);
 
   return <main className="k5-workspace">
     <header className="k5-workspace-header">
@@ -149,6 +155,10 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
         {hrWebEnabled&&canViewHr && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/hr"} className="k5-verify-link">
           الموظفون والحلاقون (HR Core)
+        </Link>}
+        {attendanceWebEnabled&&canViewAttendance && <Link href={"/workspace/" + encodeURIComponent(businessId) +
+          "/" + encodeURIComponent(branchId) + "/hr/attendance"} className="k5-verify-link">
+          الحضور والانصراف (UTC · بدون راتب)
         </Link>}
         {expensesWebEnabled&&canViewExpenses && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/expenses"} className="k5-verify-link">

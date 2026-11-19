@@ -144,7 +144,9 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  };
  page.on('response',posWatcher);
  await page.goto(scope+'/pos-preview',{waitUntil:'domcontentloaded'});
- await page.getByRole('heading',{name:'مسودة بيع — معاينة الأسعار',exact:true}).waitFor();
+ // Cashier-adapted private POS title (not the older preview-only heading).
+ await page.getByRole('heading',{name:'نقطة البيع — مسودة تشغيل',exact:true}).waitFor();
+ await page.locator('[data-cashier-pos="private-workstation-v1"]').waitFor();
  onPhase('S12 POS preview verified authorized Catalog GET');
  const previewHttp=await page.evaluate(async ({business,branch})=>{
   try{
@@ -156,7 +158,7 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  },{business,branch});
  assert.equal(previewHttp,200,'CI-only POS Preview API status');
  onPhase('S12 real POS quick cart from authorized Catalog');
- const search=page.getByPlaceholder('اكتب اسم العنصر');
+ const search=page.getByLabel('بحث سريع في الكتالوج');
  try {
   await search.waitFor({timeout:10000});
  }catch {
@@ -176,22 +178,23 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
     denied:text.includes('المعاينة غير متاحة لحسابك'),
     error:text.includes('المعاينة غير متاحة حاليًا'),
     inputCount:document.querySelectorAll('input[type="search"]').length,
-    scopeValid:document.querySelector('main.k5-workspace')?.getAttribute('data-scope-uuid-valid'),
-    businessValid:document.querySelector('main.k5-workspace')?.getAttribute('data-business-uuid-valid'),
-    branchValid:document.querySelector('main.k5-workspace')?.getAttribute('data-branch-uuid-valid'),
-    scopeLengths:document.querySelector('main.k5-workspace')?.getAttribute('data-scope-lengths')};
+    workstation:!!document.querySelector('[data-cashier-pos="private-workstation-v1"]'),
+    catalog:!!document.querySelector('[data-cashier-pos="catalog-browser"]')};
   },{business,branch,service});
   throw new Error('S12_POS_SEARCH_MISSING_NET_'+posGetStatuses.join('-')+
    '_API_'+inspection.api.status+'_FOUND_'+inspection.api.found+
    '_UI_L'+inspection.loading+'D'+inspection.denied+
-   'E'+inspection.error+'I'+inspection.inputCount+'V'+inspection.scopeValid+
-   'B'+inspection.businessValid+'R'+inspection.branchValid+'L'+inspection.scopeLengths);
+   'E'+inspection.error+'I'+inspection.inputCount+
+   'W'+inspection.workstation+'C'+inspection.catalog);
  }
  await search.fill(service);
- const quickAdd=page.getByRole('button',{name:new RegExp('^\\+ '+service+' —')});
+ const serviceEsc=service.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+ const quickAdd=page.locator('[data-cashier-pos="catalog-browser"]')
+  .getByRole('button',{name:new RegExp('خدمة · '+serviceEsc)});
  await quickAdd.waitFor();
  await quickAdd.click();
- const increase=page.getByRole('button',{name:'زيادة كمية '+service,exact:true});
+ const increase=page.locator('[data-cashier-pos="cart-panel"]')
+  .getByRole('button',{name:'زيادة الكمية',exact:true});
  await increase.waitFor();
  await increase.click();
  await page.getByRole('button',{name:'حفظ مسودة فقط (بدون بيع)'}).click();

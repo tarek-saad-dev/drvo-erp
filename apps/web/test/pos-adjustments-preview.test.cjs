@@ -35,7 +35,10 @@ test('Editing any cart line drops all stale server-priced previews',()=>{
  assert.match(source,/function quickAdd\(offering:Offering\)[\s\S]*?setPreview\(null\);setAdjustment\(null\)/);
  assert.match(source,/function adjustLineQuantity\([\s\S]*?setPreview\(null\);setAdjustment\(null\)/);
  assert.match(source,/function createNewFromDraft\([\s\S]*?setPreview\(null\);setAdjustment\(null\)/);
- assert.match(source,/setLines\(s=>s\.filter\([\s\S]*?setAdjustment\(null\)/);
+ // Package-aware remove may clear a whole groupKey, then must still invalidate previews.
+ assert.match(source,/onRemove=\{id=>\{[\s\S]*?setPreview\(null\);setAdjustment\(null\)/);
+ assert.match(source,/packageMeta\?\.groupKey/);
+ assert.match(source,/onExpand=\{next=>\{[\s\S]*?setPreview\(null\);setAdjustment\(null\)/);
  assert.match(source,/setDiscountText\(e\.target\.value\);setAdjustment\(null\)/);
  assert.match(source,/setPresentedText\(e\.target\.value\);setAdjustment\(null\)/);
 });

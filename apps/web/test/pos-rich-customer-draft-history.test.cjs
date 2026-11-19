@@ -33,7 +33,7 @@ test('restored rich draft uses authorized current Catalog; never trusts saved mo
  assert.match(client,/!offerings\.some\(o=>o\.offeringId===x\.offeringId&&o\.isActive\)/);
  assert.match(client,/setPreview\(null\);setAdjustment\(null\)/);
  assert.match(client,/setCartRevision\(v=>v\+1\)/);
- assert.match(client,/key=\{JSON\.stringify\(lines\)\+"-"\+cartRevision\}/);
+ assert.match(client,/key=\{JSON\.stringify\(lines\)\+"-"\+cartRevision\+"-"\+selectedBarberId\}/);
  assert.doesNotMatch(h,/priceMinor\s*[:=]|setPaid|postInvoice|applyDiscount/);
 });
 test('saving rich draft refreshes separately authorized history',()=>{

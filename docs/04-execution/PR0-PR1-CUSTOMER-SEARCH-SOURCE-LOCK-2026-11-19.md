@@ -4,12 +4,13 @@
 
 | Layer | State | Evidence |
 | --- | --- | --- |
-| Code committed locally | YES | Includes packages/executor work pending push after this note |
-| Code on GitHub `main` | YES through `2103d50` (prior); packages commit follows | `git ls-remote` must equal local HEAD after push |
-| Customers SQL024 CI | PASS | https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44563649332 (`537005b`) · concurrency follow-up https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44564799543 (`04c00dc`) |
-| K5C + POS Rich + Staging on `2103d50` | PASS | K5C https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44565099095 · POS Rich https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44565099330 · Staging Artifact https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44565099079 · Staging Deploy https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44565099175 |
-| Catalog SQL025 packages CI | PENDING this push | Shared Catalog workflow will exercise `tools/catalog/verify.cjs` package cases |
-| Deployed / private usable | Staging Deploy ran on `2103d50`; Owner browser OPEN | Flags OFF for finance; SQL025 **not** applied to primary/VPS |
+| Code committed locally | YES | HEAD `5ccb249` |
+| Code on GitHub `main` | YES | `git ls-remote` = `5ccb2498432c68aa4dc55352e964d7b21ab3ff83` |
+| Customers SQL024 CI | PASS | https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44563649332 (`537005b`) · https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44564799543 (`04c00dc`) |
+| K5C + POS Rich on `2103d50` | PASS | K5C https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44565099095 · POS Rich https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44565099330 |
+| Catalog SQL025 on `492b4d3` | PASS | https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44566865041 |
+| K5C/POS Rich/K1 on `492b4d3`/`d313531` | FAIL then fixed | Outdated pricing key assertion + TS handoff seed + Staging P4 pending count; fix `5ccb249` |
+| Deployed / private usable | Staging Deploy may follow green web; Owner browser OPEN | Flags OFF; SQL024/025 **not** applied to primary/VPS |
 | Full Cashier parity | NO | Migration incomplete |
 
 ## Source lock (PR0)

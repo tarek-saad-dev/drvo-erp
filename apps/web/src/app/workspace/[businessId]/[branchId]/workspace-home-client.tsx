@@ -9,8 +9,8 @@ type AuthorizedWorkspace = { businessId: string; branchId: string; businessName:
 type Account = { username: string; mustChangePassword: boolean };
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export default function WorkspaceHomeClient({businessId, branchId,salonWebEnabled,hrWebEnabled,attendanceWebEnabled,reportsWebEnabled,expensesWebEnabled,treasuryWebEnabled,inventoryWebEnabled,queueWebEnabled}: {
-  businessId: string; branchId: string;salonWebEnabled:boolean;hrWebEnabled:boolean;attendanceWebEnabled:boolean;reportsWebEnabled:boolean;expensesWebEnabled:boolean;treasuryWebEnabled:boolean;inventoryWebEnabled:boolean;queueWebEnabled:boolean;
+export default function WorkspaceHomeClient({businessId, branchId,salonWebEnabled,hrWebEnabled,attendanceWebEnabled,reportsWebEnabled,expensesWebEnabled,otherIncomeWebEnabled,treasuryWebEnabled,treasuryOpsWebEnabled,operationsWebEnabled,inventoryWebEnabled,queueWebEnabled}: {
+  businessId: string; branchId: string;salonWebEnabled:boolean;hrWebEnabled:boolean;attendanceWebEnabled:boolean;reportsWebEnabled:boolean;expensesWebEnabled:boolean;otherIncomeWebEnabled:boolean;treasuryWebEnabled:boolean;treasuryOpsWebEnabled:boolean;operationsWebEnabled:boolean;inventoryWebEnabled:boolean;queueWebEnabled:boolean;
 }) {
   const router = useRouter();
   const [branch, setBranch] = useState<Branch | null>(null);
@@ -24,7 +24,10 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
   const [canViewAttendance, setCanViewAttendance] = useState(false);
   const [canViewReports,setCanViewReports]=useState(false);
   const [canViewExpenses,setCanViewExpenses]=useState(false);
+  const [canViewOtherIncome,setCanViewOtherIncome]=useState(false);
   const [canViewTreasury,setCanViewTreasury]=useState(false);
+  const [canViewTreasuryOps,setCanViewTreasuryOps]=useState(false);
+  const [canViewOperations,setCanViewOperations]=useState(false);
   const [canViewInventory,setCanViewInventory]=useState(false);
   const [canPreviewPos, setCanPreviewPos] = useState(false);
   const [account, setAccount] = useState<Account | null>(null);
@@ -113,14 +116,30 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
           if(!live)return;
           setCanViewExpenses(expenseResult.ok);
         }
+        if(otherIncomeWebEnabled){
+          const oiResult=await fetch(base+"/other-income",{credentials:"same-origin",cache:"no-store"});
+          if(!live)return;
+          setCanViewOtherIncome(oiResult.ok);
+        }
         if(treasuryWebEnabled){
           const treasuryResult=await fetch(base+"/treasury/counts",{credentials:"same-origin",cache:"no-store"});
           if(!live)return;
           setCanViewTreasury(treasuryResult.ok);
         }
+        if(treasuryOpsWebEnabled){
+          const treasuryOpsResult=await fetch(base+"/treasury/ops",{credentials:"same-origin",cache:"no-store"});
+          if(!live)return;
+          setCanViewTreasuryOps(treasuryOpsResult.ok);
+        }
+        if(operationsWebEnabled){
+          const operationsResult=await fetch(base+"/operations",{credentials:"same-origin",cache:"no-store"});
+          if(!live)return;
+          setCanViewOperations(operationsResult.ok);
+        }
         if(inventoryWebEnabled){
-          // Inventory DRAFT preview reuses Catalog PRODUCT read auth; no stock SQL yet.
-          setCanViewInventory(catalogResult.ok);
+          const inventoryResult=await fetch(base+"/inventory",{credentials:"same-origin",cache:"no-store"});
+          if(!live)return;
+          setCanViewInventory(inventoryResult.ok);
         }
         setStatus("ready");
       } catch {
@@ -129,7 +148,7 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
     }
     void load();
     return () => { live = false; };
-  },[router,businessId,branchId,hrWebEnabled,attendanceWebEnabled,reportsWebEnabled,expensesWebEnabled,treasuryWebEnabled,inventoryWebEnabled,queueWebEnabled]);
+  },[router,businessId,branchId,hrWebEnabled,attendanceWebEnabled,reportsWebEnabled,expensesWebEnabled,otherIncomeWebEnabled,treasuryWebEnabled,treasuryOpsWebEnabled,operationsWebEnabled,inventoryWebEnabled,queueWebEnabled]);
 
   return <main className="k5-workspace">
     <header className="k5-workspace-header">
@@ -170,13 +189,25 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
           "/" + encodeURIComponent(branchId) + "/expenses"} className="k5-verify-link">
           المصروفات (مسودات غير مدفوعة)
         </Link>}
+        {otherIncomeWebEnabled&&canViewOtherIncome && <Link href={"/workspace/" + encodeURIComponent(businessId) +
+          "/" + encodeURIComponent(branchId) + "/other-income"} className="k5-verify-link">
+          إيرادات أخرى (مسودات غير محصّلة)
+        </Link>}
         {treasuryWebEnabled&&canViewTreasury && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/treasury"} className="k5-verify-link">
           الخزنة — جرد نقدي (مسودات فقط)
         </Link>}
+        {treasuryOpsWebEnabled&&canViewTreasuryOps && <Link href={"/workspace/" + encodeURIComponent(businessId) +
+          "/" + encodeURIComponent(branchId) + "/treasury/ops"} className="k5-verify-link">
+          الخزنة — حركات وتسوية (GL GATED)
+        </Link>}
+        {operationsWebEnabled&&canViewOperations && <Link href={"/workspace/" + encodeURIComponent(businessId) +
+          "/" + encodeURIComponent(branchId) + "/operations"} className="k5-verify-link">
+          تشغيل اليوم والورديات (بدون ترحيل)
+        </Link>}
         {inventoryWebEnabled&&canViewInventory && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/inventory"} className="k5-verify-link">
-          المخزون (معاينة DRAFT / UNKNOWN)
+          المخزون + استلام مشتريات (غير مرحّل)
         </Link>}
         {canViewCatalog && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/catalog"} className="k5-verify-link">

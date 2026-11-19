@@ -40,14 +40,22 @@ import { ReportsController } from "./reports/reports.controller";
 import { ReportsService } from "./reports/reports.service";
 import { ExpensesController } from "./expenses/expenses.controller";
 import { ExpensesService } from "./expenses/expenses.service";
+import { OtherIncomeController } from "./other-income/other-income.controller";
+import { OtherIncomeService } from "./other-income/other-income.service";
+import { InventoryController } from "./inventory/inventory.controller";
+import { InventoryService } from "./inventory/inventory.service";
 import { TreasuryController } from "./treasury/treasury.controller";
 import { TreasuryService } from "./treasury/treasury.service";
+import { TreasuryOpsController } from "./treasury/treasury-ops.controller";
+import { TreasuryOpsService } from "./treasury/treasury-ops.service";
+import { OperationsController } from "./operations/operations.controller";
+import { OperationsService } from "./operations/operations.service";
 
 @Module({
   controllers: [HealthController, DatabaseHealthController, K3ScopeProofController,
     IdentityController, AuthorizedBranchController, BranchAccessController,
-    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, ReleaseCatalogController, ActivationPreviewController, CatalogController, CustomersController, BookingController, QueueController, PosPreviewController, PosDraftsController, PosRichController, HrController, AttendanceController, ReportsController, ExpensesController, TreasuryController],
+    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, ReleaseCatalogController, ActivationPreviewController, CatalogController, CustomersController, BookingController, QueueController, PosPreviewController, PosDraftsController, PosRichController, HrController, AttendanceController, ReportsController, ExpensesController, OtherIncomeController, InventoryController, TreasuryController, TreasuryOpsController, OperationsController],
   providers: [FoundationDatabaseService, K3ScopeProofRepository, IdentityService, BranchAccessService,
-    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, ReleaseCatalogService, ActivationPreviewService, CatalogService, CustomersService, BookingService, QueueService, PosPreviewService, PosDraftsService, PosRichService, HrService, AttendanceService, ReportsService, ExpensesService, TreasuryService],
+    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, ReleaseCatalogService, ActivationPreviewService, CatalogService, CustomersService, BookingService, QueueService, PosPreviewService, PosDraftsService, PosRichService, HrService, AttendanceService, ReportsService, ExpensesService, OtherIncomeService, InventoryService, TreasuryService, TreasuryOpsService, OperationsService],
 })
 export class AppModule {}

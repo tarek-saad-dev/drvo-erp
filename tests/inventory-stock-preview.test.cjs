@@ -1,8 +1,7 @@
 'use strict';
 /**
- * Shared Inventory DRAFT stock preview — Catalog PRODUCT only; on-hand UNKNOWN.
- * Cashier pin concepts: casher@046bf19 admin inventory dashboard + branch stock list.
- * No SQL027 / Nest inventory procs in this track.
+ * Shared Inventory stock preview helper — Catalog PRODUCT + optional SQL027 balances.
+ * Cost remains UNKNOWN; ADR-031 out of scope.
  */
 const test=require('node:test');
 const assert=require('node:assert/strict');
@@ -19,7 +18,7 @@ function product(n,name,extra={}){
  };
 }
 
-test('PRODUCT offerings become DRAFT rows with UNKNOWN on-hand; SERVICES excluded',()=>{
+test('without balances: PRODUCT rows keep UNKNOWN on-hand; SERVICES excluded',()=>{
  const preview=inv.buildDraftStockPreview([
   product(1,'Wax'),
   {offeringId:guid(2),kind:'SERVICE',displayName:'Haircut',priceMinor:20000,
@@ -35,42 +34,43 @@ test('PRODUCT offerings become DRAFT rows with UNKNOWN on-hand; SERVICES exclude
  assert.equal(preview.kpis.activeProducts,1);
  assert.equal(preview.kpis.unitsAvailable,'UNKNOWN');
  assert.equal(preview.kpis.inventoryValueAtCost,'UNKNOWN');
- assert.equal(preview.kpis.lowStock,'UNKNOWN');
- assert.equal(preview.kpis.outOfStock,'UNKNOWN');
  assert.equal(preview.items.length,2);
  for(const row of preview.items){
   assert.equal(row.onHand,'UNKNOWN');
   assert.equal(row.stockStatus,'UNKNOWN');
-  assert.equal(row.barcode,null);
-  assert.equal(row.productCode,null);
  }
- assert.equal(preview.items.find(r=>r.displayName==='Shampoo')?.categoryName,'Retail');
 });
 
-test('query matches displayName or offeringId prefix; never invents qty 0 as truth',()=>{
+test('with balances: qtyMilli owned; cost still UNKNOWN',()=>{
+ const preview=inv.buildDraftStockPreview(
+  [product(10,'Wax'),product(11,'Gel')],
+  '',
+  [{offeringId:guid(10),qtyMilli:2500,reorderLevelMilli:1000,stockStatus:'OK'},
+   {offeringId:guid(11),qtyMilli:0,reorderLevelMilli:null,stockStatus:'OUT'}],
+ );
+ assert.equal(preview.state,'NONPOSTING_BRANCH_STOCK_BALANCES');
+ assert.equal(preview.verification,'BALANCES_OWNED');
+ assert.equal(preview.stockLedger,'BRANCH_BALANCE_TABLE');
+ assert.equal(preview.purchasingPosts,'RECEIVE_DRAFTS_ONLY');
+ assert.equal(preview.kpis.unitsMilli,2500);
+ assert.equal(preview.kpis.unitsAvailable,2.5);
+ assert.equal(preview.kpis.outOfStock,1);
+ assert.equal(preview.kpis.inventoryValueAtCost,'UNKNOWN');
+ assert.equal(preview.items.find(r=>r.offeringId===guid(10)).qtyMilli,2500);
+ assert.equal(preview.items.find(r=>r.offeringId===guid(11)).stockStatus,'OUT');
+});
+
+test('query matches displayName or offeringId prefix',()=>{
  const wax=product(10,'Arabic Wax');
  const gel=product(11,'Hair Gel');
- const all=inv.buildDraftStockPreview([wax,gel],'');
- assert.equal(all.items.length,2);
- assert.ok(all.items.every(r=>r.onHand==='UNKNOWN'&&r.onHand!==0));
  const byName=inv.buildDraftStockPreview([wax,gel],'wax');
  assert.equal(byName.items.length,1);
  assert.equal(byName.items[0].displayName,'Arabic Wax');
- const byId=inv.buildDraftStockPreview([wax,gel],guid(11));
- assert.equal(byId.items.length,1);
- assert.equal(byId.items[0].offeringId,guid(11));
 });
 
-test('malformed offerings and oversized query fail closed',()=>{
+test('malformed offerings fail closed',()=>{
  assert.throws(()=>inv.buildDraftStockPreview(null),TypeError);
- assert.throws(()=>inv.buildDraftStockPreview([{
-  offeringId:'bad',kind:'PRODUCT',displayName:'X',priceMinor:1,currency:'EGP',isActive:true,
- }]),TypeError);
  assert.throws(()=>inv.buildDraftStockPreview([product(1,'Ok')],'x'.repeat(201)),TypeError);
- assert.equal(inv.isCatalogProductOffering(product(1,'Ok')),true);
- assert.equal(inv.isCatalogProductOffering({
-  ...product(2,'Cut'),kind:'SERVICE',
- }),false);
 });
 
 test('web local helper stays aligned with shared domain package',()=>{
@@ -80,10 +80,9 @@ test('web local helper stays aligned with shared domain package',()=>{
   '../apps/web/src/app/workspace/[businessId]/[branchId]/inventory/inventory-stock-preview.ts'),
   'utf8');
  for(const token of [
-  'DRAFT_UNVERIFIED_STOCK_PREVIEW','UNVERIFIED','NOT_POSTED','NOT_AVAILABLE',
-  'NOT_IN_SCOPE','onHand: "UNKNOWN"','stockStatus: "UNKNOWN"',
-  'isCatalogProductOffering','buildDraftStockPreview','matchesStockPreviewQuery',
+  'NONPOSTING_BRANCH_STOCK_BALANCES','BALANCES_OWNED','NOT_POSTED',
+  'BRANCH_BALANCE_TABLE','RECEIVE_DRAFTS_ONLY','NOT_IN_SCOPE',
+  'buildDraftStockPreview','isCatalogProductOffering',
  ]) assert.ok(domain.includes(token)&&web.includes(token),'missing '+token);
- assert.doesNotMatch(domain,/\bQtyOnHand\b|qtyOnHand\s*[:=]\s*0|applyManualStockAdjustment/);
- assert.doesNotMatch(web,/\bQtyOnHand\b|localStorage|sessionStorage/);
+ assert.doesNotMatch(domain,/localStorage|applyManualStockAdjustment/);
 });

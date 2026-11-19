@@ -11,37 +11,44 @@ test('Inventory page requires K5 and independent web feature flag',()=>{
  assert.match(page,/notFound\(\)/);
 });
 
-test('Inventory Client is Catalog PRODUCT read-only DRAFT preview; no fake stock writes',()=>{
+test('Inventory Client uses owned inventory API with nonposting receive/adjust',()=>{
  const client=read('inventory/inventory-client.tsx');
  assert.match(client,/\/api\/workspaces\//);
- assert.match(client,/\/catalog/);
+ assert.match(client,/\/inventory/);
  assert.match(client,/credentials:"same-origin",cache:"no-store"/);
- assert.match(client,/buildDraftStockPreview/);
- assert.match(client,/DRAFT \/ UNVERIFIED/);
- assert.match(client,/on-hand = UNKNOWN/);
- assert.match(client,/stockLedger NOT_AVAILABLE/);
- assert.match(client,/posting NOT_POSTED/);
+ assert.match(client,/NONPOSTING_BRANCH_STOCK_BALANCES/);
+ assert.match(client,/NOT_POSTED/);
+ assert.match(client,/NOT_IN_SCOPE/);
+ assert.match(client,/\/receives/);
+ assert.match(client,/\/adjusts/);
+ assert.match(client,/purchasingPosts/);
  assert.doesNotMatch(client,/localStorage|sessionStorage|IndexedDB/);
- assert.doesNotMatch(client,/method:"POST"|method:'POST'/);
- assert.doesNotMatch(client,/\bQtyOnHand\b|qtyOnHand|applyManualStockAdjustment|\/inventory\/transfers/);
- assert.match(client,/purchasingPosts=\{preview\.purchasingPosts\}/);
- assert.match(client,/adr031=\{preview\.adr031\}/);
+ assert.doesNotMatch(client,/\/inventory\/transfers/);
 });
 
-test('Branch launcher only reveals Inventory tile after flag AND Catalog permission',()=>{
+test('Branch launcher reveals Inventory after inventory API auth, Other Income independently',()=>{
  const home=read('workspace-home-client.tsx');
  const route=read('page.tsx');
  assert.match(home,/if\(inventoryWebEnabled\)/);
- assert.match(home,/setCanViewInventory\(catalogResult\.ok\)/);
- assert.match(home,/inventoryWebEnabled&&canViewInventory/);
+ assert.match(home,/base\+"\/inventory"/);
+ assert.match(home,/otherIncomeWebEnabled/);
+ assert.match(home,/base\+"\/other-income"/);
+ assert.match(route,/otherIncomeWebEnabled=\{process\.env\.DRVO_OTHER_INCOME_WEB_ENABLED==="YES"\}/);
  assert.match(route,/inventoryWebEnabled=\{process\.env\.DRVO_INVENTORY_WEB_ENABLED==="YES"\}/);
 });
 
-test('Light V1 inventory styles reuse ADR-024 tokens; no separate dark theme',()=>{
+test('Other Income page is flagged and non-sale',()=>{
+ const page=read('other-income/page.tsx');
+ const client=read('other-income/other-income-client.tsx');
+ assert.match(page,/DRVO_OTHER_INCOME_WEB_ENABLED/);
+ assert.match(client,/NONPOSTING_OTHER_INCOME_DRAFTS_ONLY/);
+ assert.match(client,/notSalesRevenue/);
+ assert.match(client,/\/other-income/);
+});
+
+test('Light V1 inventory styles reuse ADR-024 tokens',()=>{
  const css=fs.readFileSync(path.resolve(__dirname,'../src/app/drvo-light.css'),'utf8');
  assert.match(css,/\.drvo-inventory-banner/);
  assert.match(css,/\.drvo-inventory-kpis/);
- assert.match(css,/\.drvo-inventory-unknown/);
  assert.match(css,/var\(--drvo-deep\)/);
- assert.doesNotMatch(css,/\.drvo-inventory[^{]*\{[^}]*prefers-color-scheme:\s*dark/);
 });

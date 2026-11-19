@@ -15,6 +15,9 @@ test('Reports: private and branch-scope verified before showing read-only bookin
  assert.match(source,/matchingGuid\(x\.businessId,businessId\)/);
  assert.match(source,/matchingGuid\(data\.businessId,businessId\)/);
  assert.match(source,/reports\/barber-operations/);
+ assert.match(source,/reports\/expense-drafts-summary/);
+ assert.match(source,/reports\/other-income-drafts-summary/);
+ assert.match(source,/reports\/inventory-stock-summary/);
  assert.match(source,/credentials:"same-origin",cache:"no-store"/);
  assert.match(source,/READ_ONLY_BOOKING_SAMPLE/);
  assert.match(source,/الأعداد تخص أحدث 200 حجز/);

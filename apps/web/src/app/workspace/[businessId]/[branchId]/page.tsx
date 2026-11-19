@@ -15,7 +15,10 @@ export default async function WorkspaceHomePage({
     attendanceWebEnabled={process.env.DRVO_HR_WEB_ENABLED==="YES"&&
       process.env.DRVO_HR_ATTENDANCE_WEB_ENABLED==="YES"}
     expensesWebEnabled={process.env.DRVO_EXPENSES_WEB_ENABLED==="YES"}
+    otherIncomeWebEnabled={process.env.DRVO_OTHER_INCOME_WEB_ENABLED==="YES"}
     treasuryWebEnabled={process.env.DRVO_TREASURY_COUNTS_WEB_ENABLED==="YES"}
+    treasuryOpsWebEnabled={process.env.DRVO_TREASURY_OPS_WEB_ENABLED==="YES"}
+    operationsWebEnabled={process.env.DRVO_OPERATIONS_WEB_ENABLED==="YES"}
     inventoryWebEnabled={process.env.DRVO_INVENTORY_WEB_ENABLED==="YES"}
     reportsWebEnabled={process.env.DRVO_REPORTS_WEB_ENABLED==="YES"}
     queueWebEnabled={process.env.DRVO_QUEUE_WEB_ENABLED==="YES"}

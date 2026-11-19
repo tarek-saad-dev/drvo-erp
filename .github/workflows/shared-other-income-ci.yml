@@ -1,0 +1,78 @@
+name: Shared Other Income SQL028 + Web CI
+on:
+  pull_request:
+    paths:
+      - 'db/migrations/**'
+      - 'apps/api/src/other-income/**'
+      - 'apps/api/src/app.module.ts'
+      - 'apps/api/test/other-income.test.cjs'
+      - 'apps/web/src/app/workspace/**'
+      - 'apps/web/test/inventory-workspace.test.cjs'
+      - 'tools/other-income/**'
+      - '.github/workflows/shared-other-income-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'db/migrations/**'
+      - 'apps/api/src/other-income/**'
+      - 'apps/api/src/app.module.ts'
+      - 'apps/api/test/other-income.test.cjs'
+      - 'apps/web/src/app/workspace/**'
+      - 'apps/web/test/inventory-workspace.test.cjs'
+      - 'tools/other-income/**'
+      - '.github/workflows/shared-other-income-ci.yml'
+permissions:
+  contents: read
+jobs:
+  other-income-web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Other Income private UI + Next build
+        run: |
+          set -euo pipefail
+          npm ci --prefix apps/web --no-audit --no-fund
+          node --test apps/web/test/inventory-workspace.test.cjs
+          env -u DRVO_K5_WEB_ENABLED -u DRVO_OTHER_INCOME_WEB_ENABLED npm run build --prefix apps/web
+          npm run typecheck --prefix apps/web
+  other-income-sql-http:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compile Nest and other-income unit tests
+        run: |
+          set -euo pipefail
+          npm ci --prefix apps/api --no-audit --no-fund
+          npm test --prefix apps/api
+          node --check tools/other-income/verify.cjs
+      - name: Start disposable SQL Server 2022
+        shell: bash
+        run: |
+          set -euo pipefail
+          pass="OtherIncomeCi_$(openssl rand -hex 18)!"
+          echo "::add-mask::$pass"
+          echo "SQL_TEST_SA_PASSWORD=$pass" >> "$GITHUB_ENV"
+          docker run --detach --name drvo-other-income-ci \
+            -e ACCEPT_EULA=Y -e MSSQL_PID=Developer \
+            -e MSSQL_SA_PASSWORD="$pass" \
+            -p 127.0.0.1:14347:1433 -p 127.0.0.1:1433:1433 \
+            mcr.microsoft.com/mssql/server:2022-latest
+      - name: Verify SQL028 other-income drafts through Nest HTTP
+        env:
+          OTHER_INCOME_SQL_DISPOSABLE: 'YES'
+          OTHER_INCOME_TEST_PORT: '14347'
+        run: node tools/other-income/verify.cjs
+      - name: SQL logs on failure
+        if: failure()
+        run: docker logs --tail 100 drvo-other-income-ci || true
+      - name: Remove disposable SQL
+        if: always()
+        run: docker rm -f drvo-other-income-ci || true

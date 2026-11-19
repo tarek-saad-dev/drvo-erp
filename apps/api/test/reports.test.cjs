@@ -48,7 +48,10 @@ test('Reports: case-insensitive UUID join, strict duplicates/invalid source deni
 test('Reports disabled before Auth and HR/Booking source reads',async()=>{
  await env({DRVO_REPORTS_ENABLED:null,DRVO_K5_AUTH_ENABLED:'YES'},async()=>{
   const service=new ReportsService({list(){throw Error('hr touched');}},
-   {list(){throw Error('booking touched');}});
+   {list(){throw Error('booking touched');}},
+   {list(){throw Error('expenses touched');}},
+   {list(){throw Error('other income touched');}},
+   {list(){throw Error('inventory touched');}});
   await assert.rejects(()=>service.barberOperations(actor,token,...scope),e=>e.getStatus?.()===503);
   const controller=new ReportsController({actorFromToken(){throw Error('auth touched');}},service);
   await assert.rejects(()=>controller.barberOperations({headers:{}},{setHeader(){}},...scope),
@@ -62,7 +65,9 @@ test('Reports calls independently scoped HR and Booking services, never writes',
     assert.equal(a,actor);assert.equal(t,token);
     assert.deepEqual([b,br],scope);return Promise.resolve(name==='hr'?
      {employees:[emp(1,10)]}:{appointments:[booking(1,10,'COMPLETED')]});}});
-  const service=new ReportsService(scoped('hr'),scoped('booking'));
+  const service=new ReportsService(scoped('hr'),scoped('booking'),
+   {list(){throw Error('expenses');}},{list(){throw Error('oi');}},
+   {list(){throw Error('inv');}});
   const data=await service.barberOperations(actor,token,...scope);
   assert.deepEqual(calls.sort(),['booking','hr']);assert.equal(data.completed,1);
  });
@@ -70,7 +75,9 @@ test('Reports calls independently scoped HR and Booking services, never writes',
 test('Reports fails closed if either domain owner denies',async()=>{
  await env({DRVO_REPORTS_ENABLED:'YES',DRVO_K5_AUTH_ENABLED:'YES'},async()=>{
   const service=new ReportsService({list(){return Promise.reject(new Error('HR denied'));}},
-   {list(){return Promise.resolve({appointments:[]});}});
+   {list(){return Promise.resolve({appointments:[]});}},
+   {list(){throw Error('expenses');}},{list(){throw Error('oi');}},
+   {list(){throw Error('inv');}});
   await assert.rejects(()=>service.barberOperations(actor,token,...scope),/HR denied/);
  });
 });

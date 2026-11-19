@@ -1,0 +1,88 @@
+name: Shared Inventory SQL027 + Web CI
+on:
+  pull_request:
+    paths:
+      - 'db/migrations/**'
+      - 'apps/api/src/inventory/**'
+      - 'apps/api/src/app.module.ts'
+      - 'apps/api/test/inventory.test.cjs'
+      - 'apps/web/src/app/workspace/**'
+      - 'apps/web/test/inventory-workspace.test.cjs'
+      - 'packages/business-modules/inventory/**'
+      - 'tests/inventory-stock-preview.test.cjs'
+      - 'tools/inventory/**'
+      - 'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json'
+      - '.github/workflows/shared-inventory-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'db/migrations/**'
+      - 'apps/api/src/inventory/**'
+      - 'apps/api/src/app.module.ts'
+      - 'apps/api/test/inventory.test.cjs'
+      - 'apps/web/src/app/workspace/**'
+      - 'apps/web/test/inventory-workspace.test.cjs'
+      - 'packages/business-modules/inventory/**'
+      - 'tests/inventory-stock-preview.test.cjs'
+      - 'tools/inventory/**'
+      - 'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json'
+      - '.github/workflows/shared-inventory-ci.yml'
+permissions:
+  contents: read
+jobs:
+  inventory-web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Inventory domain + private UI tests
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          npm run build
+          node --test tests/inventory-stock-preview.test.cjs
+          npm ci --prefix apps/web --no-audit --no-fund
+          node --test apps/web/test/inventory-workspace.test.cjs
+          env -u DRVO_K5_WEB_ENABLED -u DRVO_INVENTORY_WEB_ENABLED -u DRVO_OTHER_INCOME_WEB_ENABLED \
+            npm run build --prefix apps/web
+          npm run typecheck --prefix apps/web
+  inventory-sql-http:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compile Nest and inventory unit tests
+        run: |
+          set -euo pipefail
+          npm ci --prefix apps/api --no-audit --no-fund
+          npm test --prefix apps/api
+          node --check tools/inventory/verify.cjs
+      - name: Start disposable SQL Server 2022
+        shell: bash
+        run: |
+          set -euo pipefail
+          pass="InventoryCi_$(openssl rand -hex 18)!"
+          echo "::add-mask::$pass"
+          echo "SQL_TEST_SA_PASSWORD=$pass" >> "$GITHUB_ENV"
+          docker run --detach --name drvo-inventory-ci \
+            -e ACCEPT_EULA=Y -e MSSQL_PID=Developer \
+            -e MSSQL_SA_PASSWORD="$pass" \
+            -p 127.0.0.1:14347:1433 -p 127.0.0.1:1433:1433 \
+            mcr.microsoft.com/mssql/server:2022-latest
+      - name: Verify SQL027 balances + purchase receive through Nest HTTP
+        env:
+          INVENTORY_SQL_DISPOSABLE: 'YES'
+          INVENTORY_TEST_PORT: '14347'
+        run: node tools/inventory/verify.cjs
+      - name: SQL logs on failure
+        if: failure()
+        run: docker logs --tail 100 drvo-inventory-ci || true
+      - name: Remove disposable SQL
+        if: always()
+        run: docker rm -f drvo-inventory-ci || true

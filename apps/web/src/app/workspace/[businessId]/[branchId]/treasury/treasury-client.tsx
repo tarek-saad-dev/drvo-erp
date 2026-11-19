@@ -95,7 +95,9 @@ export default function TreasuryClient({businessId,branchId}:{businessId:string;
  return <main className="k5-workspace" dir="rtl">
   <header className="k5-workspace-header">
    <div className="k5-brand"><span className="brandmark">D</span> DRVO <b>ERP</b></div>
-   <nav className="k5-head-actions"><Link href={root}>مساحة الفرع</Link></nav>
+   <nav className="k5-head-actions"><Link href={root}>مساحة الفرع</Link>
+    <Link href={root+"/treasury/ops"}>حركات/تسوية</Link>
+    <Link href={root+"/operations"}>اليوم/الوردية</Link></nav>
   </header>
   <div className="k5-page-title"><div>
    <span className="k5-eyebrow">TREASURY CORE / CASH COUNT OBSERVATIONS</span>

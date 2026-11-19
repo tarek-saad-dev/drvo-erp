@@ -120,6 +120,47 @@ export default function ReportsClient({businessId,branchId}:{businessId:string;b
     <p className="k5-muted">مفيش مبالغ محصلة أو مبيعات POSTED أو عمولات محسوبة في التقرير ده.
      Booking وHR هما المصدر؛ Reports ما بيكتبش أي سجلات مالية.</p>
    </section>
+   <ReportsExtraSummaries root={root}/>
   </>}
  </main>;
+}
+
+function ReportsExtraSummaries({root}:{root:string}){
+ const [expense,setExpense]=useState<null|{state:string;activeDraftCount:number;cancelledCount:number;treasuryState:string}>(null);
+ const [income,setIncome]=useState<null|{state:string;activeDraftCount:number;notSalesRevenue?:boolean}>(null);
+ const [stock,setStock]=useState<null|{state:string;unitsMilli:number|null;lowStock:number;outOfStock:number;inventoryValueAtCost:string}>(null);
+ useEffect(()=>{
+  let live=true;
+  (async()=>{
+   const load=async(path:string)=>{
+    try{
+     const r=await fetch(root+path,{credentials:"same-origin",cache:"no-store"});
+     if(!r.ok)return null;return r.json();
+    }catch{return null;}
+   };
+   const [e,i,s]=await Promise.all([
+    load("/reports/expense-drafts-summary"),
+    load("/reports/other-income-drafts-summary"),
+    load("/reports/inventory-stock-summary"),
+   ]);
+   if(!live)return;
+   if(e?.state==="READ_ONLY_EXPENSE_DRAFT_SAMPLE")setExpense(e);
+   if(i?.state==="READ_ONLY_OTHER_INCOME_DRAFT_SAMPLE")setIncome(i);
+   if(s?.state==="READ_ONLY_INVENTORY_STOCK_SAMPLE")setStock(s);
+  })();
+  return ()=>{live=false;};
+ },[root]);
+ if(!expense&&!income&&!stock)return null;
+ return <section className="k5-admin-card">
+  <h2>ملخصات مسودات غير مرحّلة</h2>
+  <p className="k5-muted">قراءات فقط من Expenses / Other Income / Inventory — بدون مبيعات أو GL (ADR-031).</p>
+  <div className="k5-salon-steps">
+   {expense&&<div><strong>مصروفات DRAFT</strong>
+    <p>{expense.activeDraftCount} نشطة · {expense.cancelledCount} ملغاة · {expense.treasuryState}</p></div>}
+   {income&&<div><strong>إيرادات أخرى DRAFT</strong>
+    <p>{income.activeDraftCount} نشطة · ليست مبيعات POS</p></div>}
+   {stock&&<div><strong>مخزون الفرع</strong>
+    <p dir="ltr">unitsMilli={stock.unitsMilli??"n/a"} · low={stock.lowStock} · out={stock.outOfStock} · cost={stock.inventoryValueAtCost}</p></div>}
+  </div>
+ </section>;
 }

@@ -9,8 +9,8 @@ type AuthorizedWorkspace = { businessId: string; branchId: string; businessName:
 type Account = { username: string; mustChangePassword: boolean };
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export default function WorkspaceHomeClient({businessId, branchId,salonWebEnabled,hrWebEnabled,reportsWebEnabled,expensesWebEnabled,treasuryWebEnabled}: {
-  businessId: string; branchId: string;salonWebEnabled:boolean;hrWebEnabled:boolean;reportsWebEnabled:boolean;expensesWebEnabled:boolean;treasuryWebEnabled:boolean;
+export default function WorkspaceHomeClient({businessId, branchId,salonWebEnabled,hrWebEnabled,reportsWebEnabled,expensesWebEnabled,treasuryWebEnabled,inventoryWebEnabled}: {
+  businessId: string; branchId: string;salonWebEnabled:boolean;hrWebEnabled:boolean;reportsWebEnabled:boolean;expensesWebEnabled:boolean;treasuryWebEnabled:boolean;inventoryWebEnabled:boolean;
 }) {
   const router = useRouter();
   const [branch, setBranch] = useState<Branch | null>(null);
@@ -23,6 +23,7 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
   const [canViewReports,setCanViewReports]=useState(false);
   const [canViewExpenses,setCanViewExpenses]=useState(false);
   const [canViewTreasury,setCanViewTreasury]=useState(false);
+  const [canViewInventory,setCanViewInventory]=useState(false);
   const [canPreviewPos, setCanPreviewPos] = useState(false);
   const [account, setAccount] = useState<Account | null>(null);
   const [status, setStatus] = useState<"loading"|"ready"|"denied"|"error">("loading");
@@ -105,6 +106,10 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
           if(!live)return;
           setCanViewTreasury(treasuryResult.ok);
         }
+        if(inventoryWebEnabled){
+          // Inventory DRAFT preview reuses Catalog PRODUCT read auth; no stock SQL yet.
+          setCanViewInventory(catalogResult.ok);
+        }
         setStatus("ready");
       } catch {
         if (live) setStatus("error");
@@ -112,7 +117,7 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
     }
     void load();
     return () => { live = false; };
-  },[router,businessId,branchId,hrWebEnabled,reportsWebEnabled,expensesWebEnabled,treasuryWebEnabled]);
+  },[router,businessId,branchId,hrWebEnabled,reportsWebEnabled,expensesWebEnabled,treasuryWebEnabled,inventoryWebEnabled]);
 
   return <main className="k5-workspace">
     <header className="k5-workspace-header">
@@ -152,6 +157,10 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
         {treasuryWebEnabled&&canViewTreasury && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/treasury"} className="k5-verify-link">
           الخزنة — جرد نقدي (مسودات فقط)
+        </Link>}
+        {inventoryWebEnabled&&canViewInventory && <Link href={"/workspace/" + encodeURIComponent(businessId) +
+          "/" + encodeURIComponent(branchId) + "/inventory"} className="k5-verify-link">
+          المخزون (معاينة DRAFT / UNKNOWN)
         </Link>}
         {canViewCatalog && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/catalog"} className="k5-verify-link">

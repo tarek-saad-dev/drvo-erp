@@ -36,9 +36,9 @@ async function waitForGateway(){
  throw new Error('Disposable HTTPS gateway unavailable');
 }
 async function childCheck(env){
- // Hard ceiling: Playwright child can hang despite locator timeouts (e.g. Chrome IPC).
- // Fail closed well under the 45m workflow budget so SQL diagnostics still run.
- const MAX_MS=8*60*1000;
+ // Hard ceiling covers S12 operator journey + S13 HR/Barber UI. Fail closed
+ // well under the 45m workflow budget so SQL diagnostics still run.
+ const MAX_MS=12*60*1000;
  const fs=require('node:fs');
  const path=require('node:path');
  const heartbeat=path.join(process.env.RUNNER_TEMP||require('node:os').tmpdir(),
@@ -63,7 +63,15 @@ async function childCheck(env){
     'ms hard ceiling lastPhase='+last));
   },MAX_MS);
   child.stdout.on('data',data=>{stdout=(stdout+String(data)).slice(-1200);});
-  child.stderr.on('data',data=>{stderr=(stderr+String(data)).slice(-1200);});
+  child.stderr.on('data',data=>{
+   const chunk=String(data);
+   stderr=(stderr+chunk).slice(-2400);
+   // Surface phase breadcrumbs in the workflow log (no PII/secrets).
+   for(const line of chunk.split('\n')){
+    if(line.startsWith('S12_PHASE ')||line.startsWith('FAIL:'))
+     console.error(line.slice(0,160));
+   }
+  });
   child.once('error',()=>finish(reject,new Error('Chromium check process start failed')));
   child.once('exit',code=>{
    if(code===0&&stdout.includes('PASS: real disposable HTTPS browser'))

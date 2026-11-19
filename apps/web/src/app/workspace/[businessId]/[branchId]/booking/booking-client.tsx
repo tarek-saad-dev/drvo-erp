@@ -97,11 +97,12 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
       setCustomersReady(true);
       setServices(cat.offerings.filter(s=>s.isActive&&s.kind==="SERVICE"&&
         typeof s.durationMinutes==="number"&&s.durationMinutes>0));
-      // POS preview is a distinct protected owner, never assumed from Booking
-      // read or from a Next.js feature flag alone.
+      // Booking Core is ready once its own reads succeed. POS/Queue probes are
+      // independently authorized owners — never block resource/appointment UI.
       setCanOpenPos(false);
       setCanPrepareDraft(false);
       setCanQueueHandoff(false);
+      setStatus("ready");
       if(posWebEnabled){
         const preview=await fetch(scope+"/pos-preview",{
           credentials:"same-origin",cache:"no-store",
@@ -121,7 +122,6 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
         if(queue.status===401){router.replace("/sign-in");return;}
         setCanQueueHandoff(queue.ok);
       }
-      setStatus("ready");
     }catch{setStatus("unavailable");}
   },[businessId,branchId,scope,router,posWebEnabled,draftsWebEnabled,queueWebEnabled]);
   useEffect(()=>{void load();},[load]);

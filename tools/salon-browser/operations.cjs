@@ -86,9 +86,11 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  await page.goto(scope+'/booking',{waitUntil:'domcontentloaded',timeout:45000});
  await page.getByRole('heading',{name:'المواعيد والحجوزات',exact:true}).waitFor({timeout:45000});
  // Prefer ready form; if blocked alert appears first, fail with its text.
+ const resourceForm=page.locator('form.catalog-form').filter({
+  has:page.getByRole('button',{name:'إضافة المورد'}),
+ });
  try{
-  await page.getByRole('heading',{name:'إضافة مورد حجز',exact:true})
-   .waitFor({state:'visible',timeout:45000});
+  await resourceForm.waitFor({state:'visible',timeout:45000});
  }catch(err){
   const blocked=page.getByRole('alert').filter({hasText:/صلاحية قراءة|مش متاحة|تعذر تحميل/});
   if(await blocked.count()){
@@ -96,12 +98,12 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
   }
   throw err;
  }
- await page.getByLabel('اسم المورد').fill(resource);
+ await resourceForm.getByLabel('اسم المورد').fill(resource,{timeout:20000});
  // Default kind PERSON is fine for unrestricted-until-window Booking resources.
  const [resourceResponse]=await Promise.all([
   page.waitForResponse(r=>r.url().endsWith('/booking/resources')&&
    r.request().method()==='POST',{timeout:20000}),
-  page.getByRole('button',{name:'إضافة المورد'}).click(),
+  resourceForm.getByRole('button',{name:'إضافة المورد'}).click({timeout:20000}),
  ]);
  assert.equal(resourceResponse.status(),200,'Booking Resource create HTTP');
  const form=page.locator('#new-appointment form');

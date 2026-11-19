@@ -8,15 +8,22 @@ async function exerciseHrOperations(page,origin,business,branch,onPhase){
  const employee='S13 Synthetic Barber '+suffix;
  const resource='S13 Person Resource '+suffix;
  const scope=origin+'/workspace/'+business+'/'+branch;
- onPhase('S13 create Booking PERSON resource through real private UI');
+ onPhase('S13 navigate Booking for PERSON resource');
  await page.goto(scope+'/booking',{waitUntil:'domcontentloaded',timeout:45000});
  await page.getByRole('heading',{name:'المواعيد والحجوزات'}).waitFor({timeout:30000});
- await page.getByLabel('اسم المورد').fill(resource,{timeout:20000});
- await page.getByLabel('نوع المورد').selectOption('PERSON',{timeout:20000});
+ // Resource form mounts only after Booking Core ready (not POS probe).
+ onPhase('S13 wait Booking resource form ready');
+ const resourceForm=page.locator('form.catalog-form').filter({
+  has:page.getByRole('button',{name:'إضافة المورد'}),
+ });
+ await resourceForm.waitFor({state:'visible',timeout:45000});
+ onPhase('S13 create Booking PERSON resource through real private UI');
+ await resourceForm.getByLabel('اسم المورد').fill(resource,{timeout:20000});
+ await resourceForm.getByLabel('نوع المورد').selectOption('PERSON',{timeout:20000});
  const [res]=await Promise.all([
   page.waitForResponse(r=>r.url().endsWith('/booking/resources')&&
    r.request().method()==='POST',{timeout:20000}),
-  page.getByRole('button',{name:'إضافة المورد'}).click({timeout:20000}),
+  resourceForm.getByRole('button',{name:'إضافة المورد'}).click({timeout:20000}),
  ]);
  assert.equal(res.status(),200,'PERSON resource create HTTP');
  const resourceData=await res.json();

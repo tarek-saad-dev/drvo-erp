@@ -227,8 +227,39 @@
       "DataProof": "OPEN",
       "PilotProof": "OPEN",
       "Status": "PORTING",
-      "Blocker": "Groom optional add-ons, booking package handoff, print, paid invoice still missing; finance buttons blocked",
+      "Blocker": "Groom optional add-ons, booking package handoff, print, paid invoice still missing; PRODUCT search is CatalogOffering-only (name+offeringId prefix, no barcode/stock); finance buttons blocked",
       "NextAction": "Add optional package extras + Booking→POS package hydration; keep finance gated"
+    },
+    {
+      "ID": "POS-05",
+      "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
+      "SourcePaths+BlobSHA": [
+        "src/components/pos/luxury/ProductCatalog.tsx",
+        "src/app/income/pos/page.tsx"
+      ],
+      "OriginalScreen": "POS retail ProductCatalog",
+      "UserAction": "PRODUCT tab: Cashier-like labels; search displayName + offeringId first-8 prefix; add PRODUCT as retail (no Barber); `/` focus",
+      "AuthRole": "catalog.read + pos.draft",
+      "TenantBusinessBranchScope": "Business Catalog; Branch RBAC",
+      "Preconditions": "authorized active CatalogOffering PRODUCT rows",
+      "Reads": "CatalogOffering displayName/kind/priceMinor/offeringId only",
+      "Writes": "none (cart add is client DRAFT intent until rich save)",
+      "Effects": "NOT_COLLECTED; no inventory decrement; no barcode/stock invention",
+      "FailureAndRaceCases": "empty PRODUCT set; query miss; inactive offering excluded; no fake barcode match",
+      "OwnedModule": "Catalog + POS/Sales (nonposting)",
+      "SalonExtension": "Inventory/barcode owner still absent",
+      "TargetPaths": [
+        "apps/web/.../pos-preview/cashier-catalog-browser.tsx"
+      ],
+      "UIProof": "OPEN",
+      "DomainTest": "apps/web/test/cashier-pos-workstation.test.cjs PRODUCT assertions",
+      "SQLHTTPTest": "n/a (no new Catalog columns)",
+      "BrowserProof": "OPEN",
+      "DataProof": "OPEN",
+      "PilotProof": "OPEN",
+      "Status": "PORTING",
+      "Blocker": "CatalogOffering has no barcode/stock; branch inventory + server stock gate still GAP; Owner browser OPEN",
+      "NextAction": "Keep honest prefix/name search; inventory/barcode only after owned Inventory contract"
     },
     {
       "ID": "POS-04",

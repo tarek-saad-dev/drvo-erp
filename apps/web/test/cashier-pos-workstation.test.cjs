@@ -36,6 +36,18 @@ test('catalog browser preserves Cashier / focus and service-product tabs without
  assert.doesNotMatch(ui,/priceMinor\s*=/);
 });
 
+test('PRODUCT tab uses Cashier-like labels and offeringId prefix search without fake barcode/stock',()=>{
+ const ui=read('cashier-catalog-browser.tsx');
+ assert.match(ui,/اختر المنتج/);
+ assert.match(ui,/بيع تجزئة/);
+ assert.match(ui,/offeringId\.slice\(0,8\)/);
+ assert.match(ui,/idPrefix\.includes\(q\)/);
+ assert.match(ui,/displayName\.toLocaleLowerCase\("en"\)/);
+ assert.match(ui,/لا باركود|ليست باركود|لا باركود\/مخزون/);
+ assert.doesNotMatch(ui,/Barcode|barcode\s*[:=]|qtyOnHand|stockStatus|fakeStock|مخزون:\s*\d/);
+ assert.doesNotMatch(ui,/priceMinor\s*=/);
+});
+
 test('quick actions expose Cashier finance buttons as explicitly blocked',()=>{
  const ui=read('cashier-quick-actions.tsx');
  assert.match(ui,/data-cashier-pos="quick-actions-blocked"/);

@@ -28,9 +28,11 @@ test('search narrows only authorized active Catalog suggestions, never new API s
  assert.match(catalog,/data-cashier-pos="catalog-browser"/);
  assert.match(catalog,/offerings\.filter\(o=>\{/);
  assert.match(catalog,/if\(!o\.isActive\)return false;/);
- assert.match(catalog,/o\.displayName\.toLocaleLowerCase\("en"\)\.includes\(q\)/);
+ assert.match(catalog,/displayName\.toLocaleLowerCase\("en"\)/);
+ assert.match(catalog,/offeringId\.slice\(0,8\)/);
+ assert.match(catalog,/idPrefix\.includes\(q\)/);
  assert.match(catalog,/type="search" maxLength=\{100\}/);
- assert.match(catalog,/\.slice\(0,40\)\.map\(o=><button/);
+ assert.match(catalog,/\.slice\(0,40\)\.map\(o=>\{/);
  assert.doesNotMatch(catalog,/fetch\(/);
  assert.doesNotMatch(source,/fetch\([^)]*catalogSearch/);
 });

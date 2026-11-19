@@ -19,8 +19,8 @@ type Offering={offeringId:string;displayName:string;kind:string;durationMinutes:
 const GUID=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
 type Status="loading"|"ready"|"denied"|"unavailable"|"prerequisites";
 
-export default function BookingClient({businessId,branchId,posWebEnabled,draftsWebEnabled}:{
-  businessId:string;branchId:string;posWebEnabled:boolean;draftsWebEnabled:boolean;
+export default function BookingClient({businessId,branchId,posWebEnabled,draftsWebEnabled,queueWebEnabled}:{
+  businessId:string;branchId:string;posWebEnabled:boolean;draftsWebEnabled:boolean;queueWebEnabled:boolean;
 }){
   const router=useRouter();
   const [status,setStatus]=useState<Status>("loading");
@@ -37,8 +37,11 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
   const [services,setServices]=useState<Offering[]>([]);
   const [canOpenPos,setCanOpenPos]=useState(false);
   const [canPrepareDraft,setCanPrepareDraft]=useState(false);
+  const [canQueueHandoff,setCanQueueHandoff]=useState(false);
+  const [calendarDay,setCalendarDay]=useState(()=>new Date().toISOString().slice(0,10));
   const [notice,setNotice]=useState("");
   const [busy,setBusy]=useState(false);
+  const handoffKeys=useRef<Map<string,string>>(new Map());
   const [resourceName,setResourceName]=useState("");
   const [resourceKind,setResourceKind]=useState<Resource["kind"]>("PERSON");
   const [customerId,setCustomerId]=useState("");
@@ -98,6 +101,7 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
       // read or from a Next.js feature flag alone.
       setCanOpenPos(false);
       setCanPrepareDraft(false);
+      setCanQueueHandoff(false);
       if(posWebEnabled){
         const preview=await fetch(scope+"/pos-preview",{
           credentials:"same-origin",cache:"no-store",
@@ -112,10 +116,35 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
           setCanPrepareDraft(drafts.ok);
         }
       }
+      if(queueWebEnabled){
+        const queue=await fetch(scope+"/queue",{credentials:"same-origin",cache:"no-store"});
+        if(queue.status===401){router.replace("/sign-in");return;}
+        setCanQueueHandoff(queue.ok);
+      }
       setStatus("ready");
     }catch{setStatus("unavailable");}
-  },[businessId,branchId,scope,router,posWebEnabled,draftsWebEnabled]);
+  },[businessId,branchId,scope,router,posWebEnabled,draftsWebEnabled,queueWebEnabled]);
   useEffect(()=>{void load();},[load]);
+  const calendarBoard=useMemo(()=>{
+    const day=calendarDay;
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(day))return [] as Array<{resourceId:string;resourceName:string;items:Appointment[]}>;
+    const byResource=new Map<string,{resourceId:string;resourceName:string;items:Appointment[]}>();
+    for(const r of data.resources.filter(x=>x.isActive)){
+      byResource.set(r.resourceId,{resourceId:r.resourceId,resourceName:r.displayName,items:[]});
+    }
+    for(const a of data.appointments){
+      const local=toLocalMinute(a.startsAtUtc);
+      if(!local.startsWith(day)||a.status==="CANCELLED")continue;
+      const bucket=byResource.get(a.resourceId)??{
+        resourceId:a.resourceId,resourceName:a.resourceName,items:[],
+      };
+      bucket.items.push(a);
+      byResource.set(a.resourceId,bucket);
+    }
+    return [...byResource.values()].map(col=>({
+      ...col,items:[...col.items].sort((a,b)=>a.startsAtUtc.localeCompare(b.startsAtUtc)),
+    }));
+  },[calendarDay,data.appointments,data.resources]);
 
   useEffect(()=>{
     const q=customerQuery.trim();
@@ -297,10 +326,37 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
     }catch{setNotice("تعذر الاتصال. أعد المحاولة بنفس الطلب لتفادي التكرار.");}
     finally{setBusy(false);}
   }
+  async function handoffToQueue(bookingId:string){
+    if(busy||!canQueueHandoff||!GUID.test(bookingId))return;
+    if(!handoffKeys.current.has(bookingId))handoffKeys.current.set(bookingId,crypto.randomUUID());
+    setBusy(true);setNotice("");
+    try{
+      const response=await fetch(scope+"/queue/from-booking",{
+        method:"POST",credentials:"same-origin",cache:"no-store",
+        headers:{"Content-Type":"application/json",
+          "Idempotency-Key":handoffKeys.current.get(bookingId)!},
+        body:JSON.stringify({bookingId}),
+      });
+      if(response.status===401){router.replace("/sign-in");return;}
+      if(response.status===403||response.status===404){
+        setNotice("تسليم الطابور غير مصرح أو الحجز غير متاح.");return;
+      }
+      if(response.status===409){handoffKeys.current.delete(bookingId);
+        setNotice("الحجز اتسَلِّم للطابور قبل كده، أو فيه تعارض على المورد.");
+        await load();return;}
+      if(!response.ok){setNotice("تعذر تسليم الحجز للطابور. أعد بنفس الطلب.");return;}
+      handoffKeys.current.delete(bookingId);
+      setNotice("اتعمل تذكرة طابور من الحجز. مفيش بيع أو تحصيل (ADR-031 خارج النطاق).");
+    }catch{setNotice("تعذر الاتصال أثناء تسليم الطابور.");}
+    finally{setBusy(false);}
+  }
   return <main className="k5-workspace">
     <header className="k5-workspace-header">
       <div className="k5-brand"><span className="brandmark">D</span> DRVO <b>ERP</b></div>
-      <nav className="k5-head-actions"><Link href={home}>مساحة الفرع</Link></nav>
+      <nav className="k5-head-actions">
+        <Link href={home}>مساحة الفرع</Link>
+        {canQueueHandoff&&<Link href={home+"/queue"}>الطابور</Link>}
+      </nav>
     </header>
     <div className="k5-page-title"><div>
       <span className="k5-eyebrow">SHARED BOOKING</span>
@@ -468,6 +524,26 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
         {!customersReady||!services.length||!data.resources.some(r=>r.isActive)?
           <p className="k5-footnote">لتسجيل حجز لازم Customers search + خدمة نشطة ومورد حجز أولًا.</p>:null}
       </section>
+      <section className="k5-admin-card drvo-booking-calendar" aria-label="لوحة يوم الموارد">
+        <div className="k5-admin-summary"><h2>تقويم اليوم حسب المورد</h2>
+          <label className="drvo-booking-calendar-day">اليوم المحلي
+            <input type="date" value={calendarDay} onChange={e=>setCalendarDay(e.target.value)}/>
+          </label>
+        </div>
+        <p className="k5-muted">عرض إسقاطي من آخر 200 حجز محملة؛ مش محرك DST كامل ولا سحب لإعادة الجدولة.</p>
+        <div className="drvo-booking-calendar-grid">
+          {calendarBoard.length===0?<p className="k5-muted">مفيش موارد نشطة.</p>:
+            calendarBoard.map(col=><div key={col.resourceId} className="drvo-booking-calendar-col">
+              <strong>{col.resourceName}</strong>
+              {col.items.length===0?<span className="k5-muted">فاضي</span>:
+                col.items.map(a=><article key={a.bookingId}>
+                  <span dir="ltr">{new Date(a.startsAtUtc).toLocaleTimeString("ar-EG",{hour:"2-digit",minute:"2-digit"})}</span>
+                  <span>{a.customerName}</span>
+                  <span className="k5-muted">{a.offeringName} · {a.status==="BOOKED"?"محجوز":"مكتمل"}</span>
+                </article>)}
+            </div>)}
+        </div>
+      </section>
       <section className="k5-admin-card">
         <div className="k5-admin-summary"><h2>حجوزات الفرع</h2>
           <div className="k5-booking-actions">
@@ -489,6 +565,9 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
                   "&offeringId="+encodeURIComponent(b.offeringId)}
                   className="k5-salon-refresh">جهّز POS Draft من الخدمة</Link>:
                 b.status==="BOOKED"?<div className="k5-booking-actions">
+                {canQueueHandoff&&
+                  <button type="button" className="k5-salon-refresh" disabled={busy}
+                    onClick={()=>void handoffToQueue(b.bookingId)}>إلى الطابور</button>}
                 <button type="button" disabled={busy} onClick={()=>void changeStatus(b.bookingId,"CANCELLED")}>
                   إلغاء الحجز
                 </button>

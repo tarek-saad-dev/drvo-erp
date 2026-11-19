@@ -202,6 +202,17 @@ button, input, select, textarea { font-family:inherit; }
  .drvo-inventory-banner { align-items:flex-start; flex-direction:column; }
 }
 
+/* Booking day board + Salon Queue live board (nonposting). */
+.drvo-booking-calendar-day { display:flex; flex-direction:column; gap:8px; color:var(--drvo-muted); font-size:13px; }
+.drvo-booking-calendar-day input { min-height:42px; border:1px solid var(--drvo-border); border-radius:9px; padding:8px 12px; background:#fff; color:var(--drvo-text); }
+.drvo-booking-calendar-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-top:14px; }
+.drvo-booking-calendar-col { display:flex; flex-direction:column; gap:8px; padding:12px; border:1px solid var(--drvo-border); border-radius:12px; background:#faf9fb; min-height:120px; }
+.drvo-booking-calendar-col strong { color:var(--drvo-deep); }
+.drvo-booking-calendar-col article { display:flex; flex-direction:column; gap:2px; padding:8px 10px; border-radius:9px; border:1px solid #e4d7e1; background:#fff; font-size:13px; }
+.drvo-queue-columns { list-style:none; margin:12px 0 0; padding:0; display:flex; flex-direction:column; gap:10px; }
+.drvo-queue-columns li { display:flex; flex-direction:column; gap:6px; padding:12px 14px; border:1px solid var(--drvo-border); border-radius:11px; background:#fff; }
+.drvo-queue-columns li strong { color:var(--drvo-deep); letter-spacing:.02em; }
+
 /* Shared HR Attendance interface: UTC punch custody, not payroll. */
 .drvo-attendance-controls { display:flex; flex-wrap:wrap; align-items:end; gap:15px; margin-top:16px; }
 .drvo-attendance-controls label { display:flex; flex-direction:column; min-width:min(100%,280px); gap:8px; color:var(--drvo-muted); font-size:13px; }

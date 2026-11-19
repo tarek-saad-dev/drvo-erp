@@ -24,6 +24,8 @@ import { CustomersController } from "./customers/customers.controller";
 import { CustomersService } from "./customers/customers.service";
 import { BookingController } from "./booking/booking.controller";
 import { BookingService } from "./booking/booking.service";
+import { QueueController } from "./queue/queue.controller";
+import { QueueService } from "./queue/queue.service";
 import { PosPreviewController } from "./pos-preview/pos-preview.controller";
 import { PosPreviewService } from "./pos-preview/pos-preview.service";
 import { PosDraftsController } from "./pos-drafts/pos-drafts.controller";
@@ -44,8 +46,8 @@ import { TreasuryService } from "./treasury/treasury.service";
 @Module({
   controllers: [HealthController, DatabaseHealthController, K3ScopeProofController,
     IdentityController, AuthorizedBranchController, BranchAccessController,
-    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, ReleaseCatalogController, ActivationPreviewController, CatalogController, CustomersController, BookingController, PosPreviewController, PosDraftsController, PosRichController, HrController, AttendanceController, ReportsController, ExpensesController, TreasuryController],
+    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, ReleaseCatalogController, ActivationPreviewController, CatalogController, CustomersController, BookingController, QueueController, PosPreviewController, PosDraftsController, PosRichController, HrController, AttendanceController, ReportsController, ExpensesController, TreasuryController],
   providers: [FoundationDatabaseService, K3ScopeProofRepository, IdentityService, BranchAccessService,
-    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, ReleaseCatalogService, ActivationPreviewService, CatalogService, CustomersService, BookingService, PosPreviewService, PosDraftsService, PosRichService, HrService, AttendanceService, ReportsService, ExpensesService, TreasuryService],
+    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, ReleaseCatalogService, ActivationPreviewService, CatalogService, CustomersService, BookingService, QueueService, PosPreviewService, PosDraftsService, PosRichService, HrService, AttendanceService, ReportsService, ExpensesService, TreasuryService],
 })
 export class AppModule {}

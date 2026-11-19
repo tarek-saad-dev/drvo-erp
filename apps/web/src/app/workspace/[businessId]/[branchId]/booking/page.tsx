@@ -16,5 +16,6 @@ export default async function BookingPage({
       process.env.DRVO_CATALOG_WEB_ENABLED==="YES"}
     draftsWebEnabled={process.env.DRVO_POS_DRAFTS_WEB_ENABLED==="YES" &&
       process.env.DRVO_POS_PREVIEW_WEB_ENABLED==="YES" &&
-      process.env.DRVO_CATALOG_WEB_ENABLED==="YES"} />;
+      process.env.DRVO_CATALOG_WEB_ENABLED==="YES"}
+    queueWebEnabled={process.env.DRVO_QUEUE_WEB_ENABLED==="YES"} />;
 }

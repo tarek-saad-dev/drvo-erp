@@ -7,7 +7,7 @@ import CashierCatalogBrowser from "./cashier-catalog-browser";
 import CashierCartPanel from "./cashier-cart-panel";
 import CashierQuickActions from "./cashier-quick-actions";
 import CashierBarberSelector from "./cashier-barber-selector";
-import CashierPackagesSection from "./cashier-packages-section";
+import CashierPackagesSection,{expandPackageToDraftLines,type CatalogPackage} from "./cashier-packages-section";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -34,8 +34,10 @@ function readMoneyMinor(value:string):number|null {
   const minor=Number(major)*100+Number(decimal.padEnd(2,"0"));
   return Number.isSafeInteger(minor)&&minor<=9_000_000_000_000?minor:null;
 }
-export default function PosPreviewClient({businessId,branchId,draftsEnabled,richEnabled,initialOfferingId}:{
-  businessId:string;branchId:string;draftsEnabled:boolean;richEnabled:boolean;initialOfferingId:string|null;
+export default function PosPreviewClient({businessId,branchId,draftsEnabled,richEnabled,
+  initialOfferingId,initialCustomerId,initialPackageId}:{
+  businessId:string;branchId:string;draftsEnabled:boolean;richEnabled:boolean;
+  initialOfferingId:string|null;initialCustomerId:string|null;initialPackageId:string|null;
 }) {
   const router=useRouter();
   const [status,setStatus]=useState<"loading"|"ready"|"denied"|"error">("loading");
@@ -80,22 +82,54 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
       setOfferings(data.offerings);
       // The query is NEVER an authority, price, sale or booked-status proof.
       // Only the independently permitted POS/Catalog response can validate it.
-      if(!handoffApplied.current&&initialOfferingId!==null){
+      // Customer GUID is a draft selection hint; operator/rich save revalidates.
+      if(!handoffApplied.current&&(initialOfferingId!==null||initialCustomerId!==null||
+         initialPackageId!==null)){
         handoffApplied.current=true;
-        const offering=data.offerings.find(o=>
+        if(initialCustomerId!==null&&GUID.test(initialCustomerId)){
+          setSelectedCustomerId(initialCustomerId);
+          setCustomerRevision(v=>v+1);
+        }
+        let packageLines:Line[]|null=null;
+        if(initialPackageId!==null&&GUID.test(initialPackageId)){
+          try{
+            const packagesApi=api.replace(/\/pos-preview$/,"")+"/catalog/packages";
+            const pkgRes=await fetch(packagesApi,{credentials:"same-origin",cache:"no-store"});
+            if(pkgRes.ok){
+              const pkgBody=await pkgRes.json() as {packages?:CatalogPackage[]};
+              const pkg=Array.isArray(pkgBody.packages)?
+                pkgBody.packages.find(p=>p.packageId===initialPackageId):undefined;
+              if(pkg){
+                const expanded=expandPackageToDraftLines({
+                  pkg,offerings:data.offerings,lines:[],
+                });
+                if(expanded.ok)packageLines=expanded.lines;
+              }
+            }
+          }catch{/* fall back to offeringId */}
+        }
+        const offering=initialOfferingId!==null?data.offerings.find(o=>
           o.offeringId===initialOfferingId&&GUID.test(o.offeringId)&&
-          o.isActive&&o.kind==="SERVICE");
-        if(offering){
-          setLines(current=>current.length===0?
-            [{offeringId:offering.offeringId,quantity:1}]:current);
+          o.isActive&&o.kind==="SERVICE"):undefined;
+        // Package expand only when cart empty; otherwise (or on expand miss) offeringId.
+        let seeded:"package"|"offering"|"none"="none";
+        setLines(current=>{
+          if(current.length!==0)return current;
+          if(packageLines){seeded="package";return packageLines;}
+          if(offering){seeded="offering";return [{offeringId:offering.offeringId,quantity:1}];}
+          return current;
+        });
+        if(seeded==="package"){
+          setMessage("اتوسّعت باقة الحجز لمسودة خدمات. راجع الأسعار، ولا يوجد بيع أو تحصيل.");
+        }else if(seeded==="offering"){
           setMessage("اتجهزت سلة مسودة جديدة من خدمة الحجز. راجع الأسعار، ولا يوجد بيع أو تحصيل.");
-        }else{
+        }else if(initialOfferingId!==null||initialPackageId!==null){
           setMessage("الخدمة مش متاحة في الكتالوج الحالي. اختار خدمة من القائمة.");
         }
       }
       setStatus("ready");
     } catch {setStatus("error");}
-  },[api,businessId,branchId,router,initialOfferingId]);
+  },[api,businessId,branchId,router,initialOfferingId,initialCustomerId,initialPackageId]);
   useEffect(()=>{void load();},[load]);
 
   const loadDrafts=useCallback(async()=>{

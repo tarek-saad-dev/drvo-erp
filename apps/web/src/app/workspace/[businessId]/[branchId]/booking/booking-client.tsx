@@ -483,8 +483,9 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
               <td dir="ltr">{new Date(b.startsAtUtc).toLocaleString("ar-EG")}</td>
               <td dir="ltr">{new Date(b.endsAtUtc).toLocaleString("ar-EG")}</td>
               <td>{b.status==="BOOKED"?"محجوز":b.status==="CANCELLED"?"ملغي":"مكتمل"}</td>
-              <td>{b.status==="COMPLETED"&&canPrepareDraft&&GUID.test(b.offeringId)?
-                <Link href={home+"/pos-preview?offeringId="+encodeURIComponent(b.offeringId)}
+              <td>{b.status==="COMPLETED"&&canPrepareDraft&&GUID.test(b.offeringId)&&GUID.test(b.customerId)?
+                <Link href={home+"/pos-preview?customerId="+encodeURIComponent(b.customerId)+
+                  "&offeringId="+encodeURIComponent(b.offeringId)}
                   className="k5-salon-refresh">جهّز POS Draft من الخدمة</Link>:
                 b.status==="BOOKED"?<div className="k5-booking-actions">
                 <button type="button" disabled={busy} onClick={()=>void changeStatus(b.bookingId,"CANCELLED")}>

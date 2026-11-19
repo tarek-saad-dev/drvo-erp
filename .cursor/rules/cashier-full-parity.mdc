@@ -1,0 +1,11 @@
+---
+description: Full Cashier functional and UX port into DRVO ERP, preservation-first, no fake parity
+globs:
+  - "apps/**"
+  - "db/**"
+  - "docs/**"
+  - "tests/**"
+alwaysApply: false
+---
+When implementing Cashier to DRVO migration, FIRST read `docs/04-execution/CURSOR-CASHIER-FULL-MIGRATION-EXECUTION-2026-11-19.md` and its canonical GitHub documentation reading order. This is an EXECUTE mission, not a demo rewrite.
+Read Cashier source at a pinned immutable SHA; preserve every real workflow and the Cashier UX while adapting tenancy, ownership, financial gates and data. Never count copied routes/iframe/synthetic UI as parity. Change actual code, test every vertical slice, keep code/docs in sync, provide exact CI/deploy proof, respect all existing ADRs and do not write to Cut's production DB.

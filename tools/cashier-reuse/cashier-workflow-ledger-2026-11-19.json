@@ -44,8 +44,8 @@
       "ID": "CU-01",
       "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/CustomerSearch.tsx",
-        "src/app/api/customers/route.ts"
+        "src/components/pos/CustomerSearch.tsx#078e1e7eb5e15f745032ff3a911fb2f6cb554cb2",
+        "src/app/api/customers/route.ts#dad2059fb1961788bfc618ba3194ed5d35592892"
       ],
       "OriginalScreen": "POS customer search",
       "UserAction": "Type name/phone (≥1 char), 250ms debounce, select from TOP 20",
@@ -78,8 +78,8 @@
       "ID": "CU-02",
       "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/CustomerSearch.tsx",
-        "src/components/pos/QuickCustomerModal.tsx"
+        "src/components/pos/CustomerSearch.tsx#078e1e7eb5e15f745032ff3a911fb2f6cb554cb2",
+        "src/components/pos/QuickCustomerModal.tsx#c437211b05df69db4648d1bd1b4a3c6ed7e8c902"
       ],
       "OriginalScreen": "POS quick register",
       "UserAction": "No match → register with prefilled name/phone → auto-select",
@@ -110,8 +110,8 @@
       "ID": "CU-03",
       "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/QuickCustomerModal.tsx",
-        "src/components/pos/CustomerSourceFields.tsx"
+        "src/components/pos/QuickCustomerModal.tsx#c437211b05df69db4648d1bd1b4a3c6ed7e8c902",
+        "src/components/pos/CustomerSourceFields.tsx#57801872e707988510ca85ca52abac95f8ca38c4"
       ],
       "OriginalScreen": "Quick customer modal full profile",
       "UserAction": "Create with DOB/address/notes/source/WhatsApp opt-in",
@@ -139,8 +139,8 @@
       "ID": "CU-05",
       "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/CustomerHistoryPanel.tsx",
-        "src/app/api/customers/[id]/history-summary/route.ts"
+        "src/components/pos/CustomerHistoryPanel.tsx#da00701b0aaeeefe3b7d788833c22cb8108967b4",
+        "src/app/api/customers/[id]/history-summary/route.ts#eacf9fb3cf13906a4e77211c0d1d35ab08b3cbf3"
       ],
       "OriginalScreen": "Customer visit / sale history",
       "UserAction": "View last completed sales after select",
@@ -168,8 +168,8 @@
       "ID": "CU-07",
       "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/CustomerHistoryPanel.tsx",
-        "src/app/income/pos/page.tsx"
+        "src/components/pos/CustomerHistoryPanel.tsx#da00701b0aaeeefe3b7d788833c22cb8108967b4",
+        "src/app/income/pos/page.tsx#1a35c63fe1793482706e19186585582ed438017d"
       ],
       "OriginalScreen": "Apply last visit button",
       "UserAction": "Explicit click applies previous services with fresh pricing",
@@ -197,10 +197,10 @@
       "ID": "POS-01",
       "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
       "SourcePaths+BlobSHA": [
-        "src/app/income/pos/page.tsx",
-        "src/components/pos/CartPanel.tsx",
-        "src/components/pos/PosInvoicePanel.tsx",
-        "src/components/pos/QuickActionsBar.tsx"
+        "src/app/income/pos/page.tsx#1a35c63fe1793482706e19186585582ed438017d",
+        "src/components/pos/CartPanel.tsx#b1499215454880548cc8641eea3dc919e72ea8ff",
+        "src/components/pos/PosInvoicePanel.tsx#e0d0d90343f9ec273ab8f819837687ca24422cc2",
+        "src/components/pos/QuickActionsBar.tsx#cae78253c19222e7ecf905ad9c110a20ea58f84d"
       ],
       "OriginalScreen": "Cashier POS workstation",
       "UserAction": "Full compact RTL POS UX",
@@ -234,8 +234,8 @@
       "ID": "POS-05",
       "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/luxury/ProductCatalog.tsx",
-        "src/app/income/pos/page.tsx"
+        "src/components/pos/luxury/ProductCatalog.tsx#9f6207e1872361401466c85b5c485db361782326",
+        "src/app/income/pos/page.tsx#1a35c63fe1793482706e19186585582ed438017d"
       ],
       "OriginalScreen": "POS retail ProductCatalog",
       "UserAction": "PRODUCT tab: Cashier-like labels; search displayName + offeringId first-8 prefix; add PRODUCT as retail (no Barber); `/` focus",
@@ -265,10 +265,10 @@
       "ID": "POS-04",
       "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/luxury/PackagesSection.tsx",
-        "src/lib/pos/groomPackageCart.ts",
-        "src/lib/catalog/groomOptionalAddons.ts",
-        "src/app/api/pos/packages/resolve/route.ts"
+        "src/components/pos/luxury/PackagesSection.tsx#f0f64ed31c77e0f99a4c3b4a82fcad76d5fbb09d",
+        "src/lib/pos/groomPackageCart.ts#e94d57421458ac07dd184389d520c42a5c24e993",
+        "src/lib/catalog/groomOptionalAddons.ts#468ef6cab2c1960a6109775d4c389d4a5582bfd6",
+        "src/app/api/pos/packages/resolve/route.ts#d98bed46336f5a047298003fe2abd673b0f44cdc"
       ],
       "OriginalScreen": "POS packages / groom packs",
       "UserAction": "Browse regular/groom packages; commercial resolve; exclusive home-visit; group cart display",
@@ -304,8 +304,8 @@
       "ID": "POS-EXEC",
       "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/luxury/BarberCarousel.tsx",
-        "src/components/pos/CartPanel.tsx"
+        "src/components/pos/luxury/BarberCarousel.tsx#52389a3c48352cf7a914135620af97e285b3c410",
+        "src/components/pos/CartPanel.tsx#b1499215454880548cc8641eea3dc919e72ea8ff"
       ],
       "OriginalScreen": "Selected Barber stamps service lines",
       "UserAction": "Pick Barber/HR executor; SERVICE lines inherit default executor on rich DRAFT save; PRODUCT stays null",
@@ -380,9 +380,9 @@
       "SalonExtension": "WhatsApp follow-up offers",
       "ID": "CU-04",
       "SourcePaths+BlobSHA": [
-        "src/app/admin/customers/follow-up/page.tsx",
-        "src/components/customers/ContactDialog.tsx",
-        "src/app/api/admin/customers/follow-up/route.ts"
+        "src/app/admin/customers/follow-up/page.tsx#bb5e3ba041a5df5b3ea3fec1388bdd1ae5f7a75a",
+        "src/components/customers/ContactDialog.tsx#c0f745332f9d774b1ec59c1f04b51553db416b0d",
+        "src/app/api/admin/customers/follow-up/route.ts#4e2174335341b97fba868000e2ed5e75a52f6bb3"
       ],
       "OriginalScreen": "Customer follow-up desk",
       "UserAction": "Review dormant/follow-up customers and log contact attempts",
@@ -410,9 +410,9 @@
       "SalonExtension": "none",
       "ID": "CU-06",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/CompleteCustomerModal.tsx",
-        "src/components/pos/CustomerRecommendation.tsx",
-        "src/components/pos/CustomerVisitSummary.tsx"
+        "src/components/pos/CompleteCustomerModal.tsx#8b0795595860b3e727d60ed63ed5322fc61e3030",
+        "src/components/pos/CustomerRecommendation.tsx#92e85add7757c580924150bf881cd1b5f0ac1401",
+        "src/components/pos/CustomerVisitSummary.tsx#22bb4bccfa1256a3c8cb7a75fadea46d7d471265"
       ],
       "OriginalScreen": "POS complete customer / recommendations",
       "UserAction": "Complete sparse customer profile and view visit summary/recommendations",
@@ -440,10 +440,10 @@
       "SalonExtension": "none",
       "ID": "POS-02",
       "SourcePaths+BlobSHA": [
-        "src/app/income/pos/page.tsx",
-        "src/components/pos/PaymentMethodSelect.tsx",
-        "src/components/pos/CartPanel.tsx",
-        "src/app/api/sales/route.ts"
+        "src/app/income/pos/page.tsx#1a35c63fe1793482706e19186585582ed438017d",
+        "src/components/pos/PaymentMethodSelect.tsx#c68fc90ba10630000198cc3eedbb319309e0f82e",
+        "src/components/pos/CartPanel.tsx#b1499215454880548cc8641eea3dc919e72ea8ff",
+        "src/app/api/sales/route.ts#bddef3207501285600b6c2509f717f51aa8b9255"
       ],
       "OriginalScreen": "POS checkout / collect payment",
       "UserAction": "Choose tender(s), confirm sale, collect payment and post invoice",
@@ -471,8 +471,8 @@
       "SalonExtension": "none",
       "ID": "POS-03",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/TipsModal.tsx",
-        "src/app/api/pos/tips/route.ts"
+        "src/components/pos/TipsModal.tsx#6fdbc6da3c0ff0b0b4ec3b07288f11ac5bbcae25",
+        "src/app/api/pos/tips/route.ts#1d4446af825956d554fba6bcaa6d617341943083"
       ],
       "OriginalScreen": "POS tips settlement",
       "UserAction": "Record tip amount and allocate to barber/executor",
@@ -500,9 +500,9 @@
       "SalonExtension": "none",
       "ID": "POS-06",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/SplitPaymentInput.tsx",
-        "src/components/pos/PaymentMethodSelect.tsx",
-        "src/app/api/sales/route.ts"
+        "src/components/pos/SplitPaymentInput.tsx#2550b5aeb85a3ee389e8f045aa8bdf0be6438435",
+        "src/components/pos/PaymentMethodSelect.tsx#c68fc90ba10630000198cc3eedbb319309e0f82e",
+        "src/app/api/sales/route.ts#bddef3207501285600b6c2509f717f51aa8b9255"
       ],
       "OriginalScreen": "POS split tender",
       "UserAction": "Split invoice across multiple payment methods totaling due",
@@ -530,9 +530,9 @@
       "SalonExtension": "none",
       "ID": "POS-07",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/PrintInvoiceModal.tsx",
-        "src/components/printing/PrintRecoveryCenter.tsx",
-        "src/app/admin/settings/printing/page.tsx"
+        "src/components/pos/PrintInvoiceModal.tsx#f65310306b30ca8b9a260013aad3556d7bdbb5aa",
+        "src/components/printing/PrintRecoveryCenter.tsx#46cf0911e5f88311541828b250d0d0c34b78c16d",
+        "src/app/admin/settings/printing/page.tsx#1fcb9e25f8c865771e2d973427311c13251a6c72"
       ],
       "OriginalScreen": "POS print / reprint invoice",
       "UserAction": "Print receipt via local print agent / recovery center",
@@ -560,9 +560,9 @@
       "SalonExtension": "none",
       "ID": "POS-08",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/QuickExpenseModal.tsx",
-        "src/app/api/expenses/route.ts",
-        "src/lib/actions/expenseActions.ts"
+        "src/components/pos/QuickExpenseModal.tsx#b2fe7c00d2a4d536dbfc98341760de9e20a4ea2f",
+        "src/app/api/expenses/route.ts#fec101f0403e561ab383ab0dad1bea68dfccd19f",
+        "src/lib/actions/expenseActions.ts#8b619d4728e49559bb695ad260ba300ded999bf7"
       ],
       "OriginalScreen": "POS quick expense",
       "UserAction": "Record expense from POS without leaving workstation",
@@ -590,9 +590,9 @@
       "SalonExtension": "none",
       "ID": "POS-09",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/QuickIncomeModal.tsx",
-        "src/app/api/incomes/route.ts",
-        "src/app/income/new/page.tsx"
+        "src/components/pos/QuickIncomeModal.tsx#55456468bf6f214c33c95cb935e8cb3ad4bd0979",
+        "src/app/api/incomes/route.ts#0074edfdc3854b379addce80ffc99e1c96d89c43",
+        "src/app/income/new/page.tsx#88f99b578a8e1f3afb922443cd7aaf7280892214"
       ],
       "OriginalScreen": "POS quick income",
       "UserAction": "Record non-POS income from POS shell",
@@ -620,10 +620,10 @@
       "SalonExtension": "none",
       "ID": "POS-10",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/BarberHandoffInbox.tsx",
-        "src/app/api/pos/barber-handoffs/route.ts",
-        "src/app/api/pos/barber-handoffs/[id]/claim/route.ts",
-        "src/app/api/pos/barber-handoffs/[id]/reconcile/route.ts"
+        "src/components/pos/BarberHandoffInbox.tsx#22d10f9869d94faad31bc8c17e02bd6fd2676566",
+        "src/app/api/pos/barber-handoffs/route.ts#53ba81409d9c68c3a0777591e5b2b90270909882",
+        "src/app/api/pos/barber-handoffs/[id]/claim/route.ts#6fa5232ffc1d2d635c5280d169ff2fd20f3c077e",
+        "src/app/api/pos/barber-handoffs/[id]/reconcile/route.ts#6f14512f46673dfc05b859804e89bc8c6867437e"
       ],
       "OriginalScreen": "POS barber handoff inbox",
       "UserAction": "Claim/reconcile in-progress service handoffs between barbers",
@@ -651,10 +651,10 @@
       "SalonExtension": "none",
       "ID": "POS-11",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/AddonTransferInbox.tsx",
-        "src/app/api/pos/addon-transfers/route.ts",
-        "src/app/api/pos/addon-transfers/[id]/assign/route.ts",
-        "src/app/api/pos/addon-transfers/[id]/alternatives/route.ts"
+        "src/components/pos/AddonTransferInbox.tsx#de10f997fb2805c492c97c5433f09b305836e6df",
+        "src/app/api/pos/addon-transfers/route.ts#fe274b66423b872d95d084f2ec0d2ddb1bcc6e6b",
+        "src/app/api/pos/addon-transfers/[id]/assign/route.ts#bed6bb23d6f8f7603f769ccad26deed1d33000c0",
+        "src/app/api/pos/addon-transfers/[id]/alternatives/route.ts#0addff06a6d7d12e104fbb03c592a3fc36219eef"
       ],
       "OriginalScreen": "POS addon transfer inbox",
       "UserAction": "Assign/transfer add-on service work to alternate barber",
@@ -682,10 +682,10 @@
       "SalonExtension": "none",
       "ID": "POS-12",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/ClientVouchersModal.tsx",
-        "src/app/api/pos/voucher/route.ts",
-        "src/app/api/pos/client-inventory/route.ts",
-        "src/app/api/pos/client-inventory/use/route.ts"
+        "src/components/pos/ClientVouchersModal.tsx#30e8356d4955e3492f2ffd9aad1db3bc8908dc3a",
+        "src/app/api/pos/voucher/route.ts#75710b2446c1e644affa60908a02d5fd03e2e455",
+        "src/app/api/pos/client-inventory/route.ts#6e6e766600ff7bc000f5fb4ace16505c7c1adb13",
+        "src/app/api/pos/client-inventory/use/route.ts#22ffae2982feda9f08ce0b1286e0bd427940fbcd"
       ],
       "OriginalScreen": "POS client vouchers / inventory use",
       "UserAction": "View client prepaid packages/vouchers and consume units on cart",
@@ -713,9 +713,9 @@
       "SalonExtension": "none",
       "ID": "POS-13",
       "SourcePaths+BlobSHA": [
-        "src/app/api/pos/groom-packages/from-booking/[id]/route.ts",
-        "src/app/api/pos/groom-packages/resolve/route.ts",
-        "src/app/api/bookings/[id]/convert/route.ts"
+        "src/app/api/pos/groom-packages/from-booking/[id]/route.ts#e797a757fb0af27827605cad00512eec5f5696bf",
+        "src/app/api/pos/groom-packages/resolve/route.ts#8a51cf12e7b849b4e28e99f2aff528c67c822071",
+        "src/app/api/bookings/[id]/convert/route.ts#0bc6bf59cf181b5a78ace8a2f48e987f05d48dec"
       ],
       "OriginalScreen": "Booking → POS package/sale handoff",
       "UserAction": "Convert booking/groom package into POS cart/sale context",
@@ -743,9 +743,9 @@
       "SalonExtension": "none",
       "ID": "POS-14",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/TeamAttendanceDrawer.tsx",
-        "src/components/pos/TeamAttendanceWidget.tsx",
-        "src/app/api/pos/team-attendance/route.ts"
+        "src/components/pos/TeamAttendanceDrawer.tsx#7be65ab646c7f18df01580a832c8f5749ec6d51d",
+        "src/components/pos/TeamAttendanceWidget.tsx#17c08c0c35f75e3aeeb2b654796c58ea737b06e9",
+        "src/app/api/pos/team-attendance/route.ts#6229e8b9accb0f43d285fd8a6860bf24bfa98f98"
       ],
       "OriginalScreen": "POS team attendance widget",
       "UserAction": "View/update same-day team attendance from POS",
@@ -773,8 +773,8 @@
       "SalonExtension": "none",
       "ID": "POS-15",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/QuickWhatsAppModal.tsx",
-        "src/app/api/pos/whatsapp/quick-send/route.ts"
+        "src/components/pos/QuickWhatsAppModal.tsx#a5c985c2046e0d5f72781f0022e3977e1dc811c6",
+        "src/app/api/pos/whatsapp/quick-send/route.ts#f24a32454743ded3d1cda71ab93935bae759443a"
       ],
       "OriginalScreen": "POS quick WhatsApp",
       "UserAction": "Send quick WhatsApp message/template to selected customer",
@@ -802,9 +802,9 @@
       "SalonExtension": "none",
       "ID": "POS-16",
       "SourcePaths+BlobSHA": [
-        "src/components/sales/DeleteInvoiceDialog.tsx",
-        "src/app/api/sales/[id]/route.ts",
-        "src/app/sales/today/page.tsx"
+        "src/components/sales/DeleteInvoiceDialog.tsx#d7af16171c1fe2a05e06ee109476b76afc244e81",
+        "src/app/api/sales/[id]/route.ts#2e9746f0003587b94dc36344877bc7f61210d9e1",
+        "src/app/sales/today/page.tsx#fff9718bff295d492cec89d3d481d01fe9791d67"
       ],
       "OriginalScreen": "Void/delete sale invoice",
       "UserAction": "Void or delete a posted invoice with reason",
@@ -832,9 +832,9 @@
       "SalonExtension": "none",
       "ID": "POS-17",
       "SourcePaths+BlobSHA": [
-        "src/components/pos/PaymentTransferModal.tsx",
-        "src/components/treasury/PaymentTransferModal.tsx",
-        "src/app/api/treasury/transfer/route.ts"
+        "src/components/pos/PaymentTransferModal.tsx#8e1eb610b22c7cbb6ecddebaa4835bb059209eec",
+        "src/components/treasury/PaymentTransferModal.tsx#768fd4232a8ef29483cdc007c5c7532349d1c4fe",
+        "src/app/api/treasury/transfer/route.ts#7ede502dc24f0bf3add891876ba2a1712c8c3bd6"
       ],
       "OriginalScreen": "POS/Treasury payment method transfer",
       "UserAction": "Move funds between payment-method rails / tills",
@@ -862,8 +862,8 @@
       "SalonExtension": "none",
       "ID": "BK-01",
       "SourcePaths+BlobSHA": [
-        "src/app/bookings/page.tsx",
-        "src/app/api/bookings/route.ts"
+        "src/app/bookings/page.tsx#c6b6ba7e6caaf5eb3fe7adf6147cddbd203519ef",
+        "src/app/api/bookings/route.ts#68dfb9334b5e78050f0572a10515ab5a18507c8d"
       ],
       "OriginalScreen": "Bookings list",
       "UserAction": "Browse/filter branch bookings for a day/range",
@@ -891,10 +891,10 @@
       "SalonExtension": "none",
       "ID": "BK-02",
       "SourcePaths+BlobSHA": [
-        "src/app/bookings/new/page.tsx",
-        "src/components/operations/booking-workspace/BookingWorkspaceModal.tsx",
-        "src/components/operations/CreateBookingDrawer.tsx",
-        "src/app/api/bookings/route.ts"
+        "src/app/bookings/new/page.tsx#ecf561918efba916352f50030a1cf119f17ecca3",
+        "src/components/operations/booking-workspace/BookingWorkspaceModal.tsx#3a83b437d0e105833739b7860cb35604efc9aff3",
+        "src/components/operations/CreateBookingDrawer.tsx#756a21e2af20037d84df09f56ac7c935a909be4c",
+        "src/app/api/bookings/route.ts#68dfb9334b5e78050f0572a10515ab5a18507c8d"
       ],
       "OriginalScreen": "Create booking workspace",
       "UserAction": "Multi-step create: customer, barber, services/packages, time, confirm",
@@ -922,8 +922,8 @@
       "SalonExtension": "none",
       "ID": "BK-03",
       "SourcePaths+BlobSHA": [
-        "src/app/bookings/calendar/page.tsx",
-        "src/components/operations/SchedulerBoard.tsx"
+        "src/app/bookings/calendar/page.tsx#c0555af1c594aa765f6a0241e5550279fa5f7018",
+        "src/components/operations/SchedulerBoard.tsx#c892377662dfc6c2690661d6b2bde185e33da0c2"
       ],
       "OriginalScreen": "Bookings calendar / scheduler",
       "UserAction": "View calendar board and open booking details",
@@ -951,9 +951,9 @@
       "SalonExtension": "none",
       "ID": "BK-04",
       "SourcePaths+BlobSHA": [
-        "src/app/api/operations/bookings/[id]/arrive/route.ts",
-        "src/components/operations/BookingActionModal.tsx",
-        "src/app/operations/page.tsx"
+        "src/app/api/operations/bookings/[id]/arrive/route.ts#1033fc20a30e708cd5a575b11cc3e5ed60e50bee",
+        "src/components/operations/BookingActionModal.tsx#035e1b34e26191a489d5efbd506eca1db2b02252",
+        "src/app/operations/page.tsx#149f35883f528b1947c7aab99d45455e59265274"
       ],
       "OriginalScreen": "Mark booking arrived",
       "UserAction": "Arrive customer from operations board",
@@ -981,8 +981,8 @@
       "SalonExtension": "none",
       "ID": "BK-05",
       "SourcePaths+BlobSHA": [
-        "src/app/api/bookings/[id]/convert/route.ts",
-        "src/app/api/bookings/[id]/route.ts"
+        "src/app/api/bookings/[id]/convert/route.ts#0bc6bf59cf181b5a78ace8a2f48e987f05d48dec",
+        "src/app/api/bookings/[id]/route.ts#adbe8754913e99a0297f3fa750fd52cd23828272"
       ],
       "OriginalScreen": "Convert booking to sale",
       "UserAction": "Convert booking into POS/sale workflow",
@@ -1010,9 +1010,9 @@
       "SalonExtension": "none",
       "ID": "BK-06",
       "SourcePaths+BlobSHA": [
-        "src/app/api/operations/bookings/[id]/reschedule/route.ts",
-        "src/app/api/operations/bookings/[id]/validate-move/route.ts",
-        "src/components/operations/BookingRescheduleConfirmDialog.tsx"
+        "src/app/api/operations/bookings/[id]/reschedule/route.ts#ae2e5f4e108c3a24a5fd2d3c8a90a1c596c1d8a8",
+        "src/app/api/operations/bookings/[id]/validate-move/route.ts#4b2369ced144489a6c032d2d70629771e6860a73",
+        "src/components/operations/BookingRescheduleConfirmDialog.tsx#5bafbf3b30a15e299b56cf05895720d06e59c082"
       ],
       "OriginalScreen": "Reschedule / move booking",
       "UserAction": "Drag/validate/confirm new barber/time",
@@ -1040,10 +1040,10 @@
       "SalonExtension": "none",
       "ID": "BK-07",
       "SourcePaths+BlobSHA": [
-        "src/app/book/[branchCode]/page.tsx",
-        "src/app/api/public/booking/create/route.ts",
-        "src/app/api/public/booking/hold/route.ts",
-        "src/app/api/public/booking/available-slots/route.ts"
+        "src/app/book/[branchCode]/page.tsx#dee366b31acd21a298094fc2f5a9b19c80695826",
+        "src/app/api/public/booking/create/route.ts#5bb55bed8c6e29e42143eb0c7e7cf1f6bc83f767",
+        "src/app/api/public/booking/hold/route.ts#28737c9b9190e11d7bbcbfc7921040b88c45b9c9",
+        "src/app/api/public/booking/available-slots/route.ts#959b8419037c621fe81773475ed41c7a21e644e1"
       ],
       "OriginalScreen": "Public online booking",
       "UserAction": "Customer self-books via public branch page with hold→create",
@@ -1071,9 +1071,9 @@
       "SalonExtension": "none",
       "ID": "BK-08",
       "SourcePaths+BlobSHA": [
-        "src/app/admin/queue-booking-settings/page.tsx",
-        "src/app/api/admin/booking-settings/route.ts",
-        "src/app/admin/booking/operations/page.tsx"
+        "src/app/admin/queue-booking-settings/page.tsx#f9cf80f2ddf995d518687c0500c3ef989171e599",
+        "src/app/api/admin/booking-settings/route.ts#0a65882f827354757ba7c697b1ec1397178049fd",
+        "src/app/admin/booking/operations/page.tsx#c4ed08df907af58607cc930dee25ab953b56d62b"
       ],
       "OriginalScreen": "Queue/booking settings + booking ops admin",
       "UserAction": "Configure booking/queue policies and admin booking operations",
@@ -1101,10 +1101,10 @@
       "SalonExtension": "none",
       "ID": "Q-01",
       "SourcePaths+BlobSHA": [
-        "src/app/queue/live/page.tsx",
-        "src/components/operations/LiveQueueColumn.tsx",
-        "src/components/operations/GroupedQueueBoard.tsx",
-        "src/app/api/queue/route.ts"
+        "src/app/queue/live/page.tsx#539f18d978b94d7007e70867bbd0d0c10b99e676",
+        "src/components/operations/LiveQueueColumn.tsx#2f6297dd2e95e9131069c16526c36bdcf7179301",
+        "src/components/operations/GroupedQueueBoard.tsx#bef09c89ed9454921d7bea010fb5d143624c8c3f",
+        "src/app/api/queue/route.ts#cf890ea432aaca501b70cb66fc4af885e0bb0503"
       ],
       "OriginalScreen": "Live queue board",
       "UserAction": "Monitor waiting/serving tickets by barber",
@@ -1132,10 +1132,10 @@
       "SalonExtension": "none",
       "ID": "Q-02",
       "SourcePaths+BlobSHA": [
-        "src/app/queue/new/page.tsx",
-        "src/components/operations/CreateQueueDrawer.tsx",
-        "src/app/api/operations/queue/create/route.ts",
-        "src/app/api/queue/route.ts"
+        "src/app/queue/new/page.tsx#bb73fff1ce61ea0a0c8de8f0299388f21087887c",
+        "src/components/operations/CreateQueueDrawer.tsx#716340de89925b3050e497a55780255e3d58f865",
+        "src/app/api/operations/queue/create/route.ts#bf7ed74562ca222b78338c76185a4dc101934ded",
+        "src/app/api/queue/route.ts#cf890ea432aaca501b70cb66fc4af885e0bb0503"
       ],
       "OriginalScreen": "Create queue ticket",
       "UserAction": "Create walk-in/quick ticket with services and barber plan",
@@ -1163,9 +1163,9 @@
       "SalonExtension": "none",
       "ID": "Q-03",
       "SourcePaths+BlobSHA": [
-        "src/app/api/operations/queue/[id]/cancel/route.ts",
-        "src/app/api/queue/[id]/route.ts",
-        "src/lib/queueLifecycleEngine.ts"
+        "src/app/api/operations/queue/[id]/cancel/route.ts#d7bccfc4ec12e78f85a3b8dd306d554c966c3184",
+        "src/app/api/queue/[id]/route.ts#6fdd53cc149c81d084093300fa2a3420fc640863",
+        "src/lib/queueLifecycleEngine.ts#1aaa037e7b31da6df214bb736b1ae17363bf14fc"
       ],
       "OriginalScreen": "Cancel / lifecycle queue ticket",
       "UserAction": "Cancel or transition ticket lifecycle states",
@@ -1193,10 +1193,10 @@
       "SalonExtension": "none",
       "ID": "Q-04",
       "SourcePaths+BlobSHA": [
-        "src/app/api/operations/queue/[id]/announce/route.ts",
-        "src/app/api/queue/voice/route.ts",
-        "src/lib/queueVoice.ts",
-        "src/app/api/operations/queue/due-announcements/route.ts"
+        "src/app/api/operations/queue/[id]/announce/route.ts#e35c959ca37dc77b85cf27f4254f4d3021472c48",
+        "src/app/api/queue/voice/route.ts#1a2b21ac9eb15a7396426aa458f383c36851dcab",
+        "src/lib/queueVoice.ts#fbb183d15b260bb1a5ac30dbd0398e486f511346",
+        "src/app/api/operations/queue/due-announcements/route.ts#b08a52d20680d4c452d3ea4b227f999326307ccd"
       ],
       "OriginalScreen": "Queue announce / voice call",
       "UserAction": "Announce next ticket and play voice prompts",
@@ -1224,8 +1224,8 @@
       "SalonExtension": "none",
       "ID": "Q-05",
       "SourcePaths+BlobSHA": [
-        "src/app/api/queue/settle-expired/route.ts",
-        "src/lib/queueLifecycleEngine.ts"
+        "src/app/api/queue/settle-expired/route.ts#6104edeb8111e2b69710782c92f390ce6338dd72",
+        "src/lib/queueLifecycleEngine.ts#1aaa037e7b31da6df214bb736b1ae17363bf14fc"
       ],
       "OriginalScreen": "Settle expired queue tickets (job/trigger)",
       "UserAction": "System/job settles expired holds/tickets",
@@ -1253,9 +1253,9 @@
       "SalonExtension": "none",
       "ID": "Q-06",
       "SourcePaths+BlobSHA": [
-        "src/components/operations/PrintQueueTicketModal.tsx",
-        "src/components/queue/QueueTicketPrint.tsx",
-        "src/components/queue/QueueTicketCreatedModal.tsx"
+        "src/components/operations/PrintQueueTicketModal.tsx#37bb0d6010cd5ea7b2aa9f502bae898339691cae",
+        "src/components/queue/QueueTicketPrint.tsx#f4a16967a52acd2680923025862f581c97ce22e9",
+        "src/components/queue/QueueTicketCreatedModal.tsx#806ce7759b72833026f5452c042a5ab9f9b9876a"
       ],
       "OriginalScreen": "Print queue ticket",
       "UserAction": "Print ticket slip after create",
@@ -1283,9 +1283,9 @@
       "SalonExtension": "none",
       "ID": "HR-01",
       "SourcePaths+BlobSHA": [
-        "src/app/admin/hr/page.tsx",
-        "src/components/hr/EmployeeHrFormModal.tsx",
-        "src/components/admin/EmployeeManagementModal.tsx"
+        "src/app/admin/hr/page.tsx#177f476d11ac38ddf7bbee599b5d9de0fc0ea19a",
+        "src/components/hr/EmployeeHrFormModal.tsx#aac0dae1d07252df4279d13ad1f65e082cf60615",
+        "src/components/admin/EmployeeManagementModal.tsx#faf5f99b86de9a4da277ac5c6e20254dc0d36119"
       ],
       "OriginalScreen": "HR employees admin",
       "UserAction": "Create/update employee profile, schedule, compensation maps",
@@ -1313,10 +1313,10 @@
       "SalonExtension": "none",
       "ID": "HR-02",
       "SourcePaths+BlobSHA": [
-        "src/components/hr/AttendancePanel.tsx",
-        "src/app/api/admin/attendance/route.ts",
-        "src/app/api/admin/attendance/bulk/route.ts",
-        "src/app/admin/attendance/page.tsx"
+        "src/components/hr/AttendancePanel.tsx#2c7fd8674a1f9353768f6b1db57f522f46143f6a",
+        "src/app/api/admin/attendance/route.ts#f2afe35ec196398f81cb4651ca3138a67aebd958",
+        "src/app/api/admin/attendance/bulk/route.ts#c5a98b67ef9cd44d0d483329dfff7a05c1c45001",
+        "src/app/admin/attendance/page.tsx#2e94cce356c269541082fb645e1cd3e06c033e42"
       ],
       "OriginalScreen": "Attendance panel",
       "UserAction": "Record daily attendance, day-off, work-on-day-off, bulk fixes",
@@ -1344,10 +1344,10 @@
       "SalonExtension": "none",
       "ID": "HR-03",
       "SourcePaths+BlobSHA": [
-        "src/components/hr/DailyPayrollPanel.tsx",
-        "src/app/api/payroll/daily/generate/route.ts",
-        "src/app/api/admin/hr/daily-payroll/close/route.ts",
-        "src/app/admin/attendance/daily-payroll/page.tsx"
+        "src/components/hr/DailyPayrollPanel.tsx#fb337d7be989a0b2db7dcd1a002bff52e3841498",
+        "src/app/api/payroll/daily/generate/route.ts#64bd0421754dafc3c981b3269e143d5e19a6e5f9",
+        "src/app/api/admin/hr/daily-payroll/close/route.ts#c895756f4ae89d0002ce5848522182e191ef67c0",
+        "src/app/admin/attendance/daily-payroll/page.tsx#908df4b864a7986cbe32f52bb9d0d7616d5cb980"
       ],
       "OriginalScreen": "Daily payroll generate/close",
       "UserAction": "Generate daily targets/payroll and close the payroll day",
@@ -1375,8 +1375,8 @@
       "SalonExtension": "none",
       "ID": "HR-04",
       "SourcePaths+BlobSHA": [
-        "src/app/api/payroll/daily/post-to-cash/route.ts",
-        "src/components/hr/DailyPayrollPanel.tsx"
+        "src/app/api/payroll/daily/post-to-cash/route.ts#346f3cdf2c0c75bd80329d15496544cc920f9328",
+        "src/components/hr/DailyPayrollPanel.tsx#fb337d7be989a0b2db7dcd1a002bff52e3841498"
       ],
       "OriginalScreen": "Post daily payroll to cash",
       "UserAction": "Post generated payroll amounts into treasury/cash",
@@ -1404,9 +1404,9 @@
       "SalonExtension": "none",
       "ID": "HR-05",
       "SourcePaths+BlobSHA": [
-        "src/components/hr/EmployeeLedgerPanel.tsx",
-        "src/components/hr/EmployeePayoutModal.tsx",
-        "src/app/api/admin/hr/employee-ledger/payout/route.ts"
+        "src/components/hr/EmployeeLedgerPanel.tsx#0f19af6314f01b516cb696455f28c36399f11c34",
+        "src/components/hr/EmployeePayoutModal.tsx#313cbbf6cb9afb5c9b1f9161ccb4c5bdc90e109e",
+        "src/app/api/admin/hr/employee-ledger/payout/route.ts#c29d96ee2de9e8cb8fffaab3aa89d674b8a95879"
       ],
       "OriginalScreen": "Employee ledger payout",
       "UserAction": "Pay out employee ledger balance",
@@ -1434,8 +1434,8 @@
       "SalonExtension": "none",
       "ID": "HR-06",
       "SourcePaths+BlobSHA": [
-        "src/app/api/admin/hr/employee-ledger/void-entry/route.ts",
-        "src/components/hr/EmployeeLedgerPanel.tsx"
+        "src/app/api/admin/hr/employee-ledger/void-entry/route.ts#dba63f3f35222ee8b817ecc4d1d30c3a4d4be21b",
+        "src/components/hr/EmployeeLedgerPanel.tsx#0f19af6314f01b516cb696455f28c36399f11c34"
       ],
       "OriginalScreen": "Void employee ledger entry",
       "UserAction": "Void a ledger entry with audit",
@@ -1463,9 +1463,9 @@
       "SalonExtension": "none",
       "ID": "HR-07",
       "SourcePaths+BlobSHA": [
-        "src/components/hr/EmployeeAdvanceRepaymentModal.tsx",
-        "src/app/api/admin/hr/employee-ledger/advance-repayment/route.ts",
-        "src/app/api/admin/hr/employee-ledger/advance-repayment/void/route.ts"
+        "src/components/hr/EmployeeAdvanceRepaymentModal.tsx#8ff952493fa1a09e5afe157367997c0b9ce44610",
+        "src/app/api/admin/hr/employee-ledger/advance-repayment/route.ts#43ca2cbb3162db5974aa98eff311b56e537ff233",
+        "src/app/api/admin/hr/employee-ledger/advance-repayment/void/route.ts#01851753843c351a242dd958139cbd7af7847aff"
       ],
       "OriginalScreen": "Advance repayment (+void)",
       "UserAction": "Record employee advance repayment or void that repayment",
@@ -1493,8 +1493,8 @@
       "SalonExtension": "none",
       "ID": "HR-08",
       "SourcePaths+BlobSHA": [
-        "src/components/hr/MonthlySalaryPostModal.tsx",
-        "src/app/api/admin/hr/employee-ledger/monthly-salary/post/route.ts"
+        "src/components/hr/MonthlySalaryPostModal.tsx#03f2fc40451bdb639c6425668e5e4070d6c806d1",
+        "src/app/api/admin/hr/employee-ledger/monthly-salary/post/route.ts#9ca208d3a65066f700fae4518c01cdf4416b88ff"
       ],
       "OriginalScreen": "Post monthly salary",
       "UserAction": "Post monthly salary into employee ledger/cash",
@@ -1522,10 +1522,10 @@
       "SalonExtension": "none",
       "ID": "HR-09",
       "SourcePaths+BlobSHA": [
-        "src/components/hr/BranchTransferPage.tsx",
-        "src/app/api/admin/hr/branch-transfer/route.ts",
-        "src/app/api/admin/hr/branch-transfer/preview/route.ts",
-        "src/app/admin/hr/branch-transfer/page.tsx"
+        "src/components/hr/BranchTransferPage.tsx#adad1bc0877960798979b95706fc1ffe248c90d0",
+        "src/app/api/admin/hr/branch-transfer/route.ts#eed6e4dcb7b7963dd709bfe374caf2e982c89d0c",
+        "src/app/api/admin/hr/branch-transfer/preview/route.ts#f60078d55b6ea63505a31aa4e2bca6602dda359a",
+        "src/app/admin/hr/branch-transfer/page.tsx#c0ed195f7f0dc134e8781a03a48a66a96951e3f5"
       ],
       "OriginalScreen": "HR branch transfer",
       "UserAction": "Preview/apply employee permanent branch transfer",
@@ -1553,10 +1553,10 @@
       "SalonExtension": "none",
       "ID": "HR-10",
       "SourcePaths+BlobSHA": [
-        "src/app/admin/workforce/availability/page.tsx",
-        "src/components/admin/workforce/WorkforceAvailabilityPage.tsx",
-        "src/components/admin/workforce/DailyAdjustmentModal.tsx",
-        "src/app/api/admin/availability/daily-adjustments/route.ts"
+        "src/app/admin/workforce/availability/page.tsx#d66044faa3f296e4942d0d41de571ed543090d2c",
+        "src/components/admin/workforce/WorkforceAvailabilityPage.tsx#c62454dfd020c313d81b8d3e3f2f3ddd90c9df91",
+        "src/components/admin/workforce/DailyAdjustmentModal.tsx#1b8c5862f363abf54f3db9d202daeea2da0d4547",
+        "src/app/api/admin/availability/daily-adjustments/route.ts#a503e8d56ecbaf86f793f66fadc221c4f6a9d4a1"
       ],
       "OriginalScreen": "Workforce availability",
       "UserAction": "Inspect layers and apply daily availability adjustments",
@@ -1584,8 +1584,8 @@
       "SalonExtension": "none",
       "ID": "HR-11",
       "SourcePaths+BlobSHA": [
-        "src/components/hr/EmployeeInterBranchSettlementModal.tsx",
-        "src/app/api/admin/hr/employee-ledger/inter-branch-settlement/route.ts"
+        "src/components/hr/EmployeeInterBranchSettlementModal.tsx#34dd2a41a70e76a94cb1e7a6366d77464edbeb4d",
+        "src/app/api/admin/hr/employee-ledger/inter-branch-settlement/route.ts#03367a893feb1add86c5981de0526a1797230fa4"
       ],
       "OriginalScreen": "Inter-branch employee settlement",
       "UserAction": "Settle employee balances across branches",
@@ -1613,8 +1613,8 @@
       "SalonExtension": "none",
       "ID": "HR-12",
       "SourcePaths+BlobSHA": [
-        "src/app/api/admin/hr/daily-payroll/reopen/route.ts",
-        "src/components/hr/DailyPayrollSmartFixModal.tsx"
+        "src/app/api/admin/hr/daily-payroll/reopen/route.ts#c86a3a5f6a1416f9055c1a12400c45885e1863f6",
+        "src/components/hr/DailyPayrollSmartFixModal.tsx#707336eb85cc1c92b84d90824107ade0b1d30414"
       ],
       "OriginalScreen": "Reopen daily payroll",
       "UserAction": "Reopen a closed payroll day for corrections",
@@ -1642,10 +1642,10 @@
       "SalonExtension": "none",
       "ID": "OPS-01",
       "SourcePaths+BlobSHA": [
-        "src/app/operations/page.tsx",
-        "src/app/api/operations/bootstrap/route.ts",
-        "src/app/api/operations/overview/route.ts",
-        "src/components/operations/OperationsControlPanel.tsx"
+        "src/app/operations/page.tsx#149f35883f528b1947c7aab99d45455e59265274",
+        "src/app/api/operations/bootstrap/route.ts#f557f5bb776fc360c2376d9f1cd461fbd15f04e3",
+        "src/app/api/operations/overview/route.ts#317c04514f779bcf7546e98e40342853f04b3c69",
+        "src/components/operations/OperationsControlPanel.tsx#8e7dabbc9e11eb4ca2ca8df262e7a8b95431391e"
       ],
       "OriginalScreen": "Operations control center",
       "UserAction": "Run day ops board: bookings, queue, alerts, environment",
@@ -1673,10 +1673,10 @@
       "SalonExtension": "none",
       "ID": "OPS-02",
       "SourcePaths+BlobSHA": [
-        "src/components/operations/ScheduleControlModal.tsx",
-        "src/app/api/operations/schedule-control/route.ts",
-        "src/app/api/operations/schedule-control/apply/route.ts",
-        "src/app/api/operations/schedule-control/preview/route.ts"
+        "src/components/operations/ScheduleControlModal.tsx#63cae8c08ccf764ba882efa03c798d1138730dde",
+        "src/app/api/operations/schedule-control/route.ts#acbb95db8f62b4cb9eefc58731013a841fd68e87",
+        "src/app/api/operations/schedule-control/apply/route.ts#6e0db338b1c7615582b030c02c82e0badfecb19b",
+        "src/app/api/operations/schedule-control/preview/route.ts#b281a4bcc9ef7fb7a61815fdb82b36ce823102da"
       ],
       "OriginalScreen": "Schedule control overrides",
       "UserAction": "Preview/apply temporary schedule control overrides",
@@ -1704,9 +1704,9 @@
       "SalonExtension": "none",
       "ID": "OPS-03",
       "SourcePaths+BlobSHA": [
-        "src/components/session/OperationalHandoffControl.tsx",
-        "src/app/api/operations/shift/handoff/route.ts",
-        "src/components/session/HandoffConfirmDialog.tsx"
+        "src/components/session/OperationalHandoffControl.tsx#51c3c1cc65b8e9a3afe8cd640e598d7025b859af",
+        "src/app/api/operations/shift/handoff/route.ts#55e82c556c6c69865348b294743ae5cef32a5aec",
+        "src/components/session/HandoffConfirmDialog.tsx#164a5ce685228f6356f1a796eb66bcc36c488401"
       ],
       "OriginalScreen": "Operational shift handoff",
       "UserAction": "Hand off operational control between cashiers/managers",
@@ -1734,10 +1734,10 @@
       "SalonExtension": "none",
       "ID": "OPS-04",
       "SourcePaths+BlobSHA": [
-        "src/app/api/operations/flow-board/route.ts",
-        "src/app/api/operations/flow-board/pulse/route.ts",
-        "src/components/operations/SchedulerBoard.tsx",
-        "src/components/operations/AlertsPanel.tsx"
+        "src/app/api/operations/flow-board/route.ts#662d3731d22096620f662e2d81bf9f9d2e1a5fcb",
+        "src/app/api/operations/flow-board/pulse/route.ts#90a2409fb0ca27b26bf016e6c1656340ea9bec5f",
+        "src/components/operations/SchedulerBoard.tsx#c892377662dfc6c2690661d6b2bde185e33da0c2",
+        "src/components/operations/AlertsPanel.tsx#c8a64c8bad1b24008c72a212eef24d739451408d"
       ],
       "OriginalScreen": "Ops flow board + alerts",
       "UserAction": "Watch live flow/pulse and act on alerts",
@@ -1765,10 +1765,10 @@
       "SalonExtension": "none",
       "ID": "TR-01",
       "SourcePaths+BlobSHA": [
-        "src/app/treasury/daily/page.tsx",
-        "src/components/treasury/TreasuryDailyView.tsx",
-        "src/app/api/treasury/daily-summary/route.ts",
-        "src/app/cashier/treasury/daily/page.tsx"
+        "src/app/treasury/daily/page.tsx#2662d46021b498fa56df8cb61d8a55f73ac62d85",
+        "src/components/treasury/TreasuryDailyView.tsx#d48244bff032d81be153e9ffd96a0ad581f08891",
+        "src/app/api/treasury/daily-summary/route.ts#2f630c2feb9ca888425ee147bcb76a40d5a15956",
+        "src/app/cashier/treasury/daily/page.tsx#cca54586035ba614aa84e5f384a4d4414dcc626d"
       ],
       "OriginalScreen": "Treasury daily / day lock view",
       "UserAction": "Review daily treasury KPIs and lock posture",
@@ -1796,9 +1796,9 @@
       "SalonExtension": "none",
       "ID": "TR-02",
       "SourcePaths+BlobSHA": [
-        "src/app/treasury/movement/page.tsx",
-        "src/components/treasury/TreasuryMovementsTable.tsx",
-        "src/app/api/treasury/movements/route.ts"
+        "src/app/treasury/movement/page.tsx#7c03197b35f5524fe7cc4f2ac3397fe412e70cf9",
+        "src/components/treasury/TreasuryMovementsTable.tsx#8ca3edb8dd2485796be75f39db5098a4a41f11d9",
+        "src/app/api/treasury/movements/route.ts#df5a87c1d3ec3a3c9253d9a9e209b3d695c383bf"
       ],
       "OriginalScreen": "Treasury movements ledger",
       "UserAction": "Inspect cash/payment-method movements",
@@ -1826,9 +1826,9 @@
       "SalonExtension": "none",
       "ID": "TR-03",
       "SourcePaths+BlobSHA": [
-        "src/app/api/treasury/transfer/route.ts",
-        "src/components/treasury/PaymentTransferModal.tsx",
-        "src/app/api/treasury/balance/route.ts"
+        "src/app/api/treasury/transfer/route.ts#7ede502dc24f0bf3add891876ba2a1712c8c3bd6",
+        "src/components/treasury/PaymentTransferModal.tsx#768fd4232a8ef29483cdc007c5c7532349d1c4fe",
+        "src/app/api/treasury/balance/route.ts#97a1104b358d5b63023402cd22f20cde42fdb11e"
       ],
       "OriginalScreen": "Treasury transfer",
       "UserAction": "Transfer between payment methods / tills",
@@ -1856,10 +1856,10 @@
       "SalonExtension": "none",
       "ID": "TR-04",
       "SourcePaths+BlobSHA": [
-        "src/app/treasury/shift-close/page.tsx",
-        "src/components/treasury/ShiftCloseReconPanel.tsx",
-        "src/app/api/treasury/shift-reconciliation/route.ts",
-        "src/app/api/shift/close/route.ts"
+        "src/app/treasury/shift-close/page.tsx#757730d392478e36c5c14ccbb1fb06f61bb61b18",
+        "src/components/treasury/ShiftCloseReconPanel.tsx#17a4f0119fbe8050f63954a6a6adf42fe8e5e44e",
+        "src/app/api/treasury/shift-reconciliation/route.ts#e095223932d0b337f8405b232550ced628e5b0c9",
+        "src/app/api/shift/close/route.ts#8f51513803d083b3c12895950efaf17011404390"
       ],
       "OriginalScreen": "Shift close reconciliation",
       "UserAction": "Reconcile counted cash vs system and close shift",
@@ -1887,11 +1887,11 @@
       "SalonExtension": "none",
       "ID": "TR-05",
       "SourcePaths+BlobSHA": [
-        "src/app/api/day/open/route.ts",
-        "src/app/api/day/close/route.ts",
-        "src/app/api/day/close-and-open/route.ts",
-        "src/components/session/CloseDayModal.tsx",
-        "src/components/session/DayRolloverModal.tsx"
+        "src/app/api/day/open/route.ts#e2b20550588dfff21194caaedfc6269720f84f45",
+        "src/app/api/day/close/route.ts#d2aefd9bc6bb98e0dcae1a273e1b02dfc3b7444e",
+        "src/app/api/day/close-and-open/route.ts#b79c0d90890ed3cb9401c75ac1707181e21faf74",
+        "src/components/session/CloseDayModal.tsx#ad3c074b6aa1c6e24f148c177ef324d5d40f7d43",
+        "src/components/session/DayRolloverModal.tsx#f48e7867409b4c16d9c33c276b36e166f4fbc9d5"
       ],
       "OriginalScreen": "Business day open/close/rollover",
       "UserAction": "Open day, close day, or close-and-open rollover",
@@ -1919,9 +1919,9 @@
       "SalonExtension": "none",
       "ID": "TR-06",
       "SourcePaths+BlobSHA": [
-        "src/app/treasury/group-daily/page.tsx",
-        "src/app/api/treasury/group-daily/route.ts",
-        "src/components/treasury/TreasuryGroupDailyView.tsx"
+        "src/app/treasury/group-daily/page.tsx#90469efdbd7ba568c86877706c01408518478b52",
+        "src/app/api/treasury/group-daily/route.ts#d5cb98b2cbd6e95d2a53c815eb9ae47ae521767a",
+        "src/components/treasury/TreasuryGroupDailyView.tsx#e49bf99978b6f21fb67dcf64c66ab41c6a15e4b9"
       ],
       "OriginalScreen": "Multi-branch treasury daily",
       "UserAction": "Compare daily treasury across branches",
@@ -1949,9 +1949,9 @@
       "SalonExtension": "none",
       "ID": "TR-07",
       "SourcePaths+BlobSHA": [
-        "src/components/treasury/TreasuryHoldBreakdown.tsx",
-        "src/app/api/treasury/hold-breakdown/route.ts",
-        "src/app/api/treasury/reconciliation/route.ts"
+        "src/components/treasury/TreasuryHoldBreakdown.tsx#1619f53493514482f7befbee71d869204e1722fe",
+        "src/app/api/treasury/hold-breakdown/route.ts#2581c35ca2e4529b8769d0923849d3959dbeabf5",
+        "src/app/api/treasury/reconciliation/route.ts#ad4a2df0d29d8a67e4d5e7e47dd17c08e1051682"
       ],
       "OriginalScreen": "Treasury holds + reconciliation",
       "UserAction": "Inspect holds and run reconciliation views",
@@ -1979,11 +1979,11 @@
       "SalonExtension": "none",
       "ID": "TR-08",
       "SourcePaths+BlobSHA": [
-        "src/components/treasury/PastDateIncomeModal.tsx",
-        "src/components/treasury/PastDateExpenseModal.tsx",
-        "src/components/treasury/PastDateTransferModal.tsx",
-        "src/app/api/incomes/past-date/route.ts",
-        "src/app/api/expenses/past-date/route.ts"
+        "src/components/treasury/PastDateIncomeModal.tsx#21b4bff3b197056d2c7500ef42c983f6bd3b2918",
+        "src/components/treasury/PastDateExpenseModal.tsx#40c633ead001ba77267a68563b9dbb340b9cbf08",
+        "src/components/treasury/PastDateTransferModal.tsx#73c606d1b073fbe04b8dff9f2bc3b5d68ed0c3eb",
+        "src/app/api/incomes/past-date/route.ts#cc02341a722c53c0b74d899b372c68f7493bd98d",
+        "src/app/api/expenses/past-date/route.ts#f1c61806b3ee9cff3177dac6713643ed00972333"
       ],
       "OriginalScreen": "Past-date treasury adjustments",
       "UserAction": "Post income/expense/transfer into a past business day",
@@ -2011,10 +2011,10 @@
       "SalonExtension": "none",
       "ID": "TR-09",
       "SourcePaths+BlobSHA": [
-        "src/app/admin/monthly-closing/page.tsx",
-        "src/app/manager/closing/page.tsx",
-        "src/components/manager/ManagerDailyClose.tsx",
-        "src/components/manager/ManagerClosingHistory.tsx"
+        "src/app/admin/monthly-closing/page.tsx#ff3b1e6fa0f087c8d83170564e57c4cac88dffe6",
+        "src/app/manager/closing/page.tsx#0936f8438821550d1ea9e9f90ea1df1f7fc482c2",
+        "src/components/manager/ManagerDailyClose.tsx#361423b032370e053e77ace726bd74e0599c0ef6",
+        "src/components/manager/ManagerClosingHistory.tsx#f4fc89dac2c48cb4dd530634941b459efb970792"
       ],
       "OriginalScreen": "Manager/monthly closing",
       "UserAction": "Close manager day/month and review closing history",
@@ -2047,10 +2047,10 @@
       "SalonExtension": "none",
       "ID": "INV-01",
       "SourcePaths+BlobSHA": [
-        "src/app/admin/inventory/page.tsx",
-        "src/app/api/admin/inventory/dashboard/route.ts",
-        "src/app/api/admin/inventory/policy/route.ts",
-        "src/lib/inventory/stockPolicy.service.ts"
+        "src/app/admin/inventory/page.tsx#e709afd29beaf88057b8248d316d97df8f3b53f5",
+        "src/app/api/admin/inventory/dashboard/route.ts#71e4368d80f5a7cca5f79c162aa03f8f10cca620",
+        "src/app/api/admin/inventory/policy/route.ts#874617a28a2134249f052bbda3c5e712e83fc16a",
+        "src/lib/inventory/stockPolicy.service.ts#2ebb427687b2b6ef0388e160240dc649ed33c5b3"
       ],
       "OriginalScreen": "Inventory admin dashboard",
       "UserAction": "View stock policy/dashboard and manage inventory posture",
@@ -2082,9 +2082,9 @@
       "SalonExtension": "none",
       "ID": "INV-02",
       "SourcePaths+BlobSHA": [
-        "src/app/api/inventory/branch/route.ts",
-        "src/lib/inventory/productCatalog.service.ts",
-        "src/app/admin/products/page.tsx"
+        "src/app/api/inventory/branch/route.ts#e281eddc754e4fa719bdd679a26943b5329c153e",
+        "src/lib/inventory/productCatalog.service.ts#6bdd19ff1d794dea164bde572a030903c1618b9d",
+        "src/app/admin/products/page.tsx#2727e19c044e8d78aa68cd73a28e77f77ceb4333"
       ],
       "OriginalScreen": "Branch stock + products",
       "UserAction": "Maintain products and view branch on-hand quantities",
@@ -2112,8 +2112,8 @@
       "SalonExtension": "none",
       "ID": "INV-03",
       "SourcePaths+BlobSHA": [
-        "src/app/api/inventory/transfers/route.ts",
-        "src/lib/inventory/transferInventory.service.ts"
+        "src/app/api/inventory/transfers/route.ts#77fa2e2219c31eb510bae508d13176aec933a436",
+        "src/lib/inventory/transferInventory.service.ts#0bb552bc73708c59ef13b3020330de166e7c3a6d"
       ],
       "OriginalScreen": "Inventory branch transfers",
       "UserAction": "Transfer stock between branches",
@@ -2141,9 +2141,9 @@
       "SalonExtension": "none",
       "ID": "PUR-01",
       "SourcePaths+BlobSHA": [
-        "src/app/api/purchases/route.ts",
-        "src/lib/inventory/purchaseInventory.service.ts",
-        "src/app/admin/branches/[id]/setup/opening-inventory/page.tsx"
+        "src/app/api/purchases/route.ts#e508819187d1e8f00564217b61cc39d072fa2cb9",
+        "src/lib/inventory/purchaseInventory.service.ts#e76e2e0a46582fa0eaec9e5dbe4e4e09c80122e3",
+        "src/app/admin/branches/[id]/setup/opening-inventory/page.tsx#8467ed0f4906585116db3ea08929f6cc13dc30f1"
       ],
       "OriginalScreen": "Purchases / opening inventory receive",
       "UserAction": "Receive purchases or opening inventory into stock",
@@ -2171,10 +2171,10 @@
       "SalonExtension": "none",
       "ID": "EXP-01",
       "SourcePaths+BlobSHA": [
-        "src/app/expenses/page.tsx",
-        "src/app/expenses/new/page.tsx",
-        "src/app/api/expenses/route.ts",
-        "src/lib/actions/expenseActions.ts"
+        "src/app/expenses/page.tsx#7043d62d156f8c1634694a1035fea0b148678c20",
+        "src/app/expenses/new/page.tsx#2e9fd152c766d7eeb1a65fffa37d8e2737cea583",
+        "src/app/api/expenses/route.ts#fec101f0403e561ab383ab0dad1bea68dfccd19f",
+        "src/lib/actions/expenseActions.ts#8b619d4728e49559bb695ad260ba300ded999bf7"
       ],
       "OriginalScreen": "Record expense",
       "UserAction": "Create expense with category and payment method",
@@ -2202,9 +2202,9 @@
       "SalonExtension": "none",
       "ID": "EXP-02",
       "SourcePaths+BlobSHA": [
-        "src/components/expenses/EditExpenseModal.tsx",
-        "src/app/api/expenses/[id]/route.ts",
-        "src/app/api/expenses/[id]/category/route.ts"
+        "src/components/expenses/EditExpenseModal.tsx#08aed58e0a970a82e59c644ca772a6716ea466d6",
+        "src/app/api/expenses/[id]/route.ts#b893dc47dc56014d48f150d6ee9e91ae180e7073",
+        "src/app/api/expenses/[id]/category/route.ts#b2d672d91720b7d2c2cf5f58e7b73094259f18b5"
       ],
       "OriginalScreen": "Edit/reclassify/void expense",
       "UserAction": "Edit expense fields/category or remove",
@@ -2232,10 +2232,10 @@
       "SalonExtension": "none",
       "ID": "EXP-03",
       "SourcePaths+BlobSHA": [
-        "src/app/deductions/page.tsx",
-        "src/app/api/deductions/route.ts",
-        "src/components/deductions/EditDeductionModal.tsx",
-        "src/components/deductions/DeductionReceiptPopup.tsx"
+        "src/app/deductions/page.tsx#8fb5c08ee7ed2361edbb916ca38c09114741b47b",
+        "src/app/api/deductions/route.ts#e7e382aecdcc4d4325bd7c98b18c1dc6b2d3881d",
+        "src/components/deductions/EditDeductionModal.tsx#a2fca0213ad59d76efd0a8bbc9afc61f2ffe8dba",
+        "src/components/deductions/DeductionReceiptPopup.tsx#0f30553c619290f0e985a4903826116a5c3625a1"
       ],
       "OriginalScreen": "Employee deductions",
       "UserAction": "Record/edit staff deductions with receipt",
@@ -2263,9 +2263,9 @@
       "SalonExtension": "none",
       "ID": "EXP-04",
       "SourcePaths+BlobSHA": [
-        "src/components/expenses/StaffExpenseDistribution.tsx",
-        "src/app/api/expenses/distribute/route.ts",
-        "src/app/api/expenses/distribute/summary/route.ts"
+        "src/components/expenses/StaffExpenseDistribution.tsx#02f838d45946c7c4a17ad1e97fcb8e066e529302",
+        "src/app/api/expenses/distribute/route.ts#c3c2ed70eac4dfbdd015fa44ce631c3ec12a1faa",
+        "src/app/api/expenses/distribute/summary/route.ts#c2bec92cd82f97a7df0fc5a90f74ed85d6df54aa"
       ],
       "OriginalScreen": "Staff expense distribution",
       "UserAction": "Distribute a shared expense across staff",
@@ -2293,10 +2293,10 @@
       "SalonExtension": "none",
       "ID": "EXP-05",
       "SourcePaths+BlobSHA": [
-        "src/app/expenses/fixed/page.tsx",
-        "src/app/expenses/salaries/page.tsx",
-        "src/app/expenses-review/salaries/page.tsx",
-        "src/app/expenses-review/advances/page.tsx"
+        "src/app/expenses/fixed/page.tsx#89386269516f0fd0ef4991376cdeaec80552db26",
+        "src/app/expenses/salaries/page.tsx#4548e87c40a8159b6b037f567b48134816df06b8",
+        "src/app/expenses-review/salaries/page.tsx#5eedd14f40a31fddec58794edf0e23ff0642d6b4",
+        "src/app/expenses-review/advances/page.tsx#0dd18ce3802ba95bf01297e0e75fac8cf3fb46b8"
       ],
       "OriginalScreen": "Fixed expenses / salaries / advances review",
       "UserAction": "Review fixed expenses, salaries, and advances queues",
@@ -2324,10 +2324,10 @@
       "SalonExtension": "none",
       "ID": "LOY-01",
       "SourcePaths+BlobSHA": [
-        "src/app/admin/loyalty/page.tsx",
-        "src/app/api/loyalty/adjust/route.ts",
-        "src/app/api/loyalty/clients/route.ts",
-        "src/app/api/loyalty/ledger/route.ts"
+        "src/app/admin/loyalty/page.tsx#84fda92707dbc17e9b7cd49105dc224c735e91c5",
+        "src/app/api/loyalty/adjust/route.ts#a9528011f187229018c2ba92ae17c588c1c39018",
+        "src/app/api/loyalty/clients/route.ts#7d479bad6992bf315a87a4e8c2895777aad8d18c",
+        "src/app/api/loyalty/ledger/route.ts#510b8f54d973d8167d79d0d767d223132d0b6708"
       ],
       "OriginalScreen": "Loyalty points admin",
       "UserAction": "Browse clients and manually adjust points ledger",
@@ -2355,8 +2355,8 @@
       "SalonExtension": "none",
       "ID": "LOY-02",
       "SourcePaths+BlobSHA": [
-        "src/app/api/loyalty/reverse-sale/route.ts",
-        "src/app/api/loyalty/adjust/route.ts"
+        "src/app/api/loyalty/reverse-sale/route.ts#c4f2ad2163149e42c1306af08735b96b82cca166",
+        "src/app/api/loyalty/adjust/route.ts#a9528011f187229018c2ba92ae17c588c1c39018"
       ],
       "OriginalScreen": "Loyalty reverse on sale void",
       "UserAction": "Reverse loyalty effects when a sale is voided",
@@ -2384,11 +2384,11 @@
       "SalonExtension": "Cut Club",
       "ID": "LOY-03",
       "SourcePaths+BlobSHA": [
-        "src/app/admin/cut-club/page.tsx",
-        "src/app/admin/cut-club/tiers/page.tsx",
-        "src/app/admin/cut-club/store/page.tsx",
-        "src/app/api/loyalty/tiers/route.ts",
-        "src/app/api/public/client/store/buy/route.ts"
+        "src/app/admin/cut-club/page.tsx#605680ec3b36b7f80594f7662248e49b617a4a3d",
+        "src/app/admin/cut-club/tiers/page.tsx#2e2f927017d5b4786ac6f88da609ae67e3771370",
+        "src/app/admin/cut-club/store/page.tsx#59e1042c00e2234145afc3fb06543abe4606d46e",
+        "src/app/api/loyalty/tiers/route.ts#f44240e48339efd1bd642dc5cf4bbc328718d1e7",
+        "src/app/api/public/client/store/buy/route.ts#deaef7b036e729c624f9dbb18aaa10161c360129"
       ],
       "OriginalScreen": "Cut Club tiers/store",
       "UserAction": "Configure tiers/store and fulfill client store buys",
@@ -2416,10 +2416,10 @@
       "SalonExtension": "Cut Club",
       "ID": "LOY-04",
       "SourcePaths+BlobSHA": [
-        "src/app/admin/cut-club/transactions/page.tsx",
-        "src/app/admin/cut-club/referrals/page.tsx",
-        "src/app/admin/cut-club/mystery-boxes/page.tsx",
-        "src/app/admin/cut-club/inventory/page.tsx"
+        "src/app/admin/cut-club/transactions/page.tsx#33158aa780706aa7489d8add8fcb419b485d4762",
+        "src/app/admin/cut-club/referrals/page.tsx#7b2f7ab991ec3b76d3b9e771aa3b3bb9b15ba472",
+        "src/app/admin/cut-club/mystery-boxes/page.tsx#570a3e83d4e84d55b2714fcab8a9a1c342258971",
+        "src/app/admin/cut-club/inventory/page.tsx#963b4ed3a645969675a33ec9af3ee307d30db2c6"
       ],
       "OriginalScreen": "Cut Club transactions/referrals/boxes",
       "UserAction": "Audit Cut Club transactions, referrals, mystery boxes, club inventory",
@@ -2447,10 +2447,10 @@
       "SalonExtension": "none",
       "ID": "RPT-01",
       "SourcePaths+BlobSHA": [
-        "src/app/sales/today/page.tsx",
-        "src/app/api/sales/today/route.ts",
-        "src/components/sales/TodaySalesKpiCards.tsx",
-        "src/components/sales/TodaySalesTransactionsTable.tsx"
+        "src/app/sales/today/page.tsx#fff9718bff295d492cec89d3d481d01fe9791d67",
+        "src/app/api/sales/today/route.ts#f15426da263159ccf1590596b4885ed6f7bcd5d7",
+        "src/components/sales/TodaySalesKpiCards.tsx#87c13c519d149c071b2992473322351f3bc695fa",
+        "src/components/sales/TodaySalesTransactionsTable.tsx#560f1c06f48908c6ea0dfeddc527455d39050184"
       ],
       "OriginalScreen": "Today sales review",
       "UserAction": "Review today sales KPIs and transactions (by barber/hour/method)",
@@ -2478,10 +2478,10 @@
       "SalonExtension": "none",
       "ID": "RPT-02",
       "SourcePaths+BlobSHA": [
-        "src/app/reports/monthly/page.tsx",
-        "src/app/api/reports/monthly/route.ts",
-        "src/components/reports/monthly/SummaryCards.tsx",
-        "src/components/reports/MonthlyFinancialEquations.tsx"
+        "src/app/reports/monthly/page.tsx#b0ca127014527632d76e38aecd0bd8a2b9bd6368",
+        "src/app/api/reports/monthly/route.ts#3d01fb019eaf241cb9c1a4790ae804bfd160383c",
+        "src/components/reports/monthly/SummaryCards.tsx#138a00a573334b79e0614dd0611b057d61eb69f2",
+        "src/components/reports/MonthlyFinancialEquations.tsx#697ce4df28c95b1ae6aef139612cf15fbe29a535"
       ],
       "OriginalScreen": "Monthly financial report",
       "UserAction": "View monthly revenue/expense equations and charts",
@@ -2509,10 +2509,10 @@
       "SalonExtension": "none",
       "ID": "RPT-03",
       "SourcePaths+BlobSHA": [
-        "src/app/admin/reports/partners/page.tsx",
-        "src/components/reports/partners/PartnersReportPageView.tsx",
-        "src/app/admin/reports/partners-real/page.tsx",
-        "src/app/admin/partners/page.tsx"
+        "src/app/admin/reports/partners/page.tsx#d6bc622c6dcbc7fd234a613ff49b56267d592503",
+        "src/components/reports/partners/PartnersReportPageView.tsx#d5549dec86e14f83c2aefb6a63f84a368ed79b54",
+        "src/app/admin/reports/partners-real/page.tsx#392fafc6e6a98e27271f6934e7092fb23de30f41",
+        "src/app/admin/partners/page.tsx#a8179445a9b8934136f07408a0eb2cc614acfa47"
       ],
       "OriginalScreen": "Partners reports + admin",
       "UserAction": "Run partner settlement reports and manage partners",
@@ -2540,10 +2540,10 @@
       "SalonExtension": "none",
       "ID": "RPT-04",
       "SourcePaths+BlobSHA": [
-        "src/app/admin/reports/employee-services/page.tsx",
-        "src/app/api/reports/employee-services/route.ts",
-        "src/app/api/reports/employee-services/reassign/route.ts",
-        "src/app/admin/reports/employee-monthly-work-revenue/page.tsx"
+        "src/app/admin/reports/employee-services/page.tsx#ea46649ea4ba83ea76da8ee603e4363c911181e1",
+        "src/app/api/reports/employee-services/route.ts#19d58c74860c2d72d6b63dda8cf0f29deaed8918",
+        "src/app/api/reports/employee-services/reassign/route.ts#25e469674124fb892d98f6c2317197cb92d999ac",
+        "src/app/admin/reports/employee-monthly-work-revenue/page.tsx#41f613020f8dce0ec1037eaf16060d5fc3de5b0c"
       ],
       "OriginalScreen": "Employee services / work-revenue reports",
       "UserAction": "Inspect employee service attribution and reassign if needed",
@@ -2571,10 +2571,10 @@
       "SalonExtension": "none",
       "ID": "RPT-05",
       "SourcePaths+BlobSHA": [
-        "src/app/reports/expenses/monthly/page.tsx",
-        "src/app/api/reports/expenses/monthly/route.ts",
-        "src/components/reports/expenses/ExpensesKpiCards.tsx",
-        "src/app/api/reports/expenses/employee-advances/route.ts"
+        "src/app/reports/expenses/monthly/page.tsx#2f0746c522a95a4b0614b2ee8c4f4d2e9ccfb1bd",
+        "src/app/api/reports/expenses/monthly/route.ts#48d3e8525c8637221866eb14615ba49b4cfc981e",
+        "src/components/reports/expenses/ExpensesKpiCards.tsx#dd6316dd3603f6484c092cdc5319c8f302552bd1",
+        "src/app/api/reports/expenses/employee-advances/route.ts#f70bc79cce4514a540aa16df0772a7b22f7545b0"
       ],
       "OriginalScreen": "Monthly expenses + advances report",
       "UserAction": "Analyze expenses by category and employee advances",
@@ -2602,10 +2602,10 @@
       "SalonExtension": "none",
       "ID": "RPT-06",
       "SourcePaths+BlobSHA": [
-        "src/app/admin/reports/full-day/page.tsx",
-        "src/app/income-review/today-revenue/page.tsx",
-        "src/app/income-review/all-sales/page.tsx",
-        "src/app/income-review/payments/page.tsx"
+        "src/app/admin/reports/full-day/page.tsx#66798b7b738bb9f078b085f54fc4c41d303c6544",
+        "src/app/income-review/today-revenue/page.tsx#9612b2a25434357c04c3ab951a032527f9b49239",
+        "src/app/income-review/all-sales/page.tsx#b5d65bd28f653584484b9502295ecc6844f57188",
+        "src/app/income-review/payments/page.tsx#b72f9f6765c2f58c8ea6b08292989b4443fa6ba6"
       ],
       "OriginalScreen": "Full-day / income-review suite",
       "UserAction": "Manager full-day report and income/payment reviews",
@@ -2633,9 +2633,9 @@
       "SalonExtension": "none",
       "ID": "RPT-07",
       "SourcePaths+BlobSHA": [
-        "src/app/reports/deductions/monthly/page.tsx",
-        "src/app/api/deductions/monthly-summary/route.ts",
-        "src/components/deductions/MonthlySummary.tsx"
+        "src/app/reports/deductions/monthly/page.tsx#be630a867341a9aba1946031d3de25d7d50182a5",
+        "src/app/api/deductions/monthly-summary/route.ts#9cde220ffaff9671d7a04016d7ff537f7685428e",
+        "src/components/deductions/MonthlySummary.tsx#58e15b637aeea21dbac2dc5c084dd455ee4569c0"
       ],
       "OriginalScreen": "Monthly deductions report",
       "UserAction": "Review monthly deduction summaries",
@@ -2663,10 +2663,10 @@
       "SalonExtension": "none",
       "ID": "FIN-01",
       "SourcePaths+BlobSHA": [
-        "src/app/income/new/page.tsx",
-        "src/app/api/incomes/route.ts",
-        "src/app/api/incomes/meta/route.ts",
-        "src/components/incomes/IncomeCategoryPicker.tsx"
+        "src/app/income/new/page.tsx#88f99b578a8e1f3afb922443cd7aaf7280892214",
+        "src/app/api/incomes/route.ts#0074edfdc3854b379addce80ffc99e1c96d89c43",
+        "src/app/api/incomes/meta/route.ts#666c8ea01054af9242831000aff33f05a6134446",
+        "src/components/incomes/IncomeCategoryPicker.tsx#bf474e8d9e677b985fe77b9af500f07d7f69e42d"
       ],
       "OriginalScreen": "Manual income entry",
       "UserAction": "Create non-POS income with category",
@@ -2694,8 +2694,8 @@
       "SalonExtension": "none",
       "ID": "FIN-02",
       "SourcePaths+BlobSHA": [
-        "src/app/budget/page.tsx",
-        "src/app/budget/[id]/page.tsx"
+        "src/app/budget/page.tsx#c701c8e7a494f387609396f1f9f6224d90d0ba11",
+        "src/app/budget/[id]/page.tsx#f9bbb886a60f44fa14bf5f9b4fa85fd40bfc548b"
       ],
       "OriginalScreen": "Monthly budget",
       "UserAction": "Plan/review monthly budgets",
@@ -2723,8 +2723,8 @@
       "SalonExtension": "none",
       "ID": "FIN-03",
       "SourcePaths+BlobSHA": [
-        "src/app/admin/payment-methods/page.tsx",
-        "src/app/api/payment-methods/route.ts"
+        "src/app/admin/payment-methods/page.tsx#fb6907376772800dadc22e4fee50f3dafd67e5b2",
+        "src/app/api/payment-methods/route.ts#2215549da807a6d0552b5515bc65430df72cb550"
       ],
       "OriginalScreen": "Payment methods admin",
       "UserAction": "Configure tender rails used by POS/expenses/treasury",
@@ -2752,7 +2752,7 @@
       "SalonExtension": "none",
       "ID": "FIN-04",
       "SourcePaths+BlobSHA": [
-        "src/app/income/collection/page.tsx"
+        "src/app/income/collection/page.tsx#18693e6e32f778bfda80a45237c48e4b52ff6df9"
       ],
       "OriginalScreen": "Collection / installment desk",
       "UserAction": "Collect outstanding payments (nav currently disabled in Cashier)",
@@ -2780,11 +2780,11 @@
       "SalonExtension": "none",
       "ID": "FIN-05",
       "SourcePaths+BlobSHA": [
-        "src/app/api/shift/open/route.ts",
-        "src/app/api/shift/route.ts",
-        "src/app/api/shifts/current/route.ts",
-        "src/app/admin/shift/page.tsx",
-        "src/components/auth/OpenShiftPrompt.tsx"
+        "src/app/api/shift/open/route.ts#223aa86af7d531313a6598fd8402fb047d17afe9",
+        "src/app/api/shift/route.ts#c875242509b5463fe710bb9998689354007d7e63",
+        "src/app/api/shifts/current/route.ts#27ad82cb8895e83c7ed26ccb4c9b525363742aaf",
+        "src/app/admin/shift/page.tsx#7201642840e35cd37970d94dd67125da8729d800",
+        "src/components/auth/OpenShiftPrompt.tsx#8b9b74cd96ba4a9448f8ec6d11318c08deb28e85"
       ],
       "OriginalScreen": "Open/manage shifts",
       "UserAction": "Open cashier shift and manage shift definitions",
@@ -2815,10 +2815,10 @@
       "SalonExtension": "none",
       "ID": "SYS-01",
       "SourcePaths+BlobSHA": [
-        "src/app/login/page.tsx",
-        "src/components/auth/LoginForm.tsx",
-        "src/components/session/SessionProvider.tsx",
-        "src/components/session/BranchSwitcher.tsx"
+        "src/app/login/page.tsx#c9e02f444d0b1431a196331b6ae70fea27928b51",
+        "src/components/auth/LoginForm.tsx#bd2b9703ff114ea1f49fe2a26308c1702dac95aa",
+        "src/components/session/SessionProvider.tsx#1508a7a09fd77aea3990512ef0ec9c07086ddaf1",
+        "src/components/session/BranchSwitcher.tsx#6e52ef7e4a2f7090315356fec66e9a55c38ea562"
       ],
       "OriginalScreen": "Login + branch session",
       "UserAction": "Authenticate and select/switch operating branch",
@@ -2849,9 +2849,9 @@
       "SalonExtension": "none",
       "ID": "SYS-02",
       "SourcePaths+BlobSHA": [
-        "src/app/admin/branches/page.tsx",
-        "src/app/admin/users/page.tsx",
-        "src/app/admin/permissions/users/page.tsx"
+        "src/app/admin/branches/page.tsx#b995a4e944939081f5de05d2a347616e0949238e",
+        "src/app/admin/users/page.tsx#bb04f116322b69b51f7c6e4b66b5ab0fa10d6a9f",
+        "src/app/admin/permissions/users/page.tsx#28e28eb1bacc9c9660163ad3569f8809dc34545a"
       ],
       "OriginalScreen": "Branches / users / permissions",
       "UserAction": "Administer branches, users, and page permissions",
@@ -2879,10 +2879,10 @@
       "SalonExtension": "none",
       "ID": "SYS-03",
       "SourcePaths+BlobSHA": [
-        "src/app/admin/settings/page.tsx",
-        "src/app/admin/settings/printing/page.tsx",
-        "src/app/admin/settings/printing/studio/page.tsx",
-        "src/components/receipt-studio/ReceiptStudioEditor.tsx"
+        "src/app/admin/settings/page.tsx#0e48dab29f59c6452e2956e0a227b8807f1d12e8",
+        "src/app/admin/settings/printing/page.tsx#1fcb9e25f8c865771e2d973427311c13251a6c72",
+        "src/app/admin/settings/printing/studio/page.tsx#65832d2540ae9793c55e34a51ade4738675ce3be",
+        "src/components/receipt-studio/ReceiptStudioEditor.tsx#5c2e876270ba41893a537a58d3e9add3542c0435"
       ],
       "OriginalScreen": "Settings + receipt studio",
       "UserAction": "Configure tenant settings and receipt print templates",
@@ -2910,10 +2910,10 @@
       "SalonExtension": "none",
       "ID": "SYS-04",
       "SourcePaths+BlobSHA": [
-        "src/app/admin/approvals/page.tsx",
-        "src/app/api/admin/approvals/route.ts",
-        "src/app/api/admin/approvals/[id]/approve/route.ts",
-        "src/app/api/admin/approvals/[id]/reject/route.ts"
+        "src/app/admin/approvals/page.tsx#f1e79f3cfdd9d87444fcb9ebdc8e50f425341ce8",
+        "src/app/api/admin/approvals/route.ts#7cbdc8c9cf6febde8dfaec50b853642654aefca2",
+        "src/app/api/admin/approvals/[id]/approve/route.ts#7932c9ec2d93849421829653df2ae6cdd33a38c6",
+        "src/app/api/admin/approvals/[id]/reject/route.ts#cd303b0eb8a984dd06bc064a6f84db1609cb20c2"
       ],
       "OriginalScreen": "Approvals inbox",
       "UserAction": "Approve/reject pending operational/financial requests",
@@ -2941,10 +2941,10 @@
       "SalonExtension": "WhatsApp + AI concierge",
       "ID": "SYS-05",
       "SourcePaths+BlobSHA": [
-        "src/app/admin/whatsapp/inbox/page.tsx",
-        "src/components/admin/whatsapp/AdminWhatsAppInboxPage.tsx",
-        "src/modules/messaging/application/enqueueMessage.ts",
-        "src/modules/messaging/outbox/workerPolicy.ts"
+        "src/app/admin/whatsapp/inbox/page.tsx#9399ebfc8628897b2c5647acd2fd5e48c0f8ec1d",
+        "src/components/admin/whatsapp/AdminWhatsAppInboxPage.tsx#8dfa40f889a6f5d9c6d8505947fb42a3e0d8ecb4",
+        "src/modules/messaging/application/enqueueMessage.ts#9dcbaa5cb2119d9a655560502e537fb29d68f916",
+        "src/modules/messaging/outbox/workerPolicy.ts#21c5594192bdb2a325e563a43c0f991ae22bc17c"
       ],
       "OriginalScreen": "WhatsApp inbox + messaging outbox",
       "UserAction": "Operate inbox/templates/campaigns; workers drain outbox",
@@ -2975,11 +2975,11 @@
       "SalonExtension": "none",
       "ID": "SYS-06",
       "SourcePaths+BlobSHA": [
-        "src/app/admin/services/page.tsx",
-        "src/app/admin/packages/page.tsx",
-        "src/app/admin/categories/page.tsx",
-        "src/app/api/services/route.ts",
-        "src/app/api/packages/route.ts"
+        "src/app/admin/services/page.tsx#616bc2222c95cb026dbe9e4582fcc715c0c652a1",
+        "src/app/admin/packages/page.tsx#3d6387890e6d891812108e77bf079cc4ee641560",
+        "src/app/admin/categories/page.tsx#95de906b01582ea5181ff0df67723b660d2965e1",
+        "src/app/api/services/route.ts#d2af4d6fdefbe90250a33d7c8e3dfc4b011acf35",
+        "src/app/api/packages/route.ts#a4087097765cfe3c580e78e9c98a70b9a8466de5"
       ],
       "OriginalScreen": "Services/products packages/categories admin",
       "UserAction": "Maintain sellable services, packages, categories",
@@ -3007,10 +3007,10 @@
       "SalonExtension": "Salon concierge",
       "ID": "SYS-07",
       "SourcePaths+BlobSHA": [
-        "src/app/admin/ai-concierge/page.tsx",
-        "src/components/admin/salon-concierge/SalonConciergeAdmin.tsx",
-        "src/app/api/admin/ai-concierge/learning/artifacts/route.ts",
-        "src/app/api/admin/ai-concierge/learning/artifacts/[id]/approve/route.ts"
+        "src/app/admin/ai-concierge/page.tsx#8dd0e13b4a3a0aed22965d84bca3d3d24de4e6f6",
+        "src/components/admin/salon-concierge/SalonConciergeAdmin.tsx#20f2ff641fc271f8b91766141d0dd6c6a6c27a94",
+        "src/app/api/admin/ai-concierge/learning/artifacts/route.ts#3b84aeeb2e670af8fa69b3d51078c4074ab117a8",
+        "src/app/api/admin/ai-concierge/learning/artifacts/[id]/approve/route.ts#f65cd5d890b061bb541a88c41bbe0c84fb59b01c"
       ],
       "OriginalScreen": "AI salon concierge admin",
       "UserAction": "Review/approve/reject AI learning artifacts and submissions",

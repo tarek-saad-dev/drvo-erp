@@ -24,7 +24,8 @@ test('workflow ledger exposes mandatory columns and status vocabulary',()=>{
 
 test('every workflow row has required fields and honest non-complete statuses',()=>{
  const seen=new Set();
- const runtime=new Set(manifest.files.map(f=>f.path));
+ const runtime=new Map(manifest.files.map(f=>[f.path,f.blob]));
+ let rowsWithBlobEvidence=0;
  for(const row of ledger.workflows){
   for(const col of REQUIRED)assert.ok(Object.prototype.hasOwnProperty.call(row,col),
    row.ID+' missing '+col);
@@ -33,11 +34,24 @@ test('every workflow row has required fields and honest non-complete statuses',(
   assert.ok(STATUS.has(row.Status),row.ID+' invalid status '+row.Status);
   assert.notEqual(row.Status,'PILOT_VERIFIED');
   assert.ok(Array.isArray(row['SourcePaths+BlobSHA']));
-  for(const p of row['SourcePaths+BlobSHA']){
+  let rowHasBlob=false;
+  for(const entry of row['SourcePaths+BlobSHA']){
+   const hashIdx=entry.indexOf('#');
+   const p=hashIdx===-1?entry:entry.slice(0,hashIdx);
+   const blob=hashIdx===-1?null:entry.slice(hashIdx+1);
    if(p.includes('*')||p.startsWith('tools/'))continue;
    assert.ok(runtime.has(p)||p.endsWith('.json'),
     row.ID+' source path not in locked runtime inventory: '+p);
+   if(blob){
+    assert.match(blob,/^[0-9a-f]{40}$/,row.ID+' invalid blob sha: '+blob);
+    if(runtime.has(p)){
+     assert.equal(blob,runtime.get(p),
+      row.ID+' blob mismatch for '+p+': ledger='+blob+' baseline='+runtime.get(p));
+     rowHasBlob=true;
+    }
+   }
   }
+  if(rowHasBlob)rowsWithBlobEvidence++;
   const proofOpen=['UIProof','BrowserProof','DataProof','PilotProof']
    .filter(k=>row[k]==='OPEN').length;
   if(row.Status==='PORTING'||row.Status==='SOURCE_IDENTIFIED'||row.Status==='BLOCKED'){
@@ -45,6 +59,8 @@ test('every workflow row has required fields and honest non-complete statuses',(
     row.ID+' cannot claim closed proofs while incomplete');
   }
  }
+ assert.ok(rowsWithBlobEvidence>=90,
+  'expected >=90 rows with path#blob evidence, got '+rowsWithBlobEvidence);
  assert.ok(seen.has('CU-01'));
  assert.ok(seen.has('CU-02'));
  assert.ok(seen.has('POS-01'));

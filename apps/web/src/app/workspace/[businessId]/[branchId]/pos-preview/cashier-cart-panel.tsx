@@ -10,7 +10,7 @@ export type CartLine={offeringId:string;quantity:number};
 
 export default function CashierCartPanel({lines,offerings,disabled,onAdjust,onRemove}:{
  lines:CartLine[];offerings:CatalogOffering[];disabled:boolean;
- onAdjust:(offeringId:string,delta:number)=>void;onRemove:(offeringId:string)=>void;
+ onAdjust:(offeringId:string,delta:1|-1)=>void;onRemove:(offeringId:string)=>void;
 }){
  return <section className="k5-admin-card" aria-label="سلة المسودة Cashier"
   data-cashier-pos="cart-panel">

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import {useCallback,useEffect,useMemo,useRef,useState} from "react";
 import {suggestBookingStarts} from "./booking-availability-preview.mjs";
-import {findAuthorizedCustomers} from "./customer-finder.mjs";
 import {toLocalMinute,windowCorrectionStage} from "./window-correction.mjs";
 import {useRouter} from "next/navigation";
 
@@ -31,8 +30,10 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
   const [windowLocalStart,setWindowLocalStart]=useState("");
   const [windowLocalEnd,setWindowLocalEnd]=useState("");
   const [replacementWindowId,setReplacementWindowId]=useState<string|null>(null);
-  const [customers,setCustomers]=useState<Customer[]>([]);
+  const [customerResults,setCustomerResults]=useState<Customer[]>([]);
   const [customerQuery,setCustomerQuery]=useState("");
+  const [customerSearching,setCustomerSearching]=useState(false);
+  const [customersReady,setCustomersReady]=useState(false);
   const [services,setServices]=useState<Offering[]>([]);
   const [canOpenPos,setCanOpenPos]=useState(false);
   const [canPrepareDraft,setCanPrepareDraft]=useState(false);
@@ -41,6 +42,7 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
   const [resourceName,setResourceName]=useState("");
   const [resourceKind,setResourceKind]=useState<Resource["kind"]>("PERSON");
   const [customerId,setCustomerId]=useState("");
+  const [selectedCustomer,setSelectedCustomer]=useState<Customer|null>(null);
   const [offeringId,setOfferingId]=useState("");
   const [resourceId,setResourceId]=useState("");
   const [localStart,setLocalStart]=useState("");
@@ -53,7 +55,6 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
   const scope="/api/workspaces/"+encodeURIComponent(businessId)+"/branches/"+encodeURIComponent(branchId);
   const home="/workspace/"+encodeURIComponent(businessId)+"/"+encodeURIComponent(branchId);
   const correctionStage=windowCorrectionStage(replacementWindowId,windowResourceId,windows);
-  const filteredCustomers=useMemo(()=>findAuthorizedCustomers(customers,customerQuery),[customers,customerQuery]);
   const slotPreview=useMemo(()=>suggestBookingStarts({
     resourceId,dayLocal:slotDay,
     durationMinutes:services.find(s=>s.offeringId===offeringId)?.durationMinutes,
@@ -65,31 +66,31 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
     try{
       // Booking may present Customer/Service labels only if independently
       // permitted to read those owning Modules; never bypass their scopes.
-      const [booking,customer,category,windowResult]=await Promise.all([
+      const [booking,customerProbe,category,windowResult]=await Promise.all([
         fetch(scope+"/booking",{credentials:"same-origin",cache:"no-store"}),
-        fetch(scope+"/customers",{credentials:"same-origin",cache:"no-store"}),
+        // Probe Customers independently; full search is server-side via ?q=.
+        fetch(scope+"/customers?q="+encodeURIComponent("a"),{credentials:"same-origin",cache:"no-store"}),
         fetch(scope+"/catalog",{credentials:"same-origin",cache:"no-store"}),
         fetch(scope+"/booking/windows",{credentials:"same-origin",cache:"no-store"}),
       ]);
-      if([booking,customer,category,windowResult].some(r=>r.status===401)){router.replace("/sign-in");return;}
+      if([booking,customerProbe,category,windowResult].some(r=>r.status===401)){router.replace("/sign-in");return;}
       if(booking.status===403||booking.status===404){setStatus("denied");return;}
       if(!booking.ok){setStatus("unavailable");return;}
-      if(!customer.ok||!category.ok){setStatus("prerequisites");return;}
+      if(!customerProbe.ok||!category.ok){setStatus("prerequisites");return;}
       if(!windowResult.ok){setStatus("unavailable");return;}
-      const [book,cs,cat,availability]=await Promise.all([
+      const [book,cat,availability]=await Promise.all([
         booking.json() as Promise<BookingRead>,
-        customer.json() as Promise<{customers:Customer[]}>,
         category.json() as Promise<{offerings:Offering[]}>,
         windowResult.json() as Promise<{windows:BookingWindow[]}>,
       ]);
       if(!Array.isArray(book.resources)||!Array.isArray(book.appointments)||
-          !Array.isArray(cs.customers)||!Array.isArray(cat.offerings)||
+          !Array.isArray(cat.offerings)||
           !Array.isArray(availability.windows)){
         setStatus("unavailable");return;
       }
       setData(book);
       setWindows(availability.windows);
-      setCustomers(cs.customers.filter(c=>c.isActive));
+      setCustomersReady(true);
       setServices(cat.offerings.filter(s=>s.isActive&&s.kind==="SERVICE"&&
         typeof s.durationMinutes==="number"&&s.durationMinutes>0));
       // POS preview is a distinct protected owner, never assumed from Booking
@@ -114,6 +115,31 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
     }catch{setStatus("unavailable");}
   },[businessId,branchId,scope,router,posWebEnabled,draftsWebEnabled]);
   useEffect(()=>{void load();},[load]);
+
+  useEffect(()=>{
+    const q=customerQuery.trim();
+    if(!customersReady||q.length<1){
+      setCustomerResults([]);setCustomerSearching(false);return;
+    }
+    let cancelled=false;
+    const timer=setTimeout(async()=>{
+      setCustomerSearching(true);
+      try{
+        const r=await fetch(scope+"/customers?q="+encodeURIComponent(q),
+          {credentials:"same-origin",cache:"no-store"});
+        if(cancelled)return;
+        if(r.status===401){router.replace("/sign-in");return;}
+        if(!r.ok){setCustomerResults([]);return;}
+        const data=await r.json() as {customers?:Customer[];searchScope?:string};
+        if(!Array.isArray(data.customers)||data.searchScope!=="BUSINESS"){
+          setCustomerResults([]);return;
+        }
+        setCustomerResults(data.customers.filter(c=>c.isActive!==false));
+      }catch{if(!cancelled)setCustomerResults([]);}
+      finally{if(!cancelled)setCustomerSearching(false);}
+    },250);
+    return ()=>{cancelled=true;clearTimeout(timer);};
+  },[customerQuery,customersReady,scope,router]);
 
   async function submit(path:string,body:unknown,id:React.MutableRefObject<string|null>){
     if(busy)return false;
@@ -376,23 +402,30 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
         <h2>حجز موعد جديد</h2>
         <p className="k5-muted">اختار عميل وخدمة ومورد. المدة بتتحدد من الخدمة في Catalog، والتوقيت المعروض حسب جهازك.</p>
         <form className="catalog-form" onSubmit={addBooking}>
-          <label>ابحث عن العميل في القائمة المصرّح بيها
+          <label>ابحث عن العميل (Business كامل على السيرفر)
             <input type="search" maxLength={80} value={customerQuery}
-              placeholder="الاسم أو رقم الموبايل الدولي"
+              placeholder="الاسم أو رقم الموبايل"
+              data-customer-search="business-server"
               onChange={e=>{setCustomerQuery(e.target.value);
-                setCustomerId("");bookingRequest.current=null;}}/>
+                setCustomerId("");setSelectedCustomer(null);bookingRequest.current=null;}}/>
           </label>
-          <p className="k5-muted" role="status">ظاهر {filteredCustomers.length} من {customers.length} عميل
-            (أول 200 عميل في الـ API فقط). البحث محلي ومش بيشمل كل العملاء.
-            {filteredCustomers.length===0&&customers.length>0?
-              " مفيش نتيجة ظاهرة؛ جرّب البحث بطريقة تانية.":""}
-            <Link href={home+"/customers"}> دليل العملاء</Link>
+          <p className="k5-muted" role="status">
+            {customerSearching?"جاري البحث على السيرفر…":
+              customerQuery.trim()?`نتائج السيرفر: ${customerResults.length} (حد 20)`:
+              "اكتب اسم أو موبايل للبحث في كل عملاء الـBusiness المصرّح بهم."}
+            {" "}<Link href={home+"/customers"}>دليل العملاء</Link>
           </p>
-          <label>العميل<select required value={customerId} onChange={e=>{
-            setCustomerId(e.target.value);bookingRequest.current=null;
-          }}><option value="">اختر عميلًا</option>
-            {filteredCustomers.map(c=><option key={c.customerId} value={c.customerId}>{c.displayName}</option>)}
-          </select></label>
+          {selectedCustomer&&<p className="k5-notice">المختار: {selectedCustomer.displayName}
+            {" · "}{selectedCustomer.phoneE164??"بدون رقم"}</p>}
+          <div className="k5-booking-actions" aria-label="نتائج بحث العملاء">
+            {customerResults.map(c=><button key={c.customerId} type="button"
+              className={customerId===c.customerId?"k5-save":"k5-salon-refresh"}
+              onClick={()=>{
+                setCustomerId(c.customerId);setSelectedCustomer(c);
+                bookingRequest.current=null;
+              }}>{c.displayName} — {c.phoneE164??""}</button>)}
+          </div>
+          <input type="hidden" value={customerId} readOnly required/>
           <label>الخدمة<select required value={offeringId} onChange={e=>{
             setOfferingId(e.target.value);bookingRequest.current=null;
           }}><option value="">اختر خدمة</option>
@@ -405,7 +438,7 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
           </select></label>
           <label>الموعد المحلي<input type="datetime-local" required step={60} value={localStart}
             onChange={e=>{setLocalStart(e.target.value);bookingRequest.current=null;}}/></label>
-          <button className="k5-save" disabled={busy||!customers.length||!services.length||
+          <button className="k5-save" disabled={busy||!customersReady||!customerId||!services.length||
             !data.resources.some(r=>r.isActive)}>تأكيد الحجز</button>
         </form>
         <div className="k5-salon-suggestions" aria-label="مواعيد مرشحة للحجز">
@@ -431,8 +464,8 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
               </button>)}
             </div>}
         </div>
-        {!customers.length||!services.length||!data.resources.some(r=>r.isActive)?
-          <p className="k5-footnote">لتسجيل حجز لازم يكون فيه عميل وخدمة نشطة ومورد حجز أولًا.</p>:null}
+        {!customersReady||!services.length||!data.resources.some(r=>r.isActive)?
+          <p className="k5-footnote">لتسجيل حجز لازم Customers search + خدمة نشطة ومورد حجز أولًا.</p>:null}
       </section>
       <section className="k5-admin-card">
         <div className="k5-admin-summary"><h2>حجوزات الفرع</h2>

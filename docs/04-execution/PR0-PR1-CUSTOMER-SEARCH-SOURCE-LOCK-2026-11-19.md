@@ -1,43 +1,55 @@
-# PR0 + PR1 — Source lock & Business Customer search (2026-11-19)
+# PR0 + PR1 + PR2 progress — Cashier migration (2026-11-19)
 
-**Status: SOURCE CODED / CI PARTIAL / NOT LIVE / NOT FULL PARITY**
+## Delivery status matrix (do not collapse)
+
+| Layer | State | Evidence |
+| --- | --- | --- |
+| Code committed locally | YES | `537005b` then follow-up fixes on `main` |
+| Code on GitHub `main` | YES (as of push `1d22de9..537005b`) | `git ls-remote` = `537005b38ec2d91951bcdc8801f52625fcde2c06` · https://github.com/tarek-saad-dev/drvo-erp/commit/537005b38ec2d91951bcdc8801f52625fcde2c06 |
+| Customers SQL024 CI | PASS | https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44563649332 (`customers-sql-http` success on `537005b`) |
+| Web typecheck CI | FAIL then fixed | TS2322 cart `delta: 1\|-1` vs `number` broke K5C/Salon/Treasury/Staging Artifact; fix pushed in follow-up |
+| Deployed / private usable | NOT VERIFIED | Staging Deploy may run after green web build; flags OFF; Owner browser OPEN |
+| Full Cashier parity | NO | Migration incomplete |
 
 ## Source lock (PR0)
 
 | Field | Value |
 | --- | --- |
 | Prior pin | `bc9c03fff86074872590ad0fd3525f9a4e416958` (retained) |
-| New immutable pin | `046bf19b0d5833a07fe4b2891cbf3032d03b7cef` (`feat(CUT CLUB): add admin WhatsApp OTP API test`) |
-| Delta | +5 blobs, 0 removed, 1 changed; critical POS/HR/Treasury paths retained |
-| Inventories | `tools/cashier-reuse/cashier-source-lock-2026-11-19.json`, `*-baseline-*`, `*-all-source-blobs-*`, `*-delta-*` |
+| New immutable pin | `046bf19b0d5833a07fe4b2891cbf3032d03b7cef` |
+| Delta | +5 blobs, 0 removed |
+| Inventories | `tools/cashier-reuse/*-2026-11-19.*` |
 | Workflow ledger | `tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json` |
-| Generator | `node tools/cashier-reuse/inventory-source.cjs --repo ../casher --sha <40> --previous <40>` |
-| Gate tests | `tests/cashier-source-lock-2026-11-19.test.cjs`, `tests/cashier-workflow-ledger.test.cjs` |
-
-Cashier local working tree was **not** modified (dirty sibling checkout left alone; inventory used `git ls-tree` at the locked SHA).
 
 ## Customer search (PR1)
 
 | Piece | Detail |
 | --- | --- |
-| SQL024 | `db/migrations/024_customer_business_search.sql` — `core.SearchCustomers`, phone index, CreateCustomer phone-conflict return |
-| Duplicate policy | Refuse create; return `CUSTOMER_PHONE_EXISTS` + `existingCustomerId`. **No UNIQUE constraint** until real duplicate analysis |
-| API | `GET .../customers?q=` → Business-scoped TOP 20; browse list still TOP 200 |
-| Phone | Egyptian 01 / +20 / 0020 canonicalize (`egyptian-phone.ts` / `.mjs`) |
-| Private POS | `pos-customer-operator.tsx` debounced server search; selects existing on phone conflict |
-| Tests run | API `114/114` unit PASS; private POS web 3/3 PASS; root lock/ledger 11/11 PASS |
-| Not run here | Disposable SQL2022 `tools/customers/verify.cjs` (needs Docker SQL); primary DB apply; Owner browser |
+| SQL024 | `SearchCustomers`, phone index, create-time phone conflict |
+| Duplicate policy | Refuse create; `CUSTOMER_PHONE_EXISTS` + existing id; no UNIQUE yet |
+| API | `GET .../customers?q=` Business TOP 20 |
+| Private POS | Server search UI |
+| Booking | Wired to same `?q=` server search (follow-up) |
+| Concurrency | verify.cjs parallel duplicate-phone race case (follow-up) |
 
-## Explicit OPEN gaps
+## POS UX (PR2)
 
-- CU-03 profile/source/consent; CU-05..CU-09 history/apply-last-visit/loyalty
-- Booking UI still uses local first-200 filter
-- PR2 full Cashier POS component transplant
-- SQL024 on primary/dev DB + backup/restore evidence
-- ADR-031 financial posting
+| Slice | Detail |
+| --- | --- |
+| Catalog/cart/quick-actions | Cashier-adapted private Light shell; finance buttons disabled + labeled |
+| Barber/HR selector | Reads `/hr/employees`; bookable vs non-barber; no payroll |
+| Packages / history / print | Still OPEN |
 
-## Next executable task
+## Explicit OPEN
 
-1. Run Shared Customers SQL CI (`shared-customers-ci.yml`) against SQL024.
-2. Start PR2: transplant Cashier POS UX tree into private Light workspace with API façades (nonposting).
-3. Expand workflow ledger rows for remaining POS/HR/Treasury workflows.
+- Primary DB SQL024 apply + backup/restore
+- Owner authenticated browser
+- Cut import
+- Packages, handoffs, paid history, ADR-031 posting
+- Remaining HR/Booking/Queue/Treasury/Expenses/Inventory/Loyalty/Reports workflows
+
+## Next
+
+1. Confirm web CI green after TS fix + Barber/Booking push.
+2. Continue packages section + line executor wiring from selected Barber.
+3. Expand ledger rows; keep finance gated.

@@ -23,16 +23,16 @@ test('Arabic variants and Arabic-Indic phone digits find only the given scoped r
  assert.equal(find(rows,'احمد')[0],rows[0],'no detached globally sourced rows');
  assert.deepEqual(find(null,'احمد'),[]);
 });
-test('private Booking search never fetches unauthorized records or submits stale selected customer',()=>{
+test('private Booking uses server Business customer search, not first-200 local filter',()=>{
  const booking=fs.readFileSync(path.join(base,'booking-client.tsx'),'utf8');
  const helper=fs.readFileSync(path.join(base,'customer-finder.mjs'),'utf8');
  assert.doesNotMatch(helper,/fetch\s*\(|localStorage|sessionStorage|mssql|\/api\//);
- assert.match(booking,/findAuthorizedCustomers\(customers,customerQuery\)/);
- assert.match(booking,/setCustomerId\(""\);bookingRequest\.current=null;/);
- assert.match(booking,/filteredCustomers\.map\(c=>/);
- assert.match(booking,/customers\.length\s*===\s*0|!customers\.length/);
- assert.match(booking,/أول 200 عميل/);
+ assert.doesNotMatch(booking,/findAuthorizedCustomers\(/);
+ assert.doesNotMatch(booking,/أول 200 عميل/);
+ assert.match(booking,/customers\?q=/);
+ assert.match(booking,/searchScope!=="BUSINESS"/);
+ assert.match(booking,/data-customer-search="business-server"/);
+ assert.match(booking,/setCustomerId\(""\);setSelectedCustomer\(null\);bookingRequest\.current=null;/);
  assert.match(booking,/if\(!GUID\.test\(customerId\)/);
- assert.match(booking,/fetch\(scope\+"\/customers"/);
  assert.doesNotMatch(booking,/\/sales\/posted|localStorage|sessionStorage/);
 });

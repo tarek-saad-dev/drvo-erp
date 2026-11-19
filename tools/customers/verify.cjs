@@ -210,6 +210,31 @@ async function main(){
    assert.equal(detail.code,'CUSTOMER_PHONE_EXISTS');
    assert.equal(detail.existingCustomerId,firstCustomerId);
   });
+  await pass('concurrent duplicate phone creates yield one customer and conflict for the rest',async()=>{
+   const p=path(x.b,x.br);
+   const phone='+201098765432';
+   const attempts=Array.from({length:8},(_,i)=>({
+    key:id(),body:{displayName:'Race '+i,phoneE164:phone},
+   }));
+   const results=await Promise.all(attempts.map(a=>post(p,cookie,a.key,a.body)));
+   const statuses=results.map(r=>r.status);
+   const ok=statuses.filter(s=>s===200);
+   const conflict=statuses.filter(s=>s===409);
+   assert.equal(ok.length,1,'exactly one create must succeed');
+   assert.equal(conflict.length,7,'remaining concurrent creates must conflict');
+   const winner=await results[statuses.indexOf(200)].json();
+   assert.equal(winner.created,true);
+   for(const r of results.filter((_,i)=>statuses[i]===409)){
+    const body=await r.json();
+    const detail=typeof body.message==='object'&&body.message?body.message:body;
+    assert.equal(detail.code,'CUSTOMER_PHONE_EXISTS');
+    assert.equal(detail.existingCustomerId,winner.id);
+   }
+   const search=await get(p+'?q='+encodeURIComponent('01098765432'),cookie);
+   assert.equal(search.status,200);
+   const found=(await search.json()).customers.filter(c=>c.phoneE164===phone);
+   assert.equal(found.length,1);
+  });
   await pass('valid contact without phone, invalid PII or forged Tenant denied',async()=>{
    assert.equal((await post(path(x.b,x.br),cookie,id(),
     {displayName:'Walk In',phoneE164:null})).status,200);

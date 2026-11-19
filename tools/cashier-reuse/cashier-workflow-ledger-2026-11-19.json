@@ -66,13 +66,13 @@
       ],
       "UIProof": "OPEN",
       "DomainTest": "apps/api/test/customers.test.cjs + egyptian-phone",
-      "SQLHTTPTest": "tools/customers/verify.cjs (extend for search)",
+      "SQLHTTPTest": "https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44563649332 PASS on 537005b; concurrency race in verify.cjs",
       "BrowserProof": "OPEN",
       "DataProof": "OPEN",
       "PilotProof": "OPEN",
-      "Status": "PORTING",
+      "Status": "DRVO_CI_PASS",
       "Blocker": "Primary DB SQL024 apply + private Owner browser not verified",
-      "NextAction": "Run shared-customers CI; wire booking UI to same search"
+      "NextAction": "Owner browser acceptance after flags; keep UNIQUE phone deferred"
     },
     {
       "ID": "CU-02",

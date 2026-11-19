@@ -1,5 +1,7 @@
 # Project changelog
 
+- **2026-11-19 — GITHUB + SQL024 CI + POS/BOOKING CONTINUE:** Pushed `5cf2a82`/`537005b` to GitHub `main`. [Customers SQL024 HTTP CI PASS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44563649332). Fixed Web TS cart `1|-1` delta mismatch. Added Barber/HR selector, Booking server `?q=` search, concurrent duplicate-phone race in verify.cjs. **Primary DB / Owner browser / packages / ADR-031 still OPEN; full parity NO.**
+
 - **2026-11-19 — PR0+PR1 EXECUTION (NOT FULL PARITY):** Locked Cashier source `046bf19b0d5833a07fe4b2891cbf3032d03b7cef` (delta from `bc9c03fff`, +5 blobs / 0 removed). Added inventory generator, workflow ledger, SQL024 `SearchCustomers` + create-time phone duplicate gate (no UNIQUE index yet), Nest `GET ?q=` Business search, Egyptian phone canonicalize, private POS server search UI. API unit 114 PASS; root lock/ledger tests PASS; private POS web source tests PASS. **SQL disposable CI / primary DB SQL024 / Owner browser / Cut import / financial posting still OPEN.**
 
 - **2026-11-19 — CURSOR FULL CASHIER PORT HANDOFF (DOCS ONLY):** Added [full executable parity migration contract](CURSOR-CASHIER-FULL-MIGRATION-EXECUTION-2026-11-19.md), [Agent kickoff](CURSOR-CASHIER-AGENT-KICKOFF.md) and `.cursor/rules/cashier-full-parity.mdc`. Canonical ADR-040 shared-core/Salon extensions and Cashier UX preservation remain required; ADR-031 payment/GL gating unchanged. **No actual app/SQL/deployment/data import in this docs-only change.**

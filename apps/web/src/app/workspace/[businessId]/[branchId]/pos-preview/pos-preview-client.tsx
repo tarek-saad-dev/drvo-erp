@@ -6,6 +6,7 @@ import PosCustomerOperator from "./pos-customer-operator";
 import CashierCatalogBrowser from "./cashier-catalog-browser";
 import CashierCartPanel from "./cashier-cart-panel";
 import CashierQuickActions from "./cashier-quick-actions";
+import CashierBarberSelector from "./cashier-barber-selector";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -54,6 +55,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
   const [cartRevision,setCartRevision]=useState(0);
   const [selectedCustomerId,setSelectedCustomerId]=useState("");
   const [customerRevision,setCustomerRevision]=useState(0);
+  const [selectedBarberId,setSelectedBarberId]=useState("");
   const retryKey=useRef<string|null>(null);
   const handoffApplied=useRef(false);
   const selectedCurrency=offerings.find(o=>lines.some(l=>l.offeringId===o.offeringId))?.currency??"EGP";
@@ -239,6 +241,8 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
       {draftsEnabled&&richEnabled&&<PosCustomerOperator
         apiRoot={api.replace(/\/pos-preview$/,"")} customerId={selectedCustomerId}
         onSelect={setSelectedCustomerId} onCreated={()=>setCustomerRevision(v=>v+1)}/>}
+      <CashierBarberSelector apiRoot={api.replace(/\/pos-preview$/,"")}
+       selectedId={selectedBarberId} onSelect={setSelectedBarberId}/>
       <CashierCatalogBrowser offerings={offerings} disabled={busy||draftBusy||lines.length>=20}
        onAdd={o=>quickAdd(o)}/>
       <CashierCartPanel lines={lines} offerings={offerings} disabled={busy||draftBusy}
@@ -246,6 +250,8 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
        onRemove={id=>{
         setLines(s=>s.filter(x=>x.offeringId!==id));setPreview(null);setAdjustment(null);retryKey.current=null;
        }}/>
+      {selectedBarberId&&<p className="k5-muted" data-cashier-pos="barber-context">
+       المنفذ المختار للمسودة: {selectedBarberId} — يُمرَّر لسطور الحفظ الغني عند التوفر؛ مفيش عمولة.</p>}
       <CashierQuickActions/>
       <section className="k5-admin-card">
         <h2>حساب المعاينة وحفظ المسودة</h2>

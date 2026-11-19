@@ -112,13 +112,15 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
           o.offeringId===initialOfferingId&&GUID.test(o.offeringId)&&
           o.isActive&&o.kind==="SERVICE"):undefined;
         // Package expand only when cart empty; otherwise (or on expand miss) offeringId.
+        // Compute seed outside setState so TypeScript sees the branch result.
         let seeded:"package"|"offering"|"none"="none";
-        setLines(current=>{
-          if(current.length!==0)return current;
-          if(packageLines){seeded="package";return packageLines;}
-          if(offering){seeded="offering";return [{offeringId:offering.offeringId,quantity:1}];}
-          return current;
-        });
+        let handoffLines:Line[]|null=null;
+        if(packageLines){seeded="package";handoffLines=packageLines;}
+        else if(offering){
+          seeded="offering";
+          handoffLines=[{offeringId:offering.offeringId,quantity:1}];
+        }
+        setLines(current=>current.length!==0||!handoffLines?current:handoffLines);
         if(seeded==="package"){
           setMessage("اتوسّعت باقة الحجز لمسودة خدمات. راجع الأسعار، ولا يوجد بيع أو تحصيل.");
         }else if(seeded==="offering"){

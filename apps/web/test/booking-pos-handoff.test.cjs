@@ -42,7 +42,7 @@ test('untrusted link ID only pre-fills after independently authorized POS/Catalo
  assert.match(client,/\/catalog\/packages/);
  assert.match(client,/o\.offeringId===initialOfferingId&&GUID\.test/);
  assert.match(client,/o\.isActive&&o\.kind==="SERVICE"/);
- assert.match(client,/if\(current\.length!==0\)return current/);
+ assert.match(client,/setLines\(current=>current\.length!==0\|\|!handoffLines\?current:handoffLines\)/);
  assert.match(client,/credentials:"same-origin",cache:"no-store"/);
  assert.match(client,/retryKey\.current=null;setLines\(\[\]\);setPreview\(null\)/);
  assert.match(client,/posted!==false/);

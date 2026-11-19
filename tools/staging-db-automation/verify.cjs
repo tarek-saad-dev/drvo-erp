@@ -67,8 +67,10 @@ async function main(){
     `);
     restricted=await connect(LOGIN,pass,DB);
     // P4: recreate EXACT pre-activation K5F 001–009 state using the SAME
-    // restricted migrator, then prove that 010–017 are forward-only and
+    // restricted migrator, then prove remaining migrations are forward-only and
     // recoverable. This is disposable CI; NO production migration is invoked.
+    const afterK5f=payload.migrations.length-9;
+    assert.ok(afterK5f>=8,'expected migrations beyond K5F 001-009');
     const k5fBaseline=await run(restricted,payload.migrations.slice(0,9),SHA);
     assert.equal(k5fBaseline.pending,8);
     const before=await admin.query(
@@ -79,9 +81,10 @@ async function main(){
     assert.deepEqual(before.recordset.map(x=>x.Checksum),
       payload.migrations.slice(0,9).map(x=>x.sha256));
     const result=await run(restricted,payload.migrations,SHA);
-    assert.equal(result.pending,8,'P4 must apply only migrations 010–017');
+    assert.equal(result.pending,afterK5f,
+      'P4 must apply all remaining migrations after K5F 001-009');
     assert.ok(result.backupFile?.startsWith('/var/opt/mssql/data/drvo_erp_stage_auto_'));
-    console.log('PASS P4: same restricted migration runner upgrades exact K5F 001–009 to 010–017');
+    console.log('PASS P4: same restricted migration runner upgrades exact K5F 001–009 through current tip ('+afterK5f+' pending)');
     const ownerClaim=await admin.query(`
       SELECT USER_NAME(execute_as_principal_id) AS executor
       FROM sys.sql_modules WHERE object_id=OBJECT_ID(N'core.ClaimApprovedOwner')

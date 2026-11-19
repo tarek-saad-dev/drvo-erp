@@ -2,19 +2,27 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'../src/app/workspace/[businessId]/[branchId]/pos-preview');
+const customers=path.resolve(__dirname,'../src/app/workspace/[businessId]/[branchId]/customers');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
-test('authenticated private POS customer phone lookup and idempotent create is not synthetic',()=>{
+test('authenticated private POS uses server Business customer search, not first-200 local filter',()=>{
  const ui=read('pos-customer-operator.tsx'),parent=read('pos-preview-client.tsx'),page=read('page.tsx');
  assert.match(parent,/draftsEnabled&&richEnabled&&<PosCustomerOperator/);
  assert.match(page,/DRVO_K5_WEB_ENABLED/);
- assert.match(ui,/findAuthorizedCustomers/);
  assert.match(ui,/credentials:"same-origin"/);
  assert.match(ui,/cache:"no-store"/);
  assert.match(ui,/Idempotency-Key/);
  assert.match(ui,/crypto\.randomUUID/);
  assert.match(ui,/method:"POST"/);
- assert.match(ui,/أول 200 عميل/);
+ assert.match(ui,/encodeURIComponent\(q\)/);
+ assert.match(ui,/\?q="/);
+ assert.match(ui,/searchScope!=="BUSINESS"/);
+ assert.match(ui,/data-customer-search="business-server"/);
+ assert.match(ui,/CUSTOMER_PHONE_EXISTS/);
  assert.match(ui,/حفظ واختيار العميل/);
+ assert.match(ui,/canonicalizeEgyptPhoneE164/);
+ assert.doesNotMatch(ui,/findAuthorizedCustomers/);
+ assert.doesNotMatch(ui,/أول 200 عميل/);
+ assert.doesNotMatch(ui,/customers\.length>=200/);
  assert.doesNotMatch(ui,/DEMO_|localStorage|sessionStorage|\/demo\/salon|\/api\/sales/);
 });
 test('Cashier SQL V2 draft receives parent selected Customer with fresh scope',()=>{
@@ -28,4 +36,9 @@ test('Cashier SQL V2 draft receives parent selected Customer with fresh scope',(
  assert.match(rich,/customerId&&!customers\.some\(c=>c\.customerId===customerId\)/);
  assert.match(rich,/accountingState!=="NOT_POSTED"/);
  assert.match(rich,/paymentState!=="NOT_COLLECTED"/);
+});
+test('egyptian phone helper is shared for POS create path',()=>{
+ const helper=fs.readFileSync(path.join(customers,'egyptian-phone.mjs'),'utf8');
+ assert.match(helper,/canonicalizeEgyptPhoneE164/);
+ assert.match(helper,/01\[0-9\]\{9\}/);
 });

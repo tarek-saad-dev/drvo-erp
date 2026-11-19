@@ -6,9 +6,17 @@ import {createHash} from "node:crypto";
 import * as sql from "mssql";
 import {FoundationDatabaseService} from "../data/foundation-database.service";
 import type {Actor} from "../identity/identity.service";
+import {canonicalizeEgyptPhoneE164,phoneSearchDigits} from "./egyptian-phone";
 
 export type CustomerView={customerId:string;displayName:string;phoneE164:string|null;isActive:boolean};
 export type CreatedCustomer={id:string;created:boolean};
+export type CustomerSearchResult={
+ customers:CustomerView[];
+ query:string;
+ limit:20;
+ mayBeTruncated:boolean;
+ searchScope:"BUSINESS";
+};
 const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const TOKEN=/^[A-Za-z0-9_-]{43}$/;
 @Injectable()
@@ -49,14 +57,31 @@ export class CustomersService {
    throw new ServiceUnavailableException("Customers unavailable");
   }
  }
- async list(actor:Actor,token:string,businessId:string,branchId:string):Promise<CustomerView[]>{
-  const r=await this.execute(this.scope(actor,token,businessId,branchId),"core.ReadCustomers");
-  return r.recordset.map(row=>({
+ private mapRows(rows:Array<Record<string,unknown>>):CustomerView[]{
+  return rows.map(row=>({
    customerId:String(row.customerId),
    displayName:String(row.displayName),
    phoneE164:row.phoneE164==null?null:String(row.phoneE164),
    isActive:Boolean(row.isActive),
   }));
+ }
+ async list(actor:Actor,token:string,businessId:string,branchId:string):Promise<CustomerView[]>{
+  const r=await this.execute(this.scope(actor,token,businessId,branchId),"core.ReadCustomers");
+  return this.mapRows(r.recordset);
+ }
+ async search(actor:Actor,token:string,businessId:string,branchId:string,
+   query:unknown):Promise<CustomerSearchResult>{
+  if(typeof query!=="string")throw new BadRequestException("Invalid Customer search");
+  const trimmed=query.normalize("NFKC").trim().slice(0,80);
+  if(trimmed.length<1)throw new BadRequestException("Invalid Customer search");
+  const digits=phoneSearchDigits(trimmed);
+  const scope=this.scope(actor,token,businessId,branchId);
+  const r=await this.execute(scope,"core.SearchCustomers",request=>request
+    .input("Query",sql.NVarChar(80),trimmed)
+    .input("PhoneDigits",sql.VarChar(16),digits));
+  const customers=this.mapRows(r.recordset);
+  return {customers,query:trimmed,limit:20,mayBeTruncated:customers.length===20,
+   searchScope:"BUSINESS"};
  }
  async create(actor:Actor,token:string,businessId:string,branchId:string,
    requestId:unknown,body:unknown):Promise<CreatedCustomer>{
@@ -72,15 +97,30 @@ export class CustomersService {
      value.displayName!==value.displayName.trim()||
      value.displayName.length<1||value.displayName.length>160)
     throw new BadRequestException("Invalid Customer");
-  const phone=value.phoneE164??null;
-  if(phone!==null&&(typeof phone!=="string"||!/^\+[1-9][0-9]{6,14}$/.test(phone)))
-    throw new BadRequestException("Phone must use E.164 format");
+  let phone:string|null=value.phoneE164===undefined?null:value.phoneE164 as string|null;
+  if(phone!==null){
+   if(typeof phone!=="string")throw new BadRequestException("Phone must use E.164 format");
+   if(/^\+[1-9][0-9]{6,14}$/.test(phone)){
+    /* already E.164 */
+   }else{
+    const canon=canonicalizeEgyptPhoneE164(phone);
+    if(!canon)throw new BadRequestException("Phone must use E.164 format");
+    phone=canon;
+   }
+  }
   const result=await this.execute(scope,"core.CreateCustomer",request=>request
     .input("ClientRequestId",sql.UniqueIdentifier,requestId)
     .input("DisplayName",sql.NVarChar(160),value.displayName)
     .input("PhoneE164",sql.VarChar(16),phone));
   const row=result.recordset[0];
   if(!row)throw new ServiceUnavailableException("Customer creation unavailable");
+  if(Boolean(row.phoneConflict)&&row.existingCustomerId){
+   throw new ConflictException({
+    code:"CUSTOMER_PHONE_EXISTS",
+    message:"Customer phone already exists in this Business",
+    existingCustomerId:String(row.existingCustomerId),
+   });
+  }
   return {id:String(row.id),created:Boolean(row.created)};
  }
 }

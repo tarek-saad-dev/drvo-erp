@@ -1,6 +1,6 @@
 # Roadmap
 
-> **2026-11-19 FULL CASHIER MIGRATION EXECUTION TRACK:** [Cursor master executable contract](CURSOR-CASHIER-FULL-MIGRATION-EXECUTION-2026-11-19.md) + [ready-to-paste agent kickoff](CURSOR-CASHIER-AGENT-KICKOFF.md) defines all shared modules, Salon extensions and original UX preservation; start real PR0 workflow gate + PR1 server-side Customer search and original Cashier POS UX in private workspace. **Docs only; no production/SQL activation or full migration.**
+> **2026-11-19 PR0+PR1 IN PROGRESS:** Source lock + ledger coded; SQL024/Nest/POS server Customer search coded with unit/source tests. **NEXT:** run Shared Customers SQL2022 HTTP CI for SQL024; wire Booking to same search; PR2 Cashier POS UX transplant into private workspace; PR3 read-only historical adapter. Primary DB/SQL024 apply, Owner browser, Cut import and ADR-031 remain gated.
 
 > **2026-11-18 LIVE DEVELOPMENT PIVOT:** [Private Cut Salon pilot/data import plan](CUT-SALON-REAL-PRODUCT-LIVE-DEVELOPMENT-2026-11-18.md) makes protected DRVO workflows (not Public Demo) primary. First new private POS Customer create/select source slice coded. Next: server-wide owner-scoped Customer search, duplicate reconciliation and safe Cut read-only extraction; then source→DRVO UUID mapping/read-only last-month Sales, verified pilot DB and Owner login; financial cutover separately gated.
 

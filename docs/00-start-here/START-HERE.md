@@ -1,6 +1,6 @@
 # Start here — project handoff
 
-> **2026-11-19 CURSOR FULL CASHIER EXECUTION MANDATE (DOCUMENTED, NOT IMPLEMENTED):** [Master executable Cashier→DRVO parity contract](../04-execution/CURSOR-CASHIER-FULL-MIGRATION-EXECUTION-2026-11-19.md) + [Cursor agent kickoff](../04-execution/CURSOR-CASHIER-AGENT-KICKOFF.md) + `.cursor/rules/cashier-full-parity.mdc`. Requires every UI/action/domain/API/SQL workflow and strict K5/financial gates. **This is a handoff only; no new live features, data import or SQL changes.**
+> **2026-11-19 PR0+PR1 EXECUTION STARTED (NOT COMPLETE):** [Master contract](../04-execution/CURSOR-CASHIER-FULL-MIGRATION-EXECUTION-2026-11-19.md) + [PR0/PR1 report](../04-execution/PR0-PR1-CUSTOMER-SEARCH-SOURCE-LOCK-2026-11-19.md). Cashier locked at `046bf19`; SQL024 Business Customer search + private POS server lookup coded. **Not live / not full parity**; disposable SQL CI, primary DB, Owner browser and financial posting OPEN.
 
 > **2026-11-18 FOUNDER ACTIVE-PRODUCT DIRECTION:** [Cut Salon private real-data pilot / Live Development contract](../04-execution/CUT-SALON-REAL-PRODUCT-LIVE-DEVELOPMENT-2026-11-18.md). Public /demo/salon is not the product. Private K5 POS now supports real Customers read/name-phone filter (first 200 ONLY), inline idempotent registration and SQL V2 DRAFT Customer handoff. **No Cut Salon records imported or private live flags enabled.** Next: verified server-side phone search/dedupe, secure read-only last-month Cut extract, isolated pilot target/restore, then read-only historical sales and live operator walkthrough.
 

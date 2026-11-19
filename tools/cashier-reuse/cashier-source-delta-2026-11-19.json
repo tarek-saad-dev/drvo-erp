@@ -1,0 +1,46 @@
+{
+  "schema": "drvo.cashier.source-delta.v1",
+  "repo": "tarek-saad-dev/casher",
+  "fromRevision": "bc9c03fff86074872590ad0fd3525f9a4e416958",
+  "toRevision": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
+  "createdDate": "2026-11-19",
+  "subject": "feat(CUT CLUB): add admin WhatsApp OTP API test",
+  "counts": {
+    "added": 5,
+    "removed": 0,
+    "changed": 1,
+    "totalBlobs": 4296,
+    "runtimeFiles": 2174
+  },
+  "added": [
+    {
+      "path": "src/app/admin/integrations/drvowa/otp-test/page.tsx",
+      "blob": "80a6e342df4739bdc58111970892d2d6f409f622"
+    },
+    {
+      "path": "src/app/api/admin/integrations/drvowa/otp-test/send/route.ts",
+      "blob": "3e4ae1eb2c5d9f16ec7337a328aa0640493e6ad3"
+    },
+    {
+      "path": "src/app/api/admin/integrations/drvowa/otp-test/verify/route.ts",
+      "blob": "e58d3d2cb98be9d75e62724deabf05f19703433e"
+    },
+    {
+      "path": "src/components/admin/DrvowaOtpTest.tsx",
+      "blob": "a56cbf83f822b75eaa29efb415ca49811b882aec"
+    },
+    {
+      "path": "src/lib/integrations/drvowaOtpTest.ts",
+      "blob": "62095e8ccc105ad89250b1d18e9904a91d583ccf"
+    }
+  ],
+  "removed": [],
+  "changed": [
+    {
+      "path": "src/components/admin/DrvowaIntegrationCard.tsx",
+      "from": "a05f2f6ab357aa87e96bd47851ccaa2655457f51",
+      "to": "c63f1b1d4a7cc5ea5a9824602a385445ff3cb82d"
+    }
+  ],
+  "criticalPathsRetained": true
+}

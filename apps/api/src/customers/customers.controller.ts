@@ -1,10 +1,12 @@
 import {
- Body,Controller,Get,Headers,HttpCode,Param,Post,Req,Res,
+ Body,Controller,Get,Headers,HttpCode,Param,Post,Query,Req,Res,
  ServiceUnavailableException,UnauthorizedException,
 } from "@nestjs/common";
 import type {IncomingMessage,ServerResponse} from "node:http";
 import {IdentityService,extractSessionCookie} from "../identity/identity.service";
-import {CustomersService,type CustomerView,type CreatedCustomer} from "./customers.service";
+import {
+ CustomersService,type CustomerView,type CreatedCustomer,type CustomerSearchResult,
+} from "./customers.service";
 
 function enabled():void{
  if(process.env.DRVO_K5_AUTH_ENABLED!=="YES"||
@@ -23,11 +25,15 @@ export class CustomersController {
    private readonly customers:CustomersService){}
  @Get()
  async list(@Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,
-   @Param("businessId") businessId:string,@Param("branchId") branchId:string
- ):Promise<{customers:CustomerView[]}>{
+   @Param("businessId") businessId:string,@Param("branchId") branchId:string,
+   @Query("q") q?:string
+ ):Promise<{customers:CustomerView[]}|CustomerSearchResult>{
   res.setHeader("Cache-Control","no-store");enabled();
   const token=extractSessionCookie(req.headers.cookie);
   const actor=await this.identity.actorFromToken(token);
+  if(typeof q==="string"&&q.trim().length>0){
+   return this.customers.search(actor,token!,businessId,branchId,q);
+  }
   return {customers:await this.customers.list(actor,token!,businessId,branchId)};
  }
  @Post()

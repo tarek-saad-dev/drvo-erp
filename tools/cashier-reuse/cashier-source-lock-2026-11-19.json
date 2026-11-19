@@ -1,0 +1,15 @@
+{
+  "schema": "drvo.cashier.source-lock.v1",
+  "repo": "tarek-saad-dev/casher",
+  "sourceRevision": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
+  "previousRevision": "bc9c03fff86074872590ad0fd3525f9a4e416958",
+  "lockedDate": "2026-11-19",
+  "subject": "feat(CUT CLUB): add admin WhatsApp OTP API test",
+  "note": "New immutable Cashier source pin for full-parity migration. Historical pin bc9c03fff remains retained; never silently replace baselines.",
+  "inventories": {
+    "allBlobs": "tools/cashier-reuse/cashier-all-source-blobs-2026-11-19.json",
+    "runtime": "tools/cashier-reuse/cashier-source-baseline-2026-11-19.json",
+    "delta": "tools/cashier-reuse/cashier-source-delta-2026-11-19.json",
+    "workflowLedger": "tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json"
+  }
+}

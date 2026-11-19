@@ -101,10 +101,10 @@ async function main(){
   admin=await open({...base,database:db});
   await admin.query('CREATE USER ['+appUser+'] FOR LOGIN ['+appUser+'];'+
    'GRANT CONNECT TO ['+appUser+']');
-  await pass('12 migrations replay without drift and customer records start empty',async()=>{
-   const a=await applyMigrations(admin,undefined,12);
-   assert.equal(a.length,12);assert.ok(a.every(z=>z.status==='applied'));
-   const b=await applyMigrations(admin,undefined,12);
+  await pass('24 migrations replay without drift and customer records start empty',async()=>{
+   const a=await applyMigrations(admin,undefined,24);
+   assert.equal(a.length,24);assert.ok(a.every(z=>z.status==='applied'));
+   const b=await applyMigrations(admin,undefined,24);
    assert.ok(b.every(z=>z.status==='unchanged'));
    assert.equal((await admin.query('SELECT COUNT(*) AS n FROM core.Customer')).recordset[0].n,0);
   });
@@ -128,8 +128,9 @@ async function main(){
     "HAS_PERMS_BY_NAME('core.Customer','OBJECT','SELECT') AS readp,"+
     "HAS_PERMS_BY_NAME('core.Customer','OBJECT','UPDATE') AS writep,"+
     "HAS_PERMS_BY_NAME('core.ReadCustomers','OBJECT','EXECUTE') AS execp,"+
+    "HAS_PERMS_BY_NAME('core.SearchCustomers','OBJECT','EXECUTE') AS searchp,"+
     "HAS_PERMS_BY_NAME('core.AssertCustomersBranchAction','OBJECT','EXECUTE') AS guardp");
-   assert.deepEqual(Object.values(r.recordset[0]).map(Number),[0,0,1,0]);
+   assert.deepEqual(Object.values(r.recordset[0]).map(Number),[0,0,1,1,0]);
    await assert.rejects(()=>app.query('SELECT * FROM core.Customer'),e=>e.number===229);
   });
   await pass('composite Business FK rejects Customer in wrong Tenant',async()=>{
@@ -163,10 +164,13 @@ async function main(){
   });
   const cookie=await login('owner.customers.ci');
   const foreign=await login('other.customers.ci');
+  let firstCustomerId='';
   await pass('authorized create and idempotent exact replay; mismatch 409',async()=>{
    const key=id(),p=path(x.b,x.br),body={displayName:'Synthetic Customer',phoneE164:'+201012345678'};
    const a=await post(p,cookie,key,body);assert.equal(a.status,200);
-   assert.equal((await a.json()).created,true);
+   const created=await a.json();
+   assert.equal(created.created,true);
+   firstCustomerId=created.id;
    const r=await post(p,cookie,key,body);assert.equal(r.status,200);
    assert.equal((await r.json()).created,false);
    const clash=await post(p,cookie,key,{displayName:'Changed'});assert.equal(clash.status,409);
@@ -174,6 +178,37 @@ async function main(){
    const data=await listing.json();
    assert.equal(data.customers.length,1);
    assert.equal(data.customers[0].phoneE164,'+201012345678');
+  });
+  await pass('server Business search matches beyond browse-list assumptions',async()=>{
+   const p=path(x.b,x.br);
+   for(let i=0;i<5;i++){
+    const phone='+2011'+String(10000000+i);
+    assert.equal((await post(p,cookie,id(),
+     {displayName:'Searchable '+i,phoneE164:phone})).status,200);
+   }
+   const byName=await get(p+'?q='+encodeURIComponent('Searchable'),cookie);
+   assert.equal(byName.status,200);
+   const nameData=await byName.json();
+   assert.equal(nameData.searchScope,'BUSINESS');
+   assert.equal(nameData.limit,20);
+   assert.ok(nameData.customers.length>=5);
+   const byPhone=await get(p+'?q='+encodeURIComponent('01012345678'),cookie);
+   assert.equal(byPhone.status,200);
+   const phoneData=await byPhone.json();
+   assert.ok(phoneData.customers.some(c=>c.customerId===firstCustomerId));
+   assert.equal((await get(p+'?q=',cookie)).status,200); // empty q falls back to list
+   assert.equal((await get(path(x.b2,x.br2)+'?q=Searchable',cookie)).status,404);
+   assert.equal((await get(path(x.foreignB,x.foreignBr)+'?q=Searchable',cookie)).status,404);
+  });
+  await pass('duplicate phone create refused with existing customer id',async()=>{
+   const p=path(x.b,x.br);
+   const dup=await post(p,cookie,id(),
+    {displayName:'Another Person',phoneE164:'+201012345678'});
+   assert.equal(dup.status,409);
+   const body=await dup.json();
+   const detail=typeof body.message==='object'&&body.message?body.message:body;
+   assert.equal(detail.code,'CUSTOMER_PHONE_EXISTS');
+   assert.equal(detail.existingCustomerId,firstCustomerId);
   });
   await pass('valid contact without phone, invalid PII or forged Tenant denied',async()=>{
    assert.equal((await post(path(x.b,x.br),cookie,id(),

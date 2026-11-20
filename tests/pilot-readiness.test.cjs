@@ -65,36 +65,40 @@ test('readiness board keeps activation BLOCKED and refuses production claims', (
   );
 });
 
-test('workflow matrix covers Customer→Reload and blocks Draft Print', () => {
+test('workflow matrix covers Customer→Reload and marks Draft Print READY_IN_REPO', () => {
   const matrix = buildWorkflowMatrix();
   assert.equal(
     matrix.workflow,
     'Customer → Booking → Barber → POS Draft → Inventory Validation → Draft Print → Reload'
   );
-  assert.equal(matrix.steps.find((s) => s.id === 'DRAFT_PRINT').status, 'BLOCKED');
+  assert.equal(matrix.steps.find((s) => s.id === 'DRAFT_PRINT').status, 'READY_IN_REPO');
   assert.equal(matrix.steps.find((s) => s.id === 'INVENTORY_VALIDATION').status, 'READY_IN_REPO');
   assert.ok(matrix.summary.byStatus.CI_ONLY.includes('CUSTOMER'));
-  assert.ok(matrix.summary.byStatus.BLOCKED.includes('DRAFT_PRINT'));
+  assert.ok(matrix.summary.byStatus.READY_IN_REPO.includes('DRAFT_PRINT'));
+  assert.ok(!matrix.summary.byStatus.BLOCKED.includes('DRAFT_PRINT'));
   writeWorkflowMatrixJson();
   const committed = loadCommittedWorkflowMatrix();
-  assert.equal(committed.steps.find((s) => s.id === 'DRAFT_PRINT').status, 'BLOCKED');
+  assert.equal(committed.steps.find((s) => s.id === 'DRAFT_PRINT').status, 'READY_IN_REPO');
 });
 
-test('workflow checklist maps S12/S13 coverage and keeps Draft Print BLOCKED', () => {
+test('workflow checklist maps S12/S13 coverage and leaves Draft Print READY_IN_REPO', () => {
   const checklist = buildPilotWorkflowChecklist();
   for (const id of ['CUSTOMER', 'BOOKING', 'BARBER', 'POS_DRAFT', 'RELOAD']) {
     assert.ok(checklist.summary.s12s13CoveredStepIds.includes(id), id);
   }
-  assert.equal(checklist.summary.draftPrintStatus, 'BLOCKED');
-  assert.ok(checklist.summary.blockedStepIds.includes('DRAFT_PRINT'));
+  assert.equal(checklist.summary.draftPrintStatus, 'READY_IN_REPO');
+  assert.ok(!checklist.summary.blockedStepIds.includes('DRAFT_PRINT'));
   assert.ok(checklist.summary.openOrUncoveredStepIds.includes('INVENTORY_VALIDATION'));
+  assert.ok(checklist.summary.openOrUncoveredStepIds.includes('DRAFT_PRINT'));
 });
 
-test('E2E evidence matrix marks Draft Print BLOCKED with evidence commands', () => {
+test('E2E evidence matrix marks Draft Print PASS (READY_IN_REPO) with evidence commands', () => {
   const e2e = buildE2eEvidenceMatrix();
-  assert.equal(e2e.steps.find((s) => s.id === 'DRAFT_PRINT').gate, 'BLOCKED');
+  assert.equal(e2e.steps.find((s) => s.id === 'DRAFT_PRINT').gate, 'PASS');
+  assert.equal(e2e.steps.find((s) => s.id === 'DRAFT_PRINT').matrixStatus, 'READY_IN_REPO');
   assert.ok(e2e.summary.passStepIds.includes('POS_DRAFT'));
-  assert.ok(e2e.summary.blockedStepIds.includes('DRAFT_PRINT'));
+  assert.ok(e2e.summary.passStepIds.includes('DRAFT_PRINT'));
+  assert.ok(!e2e.summary.blockedStepIds.includes('DRAFT_PRINT'));
   for (const step of e2e.steps) {
     assert.ok(step.evidenceCommand.length > 10);
     assert.equal(step.ownerPilotBrowser, 'OPEN');

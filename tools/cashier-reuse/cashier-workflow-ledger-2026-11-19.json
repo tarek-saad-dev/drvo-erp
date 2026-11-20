@@ -566,9 +566,9 @@
       "BrowserProof": "OPEN",
       "DataProof": "OPEN",
       "PilotProof": "OPEN",
-      "Status": "PORTING",
-      "Blocker": "DRAFT browser print/preview only (GET/POST .../pos-drafts/cashier/:draftId/print-preview + private draft-print page). Cashier thermal local-print agent, PrintRecoveryCenter, and reprint of POSTED/paid sale remain OPEN (ADR-031). No SQL035 print-attempt audit; no GL/payment/stock on print.",
-      "NextAction": "Keep DRAFT-only print for pilot walkthrough; map thermal agent + POSTED reprint after ADR-031 Sales post exists",
+      "Status": "SOURCE_TESTED",
+      "Blocker": "#151 DRAFT browser print/preview in-repo (NONPOSTING window.print only). Cashier thermal local-print agent, PrintRecoveryCenter, and reprint of POSTED/paid sale remain BLOCKED/OPEN under ADR-031. No print-attempt audit SQL; no GL/payment/stock on print.",
+      "NextAction": "Owner Pilot print proof on isolated Pilot DB (NONPOSTING draft-print route); map thermal agent + POSTED reprint after ADR-031 Sales post exists",
       "SalonExtension": "none",
       "ID": "POS-07",
       "SourcePaths+BlobSHA": [
@@ -3923,10 +3923,10 @@
       "UserAction": "Map Pilot workflow readiness + S12/S13 coverage + E2E PASS/FAIL/BLOCKED evidence commands",
       "AuthRole": "Owner (human) / disposable Chromium (CI_ONLY)",
       "TenantBusinessBranchScope": "K5 Business+Branch private workspace (Owner proof OPEN)",
-      "Preconditions": "S12/S13 harness present; POS-07 print BLOCKED",
+      "Preconditions": "S12/S13 harness present; POS-07 #151 draft-print READY_IN_REPO",
       "Reads": "salon-browser phase markers + ledger POS-07",
       "Writes": "none from this matrix tooling",
-      "Effects": "Draft Print gate BLOCKED; other steps CI_ONLY/READY_IN_REPO; Owner browser OPEN",
+      "Effects": "Draft Print READY_IN_REPO (NONPOSTING window.print); other steps CI_ONLY/READY_IN_REPO; Owner browser OPEN; fiscal receipt BLOCKED",
       "FailureAndRaceCases": "must not claim PRIVATE_BROWSER_VERIFIED or PILOT_VERIFIED from CI markers alone",
       "OwnedModule": "Platform tooling / Pilot readiness",
       "SalonExtension": "Private Pilot track",
@@ -3941,8 +3941,8 @@
       "DataProof": "OPEN",
       "PilotProof": "OPEN",
       "Status": "SOURCE_TESTED",
-      "Blocker": "Draft Print BLOCKED (POS-07); Owner browser E2E OPEN; ADR-031 posting BLOCKED",
-      "NextAction": "Owner Pilot click-path after isolated DB+K5; keep draft print BLOCKED until NONPOSTING print owner merges"
+      "Blocker": "Owner browser E2E OPEN; ADR-031 posting BLOCKED; fiscal receipt BLOCKED",
+      "NextAction": "Owner Pilot click-path after isolated DB+K5 including NONPOSTING draft-print proof"
     }
   ]
 }

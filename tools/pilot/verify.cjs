@@ -7,7 +7,7 @@
  *  - Pilot activation remains BLOCKED
  *  - ADR-031 posting + Cut live import remain BLOCKED
  *  - Operator gates TARGET_APPLY / ISOLATED_BACKUP_RESTORE / K5 / OWNER_BROWSER stay OPEN
- *  - Draft Print remains BLOCKED
+ *  - Draft Print is READY_IN_REPO (#151 NONPOSTING); fiscal receipt stays out of scope
  * Never opens mssql sockets or accepts connection strings.
  */
 const assert = require('node:assert/strict');
@@ -90,22 +90,25 @@ assert.deepEqual(
     'RELOAD',
   ]
 );
-assert.equal(matrix.steps.find((s) => s.id === 'DRAFT_PRINT').status, 'BLOCKED');
+assert.equal(matrix.steps.find((s) => s.id === 'DRAFT_PRINT').status, 'READY_IN_REPO');
 assert.equal(
   matrix.steps.find((s) => s.id === 'INVENTORY_VALIDATION').status,
   'READY_IN_REPO'
 );
+assert.ok(!matrix.summary.byStatus.BLOCKED.includes('DRAFT_PRINT'));
+assert.ok(matrix.summary.byStatus.READY_IN_REPO.includes('DRAFT_PRINT'));
 
 writeWorkflowMatrixJson();
 const committed = loadCommittedWorkflowMatrix();
 assert.equal(committed.schema, matrix.schema);
-assert.equal(committed.steps.find((s) => s.id === 'DRAFT_PRINT').status, 'BLOCKED');
+assert.equal(committed.steps.find((s) => s.id === 'DRAFT_PRINT').status, 'READY_IN_REPO');
 
 const checklist = buildPilotWorkflowChecklist();
 assert.equal(checklist.productionVerificationClaimed, false);
-assert.equal(checklist.summary.draftPrintStatus, 'BLOCKED');
-assert.ok(checklist.summary.blockedStepIds.includes('DRAFT_PRINT'));
+assert.equal(checklist.summary.draftPrintStatus, 'READY_IN_REPO');
+assert.ok(!checklist.summary.blockedStepIds.includes('DRAFT_PRINT'));
 assert.ok(checklist.summary.openOrUncoveredStepIds.includes('INVENTORY_VALIDATION'));
+assert.ok(checklist.summary.openOrUncoveredStepIds.includes('DRAFT_PRINT'));
 for (const id of ['CUSTOMER', 'BOOKING', 'BARBER', 'POS_DRAFT', 'RELOAD']) {
   assert.ok(
     checklist.summary.s12s13CoveredStepIds.includes(id),
@@ -114,9 +117,11 @@ for (const id of ['CUSTOMER', 'BOOKING', 'BARBER', 'POS_DRAFT', 'RELOAD']) {
 }
 
 const e2e = buildE2eEvidenceMatrix();
-assert.equal(e2e.steps.find((s) => s.id === 'DRAFT_PRINT').gate, 'BLOCKED');
+assert.equal(e2e.steps.find((s) => s.id === 'DRAFT_PRINT').gate, 'PASS');
+assert.equal(e2e.steps.find((s) => s.id === 'DRAFT_PRINT').matrixStatus, 'READY_IN_REPO');
 assert.ok(e2e.summary.passStepIds.includes('CUSTOMER'));
-assert.ok(e2e.summary.blockedStepIds.includes('DRAFT_PRINT'));
+assert.ok(e2e.summary.passStepIds.includes('DRAFT_PRINT'));
+assert.ok(!e2e.summary.blockedStepIds.includes('DRAFT_PRINT'));
 
 const backupPlan = offlineBackupRestorePlan(34);
 assert.equal(backupPlan.expectedMigrationCount, 34);

@@ -104,14 +104,18 @@
       "id": "DRAFT_PRINT",
       "title": "Draft Print",
       "order": 6,
-      "status": "BLOCKED",
+      "status": "READY_IN_REPO",
       "evidencePaths": [
-        "tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json",
-        "docs/04-execution/CASHIER-POS-PAGE-WORKFLOW-AUDIT-V1-2026-11-18.md"
+        "packages/business-modules/pos/src/draft-print.ts",
+        "apps/api/src/pos-drafts/draft-print.ts",
+        "apps/web/src/app/workspace/[businessId]/[branchId]/pos-preview/cashier-draft-print.ts",
+        "apps/web/src/app/workspace/[businessId]/[branchId]/pos-preview/cashier-draft-print-view.tsx",
+        "docs/04-execution/POS-S5-DRAFT-PRINT-PREVIEW-2026-11-20.md",
+        ".github/workflows/shared-pos-draft-print-ci.yml"
       ],
       "s12s13Coverage": [],
       "adr031Note": "ADR-031 remains PROPOSED. This workflow step must stay NONPOSTING: no paid sale, tender settlement, stock decrement-on-sale, or first mandatory GL journal. Any print surface must remain DRAFT/NONPOSTING and must not imply a fiscal receipt.",
-      "notes": "POS-07 print/reprint is BLOCKED in the Cashier parity ledger (no DRVO print agent / NONPOSTING draft-print owner merged). S12/S13 do not cover print. Keep BLOCKED for Pilot readiness."
+      "notes": "#151 merged NONPOSTING DRAFT print preview (window.print only). Fiscal/paid receipt remains BLOCKED (ADR-031). S12/S13 do not assert print; Owner Pilot browser proof still OPEN."
     },
     {
       "id": "RELOAD",
@@ -137,7 +141,8 @@
     "stepCount": 7,
     "byStatus": {
       "READY_IN_REPO": [
-        "INVENTORY_VALIDATION"
+        "INVENTORY_VALIDATION",
+        "DRAFT_PRINT"
       ],
       "CI_ONLY": [
         "CUSTOMER",
@@ -147,9 +152,7 @@
         "RELOAD"
       ],
       "OPEN": [],
-      "BLOCKED": [
-        "DRAFT_PRINT"
-      ]
+      "BLOCKED": []
     },
     "openStepIds": [],
     "note": "CI_ONLY/READY_IN_REPO are repository evidence classes only. Pilot activation stays blocked until TARGET_APPLY, ISOLATED_BACKUP_RESTORE, K5_PERMISSIONS, and OWNER_BROWSER_E2E close outside this tool."

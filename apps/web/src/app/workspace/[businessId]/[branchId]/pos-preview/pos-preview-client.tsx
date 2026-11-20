@@ -235,10 +235,11 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
       return next>=1&&next<=20?{...l,quantity:next}:l;
     }));
   }
-  function createNewFromDraft(d:{lines:Array<{offeringId:string;quantity:number}>}){
+  function createNewFromDraft(d:{lines:Line[]}){
     if(busy||draftBusy)return;
     // A saved DRAFT is IMMUTABLE. Preparing a new cart always uses currently
     // authorized active Catalog references and requires fresh server pricing.
+    // SQL038 package snapshots restore grouping only; Catalog still reprices.
     if(!d.lines.length||d.lines.length>20||
       d.lines.some(x=>!GUID.test(x.offeringId)||!Number.isSafeInteger(x.quantity)||x.quantity<1||x.quantity>20||
         !offerings.some(o=>o.offeringId===x.offeringId&&o.isActive))||
@@ -247,8 +248,14 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
     }
     retryKey.current=null;setPreview(null);setAdjustment(null);
     setCartRevision(v=>v+1);
-    setLines(d.lines.map(x=>({offeringId:x.offeringId,quantity:x.quantity})));
-    setMessage("تم تجهيز سلة جديدة من المسودة القديمة. راجع الأسعار الحالية قبل الحفظ؛ المسودة الأصلية لم تتغير.");
+    setLines(d.lines.map(x=>({
+      offeringId:x.offeringId,quantity:x.quantity,
+      displayName:x.displayName,displayUnitPriceMinor:x.displayUnitPriceMinor,
+      packageMeta:x.packageMeta,
+    })));
+    setMessage(d.lines.some(x=>x.packageMeta)
+      ?"تم تجهيز سلة جديدة مع تجميع الباقة من لقطات SQL038. راجع الأسعار الحالية قبل الحفظ؛ المسودة الأصلية لم تتغير."
+      :"تم تجهيز سلة جديدة من المسودة القديمة. راجع الأسعار الحالية قبل الحفظ؛ المسودة الأصلية لم تتغير.");
   }
   function addLine(event:React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -409,7 +416,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
         apiRoot={api.replace(/\/pos-preview$/,"")} draftApi={draftApi}
         revision={richHistoryRevision} disabled={busy||draftBusy}
         printBasePath={home+"/pos-preview"}
-        onUseDraft={savedLines=>createNewFromDraft({lines:savedLines})}/>}
+        onUseDraft={savedLines=>createNewFromDraft({lines:savedLines as Line[]})}/>}
       {lines.length>0&&<CashierPricingPanel key={JSON.stringify(lines)+"-"+cartRevision+"-"+selectedBarberId} api={api} draftApi={draftApi}
   richEnabled={draftsEnabled&&richEnabled} afterSaved={()=>{void loadDrafts();setRichHistoryRevision(v=>v+1);}}
   lines={lines} offerings={offerings} customerId={selectedCustomerId}

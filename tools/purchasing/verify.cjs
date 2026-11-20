@@ -84,11 +84,12 @@ async function main(){
     "',CHECK_POLICY=ON,CHECK_EXPIRATION=OFF");
   admin=await connect({...base,database:db});
   await admin.query('CREATE USER ['+user+'] FOR LOGIN ['+user+'];GRANT CONNECT TO ['+user+']');
-  await pass('migrations through SQL037 purchasing (Queue SQL036 must exist on tree)',async()=>{
+  await pass('migrations through SQL037 purchasing (+ later tip SQL038 package snapshots)',async()=>{
    const a=await applyMigrations(admin);
    assert.ok(a.every(v=>v.status==='applied'));
    assert.ok(a.some(v=>v.filename==='035_catalog_product_barcode.sql'));
-   assert.equal(a[a.length-1].filename,'037_purchasing_suppliers_receive_ap_preview.sql');
+   assert.ok(a.some(v=>v.filename==='037_purchasing_suppliers_receive_ap_preview.sql'));
+   assert.equal(a[a.length-1].filename,'038_pos_draft_package_line_snapshots.sql');
    const b=await applyMigrations(admin);
    assert.ok(b.every(v=>v.status==='unchanged'));
    for(const table of ['core.Supplier','core.PurchaseReceiveDocument','core.PurchaseReceiveLine']){

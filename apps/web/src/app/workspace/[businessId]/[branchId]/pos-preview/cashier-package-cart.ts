@@ -98,6 +98,60 @@ export function removePackageGroup(
   return cart.filter((item) => item.packageMeta?.groupKey !== groupKey);
 }
 
+const PACKAGE_SNAPSHOT_ROLES = new Set<PackageCartRole>(["anchor", "included", "addon"]);
+
+/** Rebuild packageMeta from SQL038 rich DRAFT line snapshots for cart reload. */
+export function hydratePackageMetaFromSnapshots(
+  lines: Array<{
+    offeringId: string;
+    quantity: number;
+    displayName?: string;
+    packageId?: string | null;
+    packageGroupKey?: string | null;
+    packageRole?: string | null;
+    commercialPackagePriceMinor?: number | null;
+  }>,
+): PackageAwareCartLine[] {
+  const groupNames = new Map<string, string>();
+  const groupIncluded = new Map<string, number>();
+  for (const line of lines) {
+    if (!line.packageId || !line.packageGroupKey || !line.packageRole) continue;
+    if (line.packageRole === "anchor" && line.displayName) {
+      groupNames.set(line.packageGroupKey, line.displayName);
+    }
+    if (line.packageRole === "anchor" || line.packageRole === "included") {
+      groupIncluded.set(line.packageGroupKey, (groupIncluded.get(line.packageGroupKey) ?? 0) + 1);
+    }
+  }
+  return lines.map((line) => {
+    const base: PackageAwareCartLine = {offeringId: line.offeringId, quantity: line.quantity};
+    if (
+      !line.packageId ||
+      !line.packageGroupKey ||
+      !line.packageRole ||
+      line.commercialPackagePriceMinor === null ||
+      line.commercialPackagePriceMinor === undefined ||
+      !PACKAGE_SNAPSHOT_ROLES.has(line.packageRole as PackageCartRole)
+    ) {
+      return base;
+    }
+    return {
+      ...base,
+      displayName: line.displayName,
+      displayUnitPriceMinor:
+        line.packageRole === "anchor" ? line.commercialPackagePriceMinor : undefined,
+      packageMeta: {
+        packageId: line.packageId,
+        packageName: groupNames.get(line.packageGroupKey) ?? line.displayName ?? "Package",
+        role: line.packageRole as PackageCartRole,
+        groupKey: line.packageGroupKey,
+        includedCount: groupIncluded.get(line.packageGroupKey) ?? 1,
+        commercialPackagePriceMinor: line.commercialPackagePriceMinor,
+      },
+    };
+  });
+}
+
 /** Flat expand kept for Booking handoff when resolve is unavailable. */
 export function expandPackageToDraftLines(args: {
   pkg: {

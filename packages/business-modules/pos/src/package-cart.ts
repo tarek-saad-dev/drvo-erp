@@ -236,6 +236,62 @@ export function removePackageGroup<
   return cart.filter((item) => item.packageMeta?.groupKey !== groupKey);
 }
 
+const PACKAGE_SNAPSHOT_ROLES = new Set<PackageCartRole>(["anchor", "included", "addon"]);
+
+/** Rebuild PackageCartMeta from SQL038 draft line snapshots (reload / new-cart template). */
+export type DraftPackageSnapshotLine = Readonly<{
+  offeringId: string;
+  displayName?: string;
+  packageId?: string | null;
+  packageGroupKey?: string | null;
+  packageRole?: PackageCartRole | string | null;
+  commercialPackagePriceMinor?: number | null;
+}>;
+
+export function hydratePackageMetaFromSnapshots(
+  lines: readonly DraftPackageSnapshotLine[],
+): Array<{
+  offeringId: string;
+  packageMeta?: PackageCartMeta;
+}> {
+  const groupNames = new Map<string, string>();
+  const groupIncluded = new Map<string, number>();
+  for (const line of lines) {
+    if (!line.packageId || !line.packageGroupKey || !line.packageRole) continue;
+    const key = line.packageGroupKey;
+    if (line.packageRole === "anchor" && line.displayName) {
+      groupNames.set(key, line.displayName);
+    }
+    if (line.packageRole === "anchor" || line.packageRole === "included") {
+      groupIncluded.set(key, (groupIncluded.get(key) ?? 0) + 1);
+    }
+  }
+  return lines.map((line) => {
+    if (
+      !line.packageId ||
+      !line.packageGroupKey ||
+      !line.packageRole ||
+      line.commercialPackagePriceMinor === null ||
+      line.commercialPackagePriceMinor === undefined ||
+      !PACKAGE_SNAPSHOT_ROLES.has(line.packageRole as PackageCartRole)
+    ) {
+      return { offeringId: line.offeringId };
+    }
+    const role = line.packageRole as PackageCartRole;
+    return {
+      offeringId: line.offeringId,
+      packageMeta: {
+        packageId: line.packageId,
+        packageName: groupNames.get(line.packageGroupKey) ?? line.displayName ?? "Package",
+        role,
+        groupKey: line.packageGroupKey,
+        includedCount: groupIncluded.get(line.packageGroupKey) ?? 1,
+        commercialPackagePriceMinor: line.commercialPackagePriceMinor,
+      },
+    };
+  });
+}
+
 export function groupCartForDisplay(
   items: readonly PackageCartLine[],
 ): CartDisplayRow[] {

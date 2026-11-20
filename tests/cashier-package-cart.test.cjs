@@ -203,3 +203,19 @@ test('resolvePackageCommercial: anchor gets package price; home visit exclusive'
   'home_visit',
  );
 });
+
+test('hydratePackageMetaFromSnapshots rebuilds group meta; standalone stays null',()=>{
+ const pkg=guid(50),a=guid(51),b=guid(52),c=guid(53);
+ const hydrated=pos.hydratePackageMetaFromSnapshots([
+  {offeringId:a,displayName:'Pack',packageId:pkg,packageGroupKey:'g1',
+   packageRole:'anchor',commercialPackagePriceMinor:150000},
+  {offeringId:b,displayName:'Include',packageId:pkg,packageGroupKey:'g1',
+   packageRole:'included',commercialPackagePriceMinor:150000},
+  {offeringId:c,displayName:'Solo'},
+ ]);
+ assert.equal(hydrated[0].packageMeta.role,'anchor');
+ assert.equal(hydrated[0].packageMeta.packageName,'Pack');
+ assert.equal(hydrated[0].packageMeta.includedCount,2);
+ assert.equal(hydrated[1].packageMeta.role,'included');
+ assert.equal(hydrated[2].packageMeta,undefined);
+});

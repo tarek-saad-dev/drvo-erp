@@ -1,15 +1,18 @@
 "use client";
 import {useCallback,useEffect,useRef,useState} from "react";
 
-/** K5 private operator flow, actually persists SQL022 Cashier quote snapshots. */
+/** K5 private operator flow, persists SQL022 pricing + SQL038 package snapshots. */
+type PackageMeta={packageId:string;packageName:string;role:"anchor"|"included"|"addon";
+ groupKey:string;includedCount:number;commercialPackagePriceMinor:number};
 type Line={offeringId:string;quantity:number;
- lineDiscountMinor?:number;lineDiscountPercentBps?:number};
+ lineDiscountMinor?:number;lineDiscountPercentBps?:number;packageMeta?:PackageMeta};
 type Customer={customerId:string;displayName:string;isActive:boolean};
 type Employee={employeeId:string;displayName:string;isActive:boolean;branchActive:boolean};
 type Stored={draftId:string;currency:string;customerId:string|null;
  grandTotalMinor:number;headerDiscountMinor:number;totalDiscountMinor:number;
  lines:Array<{offeringId:string;displayName:string;quantity:number;discountMinor:number;
-  netMinor:number;executorEmployeeId:string|null}>};
+  netMinor:number;executorEmployeeId:string|null;packageId:string|null;
+  packageGroupKey:string|null;packageRole:string|null;commercialPackagePriceMinor:number|null}>};
 const money=(n:number,c:string)=>(n/100).toFixed(2)+" "+c;
 
 export default function CashierRichDraftActions({apiRoot,draftApi,lines,header,
@@ -79,12 +82,23 @@ export default function CashierRichDraftActions({apiRoot,draftApi,lines,header,
    setError(true);setMessage("العميل غير موجود في دليل Customers المصرّح به حاليًا؛ لا يمكن حفظ المسودة.");return;
   }
   const body={
-   lines:lines.map(l=>({
-    ...l,
-    executorEmployeeId:lineKinds?.[l.offeringId]==="PRODUCT"
-     ?null
-     :(executors[l.offeringId]||null),
-   })),
+   lines:lines.map(l=>{
+    const row:Record<string,unknown>={
+     offeringId:l.offeringId,quantity:l.quantity,
+     executorEmployeeId:lineKinds?.[l.offeringId]==="PRODUCT"
+      ?null
+      :(executors[l.offeringId]||null),
+    };
+    if(l.lineDiscountMinor!==undefined)row.lineDiscountMinor=l.lineDiscountMinor;
+    if(l.lineDiscountPercentBps!==undefined)row.lineDiscountPercentBps=l.lineDiscountPercentBps;
+    if(l.packageMeta){
+     row.packageId=l.packageMeta.packageId;
+     row.packageGroupKey=l.packageMeta.groupKey;
+     row.packageRole=l.packageMeta.role;
+     row.commercialPackagePriceMinor=l.packageMeta.commercialPackagePriceMinor;
+    }
+    return row;
+   }),
    customerId:customerId||null,...header,expectedTotalMinor:quoteTotalMinor,
   };
   setBusy(true);setMessage("");setError(false);
@@ -110,7 +124,7 @@ export default function CashierRichDraftActions({apiRoot,draftApi,lines,header,
    }
    retry.current=null;
    await load();afterSaved();
-   setMessage("اتحفظت مسودة Cashier بخصومات السطور والعميل والمنفذ. لم يتم تحصيل أو ترحيل.");
+   setMessage("اتحفظت مسودة Cashier بخصومات السطور والعميل والمنفذ ولقطات الباقة. لم يتم تحصيل أو ترحيل.");
   }catch{setError(true);setMessage("اتصال غير متاح؛ أعد المحاولة بنفس البيانات.");}
   finally{setBusy(false);}
  }
@@ -159,6 +173,7 @@ export default function CashierRichDraftActions({apiRoot,draftApi,lines,header,
       <td>{money(d.totalDiscountMinor,d.currency)}</td>
       <td>{money(d.grandTotalMinor,d.currency)}</td>
       <td>{d.lines.map(l=>l.displayName+" × "+l.quantity+
+       (l.packageRole?" ["+l.packageRole+"]":"")+
        " (خصم "+money(l.discountMinor,d.currency)+")").join("، ")}</td>
      </tr>)}</tbody></table></div>}
   </>}

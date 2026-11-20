@@ -1,0 +1,145 @@
+/* Cashier POS workstation shell — Light compact RTL 3-column (pin 046bf19 layout).
+ * Shared by public /demo/salon and private pos-preview. Presentation only. */
+
+.cashier-ws {
+  --cashier-ws-gap: 10px;
+  --cashier-ws-pad: 10px;
+  --cashier-ws-rail: minmax(240px, 280px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: min(78vh, 920px);
+  color: var(--drvo-text, #27242b);
+}
+
+.cashier-ws[data-cashier-mode="synthetic"] {
+  outline: 1px dashed color-mix(in srgb, var(--drvo-plum, #74536e) 35%, transparent);
+  outline-offset: 4px;
+  border-radius: 14px;
+  padding: 8px;
+}
+
+.cashier-ws-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 14px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--drvo-border, #e6e1e8);
+  background: #fff;
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+
+.cashier-ws-banner[data-kind="synthetic"] {
+  background: #fff8e8;
+  border-color: #e8d4a8;
+  color: #6a5420;
+}
+
+.cashier-ws-banner[data-kind="private"] {
+  background: var(--drvo-teal-soft, #e4f5f3);
+  border-color: #c5e4e1;
+  color: #156c70;
+}
+
+.cashier-ws-banner strong {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.cashier-ws-banner kbd {
+  font: 600 11px/1 ui-monospace, Consolas, monospace;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #f1ebf1;
+  border: 1px solid var(--drvo-border, #e6e1e8);
+}
+
+.cashier-ws-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--cashier-ws-gap);
+  flex: 1;
+  min-height: 0;
+}
+
+@media (min-width: 960px) {
+  .cashier-ws-grid {
+    /* Cashier desktop: customer rail | catalog | invoice rail (RTL visual order) */
+    grid-template-columns: var(--cashier-ws-rail) minmax(0, 1.35fr) var(--cashier-ws-rail);
+    align-items: stretch;
+  }
+}
+
+.cashier-ws-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  min-width: 0;
+  padding: var(--cashier-ws-pad);
+  border: 1px solid var(--drvo-border, #e6e1e8);
+  border-radius: 12px;
+  background: var(--drvo-panel, #fff);
+  box-shadow: 0 5px 18px #553e5308;
+  overflow: auto;
+}
+
+.cashier-ws-pane-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 0 2px;
+}
+
+.cashier-ws-pane-title h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--drvo-deep, #553e53);
+}
+
+.cashier-ws-pane-title span {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--drvo-plum, #74536e);
+  font-weight: 700;
+}
+
+.cashier-ws-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.cashier-ws-footer > * {
+  flex: 1 1 220px;
+}
+
+/* Compact density inside shared workstation — tighten inherited cards without new chrome */
+.cashier-ws .k5-admin-card {
+  padding: 12px 14px;
+  margin: 0;
+  box-shadow: none;
+}
+
+.cashier-ws .k5-admin-card h2 {
+  font-size: 14px;
+  margin: 0 0 8px;
+}
+
+.cashier-ws .catalog-form {
+  gap: 8px;
+}
+
+.cashier-ws .k5-table th,
+.cashier-ws .k5-table td {
+  padding: 6px 8px;
+  font-size: 12.5px;
+}

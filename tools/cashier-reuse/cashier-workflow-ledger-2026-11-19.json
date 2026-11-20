@@ -566,7 +566,7 @@
       "BrowserProof": "OPEN",
       "DataProof": "OPEN",
       "PilotProof": "OPEN",
-      "Status": "SOURCE_TESTED",
+      "Status": "PORTING",
       "Blocker": "#151 DRAFT browser print/preview in-repo (NONPOSTING window.print only). Cashier thermal local-print agent, PrintRecoveryCenter, and reprint of POSTED/paid sale remain BLOCKED/OPEN under ADR-031. No print-attempt audit SQL; no GL/payment/stock on print.",
       "NextAction": "Owner Pilot print proof on isolated Pilot DB (NONPOSTING draft-print route); map thermal agent + POSTED reprint after ADR-031 Sales post exists",
       "SalonExtension": "none",

@@ -38,6 +38,27 @@ export type InventoryWorkspace={
  limitPerSource:200;
  mayBeTruncated:boolean;
 };
+export type TransferLine={lineNo:number;offeringId:string;offeringName:string;qtyMilli:number};
+export type StockTransfer={
+ transferId:string;fromBranchId:string;fromBranchName:string;toBranchId:string;
+ toBranchName:string;direction:"IN"|"OUT";transferNote:string;
+ status:"APPLIED"|"CANCELLED";createdAtUtc:string;cancelledAtUtc:string|null;
+ lineCount:number;lines:TransferLine[];
+};
+export type TransferWorkspace={
+ state:"NONPOSTING_BRANCH_TRANSFERS";
+ posting:"NOT_POSTED";
+ adr031:"NOT_IN_SCOPE";
+ treasuryState:"NOT_PAID";
+ accountingState:"NOT_POSTED";
+ transferModel:"ATOMIC_APPLY_CANCEL_REVERSE";
+ sourceStock:"ENFORCED";
+ transfers:StockTransfer[];
+ destinations:Array<{branchId:string;displayName:string}>;
+ items:Array<{offeringId:string;displayName:string;qtyMilli:number}>;
+ limitPerSource:50;
+ mayBeTruncated:boolean;
+};
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const TOKEN=/^[A-Za-z0-9_-]{43}$/;
 const MAX=9000000000000;
@@ -259,5 +280,106 @@ export class InventoryService {
   if(!row)throw new ServiceUnavailableException("Stock adjust not cancelled");
   return {id:String(row.id),changed:Boolean(row.changed),
    posting:"NOT_POSTED" as const,adr031:"NOT_IN_SCOPE" as const};
+ }
+ // INV-03 branch transfers (SQL032): one atomic APPLIED document; cancel reverses both deltas.
+ async listTransfers(actor:Actor,token:string,businessId:string,branchId:string):
+  Promise<TransferWorkspace>{
+  const result=await this.execute(this.scope(actor,token,businessId,branchId),
+   "core.ReadStockTransfers");
+  const sets=result.recordsets;
+  if(!Array.isArray(sets)||sets.length!==4)
+   throw new ServiceUnavailableException("Transfer data unavailable");
+  const iso=(value:unknown)=>value instanceof Date?value.toISOString():String(value);
+  const lines=new Map<string,TransferLine[]>();
+  for(const row of sets[1] as Array<Record<string,unknown>>){
+   const qtyMilli=Number(row.qtyMilli);
+   if(!Number.isSafeInteger(qtyMilli))throw new ServiceUnavailableException("Invalid transfer line");
+   const key=String(row.transferId),list=lines.get(key)??[];
+   list.push({lineNo:Number(row.lineNo),offeringId:String(row.offeringId),
+    offeringName:String(row.offeringName),qtyMilli});
+   lines.set(key,list);
+  }
+  const transfers:StockTransfer[]=(sets[0] as Array<Record<string,unknown>>).map(row=>{
+   const status=String(row.status),direction=String(row.direction);
+   if(!["APPLIED","CANCELLED"].includes(status)||!["IN","OUT"].includes(direction))
+    throw new ServiceUnavailableException("Invalid transfer");
+   const transferId=String(row.transferId);
+   return {
+    transferId,fromBranchId:String(row.fromBranchId),fromBranchName:String(row.fromBranchName),
+    toBranchId:String(row.toBranchId),toBranchName:String(row.toBranchName),
+    direction:direction as StockTransfer["direction"],transferNote:String(row.transferNote),
+    status:status as StockTransfer["status"],createdAtUtc:iso(row.createdAtUtc),
+    cancelledAtUtc:row.cancelledAtUtc?iso(row.cancelledAtUtc):null,
+    lineCount:Number(row.lineCount),lines:lines.get(transferId)??[],
+   };
+  });
+  const destinations=(sets[2] as Array<Record<string,unknown>>).map(row=>(
+   {branchId:String(row.branchId),displayName:String(row.displayName)}));
+  const items=(sets[3] as Array<Record<string,unknown>>).map(row=>{
+   const qtyMilli=Number(row.qtyMilli);
+   if(!Number.isSafeInteger(qtyMilli))throw new ServiceUnavailableException("Invalid stock qty");
+   return {offeringId:String(row.offeringId),displayName:String(row.displayName),qtyMilli};
+  });
+  return {
+   state:"NONPOSTING_BRANCH_TRANSFERS",posting:"NOT_POSTED",adr031:"NOT_IN_SCOPE",
+   treasuryState:"NOT_PAID",accountingState:"NOT_POSTED",
+   transferModel:"ATOMIC_APPLY_CANCEL_REVERSE",sourceStock:"ENFORCED",
+   transfers,destinations,items,limitPerSource:50,
+   mayBeTruncated:transfers.length===50||items.length===200,
+  };
+ }
+ async createTransfer(actor:Actor,token:string,businessId:string,branchId:string,
+  key:unknown,body:unknown){
+  const scope=this.scope(actor,token,businessId,branchId),id=uuid(key);
+  const data=strictBody(body,["toBranchId","note","lines"]);
+  const toBranchId=uuid(data.toBranchId).toLowerCase();
+  if(toBranchId===branchId.toLowerCase())
+   throw new BadRequestException("Transfer needs two different branches");
+  if(typeof data.note!=="string"||data.note.length>160)
+   throw new BadRequestException("Invalid transfer note");
+  if(!Array.isArray(data.lines)||data.lines.length<1||data.lines.length>50)
+   throw new BadRequestException("Invalid transfer lines");
+  const lines:Array<{lineNo:number;offeringId:string;qtyMilli:number}>=[];
+  const seenOff=new Set<string>(),seenNo=new Set<number>();
+  for(const raw of data.lines){
+   if(!raw||typeof raw!=="object"||Array.isArray(raw))
+    throw new BadRequestException("Invalid transfer line");
+   const line=raw as Record<string,unknown>;
+   if(Object.keys(line).length!==3||!["lineNo","offeringId","qtyMilli"]
+    .every(k=>Object.prototype.hasOwnProperty.call(line,k)))
+    throw new BadRequestException("Unexpected transfer line fields");
+   if(typeof line.lineNo!=="number"||!Number.isSafeInteger(line.lineNo)||
+      line.lineNo<1||line.lineNo>50||seenNo.has(line.lineNo))
+    throw new BadRequestException("Invalid lineNo");
+   const offeringId=uuid(line.offeringId).toLowerCase();
+   if(seenOff.has(offeringId))throw new BadRequestException("Duplicate offering line");
+   const qtyMilli=milli(line.qtyMilli);
+   if(qtyMilli<1)throw new BadRequestException("Transfer quantity must be positive");
+   seenNo.add(line.lineNo);seenOff.add(offeringId);
+   lines.push({lineNo:line.lineNo,offeringId,qtyMilli});
+  }
+  const result=await this.execute(scope,"core.CreateStockTransfer",r=>r
+   .input("ClientRequestId",sql.UniqueIdentifier,id)
+   .input("ToBranchId",sql.UniqueIdentifier,toBranchId)
+   .input("TransferNote",sql.NVarChar(160),data.note)
+   .input("LinesJson",sql.NVarChar(sql.MAX),JSON.stringify(lines)));
+  const row=result.recordset?.[0];
+  if(!row)throw new ServiceUnavailableException("Stock transfer not saved");
+  return {id:String(row.id),created:Boolean(row.created),
+   posting:"NOT_POSTED" as const,adr031:"NOT_IN_SCOPE" as const,
+   treasuryState:"NOT_PAID" as const,accountingState:"NOT_POSTED" as const};
+ }
+ async cancelTransfer(actor:Actor,token:string,businessId:string,branchId:string,
+  transferId:unknown,key:unknown,body:unknown){
+  const scope=this.scope(actor,token,businessId,branchId),id=uuid(key);
+  const transfer=uuid(transferId);strictBody(body,[]);
+  const result=await this.execute(scope,"core.CancelStockTransfer",r=>r
+   .input("TransferId",sql.UniqueIdentifier,transfer)
+   .input("ClientRequestId",sql.UniqueIdentifier,id));
+  const row=result.recordset?.[0];
+  if(!row)throw new ServiceUnavailableException("Stock transfer not cancelled");
+  return {id:String(row.id),changed:Boolean(row.changed),
+   posting:"NOT_POSTED" as const,adr031:"NOT_IN_SCOPE" as const,
+   treasuryState:"NOT_PAID" as const,accountingState:"NOT_POSTED" as const};
  }
 }

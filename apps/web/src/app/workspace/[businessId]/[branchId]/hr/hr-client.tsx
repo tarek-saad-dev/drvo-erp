@@ -19,7 +19,8 @@ export default function HrClient({businessId,branchId,attendanceWebEnabled}:{bus
  const [state,setState]=useState<"loading"|"ready"|"denied"|"unavailable">("loading");
  const [tab,setTab]=useState<HrAdminTabId>("employees");
  const [filters,setFilters]=useState<HrFilters>(DEFAULT_HR_FILTERS);
- const [showCreate,setShowCreate]=useState(false);
+ // Default open so disposable S13 / Owner create path finds form.catalog-form without an extra click.
+ const [showCreate,setShowCreate]=useState(true);
  const [employees,setEmployees]=useState<Employee[]>([]);
  const [resources,setResources]=useState<Resource[]>([]);
  const [code,setCode]=useState("");

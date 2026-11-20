@@ -1,6 +1,10 @@
 # Project changelog
 
+<<<<<<< HEAD
 - **2026-11-20 — HR-01 EMPLOYEES ADMIN LIGHT UX (NONPOSTING PREVIEWS, NOT PARITY-VERIFIED):** Private HR page gains Cashier-like tabs (employees / ledger-preview / target-preview), KPI strip, search + active/inactive + employment/payroll/barber filters, collapsible create, and draft-only ledger/target preview panels that call the existing `POST .../hr/{ledger,target}-preview` endpoints (safe-preview gate; payout disabled). Pure model + web/API contract tests. **No new SQL/migration/route, no archive/profile/schedule/comp write, no payroll/cash/GL/WhatsApp, no browser proof.** Ledger: HR-01 `SOURCE_IDENTIFIED` -> `PORTING`. [Slice note](HR-01-EMPLOYEES-ADMIN-UX-2026-11-20.md).
+=======
+- **2026-11-20 — POS-05 SQL027 STOCK GATE + CUT HR FIXTURE GATES (NOT PARITY-VERIFIED):** Private POS catalog disables OUT products using SQL027 inventory overlay (`productStock` from authorized `/inventory`); `apps/web/test/pos-product-stock-gate.test.cjs`. Cut adapter adds fixture-only HR employee planner + `HR_EMPLOYEE` identity keys, preactivation SQL027/031 source probes (target apply still OPEN). **No sale stock decrement, no barcode, no live Cut SQL/import, no ADR-031 posting.** Ledger: POS-05 PORTING; CUT-03 evidence extended.
+>>>>>>> origin/main
 
 - **2026-11-20 — POS TIPS (تبس) NON-POSTING PREVIEW (NOT PARITY-VERIFIED):** Added blob-locked Cashier `tipMath.ts`/`TipsModal.tsx` (`_cashier_source/pos-tips/`, pin `046bf19`), `previewTipEntry` in the shared POS tip-preview module (default top executor, strictly positive difference, recipient must be a cart executor, always `BLOCKED_ADR_031_HR_TREASURY`), and a private POS tips panel fed by the server-priced total with a disabled "تسجيل التبس — محظور" button. Characterization executes the pinned `tipMath.ts` and `sanitizeAmountInput`; `shared-pos-tips-ci.yml` (no SQL). **No tip route, no SQL, no flag, no cash-in / employee-ledger credit / WhatsApp / ADR-031 posting / Treasury payout, no returns/refunds, no Owner browser proof.** Ledger: POS-03 BLOCKED -> PORTING. [Slice note](POS-S3-TIPS-PREVIEW-2026-11-20.md).
 

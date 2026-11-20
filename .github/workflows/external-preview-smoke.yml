@@ -39,7 +39,7 @@ jobs:
             echo "FAIL: latest Light V1 HTML marker is not visible on the public site"
             exit 1
           }
-          grep -Fq 'data-demo-revision="salon-pos-customer-v1-2"' "$dir/salon.html" || {
+          grep -Fq 'data-demo-revision="cashier-workstation-shell-v1"' "$dir/salon.html" || {
             echo "FAIL: Salon POS customer V1.2 revision not served by public site"
             exit 1
           }

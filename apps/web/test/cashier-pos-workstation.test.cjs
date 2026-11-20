@@ -7,6 +7,8 @@ const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 test('private POS workstation hosts Cashier catalog/cart/barber/packages/quick-actions shell',()=>{
  const client=read('pos-preview-client.tsx');
  assert.match(client,/data-cashier-pos="private-workstation-v1"/);
+ assert.match(client,/CashierWorkstationShell/);
+ assert.match(client,/mode="private"/);
  assert.match(client,/CashierCatalogBrowser/);
  assert.match(client,/CashierPackagesSection/);
  assert.match(client,/CashierCartPanel/);

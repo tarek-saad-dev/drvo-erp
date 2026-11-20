@@ -20,7 +20,7 @@ function statusText(status:DemoAppointment["status"]){
  return status==="confirmed"?"مؤكد":status==="completed"?"مكتمل":"ملغي";
 }
 export default function SalonDemoClient(){
- const [tab,setTab]=useState<DemoSection>("overview");
+ const [tab,setTab]=useState<DemoSection>("pos");
  const [data,setData]=useState(initialDemo);
  const [cart,setCart]=useState<DemoCartLine[]>([]);
  const [customerId,setCustomerId]=useState("guest");
@@ -81,11 +81,11 @@ export default function SalonDemoClient(){
   }
  }
   function resetDemo(){
-  setData(initialDemo());setCart([]);setTab("overview");setNotice("");
+  setData(initialDemo());setCart([]);setTab("pos");setNotice("");
   setCustomerId("guest");setStaffId("mostafa");setServiceId("cut");setTime("16:00");
  }
 
- return <main className="sd-root" dir="rtl" data-drvo-ui="light-v1" data-demo-revision="salon-pos-customer-v1-2">
+ return <main className="sd-root" dir="rtl" data-drvo-ui="light-v1" data-demo-revision="cashier-workstation-shell-v1">
   <aside className="sd-sidebar" aria-label="قائمة لوحة تحكم الديمو">
    <div className="sd-brand"><span className="sd-brand-icon">D</span><div>DRVO <b>ERP</b><small>SALON WORKSPACE</small></div></div>
    <div className="sd-workspace"><span className="sd-workspace-icon">✦</span><div><strong>Studio One</strong><small>صالون تجريبي · فرع المعاينة</small></div><span className="sd-chevron">⌄</span></div>

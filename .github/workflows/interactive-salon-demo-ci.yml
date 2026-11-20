@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'apps/web/src/app/demo/salon/**'
+      - 'apps/web/src/components/cashier-pos/**'
       - 'apps/web/src/app/page.tsx'
       - 'apps/web/src/app/globals.css'
       - 'apps/web/src/app/drvo-light.css'
@@ -10,6 +11,8 @@ on:
       - 'apps/web/public/brand/**'
       - 'apps/web/test/drvo-light-ui.test.cjs'
       - 'apps/web/test/salon-demo.test.cjs'
+      - 'apps/web/test/cashier-workstation-shell.test.cjs'
+      - 'apps/web/test/cashier-pos-workstation.test.cjs'
       - 'apps/web/src/app/workspace/**'
       - 'apps/web/test/private-salon-overview.test.cjs'
       - '.github/workflows/interactive-salon-demo-ci.yml'
@@ -17,6 +20,7 @@ on:
     branches: [main]
     paths:
       - 'apps/web/src/app/demo/salon/**'
+      - 'apps/web/src/components/cashier-pos/**'
       - 'apps/web/src/app/page.tsx'
       - 'apps/web/src/app/globals.css'
       - 'apps/web/src/app/drvo-light.css'
@@ -24,6 +28,8 @@ on:
       - 'apps/web/public/brand/**'
       - 'apps/web/test/drvo-light-ui.test.cjs'
       - 'apps/web/test/salon-demo.test.cjs'
+      - 'apps/web/test/cashier-workstation-shell.test.cjs'
+      - 'apps/web/test/cashier-pos-workstation.test.cjs'
       - 'apps/web/src/app/workspace/**'
       - 'apps/web/test/private-salon-overview.test.cjs'
       - '.github/workflows/interactive-salon-demo-ci.yml'
@@ -43,6 +49,8 @@ jobs:
           set -euo pipefail
           npm ci --prefix apps/web --no-audit --no-fund
           node --test apps/web/test/salon-demo.test.cjs
+          node --test apps/web/test/cashier-workstation-shell.test.cjs
+          node --test apps/web/test/cashier-pos-workstation.test.cjs
           node --test apps/web/test/drvo-light-ui.test.cjs
           node --test apps/web/test/private-salon-overview.test.cjs
           env -u DRVO_K5_WEB_ENABLED npm run build --prefix apps/web
@@ -64,6 +72,8 @@ jobs:
           curl -fsS http://127.0.0.1:3100/demo/salon > "$RUNNER_TEMP/demo.html"
           grep -Fq 'نسخة تجريبية تفاعلية' "$RUNNER_TEMP/demo.html"
           grep -Fq 'إدارة النشاط' "$RUNNER_TEMP/demo.html"
+          grep -Fq 'data-demo-revision="cashier-workstation-shell-v1"' "$RUNNER_TEMP/demo.html"
+          grep -Fq 'data-cashier-pos="workstation-shell"' "$RUNNER_TEMP/demo.html"
           curl -fsS http://127.0.0.1:3100/ > "$RUNNER_TEMP/home.html"
           grep -Fq '/demo/salon' "$RUNNER_TEMP/home.html"
           for route in /sign-in /verify-email /workspaces \

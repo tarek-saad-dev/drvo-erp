@@ -1,6 +1,7 @@
 "use client";
 import {useEffect,useMemo,useRef,useState} from "react";
 import type {Dispatch,SetStateAction} from "react";
+import CashierWorkstationShell from "../../../components/cashier-pos/cashier-workstation-shell";
 import SalonPosCustomerFlow from "./salon-pos-customer-flow";
 import {
  DEMO_PRODUCTS,DEMO_SERVICES,DEMO_STAFF,repeatDemoLastVisit,
@@ -89,7 +90,6 @@ export default function SalonPosWorkspace({
  }
  function save(){
   if(!ready||!discount){message("راجع السعر والخصم وتقسيم الدفع التجريبي.",true);return;}
-  // Split values are a visual NOT_COLLECTED preview, never persisted as real payment.
   if(saveDraft({customerId,staffId,discount,note:notes})){
    setDiscountMode("none");setDiscountText("");setCashText("");
    setSplit(false);setNotes("");setExpandedDraft(null);
@@ -113,26 +113,26 @@ export default function SalonPosWorkspace({
  });
  return <>
   <div className="sd-heading-row sd-pos-heading"><div>
-   <div className="sd-kicker">POS / CASHIER-INSPIRED OPERATOR WORKSPACE</div>
+   <div className="sd-kicker">POS / CASHIER WORKSTATION · SHARED SHELL</div>
    <h1>نقطة البيع</h1>
-   <p>اختار العميل والحلاق، أضف خدمات أو منتجات، راجع الخصم والدفع، واحفظ مسودة فقط.</p>
-  </div><span className="sd-date">تجربة واجهة · لا يوجد بيع أو تحصيل فعلي</span></div>
-  <div className="sd-pos-toolbar" aria-label="بيانات المسودة">
-   <SalonPosCustomerFlow data={data} customerId={customerId} onSelect={setCustomerId}
-    onCreate={onCreateCustomer} onRepeat={useLastVisit} hasCart={cart.length>0}/>
-   <label>الحلاق / منفذ الخدمة (تجريبي)
-    <select value={staffId} onChange={e=>setStaffId(e.target.value)}>
-     {DEMO_STAFF.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
-    </select>
-   </label>
-   <div className="sd-pos-toolbar-note">مسودة داخل الصفحة فقط<br/>لا فواتير أو مخزون مخصوم</div>
-  </div>
-  <div className="sd-pos-layout sd-pos-pro">
-   <section className="sd-panel sd-pos-catalog">
-    <div className="sd-panel-header"><div>
-     <span className="sd-panel-eyebrow">CATALOG / SERVICES · PACKAGES · PRODUCTS</span>
-     <h2>الكتالوج</h2>
-    </div><span className="sd-number">{displayed.length} صنف</span></div>
+   <p>نفس تخطيط محطة Cashier الثلاثي (عميل · كتالوج · مسودة) بواجهة Light المضغوطة —
+     البيانات هنا محاكاة داخل المتصفح فقط.</p>
+  </div><span className="sd-date">محاكاة · لا بيع ولا تحصيل</span></div>
+  <CashierWorkstationShell
+   mode="synthetic"
+   customerPane={<>
+    <SalonPosCustomerFlow data={data} customerId={customerId} onSelect={setCustomerId}
+     onCreate={onCreateCustomer} onRepeat={useLastVisit} hasCart={cart.length>0}/>
+    <p className="sd-pos-legal" style={{marginTop:8}}>
+     بحث/إنشاء العميل هنا محلي للديمو — ليس Customers API الخاص.
+    </p>
+   </>}
+   catalogPane={<>
+    <label>الحلاق / منفذ الخدمة (تجريبي)
+     <select value={staffId} onChange={e=>setStaffId(e.target.value)}>
+      {DEMO_STAFF.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}
+     </select>
+    </label>
     <div className="sd-pos-catalog-controls">
      <div className="sd-pos-category-tabs" role="group" aria-label="تصنيف الكتالوج">
       {([{id:"all",name:"الكل"},{id:"services",name:"الخدمات"},
@@ -161,12 +161,8 @@ export default function SalonPosWorkspace({
         <span className="sd-service-add">＋</span></span>
       </button>)}
      </div>}
-   </section>
-   <aside className="sd-panel sd-checkout sd-checkout-pro">
-    <div className="sd-panel-header"><div>
-     <span className="sd-panel-eyebrow">INVOICE DRAFT / NOT POSTED</span>
-     <h2>مسودة البيع</h2>
-    </div><span className="sd-number">{cart.reduce((n,x)=>n+x.quantity,0)} عناصر</span></div>
+   </>}
+   invoicePane={<>
     {cart.length===0?<div className="sd-empty sd-pos-empty">
      <span>◫</span><strong>السلة فاضية</strong><p>اختار خدمات أو منتجات من الكتالوج.</p>
     </div>:<div className="sd-cart-items">
@@ -188,7 +184,7 @@ export default function SalonPosWorkspace({
      </div>)}
     </div>}
     <div className="sd-pos-finance-preview">
-     <h3>ملخص الأسعار <small>حساب تجريبي فقط</small></h3>
+     <h3>ملخص الأسعار <small>حساب محاكى فقط</small></h3>
      <div className="sd-pos-value-line"><span>الإجمالي قبل الخصم</span>
       <b>{cart.length?demoMoney(price?.subtotalMinor??cart.reduce((sum,r)=>
        sum+demoPosItem(r.serviceId).priceMinor*r.quantity,0)):demoMoney(0)}</b></div>
@@ -228,7 +224,7 @@ export default function SalonPosWorkspace({
        </div>}
        {price&&!splitResult&&<p role="alert" className="sd-pos-inline-error">المبلغ النقدي مينفعش يتجاوز الإجمالي.</p>}
       </div>:<p>المعاينة الافتراضية نقدي بالكامل — لم يتم استلام أي مبلغ.</p>}
-      <span className="sd-pos-not-paid">NOT COLLECTED · NO PAYMENT OR JOURNAL</span>
+      <span className="sd-pos-not-paid">NOT COLLECTED · SIMULATED · NO JOURNAL</span>
      </div>
      <label className="sd-pos-notes">ملاحظات المسودة
       <textarea rows={2} maxLength={240} value={notes}
@@ -236,7 +232,7 @@ export default function SalonPosWorkspace({
      </label>
      <button className="sd-primary sd-full" type="button" disabled={!ready}
       onClick={save}>حفظ مسودة تجريبية فقط <kbd>F9</kbd></button>
-     <p className="sd-pos-legal">لا فواتير أو ضرائب أو خصم مخزون أو رصيد خزنة أو تحصيل حقيقي.</p>
+     <p className="sd-pos-legal">محاكاة — لا فواتير أو ضرائب أو مخزون أو خزنة أو تحصيل حقيقي.</p>
     </div>
     <div className="sd-saved sd-pos-history">
      <div className="sd-saved-title">آخر مسودات الجلسة <span>{data.drafts.length}</span></div>
@@ -260,7 +256,7 @@ export default function SalonPosWorkspace({
        </div>}
       </div>)}
     </div>
-   </aside>
-  </div>
+   </>}
+  />
  </>;
 }

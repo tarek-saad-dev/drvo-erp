@@ -3,13 +3,13 @@
  * Cashier-adapted Catalog browser for private POS (nonposting).
  * Source UX: casher@046bf19 ServiceCatalog / ProductCatalog / ServiceSearchInput.
  * Prices come only from authorized DRVO Catalog/POS preview offerings — never client-authored.
- * PRODUCT search uses displayName + offeringId prefix (first 8) only — CatalogOffering has no barcode.
+ * PRODUCT search: displayName + offeringId prefix (8) + CatalogOffering.Barcode (SQL035).
  * Optional SQL027 branch stock overlay (qtyMilli/stockStatus) gates OUT products from the draft cart.
  */
 import {useEffect,useRef,useState} from "react";
 
 export type CatalogOffering={offeringId:string;kind:"SERVICE"|"PRODUCT";displayName:string;
- priceMinor:number;currency:string;isActive:boolean};
+ priceMinor:number;currency:string;isActive:boolean;barcode?:string|null};
 export type ProductStockHint={qtyMilli:number;stockStatus:"OK"|"LOW"|"OUT"};
 
 function money(minor:number,currency:string):string{
@@ -20,7 +20,8 @@ function matchesQuery(o:CatalogOffering,q:string):boolean{
  if(!q)return true;
  const name=o.displayName.toLocaleLowerCase("en");
  const idPrefix=o.offeringId.slice(0,8).toLocaleLowerCase("en");
- return name.includes(q)||idPrefix.includes(q);
+ const barcode=(o.barcode??"").toLocaleLowerCase("en");
+ return name.includes(q)||idPrefix.includes(q)||(barcode.length>0&&barcode.includes(q));
 }
 
 function stockLabel(hint:ProductStockHint|undefined):string{
@@ -56,18 +57,19 @@ export default function CashierCatalogBrowser({offerings,disabled,onAdd,productS
  });
  const productTab=tab==="PRODUCT";
  const heading=productTab?"اختر المنتج":tab==="SERVICE"?"اختر الخدمة":"الخدمات والمنتجات";
- const searchLabel=productTab?"بحث المنتجات":"بحث سريع";
+ const searchLabel=productTab?"بحث المنتجات / باركود":"بحث سريع";
  const searchPlaceholder=productTab
-  ?"اسم المنتج أو بادئة المعرّف (8) — اضغط / للتركيز (باركود الكتالوج غير موجود؛ المخزون من SQL027 إن صُرّح)"
-  :"اسم الخدمة أو المنتج أو بادئة المعرّف — اضغط / للتركيز";
+  ?"اسم المنتج أو الباركود أو بادئة المعرّف — اضغط / للتركيز"
+  :"اسم الخدمة أو المنتج أو الباركود أو بادئة المعرّف — اضغط / للتركيز";
  const emptyCopy=productTab
   ?(query.trim()?"لم نجد منتجًا مطابقًا":"لا توجد منتجات نشطة في كتالوج الفرع")
   :"مفيش عناصر مطابقة.";
  return <section className="k5-admin-card" aria-label="كتالوج Cashier للمسودة"
-  data-cashier-pos="catalog-browser" data-product-stock={productStock?"sql027":"none"}>
+  data-cashier-pos="catalog-browser" data-product-stock={productStock?"sql027":"none"}
+  data-product-barcode="sql035">
   <div className="k5-admin-summary"><h2>{heading}</h2>
    <p className="k5-muted">{productTab
-    ?"بحث Cashier للمنتجات على displayName + بادئة offeringId. الإضافة مسودة فقط. حالة المخزون من رصيد الفرع (SQL027) عند التصريح — نفد المخزون يمنع الإضافة للمسودة."
+    ?"بحث Cashier للمنتجات على displayName + Barcode (SQL035) + بادئة offeringId. الإضافة مسودة فقط. حالة المخزون من رصيد الفرع (SQL027) عند التصريح — نفد المخزون يمنع الإضافة للمسودة."
     :"بحث Cashier (`/`) على كتالوج الفرع المصرّح. الإضافة للمسودة فقط — مش بيع."}</p>
   </div>
   <div className="k5-booking-actions" role="tablist" aria-label="تصفية الكتالوج">
@@ -77,7 +79,7 @@ export default function CashierCatalogBrowser({offerings,disabled,onAdd,productS
   </div>
   <label>{searchLabel}<input ref={searchRef} type="search" maxLength={100} value={query}
    placeholder={searchPlaceholder}
-   aria-label={productTab?"بحث في المنتجات بالاسم أو بادئة المعرّف":"بحث سريع في الكتالوج"}
+   aria-label={productTab?"بحث في المنتجات بالاسم أو الباركود أو بادئة المعرّف":"بحث سريع في الكتالوج"}
    onChange={e=>setQuery(e.target.value)}/></label>
   <div className="k5-salon-steps" aria-label="نتائج الكتالوج">
    {rows.slice(0,40).map(o=>{
@@ -85,12 +87,16 @@ export default function CashierCatalogBrowser({offerings,disabled,onAdd,productS
     const kindLabel=o.kind==="SERVICE"?"خدمة":"منتج";
     const hint=o.kind==="PRODUCT"&&productStock?productStock[o.offeringId.toLowerCase()]:undefined;
     const outOfStock=o.kind==="PRODUCT"&&hint?.stockStatus==="OUT";
+    const barcode=o.kind==="PRODUCT"?(o.barcode??null):null;
     return <button key={o.offeringId} type="button"
      className="k5-salon-refresh" disabled={disabled||!!outOfStock}
      data-stock-status={hint?.stockStatus??(o.kind==="PRODUCT"?"UNKNOWN":"N_A")}
+     data-barcode={barcode??""}
      onClick={()=>{if(!outOfStock)onAdd(o);}}>
      <span>{kindLabel} · {o.displayName}</span>
-     <span dir="ltr" className="k5-muted" title="بادئة Catalog offeringId — ليست باركود"> كود:{idPrefix}</span>
+     {barcode
+      ?<span dir="ltr" className="k5-muted" title="Catalog PRODUCT barcode"> باركود:{barcode}</span>
+      :<span dir="ltr" className="k5-muted" title="بادئة Catalog offeringId"> كود:{idPrefix}</span>}
      {o.kind==="PRODUCT"&&<span className="k5-muted"> · بيع تجزئة (بدون حلاق)</span>}
      {o.kind==="PRODUCT"&&<span className={outOfStock?"k5-error":"k5-muted"}> · {stockLabel(hint)}</span>}
      <span dir="ltr"> {money(o.priceMinor,o.currency)}</span>

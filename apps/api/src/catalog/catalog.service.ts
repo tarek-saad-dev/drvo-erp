@@ -18,7 +18,10 @@ export type CatalogOffering = {
   offeringId: string; categoryId: string | null; kind: "PRODUCT" | "SERVICE";
   displayName: string; priceMinor: number; currency: string;
   durationMinutes: number | null; isActive: boolean;
+  /** PRODUCT-only Cashier barcode; SERVICE always null. */
+  barcode: string | null;
 };
+export type CatalogBarcodeResult = { id: string; changed: boolean };
 export type CatalogPackageItem = {
   offeringId: string; sortOrder: number; isRequired: boolean;
 };
@@ -59,6 +62,22 @@ export type CatalogPackageResolveResult = {
 
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const TOKEN = /^[A-Za-z0-9_-]{43}$/;
+function optionalBarcode(value: unknown, kind: "SERVICE" | "PRODUCT"): string | null {
+  if (value===undefined || value===null || value==="") {
+    if (kind==="SERVICE") return null;
+    return null;
+  }
+  if (typeof value!=="string") throw new BadRequestException("Invalid barcode");
+  const trimmed=value.trim();
+  if (kind==="SERVICE") {
+    throw new BadRequestException("Barcode is PRODUCT-only");
+  }
+  if (trimmed.length<1 || trimmed.length>50) {
+    throw new BadRequestException("Invalid barcode");
+  }
+  return trimmed;
+}
+
 function exactObject(value: unknown, keys: string[], required: string[]): Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     throw new BadRequestException("Invalid request");
@@ -148,6 +167,7 @@ export class CatalogService {
       priceMinor:Number(row.priceMinor), currency:String(row.currency).trim(),
       durationMinutes:row.durationMinutes==null?null:Number(row.durationMinutes),
       isActive:Boolean(row.isActive),
+      barcode:row.barcode==null||row.barcode===""?null:String(row.barcode),
     }));
     return {categories,offerings};
   }
@@ -167,7 +187,7 @@ export class CatalogService {
     const scope=this.scope(actor,token,businessId,branchId);
     const reqId=guid(requestId,true)!;
     const obj=exactObject(body,
-      ["kind","displayName","priceMinor","currency","categoryId","durationMinutes"],
+      ["kind","displayName","priceMinor","currency","categoryId","durationMinutes","barcode"],
       ["kind","displayName","priceMinor","currency"]);
     if (obj.kind!=="SERVICE" && obj.kind!=="PRODUCT") {
       throw new BadRequestException("Invalid offering kind");
@@ -191,6 +211,7 @@ export class CatalogService {
         (kind==="PRODUCT" && duration!==null)) {
       throw new BadRequestException("Invalid service duration");
     }
+    const barcode=optionalBarcode(obj.barcode,kind);
     const result=await this.execute(scope,"core.CreateCatalogOffering",r=>r
       .input("ClientRequestId",sql.UniqueIdentifier,reqId)
       .input("CategoryId",sql.UniqueIdentifier,categoryId)
@@ -198,8 +219,23 @@ export class CatalogService {
       .input("DisplayName",sql.NVarChar(160),displayName)
       .input("PriceMinor",sql.BigInt,priceMinor)
       .input("Currency",sql.Char(3),currency)
-      .input("DurationMinutes",sql.Int,duration));
+      .input("DurationMinutes",sql.Int,duration)
+      .input("Barcode",sql.NVarChar(50),barcode));
     return resultRow(result.recordset?.[0]);
+  }
+
+  async setProductBarcode(actor:Actor,token:string,businessId:string,branchId:string,
+    offeringId:unknown,body:unknown):Promise<CatalogBarcodeResult> {
+    const scope=this.scope(actor,token,businessId,branchId);
+    const oid=guid(offeringId,true)!;
+    const obj=exactObject(body,["barcode"],[]);
+    const barcode=optionalBarcode(obj.barcode,"PRODUCT");
+    const result=await this.execute(scope,"core.SetCatalogProductBarcode",r=>r
+      .input("OfferingId",sql.UniqueIdentifier,oid)
+      .input("Barcode",sql.NVarChar(50),barcode));
+    const row=result.recordset?.[0];
+    if (!row?.id) throw new ServiceUnavailableException("Catalog unavailable");
+    return {id:String(row.id),changed:Boolean(row.changed)};
   }
 
   async listPackages(actor: Actor, token: string, businessId: string, branchId: string

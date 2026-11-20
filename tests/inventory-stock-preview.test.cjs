@@ -60,12 +60,15 @@ test('with balances: qtyMilli owned; cost still UNKNOWN',()=>{
  assert.equal(preview.items.find(r=>r.offeringId===guid(11)).stockStatus,'OUT');
 });
 
-test('query matches displayName or offeringId prefix',()=>{
- const wax=product(10,'Arabic Wax');
+test('query matches displayName, barcode, or offeringId prefix',()=>{
+ const wax=product(10,'Arabic Wax',{barcode:'6223000111111'});
  const gel=product(11,'Hair Gel');
  const byName=inv.buildDraftStockPreview([wax,gel],'wax');
  assert.equal(byName.items.length,1);
  assert.equal(byName.items[0].displayName,'Arabic Wax');
+ const byCode=inv.buildDraftStockPreview([wax,gel],'6223000111111');
+ assert.equal(byCode.items.length,1);
+ assert.equal(byCode.items[0].barcode,'6223000111111');
 });
 
 test('malformed offerings fail closed',()=>{

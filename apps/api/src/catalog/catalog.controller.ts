@@ -5,8 +5,8 @@ import {
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { IdentityService, extractSessionCookie } from "../identity/identity.service";
 import {
-  CatalogService, type CatalogCreateResult, type CatalogData, type CatalogPackagesData,
-  type CatalogPackageResolveResult,
+  CatalogService, type CatalogBarcodeResult, type CatalogCreateResult, type CatalogData,
+  type CatalogPackagesData, type CatalogPackageResolveResult,
 } from "./catalog.service";
 
 function enabled(): void {
@@ -110,5 +110,21 @@ export class CatalogController {
     const token=extractSessionCookie(req.headers.cookie);
     const actor=await this.identity.actorFromToken(token);
     return this.catalog.addPackage(actor,token!,businessId,branchId,requestId,body);
+  }
+
+  @Post("offerings/:offeringId/barcode")
+  @HttpCode(200)
+  async setProductBarcode(
+    @Headers("origin") origin:string|undefined,
+    @Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,
+    @Param("businessId") businessId:string,@Param("branchId") branchId:string,
+    @Param("offeringId") offeringId:string,
+    @Body() body:unknown,
+  ):Promise<CatalogBarcodeResult> {
+    res.setHeader("Cache-Control","no-store");
+    enabled();originAllowed(origin);
+    const token=extractSessionCookie(req.headers.cookie);
+    const actor=await this.identity.actorFromToken(token);
+    return this.catalog.setProductBarcode(actor,token!,businessId,branchId,offeringId,body??{});
   }
 }

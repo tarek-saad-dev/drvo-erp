@@ -310,6 +310,61 @@ async function main(){
     assert.equal((await post(previewRoot(s.foreignB,s.foreignBr)+'/checkout-preview',foreign,id(),
       {lines:[item]})).status,404);
   });
+  // SQL035 PRODUCT barcode — Cashier productCatalog Barcode search; no stock write / sale / ADR-031.
+  await pass('035 Catalog PRODUCT barcode migration applies and grants EXECUTE-only SetBarcode',async()=>{
+   const more=await applyMigrations(admin,undefined,35);
+   assert.ok(more.length>=35);
+   assert.ok(more.slice(25).every(x=>x.status==='applied'));
+   assert.ok((await applyMigrations(admin,undefined,35)).every(x=>x.status==='unchanged'));
+   const perms=await app.query(
+    "SELECT HAS_PERMS_BY_NAME('core.CatalogOffering','OBJECT','UPDATE') AS upd,"+
+    " HAS_PERMS_BY_NAME('core.SetCatalogProductBarcode','OBJECT','EXECUTE') AS execSet,"+
+    " HAS_PERMS_BY_NAME('core.ReadCatalog','OBJECT','EXECUTE') AS execRead");
+   assert.deepEqual(Object.values(perms.recordset[0]).map(Number),[0,1,1]);
+   const col=await admin.query(
+    "SELECT COUNT(*) AS n FROM sys.columns c JOIN sys.tables t ON c.object_id=t.object_id"+
+    " JOIN sys.schemas s ON t.schema_id=s.schema_id"+
+    " WHERE s.name='core' AND t.name='CatalogOffering' AND c.name='Barcode'");
+   assert.equal(col.recordset[0].n,1);
+  });
+  await pass('035 PRODUCT barcode create/list/set; SERVICE barcode rejected; uniqueness scoped',async()=>{
+   const code='6223000123456';
+   const created=await post(root(s.b,s.br)+'/offerings',cookie,id(),{
+    kind:'PRODUCT',displayName:'Shampoo Bar',categoryId:null,priceMinor:4500,currency:'EGP',
+    durationMinutes:null,barcode:code,
+   });
+   assert.equal(created.status,200);assert.equal((await created.json()).created,true);
+   const listed=await get(root(s.b,s.br),cookie);
+   assert.equal(listed.status,200);
+   const data=await listed.json();
+   const shampoo=data.offerings.find(x=>x.displayName==='Shampoo Bar');
+   assert.ok(shampoo);assert.equal(shampoo.barcode,code);
+   assert.equal(data.offerings.find(x=>x.displayName==='Haircut').barcode,null);
+   const preview=await get(previewRoot(s.b,s.br),cookie);
+   assert.equal(preview.status,200);
+   const prevOffer=(await preview.json()).offerings.find(x=>x.displayName==='Shampoo Bar');
+   assert.ok(prevOffer);assert.equal(prevOffer.barcode,code);
+   const serviceBarcode=await post(root(s.b,s.br)+'/offerings',cookie,id(),{
+    kind:'SERVICE',displayName:'Bad Barcode Cut',categoryId:null,priceMinor:1000,currency:'EGP',
+    durationMinutes:20,barcode:'SHOULD_FAIL',
+   });
+   assert.equal(serviceBarcode.status,400);
+   const dup=await post(root(s.b,s.br)+'/offerings',cookie,id(),{
+    kind:'PRODUCT',displayName:'Other',categoryId:null,priceMinor:100,currency:'EGP',
+    durationMinutes:null,barcode:code,
+   });
+   assert.equal(dup.status,400);
+   const set=await post(root(s.b,s.br)+'/offerings/'+shampoo.offeringId+'/barcode',cookie,id(),
+    {barcode:'6223999999999'});
+   assert.equal(set.status,200);
+   const setBody=await set.json();
+   assert.equal(setBody.changed,true);
+   const again=await get(root(s.b,s.br),cookie);
+   assert.equal((await again.json()).offerings.find(x=>x.offeringId===shampoo.offeringId).barcode,
+    '6223999999999');
+   assert.equal((await post(root(s.otherB,s.otherBr)+'/offerings/'+shampoo.offeringId+'/barcode',
+    cookie,id(),{barcode:'X'})).status,404);
+  });
   await pass('scope denial: same Tenant other Business, foreign Tenant, wrong Branch',async()=>{
    for(const [b,br] of [[s.otherB,s.otherBr],[s.foreignB,s.foreignBr],[s.b,s.strangerBr]]){
     const r=await get(root(b,br),cookie);

@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 
 type Category = {categoryId:string;displayName:string;isActive:boolean};
 type Offering = {offeringId:string;categoryId:string|null;kind:"SERVICE"|"PRODUCT";
-  displayName:string;priceMinor:number;currency:string;durationMinutes:number|null;isActive:boolean};
+  displayName:string;priceMinor:number;currency:string;durationMinutes:number|null;isActive:boolean;
+  barcode:string|null};
 type Data = {categories:Category[];offerings:Offering[]};
 const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -22,6 +23,7 @@ export default function CatalogClient({businessId,branchId}:{businessId:string;b
   const [amount,setAmount]=useState("");
   const [currency,setCurrency]=useState("EGP");
   const [minutes,setMinutes]=useState("30");
+  const [barcode,setBarcode]=useState("");
   const categoryRequest=useRef<string|null>(null);
   const offeringRequest=useRef<string|null>(null);
   const home="/workspace/"+encodeURIComponent(businessId)+"/"+encodeURIComponent(branchId);
@@ -78,12 +80,20 @@ export default function CatalogClient({businessId,branchId}:{businessId:string;b
     if(kind==="SERVICE"&&(!Number.isInteger(duration)||duration<1||duration>1440)){
       setNotice("مدة الخدمة لازم تكون من 1 لـ1440 دقيقة.");return;
     }
+    const code=barcode.trim();
+    if(kind==="PRODUCT"&&code.length>50){
+      setNotice("الباركود بحد أقصى 50 حرف.");return;
+    }
+    if(kind==="SERVICE"&&code){
+      setNotice("الباركود للمنتجات فقط.");return;
+    }
     await send("/offerings",{
       kind,displayName:offeringName,categoryId:categoryId||null,
       priceMinor:Math.round(value*100),currency,
       durationMinutes:kind==="SERVICE"?duration:null,
+      barcode:kind==="PRODUCT"?(code||null):null,
     },offeringRequest);
-    if(offeringRequest.current===null){setOfferingName("");setAmount("");}
+    if(offeringRequest.current===null){setOfferingName("");setAmount("");setBarcode("");}
   }
   const onCategoryChange=(value:string)=>{setCategoryName(value);categoryRequest.current=null;};
   const onOfferingEdit=()=>{offeringRequest.current=null;};
@@ -129,6 +139,9 @@ export default function CatalogClient({businessId,branchId}:{businessId:string;b
           </select></label>
           {kind==="SERVICE"&&<label>المدة بالدقائق<input required type="number" min={1} max={1440}
             value={minutes} onChange={e=>{setMinutes(e.target.value);onOfferingEdit();}}/></label>}
+          {kind==="PRODUCT"&&<label>الباركود (اختياري)<input maxLength={50} value={barcode} dir="ltr"
+            placeholder="مثال: 6223000000001"
+            onChange={e=>{setBarcode(e.target.value);onOfferingEdit();}}/></label>}
           <button className="k5-save" disabled={busy}>إضافة {kind==="SERVICE"?"الخدمة":"المنتج"}</button>
         </form>
       </section>
@@ -136,14 +149,15 @@ export default function CatalogClient({businessId,branchId}:{businessId:string;b
         <div className="k5-admin-summary"><h2>العناصر المسجلة</h2>
           <span className="k5-count">{data.offerings.length} عنصر</span></div>
         <div className="k5-table-wrap"><table className="k5-table">
-          <thead><tr><th>الاسم</th><th>النوع</th><th>التصنيف</th><th>السعر</th><th>المدة</th></tr></thead>
+          <thead><tr><th>الاسم</th><th>النوع</th><th>التصنيف</th><th>السعر</th><th>المدة</th><th>الباركود</th></tr></thead>
           <tbody>{data.offerings.length===0?
-            <tr><td colSpan={5} className="k5-empty">لسه مفيش خدمات أو منتجات.</td></tr>:
+            <tr><td colSpan={6} className="k5-empty">لسه مفيش خدمات أو منتجات.</td></tr>:
             data.offerings.map(item=><tr key={item.offeringId}>
               <td>{item.displayName}</td><td>{item.kind==="SERVICE"?"خدمة":"منتج"}</td>
               <td>{data.categories.find(c=>c.categoryId===item.categoryId)?.displayName??"—"}</td>
               <td dir="ltr">{(item.priceMinor/100).toFixed(2)} {item.currency}</td>
               <td>{item.durationMinutes??"—"}</td>
+              <td dir="ltr">{item.barcode??"—"}</td>
             </tr>)}</tbody>
         </table></div>
       </section>

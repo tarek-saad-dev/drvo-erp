@@ -6,6 +6,7 @@ on:
       - 'packages/business-modules/pos/**'
       - 'apps/web/src/app/workspace/**/pos-preview/**'
       - 'apps/web/test/pos-tips-preview.test.cjs'
+      - 'apps/web/test/pos-product-stock-gate.test.cjs'
       - 'tests/pos-tips-source.test.cjs'
       - 'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json'
       - '.github/workflows/shared-pos-tips-ci.yml'
@@ -16,6 +17,7 @@ on:
       - 'packages/business-modules/pos/**'
       - 'apps/web/src/app/workspace/**/pos-preview/**'
       - 'apps/web/test/pos-tips-preview.test.cjs'
+      - 'apps/web/test/pos-product-stock-gate.test.cjs'
       - 'tests/pos-tips-source.test.cjs'
       - '.github/workflows/shared-pos-tips-ci.yml'
 permissions:
@@ -39,4 +41,4 @@ jobs:
       - name: Private UI source guards
         run: |
           set -euo pipefail
-          node --test apps/web/test/pos-tips-preview.test.cjs apps/web/test/cashier-pos-workstation.test.cjs apps/web/test/pos-adjustments-preview.test.cjs
+          node --test apps/web/test/pos-tips-preview.test.cjs apps/web/test/cashier-pos-workstation.test.cjs apps/web/test/pos-adjustments-preview.test.cjs apps/web/test/pos-product-stock-gate.test.cjs

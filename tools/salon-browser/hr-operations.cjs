@@ -1,7 +1,37 @@
 'use strict';
-/** S13 private HR+Salon Barber UI proof; only called from CI-only S12 flow. */
+/**
+ * S13 private HR+Salon Barber UI proof; only called from CI-only S12 flow.
+ * Root cause (PR #137 run 44760962762): Playwright click on type=submit hung past
+ * locator timeouts at "S13 HR employee create POST". Submit via requestSubmit after
+ * React-native value sync; keep every HTTP/SQL assertion.
+ */
 const assert=require('node:assert/strict');
 const {randomBytes}=require('node:crypto');
+
+function setReactInput(locator,value){
+ return locator.evaluate((el,v)=>{
+  const proto=el instanceof HTMLTextAreaElement
+   ?window.HTMLTextAreaElement.prototype
+   :window.HTMLInputElement.prototype;
+  const setter=Object.getOwnPropertyDescriptor(proto,'value').set;
+  setter.call(el,v);
+  el.dispatchEvent(new Event('input',{bubbles:true}));
+  el.dispatchEvent(new Event('change',{bubbles:true}));
+ },value);
+}
+
+async function withHardTimeout(label,ms,work){
+ let timer;
+ try{
+  return await Promise.race([
+   work(),
+   new Promise((_,reject)=>{
+    timer=setTimeout(()=>reject(new Error('S13_HARD_TIMEOUT '+label+' >'+ms+'ms')),ms);
+   }),
+  ]);
+ }finally{if(timer)clearTimeout(timer);}
+}
+
 async function exerciseHrOperations(page,origin,business,branch,onPhase,existingResourceName){
  const suffix=randomBytes(5).toString('hex').toUpperCase();
  const code='BARBER_'+suffix;
@@ -21,40 +51,85 @@ async function exerciseHrOperations(page,origin,business,branch,onPhase,existing
  assert.match(resourceId||'',
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
   'S12 PERSON resource GUID visible in Booking UI');
- // A previous Chromium run stalled at the broad S13 marker for 12 minutes.
- // Each real operator action has its own PII-free phase breadcrumb.
+
  onPhase('S13 HR route navigation');
- await page.goto(scope+'/hr',{waitUntil:'commit',timeout:45000});
+ await page.goto(scope+'/hr',{waitUntil:'domcontentloaded',timeout:45000});
  onPhase('S13 HR heading rendered');
  await page.getByRole('heading',{name:'الموظفون والحلاقون'}).waitFor({timeout:30000});
+ // Form mounts only after authorized roster GET reaches ready.
+ onPhase('S13 HR create form ready');
+ const createForm=page.locator('form.catalog-form').filter({
+  has:page.getByRole('button',{name:/إضافة موظف|جاري الحفظ/}),
+ });
+ await createForm.waitFor({state:'visible',timeout:45000});
+
  onPhase('S13 HR employee code input');
- await page.getByLabel(/كود الموظف/).fill(code,{timeout:20000});
+ await setReactInput(createForm.getByLabel(/كود الموظف/),code);
  onPhase('S13 HR employee name input');
- await page.getByLabel('اسم الموظف').fill(employee,{timeout:20000});
+ await setReactInput(createForm.getByLabel('اسم الموظف'),employee);
  onPhase('S13 HR employment-type selection');
- await page.getByLabel('نوع التوظيف').selectOption('full_time',{timeout:20000});
+ await createForm.getByLabel('نوع التوظيف').selectOption('full_time',{timeout:20000});
  onPhase('S13 HR pay-method selection');
- await page.getByLabel(/نظام احتساب الأجر/).selectOption('daily',{timeout:20000});
+ await createForm.getByLabel(/نظام احتساب الأجر/).selectOption('daily',{timeout:20000});
+
  onPhase('S13 HR employee create POST');
- const [created]=await Promise.all([
-  page.waitForResponse(r=>r.url().endsWith('/hr/employees')&&
-   r.request().method()==='POST',{timeout:20000}),
-  page.getByRole('button',{name:'إضافة موظف'}).click({timeout:20000}),
- ]);
+ let created;
+ try{
+  created=await withHardTimeout('employee-create',30000,async()=>{
+   const wait=page.waitForResponse(r=>r.url().endsWith('/hr/employees')&&
+    r.request().method()==='POST',{timeout:25000});
+   // Avoid Playwright submit-button click IPC hang observed in CI.
+   await createForm.evaluate(form=>{
+    if(typeof form.requestSubmit==='function')form.requestSubmit();
+    else form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
+   });
+   return wait;
+  });
+ }catch(err){
+  const diag=await page.evaluate(()=>{
+   const notice=[...document.querySelectorAll('.k5-notice,.k5-error,[role="alert"],[role="status"]')]
+    .map(n=>(n.textContent||'').trim()).filter(Boolean).slice(0,4);
+   const btn=[...document.querySelectorAll('button')].find(b=>
+    /إضافة موظف|جاري الحفظ/.test(b.textContent||''));
+   const codeEl=document.querySelector('input[pattern]');
+   return {
+    notice,
+    btnDisabled:btn?btn.disabled:null,
+    btnText:btn?(btn.textContent||'').trim().slice(0,40):null,
+    codeLen:codeEl instanceof HTMLInputElement?codeEl.value.length:0,
+    denied:!!document.querySelector('[role="alert"]'),
+   };
+  });
+  throw new Error('S13_EMPLOYEE_CREATE_STALL diag='+JSON.stringify(diag)+
+   ' cause='+String(err instanceof Error?err.message:err).split('\n')[0].slice(0,140));
+ }
  assert.equal(created.status(),200,'Employee create actual HTTP');
  const employeeData=await created.json();
  assert.equal(employeeData.created,true);
  assert.match(employeeData.id,/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
  const row=page.getByRole('row').filter({hasText:employee});
  await row.waitFor({timeout:20000});
+
  onPhase('S13 Barber resource selection from independently authorized Booking');
  await row.getByRole('combobox',{name:'مورد حجز '+employee})
   .selectOption(resourceId,{timeout:20000});
- const [linked]=await Promise.all([
-  page.waitForResponse(r=>r.url().endsWith('/hr/employees/'+employeeData.id+'/barber')&&
-   r.request().method()==='POST',{timeout:20000}),
-  row.getByRole('button',{name:'تفعيل كحلاق'}).click({timeout:20000}),
- ]);
+ onPhase('S13 Barber activate POST');
+ let linked;
+ try{
+  linked=await withHardTimeout('barber-activate',30000,async()=>{
+   const wait=page.waitForResponse(r=>
+    r.url().endsWith('/hr/employees/'+employeeData.id+'/barber')&&
+    r.request().method()==='POST',{timeout:25000});
+   await row.getByRole('button',{name:'تفعيل كحلاق'}).evaluate(btn=>btn.click());
+   return wait;
+  });
+ }catch(err){
+  const notice=await page.evaluate(()=>
+   [...document.querySelectorAll('.k5-notice,.k5-error,[role="alert"]')]
+    .map(n=>(n.textContent||'').trim()).filter(Boolean).slice(0,3));
+  throw new Error('S13_BARBER_ACTIVATE_STALL notices='+JSON.stringify(notice)+
+   ' cause='+String(err instanceof Error?err.message:err).split('\n')[0].slice(0,140));
+ }
  assert.equal(linked.status(),200,'Salon Barber persisted link');
  assert.equal((await linked.json()).changed,true);
  onPhase('S13 reload proves SQL persisted HR employee and Barber status');

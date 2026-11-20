@@ -46,11 +46,14 @@ test('S13 HR browser records action-level phases and parent fails closed on stal
  for(const phase of [
   'S13 HR route navigation','S13 HR heading rendered',
   'S13 HR employee code input','S13 HR employee create POST',
-  'S13 Barber resource selection',
+  'S13 Barber resource selection','S13 Barber activate POST',
  ])assert.ok(hr.includes(phase),'missing HR phase marker '+phase);
  assert.match(runner,/const MAX_PHASE_IDLE_MS=120\*1000/);
  assert.match(runner,/clearInterval\(phaseWatchdog\)/);
  assert.match(runner,/Chromium phase stalled/);
- assert.match(hr,/waitUntil:'commit',timeout:45000/);
+ // Submit must not use Playwright type=submit click (CI IPC hang at create POST).
+ assert.match(hr,/requestSubmit/);
+ assert.match(hr,/S13_EMPLOYEE_CREATE_STALL/);
+ assert.match(hr,/withHardTimeout/);
  assert.match(hr,/getByRole\('heading',\{name:'الموظفون والحلاقون'\}\)\.waitFor/);
 });

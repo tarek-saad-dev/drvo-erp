@@ -3,7 +3,7 @@ import Link from "next/link";
 import CashierPricingPanel from "./cashier-pricing-panel";
 import CashierDraftHistory from "./cashier-draft-history";
 import PosCustomerOperator from "./pos-customer-operator";
-import CashierCatalogBrowser from "./cashier-catalog-browser";
+import CashierCatalogBrowser,{type ProductStockHint} from "./cashier-catalog-browser";
 import CashierCartPanel from "./cashier-cart-panel";
 import CashierQuickActions from "./cashier-quick-actions";
 import CashierBarberSelector,{type BarberEmployee} from "./cashier-barber-selector";
@@ -66,6 +66,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
   const [customerRevision,setCustomerRevision]=useState(0);
   const [selectedBarberId,setSelectedBarberId]=useState("");
   const [rosterNames,setRosterNames]=useState<Record<string,string>>({});
+  const [productStock,setProductStock]=useState<Record<string,ProductStockHint>|{}};
   const onRoster=useCallback((employees:BarberEmployee[])=>{
     const names:Record<string,string>={};
     for(const e of employees)names[e.employeeId.toLowerCase()]=e.displayName;
@@ -101,6 +102,32 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
         setStatus("error");return;
       }
       setOfferings(data.offerings);
+      // Optional SQL027 branch stock overlay for PRODUCT draft gating (never posts / decrements).
+      try{
+        const invApi=api.replace(/\/pos-preview$/,"")+"/inventory";
+        const invRes=await fetch(invApi,{credentials:"same-origin",cache:"no-store"});
+        if(invRes.ok){
+          const inv=await invRes.json() as {
+            items?:Array<{offeringId:string;qtyMilli:number;stockStatus:string}>;
+          };
+          const map:Record<string,ProductStockHint>={};
+          if(Array.isArray(inv.items)){
+            for(const item of inv.items){
+              if(!item||typeof item.offeringId!=="string"||!GUID.test(item.offeringId))continue;
+              if(!Number.isSafeInteger(item.qtyMilli))continue;
+              if(item.stockStatus!=="OK"&&item.stockStatus!=="LOW"&&item.stockStatus!=="OUT")continue;
+              map[item.offeringId.toLowerCase()]={
+                qtyMilli:item.qtyMilli,stockStatus:item.stockStatus,
+              };
+            }
+          }
+          setProductStock(map);
+        }else{
+          setProductStock({});
+        }
+      }catch{
+        setProductStock({});
+      }
       // The query is NEVER an authority, price, sale or booked-status proof.
       // Only the independently permitted POS/Catalog response can validate it.
       // Customer GUID is a draft selection hint; operator/rich save revalidates.
@@ -302,7 +329,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
       <CashierBarberSelector apiRoot={api.replace(/\/pos-preview$/,"")}
        selectedId={selectedBarberId} onSelect={setSelectedBarberId} onRoster={onRoster}/>
       <CashierCatalogBrowser offerings={offerings} disabled={busy||draftBusy||lines.length>=20}
-       onAdd={o=>quickAdd(o)}/>
+       productStock={productStock} onAdd={o=>quickAdd(o)}/>
       <CashierPackagesSection
        apiRoot={api.replace(/\/pos-preview$/,"")}
        offerings={offerings} lines={lines} disabled={busy||draftBusy||lines.length>=20}

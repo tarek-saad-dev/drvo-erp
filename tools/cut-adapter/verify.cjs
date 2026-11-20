@@ -14,6 +14,7 @@ const {planCutFixtureReconciliation} = require('./reconciliation-planner.cjs');
 const {buildIdentityMappingLedger} = require('./identity-mapping.cjs');
 const {buildReconciliationReport} = require('./reconciliation-report.cjs');
 const {buildPreactivationGateBoard} = require('./preactivation-gates.cjs');
+const {planCutEmployeeFixture} = require('./employee-planner.cjs');
 
 const root = __dirname;
 const customersFixture = JSON.parse(
@@ -22,22 +23,36 @@ const customersFixture = JSON.parse(
 const salesFixture = JSON.parse(
   fs.readFileSync(path.join(root, 'fixtures', 'sample-sales-history-summary.json'), 'utf8')
 );
+const employeesFixture = JSON.parse(
+  fs.readFileSync(path.join(root, 'fixtures', 'sample-employees-hr.json'), 'utf8')
+);
 
 assertNoLiveConnectionMarkers(customersFixture);
 assertNoLiveConnectionMarkers(salesFixture);
+assertNoLiveConnectionMarkers(employeesFixture);
 
 const plan = planCutFixtureReconciliation(customersFixture);
 assert.equal(plan.mode, 'FIXTURE_CHARACTERIZATION_DRY_RUN_ONLY');
 assert.equal(plan.writes, 0);
 assert.equal(plan.liveAccess, 'BLOCKED');
 
-const ledger = buildIdentityMappingLedger(plan, {
+const employeePlan = planCutEmployeeFixture(employeesFixture);
+assert.equal(employeePlan.mode, 'FIXTURE_CHARACTERIZATION_DRY_RUN_ONLY');
+assert.equal(employeePlan.writes, 0);
+assert.ok(employeePlan.employeeCount >= 1);
+
+const combinedPlan = Object.assign({}, plan, {employees: employeePlan.employees});
+const ledger = buildIdentityMappingLedger(combinedPlan, {
   sourceTenantKey: customersFixture.meta.sourceTenantKey,
   defaultSourceBranchKey: customersFixture.meta.sourceBranchKey,
   approvedImportLedgerEvidence: false,
 });
 assert.equal(ledger.mode, 'FIXTURE_IDENTITY_MAP_DRY_RUN_ONLY');
-assert.equal(ledger.entryCount, plan.customerCount + plan.serviceCount);
+assert.equal(
+  ledger.entryCount,
+  plan.customerCount + plan.serviceCount + employeePlan.employeeCount
+);
+assert.ok(ledger.entries.some((e) => e.entityType === 'HR_EMPLOYEE'));
 assert.equal(ledger.productionVerificationClaimed, false);
 
 const report = buildReconciliationReport(plan, {
@@ -55,6 +70,8 @@ assert.equal(board.productionVerificationClaimed, false);
 assert.equal(board.cutSqlModifications, 'FORBIDDEN');
 assert.ok(board.sourceMigrations.sql024.present, 'SQL024 source migration must exist');
 assert.ok(board.sourceMigrations.sql025.present, 'SQL025 source migration must exist');
+assert.ok(board.sourceMigrations.sql027.present, 'SQL027 source migration must exist');
+assert.ok(board.sourceMigrations.sql031.present, 'SQL031 source migration must exist');
 assert.ok(
   board.blockingGateIds.includes('SQL024_TARGET_APPLY'),
   'Target SQL024 apply must remain a blocking OPEN gate'
@@ -62,6 +79,14 @@ assert.ok(
 assert.ok(
   board.blockingGateIds.includes('SQL025_TARGET_APPLY'),
   'Target SQL025 apply must remain a blocking OPEN gate'
+);
+assert.ok(
+  board.blockingGateIds.includes('SQL027_TARGET_APPLY'),
+  'Target SQL027 apply must remain a blocking OPEN gate'
+);
+assert.ok(
+  board.blockingGateIds.includes('SQL031_TARGET_APPLY'),
+  'Target SQL031 apply must remain a blocking OPEN gate'
 );
 assert.ok(board.blockingGateIds.includes('ISOLATED_RESTORE'));
 assert.ok(board.blockingGateIds.includes('K5_PERMISSIONS'));

@@ -29,6 +29,20 @@ const GATE_DEFS = Object.freeze([
       'Confirm db/migrations/025_catalog_packages.sql exists and matches the committed SHA-256 checksum in this checklist run. Source presence ≠ target DB apply.',
   }),
   Object.freeze({
+    id: 'SQL027_SOURCE_PRESENT',
+    title: 'Inventory branch stock SQL027 present in DRVO source tree',
+    evidenceClass: 'SOURCE_ARTIFACT',
+    howToVerify:
+      'Confirm db/migrations/027_inventory_branch_stock.sql exists and matches the committed SHA-256 checksum. Source presence ≠ target DB apply or POS sale decrement.',
+  }),
+  Object.freeze({
+    id: 'SQL031_SOURCE_PRESENT',
+    title: 'Customer CRM profile/consent SQL031 present in DRVO source tree',
+    evidenceClass: 'SOURCE_ARTIFACT',
+    howToVerify:
+      'Confirm db/migrations/031_customer_profile_consent.sql exists and matches the committed SHA-256 checksum. Source presence ≠ target DB apply or messaging send.',
+  }),
+  Object.freeze({
     id: 'SQL024_TARGET_APPLY',
     title: 'SQL024 applied on verified isolated DRVO target DB',
     evidenceClass: 'OPERATOR_TARGET_DB',
@@ -41,6 +55,20 @@ const GATE_DEFS = Object.freeze([
     evidenceClass: 'OPERATOR_TARGET_DB',
     howToVerify:
       'Read-only confirm 025_catalog_packages.sql in target SchemaMigration with matching checksum after SQL024. Separate authorization required; disposable CI PASS is not primary/VPS proof.',
+  }),
+  Object.freeze({
+    id: 'SQL027_TARGET_APPLY',
+    title: 'SQL027 applied on verified isolated DRVO target DB',
+    evidenceClass: 'OPERATOR_TARGET_DB',
+    howToVerify:
+      'Read-only confirm 027_inventory_branch_stock.sql in target SchemaMigration with matching checksum after prior migrations. Separate authorization; disposable CI ≠ primary apply.',
+  }),
+  Object.freeze({
+    id: 'SQL031_TARGET_APPLY',
+    title: 'SQL031 applied on verified isolated DRVO target DB',
+    evidenceClass: 'OPERATOR_TARGET_DB',
+    howToVerify:
+      'Read-only confirm 031_customer_profile_consent.sql in target SchemaMigration with matching checksum. Never invent WhatsApp consent from phones during Cut import.',
   }),
   Object.freeze({
     id: 'ISOLATED_RESTORE',
@@ -121,6 +149,8 @@ function buildPreactivationGateBoard(operatorEvidence = {}) {
 
   const sql024 = sourceMigrationProbe(path.join('db', 'migrations', '024_customer_business_search.sql'));
   const sql025 = sourceMigrationProbe(path.join('db', 'migrations', '025_catalog_packages.sql'));
+  const sql027 = sourceMigrationProbe(path.join('db', 'migrations', '027_inventory_branch_stock.sql'));
+  const sql031 = sourceMigrationProbe(path.join('db', 'migrations', '031_customer_profile_consent.sql'));
 
   const gates = GATE_DEFS.map((def) => {
     let status = 'OPEN';
@@ -134,6 +164,16 @@ function buildPreactivationGateBoard(operatorEvidence = {}) {
       status = sql025.present ? 'PASS_SOURCE_ONLY' : 'FAIL_SOURCE_MISSING';
       evidence = sql025.present
         ? 'source checksum ' + sql025.checksumSha256
+        : 'migration file missing from repo';
+    } else if (def.id === 'SQL027_SOURCE_PRESENT') {
+      status = sql027.present ? 'PASS_SOURCE_ONLY' : 'FAIL_SOURCE_MISSING';
+      evidence = sql027.present
+        ? 'source checksum ' + sql027.checksumSha256
+        : 'migration file missing from repo';
+    } else if (def.id === 'SQL031_SOURCE_PRESENT') {
+      status = sql031.present ? 'PASS_SOURCE_ONLY' : 'FAIL_SOURCE_MISSING';
+      evidence = sql031.present
+        ? 'source checksum ' + sql031.checksumSha256
         : 'migration file missing from repo';
     }
     return Object.freeze({
@@ -166,6 +206,8 @@ function buildPreactivationGateBoard(operatorEvidence = {}) {
     sourceMigrations: Object.freeze({
       sql024,
       sql025,
+      sql027,
+      sql031,
     }),
     gates: Object.freeze(gates),
     blockingGateIds: Object.freeze(blocking.map((g) => g.id)),

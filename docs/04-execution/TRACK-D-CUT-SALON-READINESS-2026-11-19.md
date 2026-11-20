@@ -13,7 +13,8 @@ Related contracts: [CUT-SALON-REAL-PRODUCT-LIVE-DEVELOPMENT-2026-11-18](CUT-SALO
 | Identity mapping scaffold | `tools/cut-adapter/identity-mapping.cjs` | Unassigned `SourceSystem\|Tenant\|Branch\|Entity\|OriginalId` keys only |
 | Reconciliation report scaffold | `tools/cut-adapter/reconciliation-report.cjs` | Redacted non-PII counts + digests |
 | Sales-history count fixture | `tools/cut-adapter/fixtures/sample-sales-history-summary.json` | Synthetic aggregates; not invoices |
-| Pre-activation gate board | `tools/cut-adapter/preactivation-gates.cjs` | SQL024/025 source probe + OPEN operator gates |
+| Pre-activation gate board | `tools/cut-adapter/preactivation-gates.cjs` | SQL024/025/027/031 source probe + OPEN operator gates |
+| HR employee fixture planner | `tools/cut-adapter/employee-planner.cjs` + `fixtures/sample-employees-hr.json` | Synthetic HR tokens; `HR_EMPLOYEE` identity keys |
 | Offline verify | `tools/cut-adapter/verify.cjs` | Asserts activation stays BLOCKED |
 | Unit tests | `tests/cut-adapter.test.cjs` | Fixture + refusal coverage |
 
@@ -34,8 +35,12 @@ Disposable GitHub CI PASS (Customers SQL024 HTTP, Catalog SQL025 packages, Chrom
 | --- | --- | --- |
 | SQL024 **source** present | `db/migrations/024_customer_business_search.sql` exists; checksum via `buildPreactivationGateBoard()` | **PASS_SOURCE_ONLY** (git artifact) |
 | SQL025 **source** present | `db/migrations/025_catalog_packages.sql` exists; checksum via gate board | **PASS_SOURCE_ONLY** (git artifact) |
+| SQL027 **source** present | `db/migrations/027_inventory_branch_stock.sql` checksum via gate board | **PASS_SOURCE_ONLY** (git artifact) |
+| SQL031 **source** present | `db/migrations/031_customer_profile_consent.sql` checksum via gate board | **PASS_SOURCE_ONLY** (git artifact) |
 | SQL024 **target apply** | Read-only `core.SchemaMigration` on dedicated DRVO pilot DB; matching checksum; restricted migrator only after backup | **OPEN** |
 | SQL025 **target apply** | Same as above for `025_catalog_packages.sql` after 024 | **OPEN** |
+| SQL027 **target apply** | Same for `027_inventory_branch_stock.sql` | **OPEN** |
+| SQL031 **target apply** | Same for `031_customer_profile_consent.sql` | **OPEN** |
 | Isolated restore | Encrypted/off-host (or approved) backup → `RESTORE VERIFYONLY` → restore into a **new** DRVO-only recovery DB; compare migration history; never restore into Cut/Cashier/AutoResponse | **OPEN** |
 | K5 permissions | Trusted private session: `customers.read` / `customers.manage`, catalog/POS draft scopes, foreign Tenant/Business/Branch deny; flags OFF until approved; K5F checker when installed | **OPEN** |
 | Owner browser | Authenticated Owner on private workspace (not `/demo/salon`): SQL024 Customer search, catalog/packages if 025 applied, NONPOSTING DRAFT only, foreign denial | **OPEN** |

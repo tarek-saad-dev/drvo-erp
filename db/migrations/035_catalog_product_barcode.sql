@@ -3,15 +3,19 @@
 -- SERVICE rows must keep Barcode NULL. Unique per Business when present.
 -- No sale, stock decrement, purchase AP, or ADR-031 posting.
 -- Never apply on primary/VPS without separate backup + approval.
+-- Note: after ADD column, later DDL that references Barcode must be dynamic SQL
+-- (GO batches are forbidden by the migrator; same-batch name resolution fails).
 
 ALTER TABLE core.CatalogOffering ADD Barcode NVARCHAR(50) NULL;
-ALTER TABLE core.CatalogOffering ADD CONSTRAINT CK_CatalogOffering_Barcode CHECK(
- (Kind='PRODUCT' AND (Barcode IS NULL OR LEN(LTRIM(RTRIM(Barcode))) BETWEEN 1 AND 50))
- OR (Kind='SERVICE' AND Barcode IS NULL)
-);
-CREATE UNIQUE INDEX UX_CatalogOffering_Barcode
+
+EXEC(N'ALTER TABLE core.CatalogOffering ADD CONSTRAINT CK_CatalogOffering_Barcode CHECK(
+ (Kind=''PRODUCT'' AND (Barcode IS NULL OR LEN(LTRIM(RTRIM(Barcode))) BETWEEN 1 AND 50))
+ OR (Kind=''SERVICE'' AND Barcode IS NULL)
+)');
+
+EXEC(N'CREATE UNIQUE INDEX UX_CatalogOffering_Barcode
  ON core.CatalogOffering(TenantId,BusinessId,Barcode)
- WHERE Barcode IS NOT NULL;
+ WHERE Barcode IS NOT NULL');
 
 EXEC(N'CREATE OR ALTER PROCEDURE core.ReadCatalog
  @TenantId UNIQUEIDENTIFIER, @BusinessId UNIQUEIDENTIFIER,

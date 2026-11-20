@@ -212,15 +212,18 @@ export class CatalogService {
       throw new BadRequestException("Invalid service duration");
     }
     const barcode=optionalBarcode(obj.barcode,kind);
-    const result=await this.execute(scope,"core.CreateCatalogOffering",r=>r
-      .input("ClientRequestId",sql.UniqueIdentifier,reqId)
-      .input("CategoryId",sql.UniqueIdentifier,categoryId)
-      .input("Kind",sql.VarChar(7),kind)
-      .input("DisplayName",sql.NVarChar(160),displayName)
-      .input("PriceMinor",sql.BigInt,priceMinor)
-      .input("Currency",sql.Char(3),currency)
-      .input("DurationMinutes",sql.Int,duration)
-      .input("Barcode",sql.NVarChar(50),barcode));
+    // Omit @Barcode when null so pre-SQL035 CreateCatalogOffering (Booking CI tip 017) still works.
+    const result=await this.execute(scope,"core.CreateCatalogOffering",r=>{
+      r.input("ClientRequestId",sql.UniqueIdentifier,reqId)
+        .input("CategoryId",sql.UniqueIdentifier,categoryId)
+        .input("Kind",sql.VarChar(7),kind)
+        .input("DisplayName",sql.NVarChar(160),displayName)
+        .input("PriceMinor",sql.BigInt,priceMinor)
+        .input("Currency",sql.Char(3),currency)
+        .input("DurationMinutes",sql.Int,duration);
+      if (barcode!==null) r.input("Barcode",sql.NVarChar(50),barcode);
+      return r;
+    });
     return resultRow(result.recordset?.[0]);
   }
 

@@ -12,6 +12,8 @@ test('private POS workstation hosts Cashier catalog/cart/barber/packages/quick-a
  assert.match(client,/CashierCartPanel/);
  assert.match(client,/CashierQuickActions/);
  assert.match(client,/CashierBarberSelector/);
+ assert.match(client,/CashierTipsPreview/);
+ assert.match(client,/CashierReturnsPreview/);
  assert.match(client,/PosCustomerOperator/);
  assert.match(client,/defaultExecutorEmployeeId=\{selectedBarberId/);
  assert.doesNotMatch(client,/\/api\/sales|localStorage|DEMO_/);

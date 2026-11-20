@@ -8,6 +8,7 @@ import CashierCartPanel from "./cashier-cart-panel";
 import CashierQuickActions from "./cashier-quick-actions";
 import CashierBarberSelector,{type BarberEmployee} from "./cashier-barber-selector";
 import CashierTipsPreview from "./cashier-tips-preview";
+import CashierReturnsPreview from "./cashier-returns-preview";
 import CashierPackagesSection,{expandPackageToDraftLines,type CatalogPackage} from "./cashier-packages-section";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -425,6 +426,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
       </section>}
       {lines.length>0&&<CashierTipsPreview totalDueMinor={tipTotalDueMinor} currency={tipCurrency}
        executorLines={tipExecutorLines} executorNames={rosterNames} disabled={busy||draftBusy}/>}
+      <CashierReturnsPreview disabled={busy||draftBusy}/>
       {preview&&<section className="k5-admin-card">
         <h2>نتيجة المعاينة — ليست فاتورة</h2>
         <div className="k5-table-wrap"><table className="k5-table">

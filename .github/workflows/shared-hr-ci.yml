@@ -6,6 +6,8 @@ on:
       - 'apps/api/src/hr/**'
       - 'apps/api/src/app.module.ts'
       - 'apps/api/test/hr.test.cjs'
+      - 'apps/api/test/hr-admin-ui-contract.test.cjs'
+      - 'apps/api/test/hr-ledger-preview.test.cjs'
       - 'tools/hr/**'
       - '.github/workflows/shared-hr-ci.yml'
   push:
@@ -15,6 +17,8 @@ on:
       - 'apps/api/src/hr/**'
       - 'apps/api/src/app.module.ts'
       - 'apps/api/test/hr.test.cjs'
+      - 'apps/api/test/hr-admin-ui-contract.test.cjs'
+      - 'apps/api/test/hr-ledger-preview.test.cjs'
       - 'tools/hr/**'
       - '.github/workflows/shared-hr-ci.yml'
 permissions:

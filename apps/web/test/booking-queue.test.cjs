@@ -9,15 +9,22 @@ test('Queue page is private and independently gated',()=>{
  assert.match(page,/DRVO_QUEUE_WEB_ENABLED/);
  assert.match(page,/notFound\(\)/);
 });
-test('Queue UI stays nonposting and uses idempotent lifecycle actions',()=>{
+test('Queue UI stays nonposting and uses idempotent lifecycle + settle actions',()=>{
  const client=read('queue/queue-client.tsx');
  assert.match(client,/NONPOSTING_QUEUE_TICKETS_ONLY/);
+ assert.match(client,/NONPOSTING_QUEUE_LIFECYCLE/);
  assert.match(client,/treasuryState!=="NOT_PAID"/);
  assert.match(client,/accountingState!=="NOT_POSTED"/);
  assert.match(client,/ADR-031 OUT OF SCOPE/);
  assert.match(client,/Idempotency-Key/);
  assert.match(client,/\/queue\/tickets/);
  assert.match(client,/\/queue\/tickets\/.+\/status/);
+ assert.match(client,/\/queue\/settle-expired/);
+ assert.match(client,/تسوية منتهية/);
+ assert.match(client,/drvo-queue-board/);
+ assert.match(client,/WAITING/);
+ assert.match(client,/CALLED/);
+ assert.match(client,/IN_SERVICE/);
  assert.doesNotMatch(client,/localStorage|sessionStorage|CashMove|paidSale/);
  assert.match(client,/NOT_POSTED/);
  assert.doesNotMatch(client,/"POSTED"|accountingPosted|paid invoice/i);
@@ -41,8 +48,10 @@ test('Branch launcher exposes queue only behind web flag + API auth',()=>{
  assert.match(home,/\/queue/);
  assert.match(home,/setCanViewQueue\(queueResult\.ok/);
 });
-test('Light CSS covers booking calendar and queue live columns',()=>{
+test('Light CSS covers booking calendar and queue live board columns',()=>{
  const css=fs.readFileSync(path.resolve(__dirname,'../src/app/drvo-light.css'),'utf8');
  assert.match(css,/\.drvo-booking-calendar-grid/);
  assert.match(css,/\.drvo-queue-columns/);
+ assert.match(css,/\.drvo-queue-board/);
+ assert.match(css,/\.drvo-queue-card/);
 });

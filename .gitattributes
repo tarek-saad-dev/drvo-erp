@@ -1,1 +1,3 @@
 tests/fixtures/cashier/** text eol=lf
+
+_cashier_source/queue/** text eol=lf

@@ -112,12 +112,14 @@ async function main(){
   "',CHECK_POLICY=ON,CHECK_EXPIRATION=OFF");
  admin=await connect({...base,database:db});
  await admin.query('CREATE USER ['+user+'] FOR LOGIN ['+user+'];GRANT CONNECT TO ['+user+']');
- await pass('26 migrations apply including SQL026 queue tables',async()=>{
-  const a=await applyMigrations(admin,undefined,26);
-  assert.equal(a.length,26);assert.ok(a.every(v=>v.status==='applied'));
-  const b=await applyMigrations(admin,undefined,26);
+ await pass('36 migrations apply including SQL026 queue + SQL036 settle',async()=>{
+  const a=await applyMigrations(admin,undefined,36);
+  assert.equal(a.length,36);assert.ok(a.every(v=>v.status==='applied'));
+  const b=await applyMigrations(admin,undefined,36);
   assert.ok(b.every(v=>v.status==='unchanged'));
   assert.equal((await admin.query('SELECT COUNT(*) AS n FROM core.QueueTicket')).recordset[0].n,0);
+  assert.equal((await admin.query(
+   "SELECT COL_LENGTH('core.QueueTicket','AutoClosedAtUtc') AS c")).recordset[0].c,7);
  });
  await grants(admin);
  await query(admin,"INSERT core.Tenant(TenantId,DisplayName) VALUES(@t,N'CI'),(@otherT,N'Other')",
@@ -137,8 +139,9 @@ async function main(){
    "SELECT HAS_PERMS_BY_NAME('core.QueueTicket','OBJECT','SELECT') AS r,"+
    "HAS_PERMS_BY_NAME('core.QueueTicket','OBJECT','INSERT') AS w,"+
    "HAS_PERMS_BY_NAME('core.ReadBranchQueue','OBJECT','EXECUTE') AS x,"+
-   "HAS_PERMS_BY_NAME('core.CreateQueueTicket','OBJECT','EXECUTE') AS y");
-  assert.deepEqual(Object.values(r.recordset[0]).map(Number),[0,0,1,1]);
+   "HAS_PERMS_BY_NAME('core.CreateQueueTicket','OBJECT','EXECUTE') AS y,"+
+   "HAS_PERMS_BY_NAME('core.SettleExpiredQueueTickets','OBJECT','EXECUTE') AS z");
+  assert.deepEqual(Object.values(r.recordset[0]).map(Number),[0,0,1,1,1]);
   await assert.rejects(()=>app.query('SELECT * FROM core.QueueTicket'),e=>e.number===229);
  });
  const env={...process.env,NODE_ENV:'production',API_HOST:'127.0.0.1',API_PORT:'3421',
@@ -178,9 +181,13 @@ async function main(){
   const r=await get(endpoint(x.b,x.br),own);assert.equal(r.status,200);
   const body=await r.json();
   assert.equal(body.state,'NONPOSTING_QUEUE_TICKETS_ONLY');
+  assert.equal(body.lifecycleState,'NONPOSTING_QUEUE_LIFECYCLE');
   assert.equal(body.treasuryState,'NOT_PAID');
   assert.equal(body.accountingState,'NOT_POSTED');
+  assert.equal(body.graceMinutes,15);
   assert.ok(body.tickets.length>=2);
+  assert.ok(body.tickets.every(t=>typeof t.effectiveStatus==='string'&&
+   typeof t.needsOperatorAction==='boolean'&&typeof t.settleEligible==='boolean'));
   assert.ok(body.tickets.some(t=>t.source==='WALK_IN'));
   assert.ok(body.tickets.some(t=>t.source==='BOOKING_HANDOFF'&&
    String(t.bookingId).toLowerCase()===x.booking.toLowerCase()));
@@ -195,6 +202,32 @@ async function main(){
   const doneKey=id();
   assert.equal((await post(basePath,own,doneKey,{status:'DONE'})).status,200);
   assert.equal((await post(basePath,own,id(),{status:'CANCELLED'})).status,409);
+ });
+ let expiredTicketId;
+ await pass('operator settle-expired marks WAITING past grace as NO_SHOW',async()=>{
+  const path=endpoint(x.b,x.br)+'/tickets';
+  const payload={customerId:null,resourceId:x.resource,offeringId:null,durationMinutes:30,
+   expectedStartAtUtc:'2020-01-01T10:00:00.000Z'};
+  const created=await post(path,own,id(),payload);assert.equal(created.status,200);
+  expiredTicketId=(await created.json()).id;
+  const settlePath=endpoint(x.b,x.br)+'/settle-expired';
+  const first=await post(settlePath,own,id(),{graceMinutes:15});
+  assert.equal(first.status,200);
+  const body=await first.json();
+  assert.equal(body.treasuryState,'NOT_PAID');
+  assert.equal(body.accountingState,'NOT_POSTED');
+  assert.ok(body.settledCount>=1);
+  assert.ok(body.ticketIds.some(t=>String(t).toLowerCase()===expiredTicketId.toLowerCase()));
+  const replay=await post(settlePath,own,id(),{graceMinutes:15});
+  assert.equal(replay.status,200);
+  assert.equal((await replay.json()).settledCount,0);
+  assert.equal((await post(settlePath,own,id(),{graceMinutes:15},
+   'https://evil.example')).status,401);
+  const board=await (await get(endpoint(x.b,x.br),own)).json();
+  const settled=board.tickets.find(t=>String(t.ticketId).toLowerCase()===
+   expiredTicketId.toLowerCase());
+  assert.equal(settled?.status,'NO_SHOW');
+  assert.equal(settled?.settleEligible,false);
  });
  await pass('cross-tenant and unassigned branch denied',async()=>{
   assert.equal((await get(endpoint(x.foreignB,x.foreignBr),own)).status,404);

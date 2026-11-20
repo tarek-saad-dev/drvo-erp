@@ -3,31 +3,71 @@ import Link from "next/link";
 import {useCallback,useEffect,useMemo,useRef,useState} from "react";
 import {useRouter} from "next/navigation";
 
+type TicketStatus="WAITING"|"CALLED"|"IN_SERVICE"|"DONE"|"CANCELLED"|"NO_SHOW";
+type EffectiveStatus=TicketStatus|"NO_SHOW_CANDIDATE"|"OVERDUE_FINISH_REQUIRED";
 type Ticket={
  ticketId:string;ticketCode:string;customerId:string|null;resourceId:string|null;
  offeringId:string|null;bookingId:string|null;customerName:string;resourceName:string;
  offeringName:string;durationMinutes:number;expectedStartAtUtc:string;expectedEndAtUtc:string;
- status:"WAITING"|"CALLED"|"IN_SERVICE"|"DONE"|"CANCELLED"|"NO_SHOW";
- source:"WALK_IN"|"BOOKING_HANDOFF";createdAtUtc:string;
+ status:TicketStatus;source:"WALK_IN"|"BOOKING_HANDOFF";createdAtUtc:string;
+ effectiveStatus:EffectiveStatus;needsOperatorAction:boolean;isBlockingAvailability:boolean;
+ isCountingAhead:boolean;overdueMinutes:number;settleEligible:boolean;
 };
 type QueueRead={
- state:"NONPOSTING_QUEUE_TICKETS_ONLY";tickets:Ticket[];limit:200;mayBeTruncated:boolean;
+ state:"NONPOSTING_QUEUE_TICKETS_ONLY";lifecycleState:"NONPOSTING_QUEUE_LIFECYCLE";
+ tickets:Ticket[];limit:200;mayBeTruncated:boolean;actionRequiredCount:number;
+ settleEligibleCount:number;graceMinutes:number;
  treasuryState:"NOT_PAID";accountingState:"NOT_POSTED";
 };
 type Resource={resourceId:string;displayName:string;kind:string;isActive:boolean};
 type Customer={customerId:string;displayName:string;phoneE164?:string|null;isActive:boolean};
 type Offering={offeringId:string;displayName:string;kind:string;durationMinutes:number|null;isActive:boolean};
 const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const ACTIVE=new Set(["WAITING","CALLED","IN_SERVICE"]);
-const label:Record<Ticket["status"],string>={
+const LIVE=["WAITING","CALLED","IN_SERVICE"] as const;
+type LiveStatus=(typeof LIVE)[number];
+const label:Record<TicketStatus,string>={
  WAITING:"انتظار",CALLED:"تم النداء",IN_SERVICE:"قيد الخدمة",
  DONE:"منتهي",CANCELLED:"ملغي",NO_SHOW:"لم يحضر",
+};
+const effectiveLabel:Partial<Record<EffectiveStatus,string>>={
+ NO_SHOW_CANDIDATE:"مرشح لعدم الحضور",OVERDUE_FINISH_REQUIRED:"متأخر — يلزم الإنهاء",
 };
 function when(value:string){
  const d=new Date(value);
  return Number.isNaN(d.getTime())?"—":new Intl.DateTimeFormat("ar-EG",{
   dateStyle:"short",timeStyle:"short",timeZone:"Africa/Cairo",
  }).format(d);
+}
+function TicketCard({t,busy,onTransition}:{
+ t:Ticket;busy:string;onTransition:(id:string,next:TicketStatus)=>void;
+}){
+ return <article className={t.needsOperatorAction?"drvo-queue-card action":"drvo-queue-card"}>
+  <strong>{t.ticketCode}</strong>
+  <span>{t.customerName||"بدون عميل"} · {t.resourceName||"—"}</span>
+  <span className="k5-muted">{label[t.status]} · {when(t.expectedStartAtUtc)} · {t.durationMinutes}د</span>
+  {t.needsOperatorAction&&<span className="drvo-queue-flag">
+   {effectiveLabel[t.effectiveStatus]||"يحتاج إجراء"}
+   {t.overdueMinutes>0?` · +${t.overdueMinutes}د`:""}
+  </span>}
+  <div className="k5-booking-actions">
+   {t.status==="WAITING"&&<>
+    <button type="button" className="k5-salon-refresh" disabled={!!busy}
+     onClick={()=>onTransition(t.ticketId,"CALLED")}>نداء</button>
+    <button type="button" className="k5-salon-refresh" disabled={!!busy}
+     onClick={()=>onTransition(t.ticketId,"IN_SERVICE")}>بدء الخدمة</button>
+   </>}
+   {t.status==="CALLED"&&<button type="button" className="k5-salon-refresh" disabled={!!busy}
+    onClick={()=>onTransition(t.ticketId,"IN_SERVICE")}>بدء الخدمة</button>}
+   {t.status==="IN_SERVICE"&&<button type="button" className="k5-save" disabled={!!busy}
+    onClick={()=>onTransition(t.ticketId,"DONE")}>إنهاء</button>}
+   {(LIVE as readonly string[]).includes(t.status)&&<>
+    <button type="button" disabled={!!busy}
+     onClick={()=>onTransition(t.ticketId,"CANCELLED")}>إلغاء</button>
+    <button type="button" disabled={!!busy}
+     onClick={()=>onTransition(t.ticketId,"NO_SHOW")}>لم يحضر</button>
+   </>}
+  </div>
+ </article>;
 }
 export default function QueueClient({businessId,branchId}:{
  businessId:string;branchId:string;
@@ -67,9 +107,11 @@ export default function QueueClient({businessId,branchId}:{
    const board=await queue.json() as QueueRead;
    const book=await booking.json() as {resources?:Resource[]};
    const cat=await catalog.json() as {offerings?:Offering[]};
-   if(board.state!=="NONPOSTING_QUEUE_TICKETS_ONLY"||board.treasuryState!=="NOT_PAID"||
-    board.accountingState!=="NOT_POSTED"||board.limit!==200||
-    !Array.isArray(board.tickets)||!Array.isArray(book.resources)||!Array.isArray(cat.offerings)){
+   if(board.state!=="NONPOSTING_QUEUE_TICKETS_ONLY"||
+    board.lifecycleState!=="NONPOSTING_QUEUE_LIFECYCLE"||
+    board.treasuryState!=="NOT_PAID"||board.accountingState!=="NOT_POSTED"||
+    board.limit!==200||!Array.isArray(board.tickets)||
+    !Array.isArray(book.resources)||!Array.isArray(cat.offerings)){
     setStatus("unavailable");return;
    }
    const activeResources=book.resources.filter(r=>r.isActive);
@@ -98,7 +140,16 @@ export default function QueueClient({businessId,branchId}:{
   },250);
   return ()=>{cancelled=true;clearTimeout(timer);};
  },[customerQuery,api,router]);
- const live=useMemo(()=>data?.tickets.filter(t=>ACTIVE.has(t.status))??[],[data]);
+ const columns=useMemo(()=>{
+  const live=data?.tickets.filter((t):t is Ticket&{status:LiveStatus}=>
+   (LIVE as readonly string[]).includes(t.status))??[];
+  return {
+   WAITING:live.filter(t=>t.status==="WAITING"),
+   CALLED:live.filter(t=>t.status==="CALLED"),
+   IN_SERVICE:live.filter(t=>t.status==="IN_SERVICE"),
+   liveCount:live.length,
+  } as Record<LiveStatus,Ticket[]>&{liveCount:number};
+ },[data]);
  async function createWalkIn(event:React.FormEvent<HTMLFormElement>){
   event.preventDefault();if(busy)return;
   const start=new Date(localStart);
@@ -124,7 +175,7 @@ export default function QueueClient({businessId,branchId}:{
   }catch{setError(true);setNotice("تعذر الاتصال. أعد المحاولة بنفس الطلب.");}
   finally{setBusy("");}
  }
- async function transition(ticketId:string,next:Ticket["status"]){
+ async function transition(ticketId:string,next:TicketStatus){
   if(busy||!GUID.test(ticketId))return;
   const key=ticketId+":"+next;
   if(!statusKeys.current[key])statusKeys.current[key]=crypto.randomUUID();
@@ -145,6 +196,26 @@ export default function QueueClient({businessId,branchId}:{
   }catch{setError(true);setNotice("تعذر الاتصال. أعد بنفس الطلب.");}
   finally{setBusy("");}
  }
+ async function settleExpired(){
+  if(busy||!data)return;
+  setBusy("settle");setNotice("");setError(false);
+  try{
+   const resp=await fetch(api+"/queue/settle-expired",{method:"POST",
+    credentials:"same-origin",cache:"no-store",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({graceMinutes:data.graceMinutes||15})});
+   if(resp.status===401){router.replace("/sign-in");return;}
+   if(resp.status===403||resp.status===404){setError(true);setNotice("تسوية الطابور غير مصرحة.");return;}
+   if(!resp.ok){setError(true);setNotice("تعذر تسوية التذاكر المنتهية.");return;}
+   const body=await resp.json() as {settledCount?:number;treasuryState?:string;accountingState?:string};
+   if(body.treasuryState!=="NOT_PAID"||body.accountingState!=="NOT_POSTED"){
+    setError(true);setNotice("استجابة غير متوقعة من التسوية.");return;
+   }
+   await load();
+   setNotice(`تسوية منتهية: ${Number(body.settledCount||0)} تذكرة → لم يحضر (بدون أثر مالي).`);
+  }catch{setError(true);setNotice("تعذر الاتصال أثناء التسوية.");}
+  finally{setBusy("");}
+ }
  return <main className="k5-workspace">
   <header className="k5-workspace-header">
    <div className="k5-brand"><span className="brandmark">D</span> DRVO <b>ERP</b></div>
@@ -156,7 +227,7 @@ export default function QueueClient({businessId,branchId}:{
   <div className="k5-page-title"><div>
    <span className="k5-eyebrow">SALON QUEUE</span>
    <h1>طابور الفرع</h1>
-   <p className="k5-muted">تذاكر انتظار وWalk-in مرتبطة بمورد الحجز. مفيش بيع أو قيد مالي من الشاشة دي.</p>
+   <p className="k5-muted">لوحة حية WAITING/CALLED/IN_SERVICE مع تسوية منتهية للمشغّل. مفيش بيع أو قيد مالي.</p>
   </div></div>
   {status==="loading"&&<p role="status" className="k5-table-state">جاري تحميل الطابور…</p>}
   {status==="denied"&&<p role="alert" className="k5-error">الطابور مش متاح لحسابك أو الفرع ده.</p>}
@@ -167,39 +238,30 @@ export default function QueueClient({businessId,branchId}:{
   {status==="ready"&&data&&<>
    <p role="status" className={error?"k5-error":"k5-notice"}>{notice||
     "حالة مالية: NOT_PAID / NOT_POSTED — ADR-031 OUT OF SCOPE."}</p>
-   <section className="k5-admin-card drvo-queue-live" aria-label="التذاكر النشطة">
+   <section className="k5-admin-card drvo-queue-live" aria-label="اللوحة الحية">
     <div className="k5-admin-summary"><h2>اللوحة الحية</h2>
-     <span className="k5-count">{live.length} نشطة / {data.tickets.length} معروضة</span></div>
-    <ul className="drvo-queue-columns">
-     {live.length===0?<li className="k5-muted">مفيش تذاكر نشطة حاليًا.</li>:
-      live.map(t=><li key={t.ticketId}>
-       <strong>{t.ticketCode}</strong>
-       <span>{t.customerName||"بدون عميل"} · {t.resourceName||"—"}</span>
-       <span className="k5-muted">{label[t.status]} · {when(t.expectedStartAtUtc)} · {t.durationMinutes}د</span>
-       <div className="k5-booking-actions">
-        {t.status==="WAITING"&&<>
-         <button type="button" className="k5-salon-refresh" disabled={!!busy}
-          onClick={()=>void transition(t.ticketId,"CALLED")}>نداء</button>
-         <button type="button" className="k5-salon-refresh" disabled={!!busy}
-          onClick={()=>void transition(t.ticketId,"IN_SERVICE")}>بدء الخدمة</button>
-        </>}
-        {t.status==="CALLED"&&<button type="button" className="k5-salon-refresh" disabled={!!busy}
-         onClick={()=>void transition(t.ticketId,"IN_SERVICE")}>بدء الخدمة</button>}
-        {t.status==="IN_SERVICE"&&<button type="button" className="k5-save" disabled={!!busy}
-         onClick={()=>void transition(t.ticketId,"DONE")}>إنهاء</button>}
-        {ACTIVE.has(t.status)&&<>
-         <button type="button" disabled={!!busy}
-          onClick={()=>void transition(t.ticketId,"CANCELLED")}>إلغاء</button>
-         <button type="button" disabled={!!busy}
-          onClick={()=>void transition(t.ticketId,"NO_SHOW")}>لم يحضر</button>
-        </>}
-       </div>
-      </li>)}
-    </ul>
+     <span className="k5-count">{columns.liveCount} نشطة · {data.actionRequiredCount} تحتاج إجراء ·
+      {data.settleEligibleCount} للتسوية</span></div>
+    <div className="k5-booking-actions" style={{marginBottom:12}}>
+     <button type="button" className="k5-salon-refresh" disabled={!!busy}
+      onClick={()=>{void load();}}>تحديث ↻</button>
+     <button type="button" className="k5-save" disabled={!!busy||data.settleEligibleCount<1}
+      onClick={()=>void settleExpired()}>
+      تسوية منتهية ({data.settleEligibleCount})
+     </button>
+    </div>
+    <div className="drvo-queue-board">
+     {LIVE.map(col=><div key={col} className="drvo-queue-board-col" data-status={col}>
+      <strong>{label[col]} <span className="k5-muted">({columns[col].length})</span></strong>
+      {columns[col].length===0?<p className="k5-muted">فارغ</p>:
+       columns[col].map(t=><TicketCard key={t.ticketId} t={t} busy={busy}
+        onTransition={(id,next)=>void transition(id,next)}/>)}
+     </div>)}
+    </div>
    </section>
    <section className="k5-admin-card k5-invite-card" aria-label="إنشاء تذكرة walk-in">
     <h2>تذكرة Walk-in</h2>
-    <p className="k5-muted">إنشاء تذكرة على مورد حجز مع مدة متوقعة. الصوت/الطباعة والـsettle-expired لسه OPEN.</p>
+    <p className="k5-muted">إنشاء تذكرة على مورد حجز مع مدة متوقعة وتعارض الموارد. الصوت/الطباعة لسه OPEN.</p>
     <form className="catalog-form" onSubmit={createWalkIn}>
      <label>بحث عميل (اختياري)
       <input type="search" maxLength={80} value={customerQuery}
@@ -237,19 +299,19 @@ export default function QueueClient({businessId,branchId}:{
     </form>
    </section>
    <section className="k5-admin-card">
-    <div className="k5-admin-summary"><h2>آخر التذاكر</h2>
-     <button type="button" className="k5-salon-refresh" disabled={!!busy}
-      onClick={()=>{void load();}}>تحديث ↻</button></div>
+    <div className="k5-admin-summary"><h2>آخر التذاكر</h2></div>
     <div className="k5-table-wrap"><table className="k5-table">
-     <thead><tr><th>الكود</th><th>العميل</th><th>المورد</th><th>البداية</th><th>الحالة</th><th>المصدر</th></tr></thead>
+     <thead><tr><th>الكود</th><th>العميل</th><th>المورد</th><th>البداية</th><th>الحالة</th>
+      <th>فعّالة</th><th>المصدر</th></tr></thead>
      <tbody>{data.tickets.length===0?
-      <tr><td colSpan={6} className="k5-empty">لا توجد تذاكر.</td></tr>:
+      <tr><td colSpan={7} className="k5-empty">لا توجد تذاكر.</td></tr>:
       data.tickets.map(t=><tr key={t.ticketId}>
        <td dir="ltr">{t.ticketCode}</td>
        <td>{t.customerName||"—"}</td>
        <td>{t.resourceName||"—"}</td>
        <td dir="ltr">{when(t.expectedStartAtUtc)}</td>
        <td>{label[t.status]}</td>
+       <td>{effectiveLabel[t.effectiveStatus]||label[t.status]}</td>
        <td>{t.source==="BOOKING_HANDOFF"?"من حجز":"Walk-in"}</td>
       </tr>)}</tbody>
     </table></div>

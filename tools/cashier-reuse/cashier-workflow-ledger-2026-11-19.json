@@ -1391,16 +1391,19 @@
     },
     {
       "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
-      "TargetPaths": [],
+      "TargetPaths": [
+        "packages/business-modules/hr/src/employee-ledger.ts#calculateMtdDayTarget",
+        "apps/api/src/hr/hr.service.ts#previewTarget"
+      ],
       "UIProof": "OPEN",
-      "DomainTest": "OPEN",
+      "DomainTest": "tests/hr-employee-ledger-source.test.cjs + apps/api/test/hr-ledger-preview.test.cjs",
       "SQLHTTPTest": "OPEN",
       "BrowserProof": "OPEN",
       "DataProof": "OPEN",
       "PilotProof": "OPEN",
       "Status": "BLOCKED",
-      "Blocker": "Payroll posting touches cash; DRVO finance gated",
-      "NextAction": "Identify payroll owner after Treasury/Sales",
+      "Blocker": "Payroll posting touches cash; DRVO finance gated. Only the progressive MTD target calculator is previewed (no attendance/readiness/close/generate)",
+      "NextAction": "Identify payroll owner after Treasury/Sales; target plans/versioning/recalc still SOURCE_IDENTIFIED",
       "SalonExtension": "none",
       "ID": "HR-03",
       "SourcePaths+BlobSHA": [
@@ -1451,16 +1454,20 @@
     },
     {
       "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
-      "TargetPaths": [],
+      "TargetPaths": [
+        "packages/business-modules/hr/src/employee-ledger.ts",
+        "apps/api/src/hr/ledger-policy.ts",
+        "apps/api/src/hr/hr.service.ts#previewLedger"
+      ],
       "UIProof": "OPEN",
-      "DomainTest": "OPEN",
+      "DomainTest": "tests/hr-employee-ledger-source.test.cjs + apps/api/test/hr-ledger-preview.test.cjs",
       "SQLHTTPTest": "OPEN",
       "BrowserProof": "OPEN",
       "DataProof": "OPEN",
       "PilotProof": "OPEN",
       "Status": "BLOCKED",
-      "Blocker": "Employee ledger/Treasury absent",
-      "NextAction": "Port ledger read model before payout",
+      "Blocker": "Non-posting ledger preview (summary buckets, running balance, liquidity) only; no persisted TblEmpLedgerEntry equivalent, payout, cash movement or Treasury link (ADR-031)",
+      "NextAction": "Persisted append-only ledger SQL + payout contract only after Treasury/ADR-031 owner; keep preview unposted",
       "SalonExtension": "none",
       "ID": "HR-05",
       "SourcePaths+BlobSHA": [
@@ -1510,16 +1517,20 @@
     },
     {
       "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
-      "TargetPaths": [],
+      "TargetPaths": [
+        "packages/business-modules/hr/src/employee-ledger.ts#previewAdvanceRepayment",
+        "apps/api/src/hr/ledger-policy.ts",
+        "apps/api/src/hr/hr.service.ts#previewLedger"
+      ],
       "UIProof": "OPEN",
-      "DomainTest": "OPEN",
+      "DomainTest": "tests/hr-employee-ledger-source.test.cjs + apps/api/test/hr-ledger-preview.test.cjs",
       "SQLHTTPTest": "OPEN",
       "BrowserProof": "OPEN",
       "DataProof": "OPEN",
       "PilotProof": "OPEN",
       "Status": "BLOCKED",
-      "Blocker": "Advances cascade into expenses/treasury",
-      "NextAction": "Map with EXP advances reports",
+      "Blocker": "Advance/repayment cap preview only (outstanding = max(0,-balance), over-repay rejected); no cash-in, void, expense or Treasury effect",
+      "NextAction": "Map with EXP advances reports; persisted repayment/void waits on Treasury/ADR-031",
       "SalonExtension": "none",
       "ID": "HR-07",
       "SourcePaths+BlobSHA": [

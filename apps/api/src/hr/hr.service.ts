@@ -5,6 +5,12 @@ import {createHash} from "node:crypto";
 import * as sql from "mssql";
 import {FoundationDatabaseService} from "../data/foundation-database.service";
 import type {Actor} from "../identity/identity.service";
+import {
+ HR_LEDGER_PREVIEW_STATE,LEDGER_REASONS,buildEmployeeStatements,calculateMtdDayTarget,
+ previewAdvanceDisbursement,previewAdvanceRepayment,summarizeBranchLiquidity,
+ summarizeLedgerByEmployee,
+} from "./ledger-policy";
+import type {LedgerEntry,TargetTier} from "./ledger-policy";
 
 // Cashier Employee HR model -> DRVO shared HR; payroll is NOT a posting effect.
 export type HrEmployeeView={
@@ -120,5 +126,78 @@ export class HrService {
   const row=result.recordset?.[0];
   if(!row)throw new ServiceUnavailableException("Barber not configured");
   return {id:String(row.id),changed:Boolean(row.changed)};
+ }
+ /** Branch/HR permission probe: the roster procedure enforces session + scope in SQL. */
+ private async rosterIds(scope:ReturnType<HrService["scope"]>){
+  const result=await this.execute(scope,"core.ReadHrBranchRoster");
+  return new Set(result.recordset.map((row:Record<string,unknown>)=>
+   String(row.employeeId).toLowerCase()));
+ }
+ private preview<T>(fn:()=>T):T{
+  try{return fn();}catch(e){
+   if(e instanceof TypeError||e instanceof RangeError)
+    throw new BadRequestException("Invalid HR preview request");
+   throw e;
+  }
+ }
+ /**
+  * Draft/non-posting employee ledger preview (Cashier HR-05/06/07 characterization).
+  * Nothing is persisted; no cash, payout, payroll approval or GL effect exists.
+  */
+ async previewLedger(actor:Actor,token:string,businessId:string,branchId:string,
+  body:unknown){
+  const scope=this.scope(actor,token,businessId,branchId);
+  const data=strictBody(body,["entries","proposal"]);
+  if(!Array.isArray(data.entries)||data.entries.length>500)
+   throw new BadRequestException("Invalid HR preview request");
+  const entries:LedgerEntry[]=data.entries.map((raw:unknown)=>{
+   const e=strictBody(raw,["employeeId","entryDate","direction","reason","amountMinor"]);
+   return e as unknown as LedgerEntry;
+  });
+  let proposal:{employeeId:string;kind:"advance"|"advance_repayment";amountMinor:number}|null=null;
+  if(data.proposal!==null){
+   const p=strictBody(data.proposal,["employeeId","kind","amountMinor"]);
+   if(typeof p.employeeId!=="string"||!UUID.test(p.employeeId)||
+    (p.kind!=="advance"&&p.kind!=="advance_repayment")||typeof p.amountMinor!=="number")
+    throw new BadRequestException("Invalid HR preview request");
+   proposal={employeeId:p.employeeId.toLowerCase(),kind:p.kind,amountMinor:p.amountMinor};
+  }
+  const computed=this.preview(()=>({
+   summaries:summarizeLedgerByEmployee(entries),statements:buildEmployeeStatements(entries),
+  }));
+  const roster=await this.rosterIds(scope);
+  for(const s of computed.summaries)
+   if(!roster.has(s.employeeId))throw new BadRequestException("Invalid HR preview request");
+  if(proposal&&!roster.has(proposal.employeeId))
+   throw new BadRequestException("Invalid HR preview request");
+  let proposalResult:unknown=null;
+  if(proposal){
+   const p=proposal;
+   const balance=computed.summaries.find(s=>s.employeeId===p.employeeId)?.balanceMinor??0;
+   proposalResult=this.preview(()=>({employeeId:p.employeeId,kind:p.kind,
+    ...(p.kind==="advance"?previewAdvanceDisbursement(balance,p.amountMinor)
+     :previewAdvanceRepayment(balance,p.amountMinor))}));
+  }
+  return {state:HR_LEDGER_PREVIEW_STATE,persisted:false,
+   financialPostingState:"NOT_AUTHORIZED" as const,reasons:LEDGER_REASONS,
+   employees:computed.summaries,statements:computed.statements,
+   liquidity:summarizeBranchLiquidity(computed.summaries),proposal:proposalResult};
+ }
+ /** Progressive MTD target preview (Cashier employee-target); never writes a ledger row. */
+ async previewTarget(actor:Actor,token:string,businessId:string,branchId:string,
+  body:unknown){
+  const scope=this.scope(actor,token,businessId,branchId);
+  const data=strictBody(body,["mtdSalesMinor","priorMtdSalesMinor","tiers"]);
+  if(!Array.isArray(data.tiers)||data.tiers.length>50)
+   throw new BadRequestException("Invalid HR preview request");
+  const tiers:TargetTier[]=data.tiers.map((raw:unknown)=>{
+   const t=strictBody(raw,["startMinor","rateBp"]);
+   return t as unknown as TargetTier;
+  });
+  const result=this.preview(()=>calculateMtdDayTarget(
+   data.mtdSalesMinor as number,data.priorMtdSalesMinor as number,tiers));
+  await this.rosterIds(scope);
+  return {state:HR_LEDGER_PREVIEW_STATE,persisted:false,
+   financialPostingState:"NOT_AUTHORIZED" as const,...result};
  }
 }

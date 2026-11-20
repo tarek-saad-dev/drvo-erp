@@ -50,4 +50,25 @@ export class HrController {
   const actor=await this.identity.actorFromToken(token);
   return this.hr.setBarber(actor,token!,businessId,branchId,employeeId,key,body);
  }
+ /** Draft/non-posting preview: POST is only for the request body; nothing is written. */
+ @Post("ledger-preview") @HttpCode(200)
+ async ledgerPreview(@Headers("origin") origin:string|undefined,
+  @Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,
+  @Param("businessId") businessId:string,@Param("branchId") branchId:string,
+  @Body() body:unknown){
+  res.setHeader("Cache-Control","no-store");enabled();originAllowed(origin);
+  const token=extractSessionCookie(req.headers.cookie);
+  const actor=await this.identity.actorFromToken(token);
+  return this.hr.previewLedger(actor,token!,businessId,branchId,body);
+ }
+ @Post("target-preview") @HttpCode(200)
+ async targetPreview(@Headers("origin") origin:string|undefined,
+  @Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,
+  @Param("businessId") businessId:string,@Param("branchId") branchId:string,
+  @Body() body:unknown){
+  res.setHeader("Cache-Control","no-store");enabled();originAllowed(origin);
+  const token=extractSessionCookie(req.headers.cookie);
+  const actor=await this.identity.actorFromToken(token);
+  return this.hr.previewTarget(actor,token!,businessId,branchId,body);
+ }
 }

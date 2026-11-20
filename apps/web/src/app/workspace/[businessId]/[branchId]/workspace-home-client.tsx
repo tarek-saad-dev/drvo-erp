@@ -9,8 +9,8 @@ type AuthorizedWorkspace = { businessId: string; branchId: string; businessName:
 type Account = { username: string; mustChangePassword: boolean };
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export default function WorkspaceHomeClient({businessId, branchId,salonWebEnabled,hrWebEnabled,attendanceWebEnabled,reportsWebEnabled,expensesWebEnabled,otherIncomeWebEnabled,treasuryWebEnabled,treasuryOpsWebEnabled,operationsWebEnabled,inventoryWebEnabled,queueWebEnabled}: {
-  businessId: string; branchId: string;salonWebEnabled:boolean;hrWebEnabled:boolean;attendanceWebEnabled:boolean;reportsWebEnabled:boolean;expensesWebEnabled:boolean;otherIncomeWebEnabled:boolean;treasuryWebEnabled:boolean;treasuryOpsWebEnabled:boolean;operationsWebEnabled:boolean;inventoryWebEnabled:boolean;queueWebEnabled:boolean;
+export default function WorkspaceHomeClient({businessId, branchId,salonWebEnabled,hrWebEnabled,attendanceWebEnabled,reportsWebEnabled,expensesWebEnabled,otherIncomeWebEnabled,treasuryWebEnabled,treasuryOpsWebEnabled,operationsWebEnabled,inventoryWebEnabled,purchasingWebEnabled,queueWebEnabled}: {
+  businessId: string; branchId: string;salonWebEnabled:boolean;hrWebEnabled:boolean;attendanceWebEnabled:boolean;reportsWebEnabled:boolean;expensesWebEnabled:boolean;otherIncomeWebEnabled:boolean;treasuryWebEnabled:boolean;treasuryOpsWebEnabled:boolean;operationsWebEnabled:boolean;inventoryWebEnabled:boolean;purchasingWebEnabled:boolean;queueWebEnabled:boolean;
 }) {
   const router = useRouter();
   const [branch, setBranch] = useState<Branch | null>(null);
@@ -29,6 +29,7 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
   const [canViewTreasuryOps,setCanViewTreasuryOps]=useState(false);
   const [canViewOperations,setCanViewOperations]=useState(false);
   const [canViewInventory,setCanViewInventory]=useState(false);
+  const [canViewPurchasing,setCanViewPurchasing]=useState(false);
   const [canPreviewPos, setCanPreviewPos] = useState(false);
   const [account, setAccount] = useState<Account | null>(null);
   const [status, setStatus] = useState<"loading"|"ready"|"denied"|"error">("loading");
@@ -141,6 +142,11 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
           if(!live)return;
           setCanViewInventory(inventoryResult.ok);
         }
+        if(purchasingWebEnabled){
+          const purchasingResult=await fetch(base+"/purchasing",{credentials:"same-origin",cache:"no-store"});
+          if(!live)return;
+          setCanViewPurchasing(purchasingResult.ok);
+        }
         setStatus("ready");
       } catch {
         if (live) setStatus("error");
@@ -148,7 +154,7 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
     }
     void load();
     return () => { live = false; };
-  },[router,businessId,branchId,hrWebEnabled,attendanceWebEnabled,reportsWebEnabled,expensesWebEnabled,otherIncomeWebEnabled,treasuryWebEnabled,treasuryOpsWebEnabled,operationsWebEnabled,inventoryWebEnabled,queueWebEnabled]);
+  },[router,businessId,branchId,hrWebEnabled,attendanceWebEnabled,reportsWebEnabled,expensesWebEnabled,otherIncomeWebEnabled,treasuryWebEnabled,treasuryOpsWebEnabled,operationsWebEnabled,inventoryWebEnabled,purchasingWebEnabled,queueWebEnabled]);
 
   return <main className="k5-workspace">
     <header className="k5-workspace-header">
@@ -208,6 +214,10 @@ export default function WorkspaceHomeClient({businessId, branchId,salonWebEnable
         {inventoryWebEnabled&&canViewInventory && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/inventory"} className="k5-verify-link">
           المخزون + استلام مشتريات (غير مرحّل)
+        </Link>}
+        {purchasingWebEnabled&&canViewPurchasing && <Link href={"/workspace/" + encodeURIComponent(businessId) +
+          "/" + encodeURIComponent(branchId) + "/purchasing"} className="k5-verify-link">
+          المشتريات والموردون (معاينة ذمم)
         </Link>}
         {canViewCatalog && <Link href={"/workspace/" + encodeURIComponent(businessId) +
           "/" + encodeURIComponent(branchId) + "/catalog"} className="k5-verify-link">

@@ -2345,20 +2345,22 @@
     {
       "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
       "TargetPaths": [
-        "db/migrations/027_inventory_branch_stock.sql",
-        "apps/api/src/inventory/inventory.service.ts",
-        "apps/web/.../inventory/inventory-client.tsx",
-        "tools/inventory/verify.cjs"
+        "db/migrations/037_purchasing_suppliers_receive_ap_preview.sql",
+        "apps/api/src/purchasing/*",
+        "apps/web/.../purchasing/*",
+        "tools/purchasing/verify.cjs",
+        "packages/business-modules/purchasing/src/ap-preview.ts",
+        "_cashier_source/purchasing/*"
       ],
-      "UIProof": "OPEN — receive form on /inventory",
-      "DomainTest": "apps/api/test/inventory.test.cjs",
-      "SQLHTTPTest": "tools/inventory/verify.cjs CreateStockReceive/CancelStockReceive",
+      "UIProof": "OPEN — private /purchasing behind DRVO_PURCHASING_WEB_ENABLED",
+      "DomainTest": "apps/api/test/purchasing.test.cjs + tests/purchasing-ap-preview.test.cjs",
+      "SQLHTTPTest": "tools/purchasing/verify.cjs CreateSupplier/CreatePurchaseReceive/CancelPurchaseReceive",
       "BrowserProof": "OPEN",
       "DataProof": "OPEN",
       "PilotProof": "OPEN",
       "Status": "PORTING",
-      "Blocker": "AP/payable/Treasury payment and Accounting cost posting gated (ADR-031); supplier directory not yet ported",
-      "NextAction": "Keep RECEIVE_DRAFTS_ONLY / NOT_POSTED; supplier master + paid purchase after Treasury/Accounting owners",
+      "Blocker": "Paid AP/Treasury/GL gated ADR-031; primary SQL037 OPEN; Owner browser OPEN; depends on Queue SQL036 for consecutive K4 numbering (not owned here)",
+      "NextAction": "Keep RECEIVE_DRAFTS_ONLY + AP_PREVIEW_ONLY / NOT_POSTED; paid purchase after Treasury/Accounting owners",
       "SalonExtension": "none",
       "ID": "PUR-01",
       "SourcePaths+BlobSHA": [
@@ -2376,6 +2378,39 @@
       "Effects": "on-hand increases without AP/GL; unitCostMinor informational only",
       "FailureAndRaceCases": "duplicate receive; cost missing",
       "OwnedModule": "Purchasing + Inventory"
+    },
+    {
+      "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
+      "TargetPaths": [
+        "db/migrations/037_purchasing_suppliers_receive_ap_preview.sql",
+        "apps/api/src/purchasing/*",
+        "apps/web/.../purchasing/purchasing-client.tsx"
+      ],
+      "UIProof": "OPEN — supplier form on /purchasing",
+      "DomainTest": "apps/api/test/purchasing.test.cjs",
+      "SQLHTTPTest": "tools/purchasing/verify.cjs CreateSupplier",
+      "BrowserProof": "OPEN",
+      "DataProof": "OPEN",
+      "PilotProof": "OPEN",
+      "Status": "PORTING",
+      "Blocker": "Cashier had no separate supplier master in pin paths; DRVO Business-shared Supplier is additive. Paid AP still ADR-031",
+      "NextAction": "Keep supplier directory nonposting; deactivate/edit after Owner contract",
+      "SalonExtension": "none",
+      "ID": "PUR-02",
+      "SourcePaths+BlobSHA": [
+        "src/app/api/purchases/route.ts#e508819187d1e8f00564217b61cc39d072fa2cb9",
+        "src/lib/inventory/purchaseInventory.service.ts#e76e2e0a46582fa0eaec9e5dbe4e4e09c80122e3"
+      ],
+      "OriginalScreen": "Purchases (supplier note / vendor context)",
+      "UserAction": "Maintain Business-shared suppliers for purchase receive",
+      "AuthRole": "purchasing.manage",
+      "TenantBusinessBranchScope": "Business (directory) / Branch (receive)",
+      "Preconditions": "purchasing permission",
+      "Reads": "suppliers",
+      "Writes": "Supplier create",
+      "Effects": "Business-shared supplier master; no AP/GL",
+      "FailureAndRaceCases": "duplicate name; replay conflict",
+      "OwnedModule": "Purchasing"
     },
     {
       "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",

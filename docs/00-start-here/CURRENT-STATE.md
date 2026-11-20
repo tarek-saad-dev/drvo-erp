@@ -1,6 +1,6 @@
 # Current state
 
-> **2026-11-20 MAIN @ `7cb8b93` — PRs #137–#147 (OPERATIONAL PILOT READINESS NEXT):** Merged Cashier nonposting slices through POS-16 (#137–#146) plus ADR-031 posting readiness package (#147, still PROPOSED). **Still OPEN / not claimed:** isolated Pilot DB Owner E2E (#150 in flight), POS-07 draft print, Catalog barcode SQL035 (#148 in flight), primary/VPS SQL apply, ADR-031 human approvals+paid posting, live Cut import, full Cashier parity. Goal: **Operational Pilot Readiness + functional parity**, not more disconnected previews.
+> **2026-11-20 MAIN tip includes #147–#148:** ADR-031 readiness package (PROPOSED) + Catalog barcode SQL035. [Track A Pilot package](../04-execution/PILOT-OPERATIONAL-READINESS-2026-11-20.md) on #150 — fail-closed board + disposable harness; TARGET_APPLY / restore / K5 / Owner browser **OPEN**. POS-07 draft print on #151. **Still OPEN:** primary/VPS SQL, ADR-031 human approvals+paid posting, live Cut import, full Cashier parity.
 
 > **2026-11-20 K0 / S13 FAILURE TRIAGE — DIAGNOSTIC PR ONLY:** [RCA and minimal test-harness hardening](../04-execution/CASHIER-S13-K0-FAILURE-TRIAGE-2026-11-20.md) records K0 #44751858614 CUT-03 incorrectly referencing DRVO docs as Cashier source, and S12→S13 Chromium run #44751858621 hanging at broad HR marker for 720s. Keep S13 real UI/SQL assertions; new action-level breadcrumbs + 120s phase idle limit enable next diagnosis. **No S13 PASS, primary SQL, Owner browser or Cut go-live claimed.**
 

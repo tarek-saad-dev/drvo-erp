@@ -3781,6 +3781,110 @@
       "Status": "SOURCE_IDENTIFIED",
       "Blocker": "Target SQL024/025 apply, isolated restore, K5 permissions, Owner browser, founder Cut scope, approved import ledger all OPEN",
       "NextAction": "Keep real-data activation BLOCKED until founder source scope + isolated restore + Owner browser"
+    },
+    {
+      "ID": "PILOT-01",
+      "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
+      "SourcePaths+BlobSHA": [
+        "tools/pilot/readiness-board.cjs",
+        "tools/pilot/verify.cjs",
+        "tools/pilot/render-board.cjs"
+      ],
+      "OriginalScreen": "n/a (Track A Pilot readiness board)",
+      "UserAction": "Fail-closed SQL001–034 checksum board + JSON/MD export; refuse production claims",
+      "AuthRole": "n/a (local dry-run tooling)",
+      "TenantBusinessBranchScope": "Modular Monolith Tenant isolation language only (no live bind)",
+      "Preconditions": "db/migrations 001–034 present in git",
+      "Reads": "local migration file checksums",
+      "Writes": "none (offline board/artifacts only)",
+      "Effects": "PASS_SOURCE_ONLY for migrations; TARGET_APPLY/restore/K5/Owner OPEN; ADR-031+Cut live BLOCKED",
+      "FailureAndRaceCases": "must refuse productionVerificationClaimed=true, live connection strings, adr031Posting ENABLED",
+      "OwnedModule": "Platform tooling / Pilot readiness",
+      "SalonExtension": "Private Pilot track",
+      "TargetPaths": [
+        "tools/pilot/**",
+        "tests/pilot-readiness.test.cjs",
+        "docs/04-execution/PILOT-OPERATIONAL-READINESS-2026-11-20.md"
+      ],
+      "UIProof": "n/a",
+      "DomainTest": "tests/pilot-readiness.test.cjs + tools/pilot/verify.cjs",
+      "SQLHTTPTest": "n/a for offline board; disposable harness separate (PILOT-02)",
+      "BrowserProof": "OPEN",
+      "DataProof": "OPEN",
+      "PilotProof": "OPEN",
+      "Status": "SOURCE_TESTED",
+      "Blocker": "Operator TARGET_APPLY / ISOLATED_BACKUP_RESTORE / K5_PERMISSIONS / OWNER_BROWSER_E2E remain OPEN; ADR-031 BLOCKED",
+      "NextAction": "Close human Pilot gates only with isolated Pilot DB evidence; never primary/VPS from this package"
+    },
+    {
+      "ID": "PILOT-02",
+      "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
+      "SourcePaths+BlobSHA": [
+        "tools/pilot/isolated-db-harness.cjs",
+        "tools/pilot/backup-restore-evidence.cjs",
+        "tools/pilot/k5-owner-bootstrap-evidence.cjs",
+        "tools/k4-db/migrate.cjs"
+      ],
+      "OriginalScreen": "n/a (disposable Pilot SQL harness)",
+      "UserAction": "Disposable applyMigrations 001–034 + COPY_ONLY backup/restore + synthetic K5 Owner seed",
+      "AuthRole": "CI disposable sa on localhost only",
+      "TenantBusinessBranchScope": "DrvoPilotDisposable / DrvoPilotDisposableRestore allowlist only",
+      "Preconditions": "GITHUB_ACTIONS + DRVO_PILOT_CI_DISPOSABLE=YES + port 14345",
+      "Reads": "core.SchemaMigration checksums on disposable DBs",
+      "Writes": "disposable DB only; dropped after harness",
+      "Effects": "CI rehearsal evidence; does not close operator TARGET_APPLY/restore/K5 gates",
+      "FailureAndRaceCases": "refuse Cut/Cashier/staging/primary DB names; refuse missing disposable flags",
+      "OwnedModule": "Platform tooling / Pilot readiness",
+      "SalonExtension": "Private Pilot track",
+      "TargetPaths": [
+        "tools/pilot/isolated-db-harness.cjs",
+        ".github/workflows/pilot-readiness-ci.yml"
+      ],
+      "UIProof": "n/a",
+      "DomainTest": "tools/pilot/backup-restore-evidence.cjs allowlist tests",
+      "SQLHTTPTest": "pilot-readiness-ci.yml pilot-isolated-sql job (disposable)",
+      "BrowserProof": "n/a",
+      "DataProof": "OPEN (synthetic disposable only)",
+      "PilotProof": "OPEN",
+      "Status": "SOURCE_TESTED",
+      "Blocker": "Real Pilot DB apply/restore/K5 Owner session still OPEN; primary/VPS FORBIDDEN",
+      "NextAction": "Use harness as CI rehearsal only; operator witnesses isolated Pilot backup/restore separately"
+    },
+    {
+      "ID": "PILOT-03",
+      "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
+      "SourcePaths+BlobSHA": [
+        "tools/pilot/workflow-matrix.json",
+        "tools/pilot/workflow-matrix-builder.cjs",
+        "tools/pilot/workflow-checklist.cjs",
+        "tools/pilot/e2e-matrix.cjs",
+        "tools/salon-browser/operations.cjs",
+        "tools/salon-browser/hr-operations.cjs"
+      ],
+      "OriginalScreen": "Private workspace Customer→Booking→Barber→POS Draft→Inventory→Print→Reload",
+      "UserAction": "Map Pilot workflow readiness + S12/S13 coverage + E2E PASS/FAIL/BLOCKED evidence commands",
+      "AuthRole": "Owner (human) / disposable Chromium (CI_ONLY)",
+      "TenantBusinessBranchScope": "K5 Business+Branch private workspace (Owner proof OPEN)",
+      "Preconditions": "S12/S13 harness present; POS-07 print BLOCKED",
+      "Reads": "salon-browser phase markers + ledger POS-07",
+      "Writes": "none from this matrix tooling",
+      "Effects": "Draft Print gate BLOCKED; other steps CI_ONLY/READY_IN_REPO; Owner browser OPEN",
+      "FailureAndRaceCases": "must not claim PRIVATE_BROWSER_VERIFIED or PILOT_VERIFIED from CI markers alone",
+      "OwnedModule": "Platform tooling / Pilot readiness",
+      "SalonExtension": "Private Pilot track",
+      "TargetPaths": [
+        "tools/pilot/workflow-matrix.json",
+        "tools/pilot/e2e-matrix.cjs"
+      ],
+      "UIProof": "OPEN",
+      "DomainTest": "tests/pilot-readiness.test.cjs",
+      "SQLHTTPTest": "n/a (matrix/checklist offline)",
+      "BrowserProof": "OPEN (S12/S13 CI_ONLY ≠ Owner Pilot)",
+      "DataProof": "OPEN",
+      "PilotProof": "OPEN",
+      "Status": "SOURCE_TESTED",
+      "Blocker": "Draft Print BLOCKED (POS-07); Owner browser E2E OPEN; ADR-031 posting BLOCKED",
+      "NextAction": "Owner Pilot click-path after isolated DB+K5; keep draft print BLOCKED until NONPOSTING print owner merges"
     }
   ]
 }

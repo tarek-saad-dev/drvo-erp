@@ -12,6 +12,7 @@ const {planCutFixtureReconciliation} = require('../tools/cut-adapter/reconciliat
 const {buildIdentityMappingLedger, composeSourceKey} = require('../tools/cut-adapter/identity-mapping.cjs');
 const {buildReconciliationReport} = require('../tools/cut-adapter/reconciliation-report.cjs');
 const {buildPreactivationGateBoard} = require('../tools/cut-adapter/preactivation-gates.cjs');
+const {planCutEmployeeFixture} = require('../tools/cut-adapter/employee-planner.cjs');
 
 const samplePath = path.join(
   __dirname,
@@ -29,6 +30,14 @@ const salesPath = path.join(
   'fixtures',
   'sample-sales-history-summary.json'
 );
+const employeesPath = path.join(
+  __dirname,
+  '..',
+  'tools',
+  'cut-adapter',
+  'fixtures',
+  'sample-employees-hr.json'
+);
 
 function loadSample() {
   return JSON.parse(fs.readFileSync(samplePath, 'utf8'));
@@ -36,6 +45,10 @@ function loadSample() {
 
 function loadSales() {
   return JSON.parse(fs.readFileSync(salesPath, 'utf8'));
+}
+
+function loadEmployees() {
+  return JSON.parse(fs.readFileSync(employeesPath, 'utf8'));
 }
 
 test('Cut adapter sample fixture plans dry-run characterization with zero writes', () => {
@@ -54,6 +67,28 @@ test('Cut adapter sample fixture plans dry-run characterization with zero writes
   assert.equal(a.customers[0].targetMapping, 'UNASSIGNED_PENDING_APPROVED_IMPORT_LEDGER');
   assert.ok(Object.isFrozen(a) && Object.isFrozen(a.customers) && Object.isFrozen(a.services));
   assert.ok(a.findings.some((f) => f.code === 'LIVE_SOURCE_BLOCKED'));
+});
+
+test('Cut employee HR fixture plans dry-run and maps HR_EMPLOYEE identity keys', () => {
+  const emp = planCutEmployeeFixture(loadEmployees());
+  assert.equal(emp.mode, 'FIXTURE_CHARACTERIZATION_DRY_RUN_ONLY');
+  assert.equal(emp.writes, 0);
+  assert.equal(emp.liveAccess, 'BLOCKED');
+  assert.ok(emp.employeeCount >= 1);
+  const plan = Object.assign({}, planCutFixtureReconciliation(loadSample()), {
+    employees: emp.employees,
+  });
+  const ledger = buildIdentityMappingLedger(plan, {
+    sourceTenantKey: loadSample().meta.sourceTenantKey,
+    defaultSourceBranchKey: loadSample().meta.sourceBranchKey,
+    approvedImportLedgerEvidence: false,
+  });
+  assert.ok(ledger.entries.some((e) => e.entityType === 'HR_EMPLOYEE'));
+  assert.ok(ledger.entries.every((e) => e.targetDrvoUuid === null));
+  assert.throws(() => planCutEmployeeFixture({
+    ...loadEmployees(),
+    meta: {...loadEmployees().meta, liveConnectionAuthorized: true},
+  }), TypeError);
 });
 
 test('connection gates refuse live connection strings and hostnames', () => {
@@ -199,7 +234,7 @@ test('reconciliation report stays redacted and blocks production claims', () => 
   );
 });
 
-test('preactivation gates pass SQL024/025 source only and keep operator gates OPEN', () => {
+test('preactivation gates pass SQL024/025/027/031 source only and keep operator gates OPEN', () => {
   const board = buildPreactivationGateBoard();
   assert.equal(board.schema, 'drvo.cut-adapter.preactivation-gates.v1');
   assert.equal(board.realDataActivation, 'BLOCKED');
@@ -208,6 +243,8 @@ test('preactivation gates pass SQL024/025 source only and keep operator gates OP
   assert.equal(board.summary.realDataActivationAllowed, false);
   assert.ok(board.sourceMigrations.sql024.present);
   assert.ok(board.sourceMigrations.sql025.present);
+  assert.ok(board.sourceMigrations.sql027.present);
+  assert.ok(board.sourceMigrations.sql031.present);
   assert.equal(
     board.gates.find((g) => g.id === 'SQL024_SOURCE_PRESENT').status,
     'PASS_SOURCE_ONLY'
@@ -216,9 +253,19 @@ test('preactivation gates pass SQL024/025 source only and keep operator gates OP
     board.gates.find((g) => g.id === 'SQL025_SOURCE_PRESENT').status,
     'PASS_SOURCE_ONLY'
   );
+  assert.equal(
+    board.gates.find((g) => g.id === 'SQL027_SOURCE_PRESENT').status,
+    'PASS_SOURCE_ONLY'
+  );
+  assert.equal(
+    board.gates.find((g) => g.id === 'SQL031_SOURCE_PRESENT').status,
+    'PASS_SOURCE_ONLY'
+  );
   for (const id of [
     'SQL024_TARGET_APPLY',
     'SQL025_TARGET_APPLY',
+    'SQL027_TARGET_APPLY',
+    'SQL031_TARGET_APPLY',
     'ISOLATED_RESTORE',
     'K5_PERMISSIONS',
     'OWNER_BROWSER',

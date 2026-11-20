@@ -215,6 +215,7 @@ export default function InventoryClient({businessId,branchId}:{
    <div className="k5-brand"><span className="brandmark">D</span> DRVO <b>ERP</b></div>
    <nav className="k5-head-actions">
     <Link href={home}>مساحة الفرع</Link>
+    <Link href={home+"/inventory/transfers"}>تحويل بين الفروع</Link>
     <Link href={home+"/catalog"}>الكتالوج</Link>
    </nav>
   </header>

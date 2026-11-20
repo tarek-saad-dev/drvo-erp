@@ -43,15 +43,17 @@ test('SQL034 follow-up desk is Business-scoped, EXECUTE-only, no messaging send'
  assert.match(sql,/CU-05|posted Sales|dormant/i);
 });
 
-test('032 slot is reserved for inventory; booking is 033; follow-up is 034',()=>{
+test('032 is inventory transfers; booking is 033; follow-up is 034',()=>{
  const names=fs.readdirSync(path.join(root,'db/migrations'))
   .filter(f=>f.endsWith('.sql')).sort();
  assert.ok(names.includes('032_inventory_branch_transfers.sql'));
  assert.ok(names.includes('033_booking_reschedule.sql'));
  assert.ok(names.includes('034_customer_follow_up.sql'));
- const stub=read('db/migrations/032_inventory_branch_transfers.sql');
- assert.match(stub,/SLOT RESERVED|owned by feat\/cashier-inv-transfer/i);
- assert.doesNotMatch(stub,/CREATE TABLE core\.StockTransfer/i);
+ // After #144, SQL032 is the real INV-03 body (no placeholder stub).
+ const inv=read('db/migrations/032_inventory_branch_transfers.sql');
+ assert.match(inv,/CREATE TABLE core\.StockTransferDocument/i);
+ assert.match(inv,/CreateStockTransfer|CancelStockTransfer/);
+ assert.doesNotMatch(inv,/033_booking_reschedule|034_customer_follow_up/);
 });
 
 test('ledger CU-04 / BK-06 point at owned DRVO targets',()=>{

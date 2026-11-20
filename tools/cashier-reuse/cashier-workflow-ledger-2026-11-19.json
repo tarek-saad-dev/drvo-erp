@@ -1359,16 +1359,23 @@
     },
     {
       "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
-      "TargetPaths": [],
+      "TargetPaths": [
+        "apps/web/.../hr/hr-client.tsx",
+        "apps/web/.../hr/hr-admin-model.ts",
+        "apps/web/.../hr/hr-ledger-preview-panel.tsx",
+        "apps/web/.../hr/hr-target-preview-panel.tsx",
+        "apps/api/src/hr/hr.service.ts",
+        "db/migrations/018_hr_employee_salon_barber.sql"
+      ],
       "UIProof": "OPEN",
-      "DomainTest": "OPEN",
+      "DomainTest": "apps/web/test/hr-admin-ui.test.cjs + apps/web/test/hr-workspace.test.cjs + apps/api/test/hr-admin-ui-contract.test.cjs + apps/api/test/hr.test.cjs",
       "SQLHTTPTest": "OPEN",
       "BrowserProof": "OPEN",
       "DataProof": "OPEN",
       "PilotProof": "OPEN",
-      "Status": "SOURCE_IDENTIFIED",
-      "Blocker": "Not ported to DRVO; Cashier behavior identified at pin only",
-      "NextAction": "Keep SOURCE_IDENTIFIED until owned DRVO module contract exists",
+      "Status": "PORTING",
+      "Blocker": "Private Light employees admin (search, active/inactive tabs, employment/payroll/barber filters, KPI strip, create, barber link, ledger/target preview tabs) is source-tested only. Employee profile edit, schedule, compensation/target maps, archive/reactivate, portal accounts and branch transfer have NO SQL/API yet (archive needs a new procedure; migrations not touched). No browser/data/pilot proof; no payroll or cash posting (ADR-031)",
+      "NextAction": "Add owned SQL+API for archive/reactivate and profile/schedule edit under a free migration number, then private browser proof; keep ledger/target tabs unposted",
       "SalonExtension": "none",
       "ID": "HR-01",
       "SourcePaths+BlobSHA": [
@@ -1439,7 +1446,7 @@
       "PilotProof": "OPEN",
       "Status": "BLOCKED",
       "Blocker": "Payroll posting touches cash; DRVO finance gated. Only the progressive MTD target calculator is previewed (no attendance/readiness/close/generate)",
-      "NextAction": "Identify payroll owner after Treasury/Sales; target plans/versioning/recalc still SOURCE_IDENTIFIED",
+      "NextAction": "Daily payroll generate/close needs attendance+ledger+Treasury owners (ADR-031). private Light target-preview tab (hr-target-preview-panel.tsx) calls target-preview only",
       "SalonExtension": "none",
       "ID": "HR-03",
       "SourcePaths+BlobSHA": [
@@ -1503,7 +1510,7 @@
       "PilotProof": "OPEN",
       "Status": "BLOCKED",
       "Blocker": "Non-posting ledger preview (summary buckets, running balance, liquidity) only; no persisted TblEmpLedgerEntry equivalent, payout, cash movement or Treasury link (ADR-031)",
-      "NextAction": "Persisted append-only ledger SQL + payout contract only after Treasury/ADR-031 owner; keep preview unposted",
+      "NextAction": "Persisted append-only ledger SQL + payout contract only after Treasury/ADR-031 owner; keep preview unposted. Private Light ledger-preview tab (hr-ledger-preview-panel.tsx) now drives the preview from the HR admin page; payout button is disabled/BLOCKED",
       "SalonExtension": "none",
       "ID": "HR-05",
       "SourcePaths+BlobSHA": [

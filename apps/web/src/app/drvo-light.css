@@ -230,3 +230,24 @@ button, input, select, textarea { font-family:inherit; }
 .drvo-attendance-open-list li strong { display:block; }
 .drvo-attendance-open-list .k5-muted { display:block; margin-top:4px; font-size:12px; }
 .drvo-attendance-filter { display:flex; flex-direction:column; gap:6px; color:var(--drvo-muted); font-size:12px; min-width:min(100%,220px); }
+
+/* HR admin (HR-01): Cashier-like tabs/KPI strip/filters in Light V1; presentation only. */
+.hr-tabs,.hr-status-tabs { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 16px; }
+.hr-tab { display:inline-flex; align-items:center; min-height:42px; padding:8px 16px;
+  border:1px solid var(--drvo-border); border-radius:10px; background:#fff;
+  color:var(--drvo-deep); font-weight:700; cursor:pointer; text-decoration:none; }
+.hr-tab:hover { background:#f1ebf1; border-color:#d7c4d3; }
+.hr-tab-active { background:var(--drvo-teal-soft); border-color:var(--drvo-teal); color:#12686e; }
+.hr-kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px;
+  margin:0 0 18px; }
+.hr-kpis div { background:#fff; border:1px solid var(--drvo-border); border-radius:12px;
+  padding:14px 16px; display:flex; flex-direction:column; gap:6px; }
+.hr-kpis span { color:var(--drvo-muted); font-size:12px; }
+.hr-kpis b { color:var(--drvo-deep); font-size:24px; }
+.hr-filters,.hr-form-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px; align-items:end; }
+.hr-check { display:flex; align-items:center; gap:8px; }
+.hr-check input { width:auto; min-height:0; }
+.hr-panel h3 { color:var(--drvo-deep); }
+.hr-proposal-result { background:#f6f1f6; border:1px solid var(--drvo-border); border-radius:10px;
+  padding:12px; overflow:auto; }

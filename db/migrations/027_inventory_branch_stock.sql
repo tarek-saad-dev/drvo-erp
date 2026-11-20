@@ -1,7 +1,7 @@
 -- SQL027: Inventory branch on-hand + nonposting purchase/opening receives + adjustments.
 -- Cashier pin 046bf19: branch inventory list, stock policy, purchaseInventory receive.
 -- Quantities are QtyMilli (1000 = 1 unit). No sale decrement, transfers, AP, Treasury or GL (ADR-031).
--- Primary/VPS apply only after backup + 001â€“026 verification.
+-- Primary/VPS apply only after backup + 001ΓÇô026 verification.
 CREATE TABLE core.InventoryStockPolicy (
  TenantId UNIQUEIDENTIFIER NOT NULL,BusinessId UNIQUEIDENTIFIER NOT NULL,
  AllowNegativeStock BIT NOT NULL CONSTRAINT DF_InvPolicy_Neg DEFAULT(1),

@@ -62,8 +62,8 @@ export default function HrClient({businessId,branchId,attendanceWebEnabled}:{bus
    }).catch(()=>{});
   return ()=>{live=false;};
  },[booking,businessId,branchId]);
- async function create(event:React.FormEvent<HTMLFormElement>){
-  event.preventDefault();if(busy||configBusy)return;
+ async function createEmployee(){
+  if(busy||configBusy)return;
   if(!/^[A-Z0-9_-]{2,32}$/.test(code)||!name.trim()||
      name.trim()!==name||(employmentType==="freelance"&&payrollMethod==="monthly")){
    setNotice("راجع كود الموظف واسمه ونظام المرتب؛ الفري لانس لا يقبل شهري.");return;
@@ -83,6 +83,12 @@ export default function HrClient({businessId,branchId,attendanceWebEnabled}:{bus
    await load();
   }catch{setNotice("اتصال غير متاح؛ أعد نفس الطلب بدون تكرار.");}
   finally{setBusy(false);}
+ }
+ function create(event:React.FormEvent<HTMLFormElement>){
+  // Keep Enter-in-field submit, but the primary button is type=button so Chromium
+  // automation never waits on native form navigation after type=submit click.
+  event.preventDefault();
+  void createEmployee();
  }
  async function setBarber(e:Employee,bookable:boolean){
   if(configBusy||busy)return;
@@ -154,7 +160,8 @@ export default function HrClient({businessId,branchId,attendanceWebEnabled}:{bus
        <option value="monthly">شهري</option>
       </select>
      </label>
-     <button className="k5-save" type="submit" disabled={busy||!!configBusy}>
+     <button className="k5-save" type="button" disabled={busy||!!configBusy}
+      onClick={()=>void createEmployee()}>
       {busy?"جاري الحفظ…":"إضافة موظف"}
      </button>
     </form>

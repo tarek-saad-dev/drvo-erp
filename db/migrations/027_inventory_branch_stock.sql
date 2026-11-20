@@ -1,7 +1,7 @@
--- SQL027: Inventory branch on-hand + nonposting purchase/opening receives + adjustments.
+﻿-- SQL027: Inventory branch on-hand + nonposting purchase/opening receives + adjustments.
 -- Cashier pin 046bf19: branch inventory list, stock policy, purchaseInventory receive.
 -- Quantities are QtyMilli (1000 = 1 unit). No sale decrement, transfers, AP, Treasury or GL (ADR-031).
--- Primary/VPS apply only after backup + 001–026 verification.
+-- Primary/VPS apply only after backup + 001â€“026 verification.
 CREATE TABLE core.InventoryStockPolicy (
  TenantId UNIQUEIDENTIFIER NOT NULL,BusinessId UNIQUEIDENTIFIER NOT NULL,
  AllowNegativeStock BIT NOT NULL CONSTRAINT DF_InvPolicy_Neg DEFAULT(1),
@@ -73,14 +73,14 @@ CREATE INDEX IX_StockReceive_Recent
 CREATE TABLE core.StockReceiveLine (
  TenantId UNIQUEIDENTIFIER NOT NULL,BusinessId UNIQUEIDENTIFIER NOT NULL,
  BranchId UNIQUEIDENTIFIER NOT NULL,ReceiveId UNIQUEIDENTIFIER NOT NULL,
- LineNo INT NOT NULL,OfferingId UNIQUEIDENTIFIER NOT NULL,
+ [LineNo] INT NOT NULL,OfferingId UNIQUEIDENTIFIER NOT NULL,
  QtyMilli BIGINT NOT NULL,UnitCostMinor BIGINT NOT NULL,
- CONSTRAINT PK_StockReceiveLine PRIMARY KEY(TenantId,BusinessId,BranchId,ReceiveId,LineNo),
+ CONSTRAINT PK_StockReceiveLine PRIMARY KEY(TenantId,BusinessId,BranchId,ReceiveId,[LineNo]),
  CONSTRAINT FK_StockReceiveLine_Doc FOREIGN KEY(TenantId,BusinessId,BranchId,ReceiveId)
   REFERENCES core.StockReceiveDocument(TenantId,BusinessId,BranchId,ReceiveId),
  CONSTRAINT FK_StockReceiveLine_Offering FOREIGN KEY(TenantId,BusinessId,OfferingId)
   REFERENCES core.CatalogOffering(TenantId,BusinessId,OfferingId),
- CONSTRAINT CK_StockReceiveLine_No CHECK(LineNo BETWEEN 1 AND 50),
+ CONSTRAINT CK_StockReceiveLine_No CHECK([LineNo] BETWEEN 1 AND 50),
  CONSTRAINT CK_StockReceiveLine_Qty CHECK(QtyMilli BETWEEN 1 AND 9000000000000),
  CONSTRAINT CK_StockReceiveLine_Cost CHECK(UnitCostMinor BETWEEN 0 AND 9000000000000)
 );
@@ -302,21 +302,21 @@ AS BEGIN
   SELECT CONVERT(VARCHAR(36),@Prior) AS id,CAST(0 AS BIT) AS created;
   COMMIT TRANSACTION;SET TRANSACTION ISOLATION LEVEL READ COMMITTED;RETURN;
  END
- DECLARE @Lines TABLE(LineNo INT NOT NULL,OfferingId UNIQUEIDENTIFIER NOT NULL,
-  QtyMilli BIGINT NOT NULL,UnitCostMinor BIGINT NOT NULL PRIMARY KEY(LineNo));
- INSERT @Lines(LineNo,OfferingId,QtyMilli,UnitCostMinor)
- SELECT CAST(j.LineNo AS INT),TRY_CONVERT(UNIQUEIDENTIFIER,j.OfferingId),
+ DECLARE @Lines TABLE([LineNo] INT NOT NULL,OfferingId UNIQUEIDENTIFIER NOT NULL,
+  QtyMilli BIGINT NOT NULL,UnitCostMinor BIGINT NOT NULL PRIMARY KEY([LineNo]));
+ INSERT @Lines([LineNo],OfferingId,QtyMilli,UnitCostMinor)
+ SELECT CAST(j.[LineNo] AS INT),TRY_CONVERT(UNIQUEIDENTIFIER,j.OfferingId),
   CAST(j.QtyMilli AS BIGINT),CAST(j.UnitCostMinor AS BIGINT)
  FROM OPENJSON(@LinesJson) WITH(
-  LineNo INT ''$.lineNo'',OfferingId NVARCHAR(36) ''$.offeringId'',
+  [LineNo] INT ''$.lineNo'',OfferingId NVARCHAR(36) ''$.offeringId'',
   QtyMilli BIGINT ''$.qtyMilli'',UnitCostMinor BIGINT ''$.unitCostMinor'') j;
  IF NOT EXISTS(SELECT 1 FROM @Lines) OR (SELECT COUNT(*) FROM @Lines)>50
   THROW 51472,''Invalid stock receive lines'',1;
- IF EXISTS(SELECT 1 FROM @Lines WHERE LineNo NOT BETWEEN 1 AND 50
+ IF EXISTS(SELECT 1 FROM @Lines WHERE [LineNo] NOT BETWEEN 1 AND 50
   OR OfferingId IS NULL OR QtyMilli NOT BETWEEN 1 AND 9000000000000
   OR UnitCostMinor NOT BETWEEN 0 AND 9000000000000)
   THROW 51472,''Invalid stock receive line values'',1;
- IF (SELECT COUNT(DISTINCT LineNo) FROM @Lines)<>(SELECT COUNT(*) FROM @Lines)
+ IF (SELECT COUNT(DISTINCT [LineNo]) FROM @Lines)<>(SELECT COUNT(*) FROM @Lines)
   OR (SELECT COUNT(DISTINCT OfferingId) FROM @Lines)<>(SELECT COUNT(*) FROM @Lines)
   THROW 51472,''Duplicate stock receive lines'',1;
  IF EXISTS(SELECT 1 FROM @Lines l WHERE NOT EXISTS(
@@ -327,11 +327,11 @@ AS BEGIN
  INSERT core.StockReceiveDocument(TenantId,BusinessId,BranchId,ReceiveId,ClientRequestId,
   SourceType,SupplierNote,CreatedByAccountId)
   VALUES(@TenantId,@BusinessId,@BranchId,@Id,@ClientRequestId,@SourceType,@SupplierNote,@AccountId);
- INSERT core.StockReceiveLine(TenantId,BusinessId,BranchId,ReceiveId,LineNo,OfferingId,
+ INSERT core.StockReceiveLine(TenantId,BusinessId,BranchId,ReceiveId,[LineNo],OfferingId,
   QtyMilli,UnitCostMinor)
- SELECT @TenantId,@BusinessId,@BranchId,@Id,LineNo,OfferingId,QtyMilli,UnitCostMinor FROM @Lines;
+ SELECT @TenantId,@BusinessId,@BranchId,@Id,[LineNo],OfferingId,QtyMilli,UnitCostMinor FROM @Lines;
  DECLARE @Off UNIQUEIDENTIFIER,@Qty BIGINT;
- DECLARE c CURSOR LOCAL FAST_FORWARD FOR SELECT OfferingId,QtyMilli FROM @Lines ORDER BY LineNo;
+ DECLARE c CURSOR LOCAL FAST_FORWARD FOR SELECT OfferingId,QtyMilli FROM @Lines ORDER BY [LineNo];
  OPEN c;FETCH NEXT FROM c INTO @Off,@Qty;
  WHILE @@FETCH_STATUS=0 BEGIN
   EXEC core.ApplyBranchStockDelta @TenantId,@BusinessId,@BranchId,@Off,@Qty;
@@ -370,7 +370,7 @@ AS BEGIN
   DECLARE c CURSOR LOCAL FAST_FORWARD FOR
    SELECT OfferingId,QtyMilli FROM core.StockReceiveLine
     WHERE TenantId=@TenantId AND BusinessId=@BusinessId AND BranchId=@BranchId
-     AND ReceiveId=@ReceiveId ORDER BY LineNo;
+     AND ReceiveId=@ReceiveId ORDER BY [LineNo];
   OPEN c;FETCH NEXT FROM c INTO @Off,@Qty;
   WHILE @@FETCH_STATUS=0 BEGIN
    EXEC core.ApplyBranchStockDelta @TenantId,@BusinessId,@BranchId,@Off,-@Qty;

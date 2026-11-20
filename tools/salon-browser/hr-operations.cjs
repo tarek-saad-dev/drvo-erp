@@ -1,9 +1,12 @@
 'use strict';
 /**
  * S13 private HR+Salon Barber UI proof; only called from CI-only S12 flow.
- * Root cause (PR #137 run 44760962762): Playwright click on type=submit hung past
- * locator timeouts at "S13 HR employee create POST". Submit via requestSubmit after
- * React-native value sync; keep every HTTP/SQL assertion.
+ *
+ * PR #137 run 44760962762 / 44773151927: stalled at "S13 HR employee create POST".
+ * Root cause: Playwright click on type=submit waited for native form navigation
+ * that React preventDefault could not cancel from the driver's perspective, freezing
+ * the CDP session past locator timeouts. HR create button is now type=button; click
+ * uses noWaitAfter. Assertions for HTTP 200 + SQL Barber persistence unchanged.
  */
 const assert=require('node:assert/strict');
 const {randomBytes}=require('node:crypto');
@@ -56,7 +59,6 @@ async function exerciseHrOperations(page,origin,business,branch,onPhase,existing
  await page.goto(scope+'/hr',{waitUntil:'domcontentloaded',timeout:45000});
  onPhase('S13 HR heading rendered');
  await page.getByRole('heading',{name:'الموظفون والحلاقون'}).waitFor({timeout:30000});
- // Form mounts only after authorized roster GET reaches ready.
  onPhase('S13 HR create form ready');
  const createForm=page.locator('form.catalog-form').filter({
   has:page.getByRole('button',{name:/إضافة موظف|جاري الحفظ/}),
@@ -75,14 +77,12 @@ async function exerciseHrOperations(page,origin,business,branch,onPhase,existing
  onPhase('S13 HR employee create POST');
  let created;
  try{
-  created=await withHardTimeout('employee-create',30000,async()=>{
+  created=await withHardTimeout('employee-create',35000,async()=>{
    const wait=page.waitForResponse(r=>r.url().endsWith('/hr/employees')&&
     r.request().method()==='POST',{timeout:25000});
-   // Avoid Playwright submit-button click IPC hang observed in CI.
-   await createForm.evaluate(form=>{
-    if(typeof form.requestSubmit==='function')form.requestSubmit();
-    else form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));
-   });
+   // type=button + noWaitAfter: do not wait for native submit navigation.
+   await createForm.getByRole('button',{name:'إضافة موظف'})
+    .click({timeout:15000,noWaitAfter:true});
    return wait;
   });
  }catch(err){
@@ -94,12 +94,12 @@ async function exerciseHrOperations(page,origin,business,branch,onPhase,existing
    const codeEl=document.querySelector('input[pattern]');
    return {
     notice,
+    btnType:btn?btn.getAttribute('type'):null,
     btnDisabled:btn?btn.disabled:null,
     btnText:btn?(btn.textContent||'').trim().slice(0,40):null,
     codeLen:codeEl instanceof HTMLInputElement?codeEl.value.length:0,
-    denied:!!document.querySelector('[role="alert"]'),
    };
-  });
+  }).catch(()=>({notice:['diag_unavailable']}));
   throw new Error('S13_EMPLOYEE_CREATE_STALL diag='+JSON.stringify(diag)+
    ' cause='+String(err instanceof Error?err.message:err).split('\n')[0].slice(0,140));
  }
@@ -116,17 +116,19 @@ async function exerciseHrOperations(page,origin,business,branch,onPhase,existing
  onPhase('S13 Barber activate POST');
  let linked;
  try{
-  linked=await withHardTimeout('barber-activate',30000,async()=>{
+  linked=await withHardTimeout('barber-activate',35000,async()=>{
    const wait=page.waitForResponse(r=>
     r.url().endsWith('/hr/employees/'+employeeData.id+'/barber')&&
     r.request().method()==='POST',{timeout:25000});
-   await row.getByRole('button',{name:'تفعيل كحلاق'}).evaluate(btn=>btn.click());
+   await row.getByRole('button',{name:'تفعيل كحلاق'})
+    .click({timeout:15000,noWaitAfter:true});
    return wait;
   });
  }catch(err){
   const notice=await page.evaluate(()=>
    [...document.querySelectorAll('.k5-notice,.k5-error,[role="alert"]')]
-    .map(n=>(n.textContent||'').trim()).filter(Boolean).slice(0,3));
+    .map(n=>(n.textContent||'').trim()).filter(Boolean).slice(0,3))
+   .catch(()=>['diag_unavailable']);
   throw new Error('S13_BARBER_ACTIVATE_STALL notices='+JSON.stringify(notice)+
    ' cause='+String(err instanceof Error?err.message:err).split('\n')[0].slice(0,140));
  }

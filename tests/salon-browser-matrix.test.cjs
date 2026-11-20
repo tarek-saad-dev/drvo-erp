@@ -51,9 +51,12 @@ test('S13 HR browser records action-level phases and parent fails closed on stal
  assert.match(runner,/const MAX_PHASE_IDLE_MS=120\*1000/);
  assert.match(runner,/clearInterval\(phaseWatchdog\)/);
  assert.match(runner,/Chromium phase stalled/);
- // Submit must not use Playwright type=submit click (CI IPC hang at create POST).
- assert.match(hr,/requestSubmit/);
+ // type=submit click waited for native navigation in CI; require noWaitAfter + hard timeout.
+ assert.match(hr,/noWaitAfter:\s*true/);
  assert.match(hr,/S13_EMPLOYEE_CREATE_STALL/);
  assert.match(hr,/withHardTimeout/);
  assert.match(hr,/getByRole\('heading',\{name:'الموظفون والحلاقون'\}\)\.waitFor/);
+ const hrUi=read('apps/web/src/app/workspace/[businessId]/[branchId]/hr/hr-client.tsx');
+ assert.match(hrUi,/type="button"/);
+ assert.match(hrUi,/createEmployee/);
 });

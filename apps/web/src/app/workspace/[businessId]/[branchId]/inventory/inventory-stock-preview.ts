@@ -15,6 +15,7 @@ export type CatalogOfferingInput = Readonly<{
   isActive: boolean;
   categoryId?: string | null;
   categoryName?: string | null;
+  barcode?: string | null;
 }>;
 
 export type BalanceInput = Readonly<{
@@ -34,7 +35,7 @@ export type StockPreviewRow = Readonly<{
   onHand: number | "UNKNOWN";
   qtyMilli: number | "UNKNOWN";
   stockStatus: "OK" | "LOW" | "OUT" | "UNKNOWN";
-  barcode: null;
+  barcode: string | null;
   productCode: null;
 }>;
 
@@ -92,13 +93,14 @@ export function isCatalogProductOffering(
 }
 
 export function matchesStockPreviewQuery(
-  row: Pick<StockPreviewRow, "displayName" | "offeringId">,
+  row: Pick<StockPreviewRow, "displayName" | "offeringId" | "barcode">,
   query: string,
 ): boolean {
   if (typeof query !== "string") throw new TypeError("Invalid query");
   const q = query.trim().toLowerCase();
   if (!q) return true;
   if (row.displayName.toLowerCase().includes(q)) return true;
+  if (row.barcode && row.barcode.toLowerCase().includes(q)) return true;
   const id = row.offeringId.toLowerCase();
   return id.startsWith(q) || id.slice(0, 8).startsWith(q);
 }
@@ -165,7 +167,9 @@ export function buildDraftStockPreview(
       onHand: owned && bal ? unitsFromMilli(bal.qtyMilli) : owned ? 0 : "UNKNOWN",
       qtyMilli: owned && bal ? bal.qtyMilli : owned ? 0 : "UNKNOWN",
       stockStatus: owned && bal ? bal.stockStatus : owned ? "OUT" : "UNKNOWN",
-      barcode: null,
+      barcode: typeof offering.barcode === "string" && offering.barcode.trim()
+        ? offering.barcode.trim()
+        : null,
       productCode: null,
     });
   }

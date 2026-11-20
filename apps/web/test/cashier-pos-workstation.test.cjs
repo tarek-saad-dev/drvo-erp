@@ -38,16 +38,18 @@ test('catalog browser preserves Cashier / focus and service-product tabs without
  assert.doesNotMatch(ui,/priceMinor\s*=/);
 });
 
-test('PRODUCT tab uses Cashier-like labels and offeringId prefix search without fake barcode',()=>{
+test('PRODUCT tab uses Cashier-like labels with SQL035 barcode + offeringId prefix search',()=>{
  const ui=read('cashier-catalog-browser.tsx');
  assert.match(ui,/اختر المنتج/);
  assert.match(ui,/بيع تجزئة/);
  assert.match(ui,/offeringId\.slice\(0,8\)/);
  assert.match(ui,/idPrefix\.includes\(q\)/);
  assert.match(ui,/displayName\.toLocaleLowerCase\("en"\)/);
- assert.match(ui,/لا باركود|ليست باركود|لا باركود\/مخزون/);
- // SQL027 overlay may expose stockStatus/qtyMilli; forbid barcode invent + client price writes.
- assert.doesNotMatch(ui,/Barcode|barcode\s*[:=]|fakeStock|qtyOnHand/);
+ assert.match(ui,/data-product-barcode="sql035"/);
+ assert.match(ui,/o\.barcode/);
+ assert.match(ui,/barcode\.includes\(q\)/);
+ // SQL035 reads CatalogOffering.Barcode; forbid invented stock qty + client price writes.
+ assert.doesNotMatch(ui,/fakeStock|qtyOnHand|clientPrice/);
  assert.doesNotMatch(ui,/priceMinor\s*=/);
  assert.match(ui,/ProductStockHint|productStock|stockStatus/);
 });

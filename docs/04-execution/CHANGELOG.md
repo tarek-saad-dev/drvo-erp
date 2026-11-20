@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **2026-11-20 — CATALOG PRODUCT BARCODE SQL035 + POS SEARCH (NOT PARITY-VERIFIED):** Additive `035_catalog_product_barcode.sql` (`CatalogOffering.Barcode` PRODUCT-only, unique per Business, `ReadCatalog`/`CreateCatalogOffering`/`SetCatalogProductBarcode`), Nest create/list/set barcode, Catalog Light barcode field, private POS catalog search by barcode + SQL027 stock gate, inventory stock preview query match. `tools/catalog/verify.cjs` SQL035 cases. **No sale stock decrement, no GL/COGS, no primary DB apply, no Owner browser, no ADR-031 posting.** Ledger POS-05 PORTING (barcode gap closed at Catalog/POS search layer).
+
 - **2026-11-20 — DOCS SYNC POST #137–#147:** START-HERE / CURRENT-STATE / ROADMAP banners updated to Operational Pilot Readiness + Tracks A/B/C after #137–#146 merges and #147 ADR-031 readiness package (still PROPOSED). Pilot E2E, POS draft print, barcode SQL035, primary SQL, ADR-031 human approvals and Cut import remain OPEN.
 
 - **2026-11-20 — ADR-031 FINANCIAL POSTING READINESS PACKAGE (STILL PROPOSED):** Added [Track C decision package](ADR-031-POSTING-READINESS-PACKAGE-2026-11-20.md) with nonposting inventory, ownership matrix, Option A (conditional) vs B, open tender questions, idempotency/reconciliation/reversal/failure gates, and PENDING Founder/Finance/Architecture/Security + E1–E4 evidence checklists. Machine board `tools/finance/adr031-readiness-board.cjs` + `verify-adr031-readiness.cjs`; tests `tests/adr031-readiness-board.test.cjs`; workflow `adr031-readiness-ci.yml`. **ADR-031 remains PROPOSED; postingActivation BLOCKED; no `pos.sale.post`, no live GL SQL.**

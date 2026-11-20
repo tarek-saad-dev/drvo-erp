@@ -11,8 +11,10 @@ export type BarberEmployee={
  isBookable:boolean;resourceId:string|null;resourceName:string|null;
 };
 
-export default function CashierBarberSelector({apiRoot,selectedId,onSelect}:{
+export default function CashierBarberSelector({apiRoot,selectedId,onSelect,onRoster}:{
  apiRoot:string;selectedId:string;onSelect:(employeeId:string)=>void;
+ /** Read-only roster hand-off (names for nonposting tip preview labels). */
+ onRoster?:(employees:BarberEmployee[])=>void;
 }){
  const [status,setStatus]=useState<"loading"|"ready"|"denied">("loading");
  const [employees,setEmployees]=useState<BarberEmployee[]>([]);
@@ -22,10 +24,11 @@ export default function CashierBarberSelector({apiRoot,selectedId,onSelect}:{
    if(!r.ok){setEmployees([]);setStatus("denied");return;}
    const data=await r.json() as {employees?:BarberEmployee[]};
    if(!Array.isArray(data.employees)){setEmployees([]);setStatus("denied");return;}
-   setEmployees(data.employees.filter(e=>e.isActive&&e.branchActive));
+   const active=data.employees.filter(e=>e.isActive&&e.branchActive);
+   setEmployees(active);onRoster?.(active);
    setStatus("ready");
   }catch{setEmployees([]);setStatus("denied");}
- },[apiRoot]);
+ },[apiRoot,onRoster]);
  useEffect(()=>{void load();},[load]);
  const barbers=employees.filter(e=>e.isBookable);
  const others=employees.filter(e=>!e.isBookable);

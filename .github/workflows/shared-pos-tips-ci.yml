@@ -1,0 +1,42 @@
+name: Shared POS tips preview CI
+on:
+  pull_request:
+    paths:
+      - '_cashier_source/pos-tips/**'
+      - 'packages/business-modules/pos/**'
+      - 'apps/web/src/app/workspace/**/pos-preview/**'
+      - 'apps/web/test/pos-tips-preview.test.cjs'
+      - 'tests/pos-tips-source.test.cjs'
+      - 'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json'
+      - '.github/workflows/shared-pos-tips-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - '_cashier_source/pos-tips/**'
+      - 'packages/business-modules/pos/**'
+      - 'apps/web/src/app/workspace/**/pos-preview/**'
+      - 'apps/web/test/pos-tips-preview.test.cjs'
+      - 'tests/pos-tips-source.test.cjs'
+      - '.github/workflows/shared-pos-tips-ci.yml'
+permissions:
+  contents: read
+jobs:
+  pos-tips-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # No SQL Server: tips are preview-only (no migration, no tables, no writes).
+      - name: Package + pinned Cashier tip characterization
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          npm run build
+          node --test tests/pos-tips-source.test.cjs tests/cashier-workflow-ledger.test.cjs
+      - name: Private UI source guards
+        run: |
+          set -euo pipefail
+          node --test apps/web/test/pos-tips-preview.test.cjs apps/web/test/cashier-pos-workstation.test.cjs apps/web/test/pos-adjustments-preview.test.cjs

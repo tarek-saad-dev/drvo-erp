@@ -476,16 +476,22 @@
     },
     {
       "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
-      "TargetPaths": [],
+      "TargetPaths": [
+        "packages/business-modules/pos/src/tip-preview.ts",
+        "apps/web/.../pos-preview/cashier-tip-preview.ts",
+        "apps/web/.../pos-preview/cashier-tips-preview.tsx",
+        "_cashier_source/pos-tips/tipMath.ts",
+        "_cashier_source/pos-tips/TipsModal.tsx"
+      ],
       "UIProof": "OPEN",
-      "DomainTest": "OPEN",
+      "DomainTest": "tests/pos-tips-source.test.cjs (pinned tipMath/TipsModal blobs; calculateTipAmount + resolveTipBarberCandidates + sanitizeAmountInput characterization) + tests/cashier-owned-module-port.test.cjs + apps/web/test/pos-tips-preview.test.cjs (source guards)",
       "SQLHTTPTest": "OPEN",
       "BrowserProof": "OPEN",
       "DataProof": "OPEN",
       "PilotProof": "OPEN",
-      "Status": "BLOCKED",
-      "Blocker": "Finance gated; no DRVO tips owner",
-      "NextAction": "Identify tips ledger owner after ADR-031",
+      "Status": "PORTING",
+      "Blocker": "ADR-031 posting + employee ledger + Treasury cash-in owners absent: tip RECORDING (cash-in + employee ledger credit + WhatsApp, Cashier /api/pos/tips) stays BLOCKED; no Nest tip route; only nonposting tip-entry preview (presented - due, default top executor) exists; per-line executor recipient list limited to selected barber (rich-draft per-line executors not wired); DRVO is stricter than Cashier (<=2 decimals, executor ties by id); UI/Browser/Data/Pilot proof OPEN",
+      "NextAction": "Keep tip recording BLOCKED; after ADR-031 + HR employee-ledger credit contract + Treasury receipt method catalog exist, add flag-gated Nest tip POST with idempotency and shift/day ownership; owner browser click-path vs TipsModal",
       "SalonExtension": "none",
       "ID": "POS-03",
       "SourcePaths+BlobSHA": [

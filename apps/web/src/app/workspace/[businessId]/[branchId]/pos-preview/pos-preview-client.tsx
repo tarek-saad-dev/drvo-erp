@@ -6,9 +6,10 @@ import PosCustomerOperator from "./pos-customer-operator";
 import CashierCatalogBrowser from "./cashier-catalog-browser";
 import CashierCartPanel from "./cashier-cart-panel";
 import CashierQuickActions from "./cashier-quick-actions";
-import CashierBarberSelector from "./cashier-barber-selector";
+import CashierBarberSelector,{type BarberEmployee} from "./cashier-barber-selector";
+import CashierTipsPreview from "./cashier-tips-preview";
 import CashierPackagesSection,{expandPackageToDraftLines,type CatalogPackage} from "./cashier-packages-section";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type Offering = {offeringId:string;kind:"SERVICE"|"PRODUCT";displayName:string;
@@ -64,9 +65,24 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
   const [selectedCustomerId,setSelectedCustomerId]=useState("");
   const [customerRevision,setCustomerRevision]=useState(0);
   const [selectedBarberId,setSelectedBarberId]=useState("");
+  const [rosterNames,setRosterNames]=useState<Record<string,string>>({});
+  const onRoster=useCallback((employees:BarberEmployee[])=>{
+    const names:Record<string,string>={};
+    for(const e of employees)names[e.employeeId.toLowerCase()]=e.displayName;
+    setRosterNames(names);
+  },[]);
   const retryKey=useRef<string|null>(null);
   const handoffApplied=useRef(false);
   const selectedCurrency=offerings.find(o=>lines.some(l=>l.offeringId===o.offeringId))?.currency??"EGP";
+  // Tip preview basis: server-priced total + SERVICE lines stamped with the selected executor
+  // (Cashier groups only lines that carry an EmpID; PRODUCT lines never do).
+  const tipTotalDueMinor=adjustment?adjustment.afterDiscountMinor:preview?preview.listPriceSubtotalMinor:null;
+  const tipExecutorLines=useMemo(()=>{
+    if(!preview||!GUID.test(selectedBarberId))return [];
+    return preview.lines.filter(l=>offerings.some(o=>o.offeringId===l.offeringId&&o.kind==="SERVICE"))
+      .map(l=>({employeeId:selectedBarberId,lineSubtotalMinor:l.lineSubtotalMinor}));
+  },[preview,offerings,selectedBarberId]);
+  const tipCurrency=adjustment?adjustment.currency:preview?preview.currency:selectedCurrency;
   const home="/workspace/"+encodeURIComponent(businessId)+"/"+encodeURIComponent(branchId);
   const api="/api/workspaces/"+encodeURIComponent(businessId)+"/branches/"+
     encodeURIComponent(branchId)+"/pos-preview";
@@ -284,7 +300,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
         apiRoot={api.replace(/\/pos-preview$/,"")} customerId={selectedCustomerId}
         onSelect={setSelectedCustomerId} onCreated={()=>setCustomerRevision(v=>v+1)}/>}
       <CashierBarberSelector apiRoot={api.replace(/\/pos-preview$/,"")}
-       selectedId={selectedBarberId} onSelect={setSelectedBarberId}/>
+       selectedId={selectedBarberId} onSelect={setSelectedBarberId} onRoster={onRoster}/>
       <CashierCatalogBrowser offerings={offerings} disabled={busy||draftBusy||lines.length>=20}
        onAdd={o=>quickAdd(o)}/>
       <CashierPackagesSection
@@ -380,6 +396,8 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
         <p>المبلغ الناقص: {money(adjustment.shortfallMinor,adjustment.currency)}</p>
         <p className="k5-muted">لا يوجد تحصيل أو إكرامية موزعة أو خصم محفوظ أو فاتورة أو قيد. حفظ المسودة يحفظ العناصر فقط؛ هذه الأرقام مؤقتة ولا تشمل ضريبة.</p>
       </section>}
+      {lines.length>0&&<CashierTipsPreview totalDueMinor={tipTotalDueMinor} currency={tipCurrency}
+       executorLines={tipExecutorLines} executorNames={rosterNames} disabled={busy||draftBusy}/>}
       {preview&&<section className="k5-admin-card">
         <h2>نتيجة المعاينة — ليست فاتورة</h2>
         <div className="k5-table-wrap"><table className="k5-table">

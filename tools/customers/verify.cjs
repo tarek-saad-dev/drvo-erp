@@ -75,6 +75,9 @@ async function wait(){
 }
 const path=(b,br)=>api+'/workspaces/'+b+'/branches/'+br+'/customers';
 const get=(p,cookie)=>fetch(p,{headers:cookie?{Cookie:cookie}:{}});
+const put=(p,cookie,data,headers={})=>fetch(p,{method:'PUT',
+ headers:{Cookie:cookie,Origin:origin,'Content-Type':'application/json',...headers},
+ body:JSON.stringify(data)});
 const post=(p,cookie,key,data,headers={})=>fetch(p,{method:'POST',
  headers:{Cookie:cookie,Origin:origin,'Content-Type':'application/json',
  'Idempotency-Key':key,...headers},body:JSON.stringify(data)});
@@ -101,10 +104,10 @@ async function main(){
   admin=await open({...base,database:db});
   await admin.query('CREATE USER ['+appUser+'] FOR LOGIN ['+appUser+'];'+
    'GRANT CONNECT TO ['+appUser+']');
-  await pass('24 migrations replay without drift and customer records start empty',async()=>{
-   const a=await applyMigrations(admin,undefined,24);
-   assert.equal(a.length,24);assert.ok(a.every(z=>z.status==='applied'));
-   const b=await applyMigrations(admin,undefined,24);
+  await pass('31 migrations (incl. SQL031 CRM profile) replay without drift and customer records start empty',async()=>{
+   const a=await applyMigrations(admin,undefined,31);
+   assert.equal(a.length,31);assert.ok(a.every(z=>z.status==='applied'));
+   const b=await applyMigrations(admin,undefined,31);
    assert.ok(b.every(z=>z.status==='unchanged'));
    assert.equal((await admin.query('SELECT COUNT(*) AS n FROM core.Customer')).recordset[0].n,0);
   });
@@ -129,9 +132,16 @@ async function main(){
     "HAS_PERMS_BY_NAME('core.Customer','OBJECT','UPDATE') AS writep,"+
     "HAS_PERMS_BY_NAME('core.ReadCustomers','OBJECT','EXECUTE') AS execp,"+
     "HAS_PERMS_BY_NAME('core.SearchCustomers','OBJECT','EXECUTE') AS searchp,"+
-    "HAS_PERMS_BY_NAME('core.AssertCustomersBranchAction','OBJECT','EXECUTE') AS guardp");
-   assert.deepEqual(Object.values(r.recordset[0]).map(Number),[0,0,1,1,0]);
+    "HAS_PERMS_BY_NAME('core.AssertCustomersBranchAction','OBJECT','EXECUTE') AS guardp,"+
+    "HAS_PERMS_BY_NAME('core.CustomerProfile','OBJECT','SELECT') AS profileRead,"+
+    "HAS_PERMS_BY_NAME('core.CustomerProfile','OBJECT','UPDATE') AS profileWrite,"+
+    "HAS_PERMS_BY_NAME('core.CustomerOffersConsentEvent','OBJECT','SELECT') AS consentRead,"+
+    "HAS_PERMS_BY_NAME('core.ReadCustomerProfile','OBJECT','EXECUTE') AS profileReadExec,"+
+    "HAS_PERMS_BY_NAME('core.UpsertCustomerProfile','OBJECT','EXECUTE') AS profileWriteExec");
+   assert.deepEqual(Object.values(r.recordset[0]).map(Number),[0,0,1,1,0,0,0,0,1,1]);
    await assert.rejects(()=>app.query('SELECT * FROM core.Customer'),e=>e.number===229);
+   await assert.rejects(()=>app.query('SELECT * FROM core.CustomerProfile'),e=>e.number===229);
+   await assert.rejects(()=>app.query('SELECT * FROM core.CustomerOffersConsentEvent'),e=>e.number===229);
   });
   await pass('composite Business FK rejects Customer in wrong Tenant',async()=>{
    await assert.rejects(()=>query(admin,
@@ -244,6 +254,114 @@ async function main(){
     {displayName:'Forge',tenantId:x.t2})).status,400);
    assert.equal((await post(path(x.b,x.br),cookie,id(),
     {displayName:'Bad'}, {Origin:'https://attacker.invalid'})).status,401);
+  });
+  const profilePath=(b,br,c)=>path(b,br)+'/'+c+'/profile';
+  const dbRow=async(sqlText,params)=>(await query(admin,sqlText,params)).recordset;
+  await pass('SQL031 profile: absent profile reads empty/incomplete with NO consent',async()=>{
+   const r=await get(profilePath(x.b,x.br,firstCustomerId),cookie);
+   assert.equal(r.status,200);assert.equal(r.headers.get('cache-control'),'no-store');
+   const view=await r.json();
+   assert.equal(view.profileExists,false);assert.equal(view.incomplete,true);
+   assert.equal(view.offersConsentActive,false);
+   assert.equal(view.phoneE164,'+201012345678');
+   assert.equal((await dbRow('SELECT COUNT(*) AS n FROM core.CustomerProfile')).at(0).n,0);
+  });
+  await pass('SQL031 profile: full CRM write persists source rules and does not imply consent from a stored phone',async()=>{
+   const p=profilePath(x.b,x.br,firstCustomerId);
+   const saved=await put(p,cookie,{birthDate:'1990-05-17',address:'  Nasr City ',
+    notes:'prefers evenings',cameFrom:'word_of_mouth',cameFromDetails:' Ahmed ',
+    referralCode:'STALE'});
+   assert.equal(saved.status,200);
+   const view=await saved.json();
+   assert.equal(view.birthDate,'1990-05-17');assert.equal(view.address,'Nasr City');
+   assert.equal(view.cameFrom,'word_of_mouth');assert.equal(view.cameFromDetails,'Ahmed');
+   assert.equal(view.referralCode,null);assert.equal(view.incomplete,false);
+   assert.equal(view.offersConsentActive,false,'phone alone is not WhatsApp consent');
+   const again=await (await get(p,cookie)).json();
+   assert.equal(again.cameFromDetails,'Ahmed');assert.equal(again.profileExists,true);
+   const rows=await dbRow('SELECT OffersConsentedAtUtc,OffersConsentPhoneE164,CameFrom,ReferralCode'+
+    ' FROM core.CustomerProfile');
+   assert.equal(rows.length,1);assert.equal(rows[0].OffersConsentedAtUtc,null);
+   assert.equal(rows[0].OffersConsentPhoneE164,null);assert.equal(rows[0].ReferralCode,null);
+   assert.equal((await dbRow('SELECT COUNT(*) AS n FROM core.CustomerOffersConsentEvent')).at(0).n,0);
+   // Repeating the identical PUT is idempotent: still one profile row.
+   assert.equal((await put(p,cookie,{birthDate:'1990-05-17',address:'Nasr City',
+    notes:'prefers evenings',cameFrom:'word_of_mouth',cameFromDetails:'Ahmed'})).status,200);
+   assert.equal((await dbRow('SELECT COUNT(*) AS n FROM core.CustomerProfile')).at(0).n,1);
+  });
+  await pass('SQL031 profile: invalid source, DOB, keys, origin and ids are rejected',async()=>{
+   const p=profilePath(x.b,x.br,firstCustomerId);
+   for(const body of [
+    {cameFrom:'word_of_mouth'},{cameFrom:'referral_code'},{cameFrom:'legacy_made_up'},
+    {cameFromDetails:'orphan'},{birthDate:'2999-01-01'},{birthDate:'1990-02-30'},
+    {offersConsentAction:'YES'},{tenantId:x.t2},{whatsappOffersConsentConfirmed:true},
+   ])assert.equal((await put(p,cookie,body)).status,400,JSON.stringify(body));
+   assert.equal((await put(p,cookie,{},{Origin:'https://attacker.invalid'})).status,401);
+   assert.equal((await put(profilePath(x.b,x.br,'not-a-guid'),cookie,{})).status,404);
+   assert.equal((await put(profilePath(x.b,x.br,id()),cookie,{})).status,404);
+   assert.equal((await get(profilePath(x.b,x.br,id()),cookie)).status,404);
+   assert.equal((await fetch(p,{headers:{}})).status,401);
+  });
+  await pass('SQL031 consent: explicit GRANT/REVOKE with append-only evidence; no phone, no GRANT',async()=>{
+   const p=profilePath(x.b,x.br,firstCustomerId);
+   const base={birthDate:'1990-05-17',address:'Nasr City',cameFrom:'instagram'};
+   const granted=await (await put(p,cookie,{...base,offersConsentAction:'GRANT'})).json();
+   assert.equal(granted.offersConsentActive,true);
+   assert.equal(granted.offersConsentEvidence,'STAFF_CONFIRMED_CUSTOMER_WHATSAPP_OFFERS');
+   const firstAt=granted.offersConsentedAtUtc;assert.ok(firstAt);
+   const replay=await (await put(p,cookie,{...base,offersConsentAction:'GRANT'})).json();
+   assert.equal(replay.offersConsentedAtUtc,firstAt,'replayed GRANT keeps original evidence');
+   assert.equal((await dbRow('SELECT COUNT(*) AS n FROM core.CustomerOffersConsentEvent')).at(0).n,1);
+   // A later PUT without an action must not change consent either way.
+   const untouched=await (await put(p,cookie,{...base,notes:'edited'})).json();
+   assert.equal(untouched.offersConsentActive,true);
+   const revoked=await (await put(p,cookie,{...base,offersConsentAction:'REVOKE'})).json();
+   assert.equal(revoked.offersConsentActive,false);assert.ok(revoked.offersConsentRevokedAtUtc);
+   const regrant=await (await put(p,cookie,{...base,offersConsentAction:'GRANT'})).json();
+   assert.equal(regrant.offersConsentActive,true);assert.equal(regrant.offersConsentRevokedAtUtc,null);
+   const events=await dbRow('SELECT Action FROM core.CustomerOffersConsentEvent'+
+    ' ORDER BY OccurredAtUtc,EventId');
+   assert.equal(events.length,3);
+   assert.deepEqual(events.map(e=>e.Action).sort(),['GRANT','GRANT','REVOKE']);
+   // Customer without a phone can never be granted consent.
+   const walkIn=await (await post(path(x.b,x.br),cookie,id(),{displayName:'No Phone CRM'})).json();
+   assert.equal((await put(profilePath(x.b,x.br,walkIn.id),cookie,
+    {offersConsentAction:'GRANT'})).status,400);
+   assert.equal((await put(profilePath(x.b,x.br,walkIn.id),cookie,
+    {address:'Giza'})).status,200);
+   // Changing the stored phone voids the consent bound to the old number.
+   await query(admin,"UPDATE core.Customer SET PhoneE164='+201055555555' WHERE TenantId=@t"+
+    " AND BusinessId=@b AND CustomerId=@c",{t:x.t,b:x.b,c:firstCustomerId});
+   assert.equal((await (await get(p,cookie)).json()).offersConsentActive,false);
+  });
+  await pass('SQL031 DB constraints: orphan source detail (NULL CameFrom) and wrong-Business FK are rejected',async()=>{
+   const c=id();
+   await query(admin,"INSERT core.Customer(TenantId,BusinessId,CustomerId,ClientRequestId,DisplayName)"+
+    " VALUES(@t,@b,@c,@req,N'Constraint Probe')",{t:x.t,b:x.b,c,req:id()});
+   await assert.rejects(()=>query(admin,
+    "INSERT core.CustomerProfile(TenantId,BusinessId,CustomerId,CameFromDetails,UpdatedByAccountId)"+
+    " VALUES(@t,@b,@c,N'orphan',@a)",{t:x.t,b:x.b,c,a:x.account}),e=>e.number===547);
+   await assert.rejects(()=>query(admin,
+    "INSERT core.CustomerProfile(TenantId,BusinessId,CustomerId,CameFrom,CameFromDetails,UpdatedByAccountId)"+
+    " VALUES(@t,@b,@c,'instagram',N'detail on wrong source',@a)",
+    {t:x.t,b:x.b,c,a:x.account}),e=>e.number===547);
+   await assert.rejects(()=>query(admin,
+    "INSERT core.CustomerProfile(TenantId,BusinessId,CustomerId,OffersConsentedAtUtc,UpdatedByAccountId)"+
+    " VALUES(@t,@b,@c,SYSUTCDATETIME(),@a)",{t:x.t,b:x.b,c,a:x.account}),e=>e.number===547);
+   await assert.rejects(()=>query(admin,
+    "INSERT core.CustomerProfile(TenantId,BusinessId,CustomerId,UpdatedByAccountId)"+
+    " VALUES(@t,@b,@c,@a)",{t:x.t,b:x.b2,c,a:x.account}),e=>e.number===547);
+  });
+  await pass('SQL031 profile reads/writes deny other Business, foreign Tenant and unassigned Branch',async()=>{
+   for(const [b,br] of [[x.b2,x.br2],[x.foreignB,x.foreignBr],[x.b,x.unassignedBr]]){
+    assert.equal((await get(profilePath(b,br,firstCustomerId),cookie)).status,404);
+    assert.equal((await put(profilePath(b,br,firstCustomerId),cookie,{address:'x'})).status,404);
+   }
+   // A different Tenant's operator cannot reach this Business customer through their own scope.
+   assert.equal((await get(profilePath(x.foreignB,x.foreignBr,firstCustomerId),foreign)).status,404);
+   assert.equal((await put(profilePath(x.foreignB,x.foreignBr,firstCustomerId),foreign,
+    {address:'hijack'})).status,404);
+   assert.equal((await dbRow("SELECT COUNT(*) AS n FROM core.CustomerProfile WHERE Address=N'hijack'")).at(0).n,0);
   });
   await pass('same Tenant other Business, foreign Tenant, unassigned Branch deny reads and writes',async()=>{
    for(const [b,br] of [[x.b2,x.br2],[x.foreignB,x.foreignBr],[x.b,x.unassignedBr]]){

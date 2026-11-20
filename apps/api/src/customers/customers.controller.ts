@@ -1,11 +1,12 @@
 import {
- Body,Controller,Get,Headers,HttpCode,Param,Post,Query,Req,Res,
+ Body,Controller,Get,Headers,HttpCode,Param,Post,Put,Query,Req,Res,
  ServiceUnavailableException,UnauthorizedException,
 } from "@nestjs/common";
 import type {IncomingMessage,ServerResponse} from "node:http";
 import {IdentityService,extractSessionCookie} from "../identity/identity.service";
 import {
  CustomersService,type CustomerView,type CreatedCustomer,type CustomerSearchResult,
+ type CustomerProfileView,
 } from "./customers.service";
 
 function enabled():void{
@@ -35,6 +36,27 @@ export class CustomersController {
    return this.customers.search(actor,token!,businessId,branchId,q);
   }
   return {customers:await this.customers.list(actor,token!,businessId,branchId)};
+ }
+ @Get(":customerId/profile")
+ async profile(@Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,
+   @Param("businessId") businessId:string,@Param("branchId") branchId:string,
+   @Param("customerId") customerId:string):Promise<CustomerProfileView>{
+  res.setHeader("Cache-Control","no-store");enabled();
+  const token=extractSessionCookie(req.headers.cookie);
+  const actor=await this.identity.actorFromToken(token);
+  return this.customers.getProfile(actor,token!,businessId,branchId,customerId);
+ }
+ @Put(":customerId/profile")
+ @HttpCode(200)
+ async saveProfile(@Headers("origin") origin:string|undefined,
+   @Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,
+   @Param("businessId") businessId:string,@Param("branchId") branchId:string,
+   @Param("customerId") customerId:string,
+   @Body() body:unknown):Promise<CustomerProfileView>{
+  res.setHeader("Cache-Control","no-store");enabled();checkOrigin(origin);
+  const token=extractSessionCookie(req.headers.cookie);
+  const actor=await this.identity.actorFromToken(token);
+  return this.customers.upsertProfile(actor,token!,businessId,branchId,customerId,body);
  }
  @Post()
  @HttpCode(200)

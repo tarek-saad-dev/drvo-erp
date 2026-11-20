@@ -11,6 +11,7 @@ on:
       - 'apps/web/test/pos-rich-*.test.cjs'
       - 'apps/web/test/cashier-pricing-ui.test.cjs'
       - 'apps/web/test/private-pos-customer-operator.test.cjs'
+      - 'apps/web/test/customer-profile-crm.test.cjs'
       - 'apps/web/test/pos-draft-quick-cart.test.cjs'
       - 'tools/pos-rich/**'
       - '.github/workflows/pos-rich-ci.yml'
@@ -24,6 +25,7 @@ on:
       - 'apps/web/test/pos-rich-*.test.cjs'
       - 'apps/web/test/cashier-pricing-ui.test.cjs'
       - 'apps/web/test/private-pos-customer-operator.test.cjs'
+      - 'apps/web/test/customer-profile-crm.test.cjs'
       - 'apps/web/test/pos-draft-quick-cart.test.cjs'
       - 'tools/pos-rich/**'
       - '.github/workflows/pos-rich-ci.yml'
@@ -83,6 +85,7 @@ jobs:
           node --test apps/web/test/pos-rich-customer-draft-history.test.cjs
           node --test apps/web/test/cashier-pricing-ui.test.cjs
           node --test apps/web/test/private-pos-customer-operator.test.cjs
+          node --test apps/web/test/customer-profile-crm.test.cjs
           node --test apps/web/test/pos-draft-quick-cart.test.cjs
           env -u DRVO_K5_WEB_ENABLED -u DRVO_POS_RICH_WEB_ENABLED npm run build --prefix apps/web
           npm run typecheck --prefix apps/web

@@ -8,4 +8,5 @@ Do not edit these excerpts to invent DRVO behavior. Adapt through Nest/SQL modul
 - `operations/businessDayReconciliation.ts` — pure BusinessDay catch-up plan (NO_OP / ROLLED_OVER / OPENED_MISSING_DAY).
 - `operations/invariants.ts` — one OPEN day per branch; one OPEN shift per user.
 - `treasury/treasuryCashMoveFilters.ts` — Cashier movement filter vocabulary reused for characterization only.
+- `crm/customerSource.ts` — verbatim Cashier customer acquisition-source contract (blob `70f0ad1b…`, `src/lib/customerSource.ts`). Adapted, not edited, into `apps/api/src/customers/customer-source.ts`; `tests/customer-profile-source.test.cjs` locks the blob and the option list.
 - Additional Booking/Queue contracts may also live under `tests/fixtures/cashier/`.

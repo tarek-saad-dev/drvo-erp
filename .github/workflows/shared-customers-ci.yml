@@ -5,6 +5,10 @@ on:
       - 'apps/api/src/customers/**'
       - 'apps/api/src/app.module.ts'
       - 'apps/api/test/customers.test.cjs'
+      - 'apps/api/test/customer-source.test.cjs'
+      - 'apps/web/test/customer-profile-crm.test.cjs'
+      - 'tests/customer-profile-source.test.cjs'
+      - '_cashier_source/crm/**'
       - 'apps/web/src/app/workspace/**'
       - 'db/migrations/**'
       - 'tools/customers/**'
@@ -15,6 +19,10 @@ on:
       - 'apps/api/src/customers/**'
       - 'apps/api/src/app.module.ts'
       - 'apps/api/test/customers.test.cjs'
+      - 'apps/api/test/customer-source.test.cjs'
+      - 'apps/web/test/customer-profile-crm.test.cjs'
+      - 'tests/customer-profile-source.test.cjs'
+      - '_cashier_source/crm/**'
       - 'apps/web/src/app/workspace/**'
       - 'db/migrations/**'
       - 'tools/customers/**'
@@ -36,6 +44,8 @@ jobs:
           npm ci --prefix apps/api --no-audit --no-fund
           npm test --prefix apps/api
           node --check tools/customers/verify.cjs
+          node --test tests/customer-profile-source.test.cjs
+          node --test apps/web/test/customer-profile-crm.test.cjs
       - name: Start local disposable SQL Server
         shell: bash
         run: |

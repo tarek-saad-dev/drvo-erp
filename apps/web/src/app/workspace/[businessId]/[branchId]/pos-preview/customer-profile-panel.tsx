@@ -10,7 +10,8 @@ import {useEffect,useState} from "react";
 import {useRouter} from "next/navigation";
 import {
  CUSTOMER_SOURCE_OPTIONS,formatCustomerSourceDisplay,isCustomerProfileIncomplete,
- validateCustomerSource,
+ buildProfileBody as buildProfileBodyImpl,
+ profileDraftHasContent as profileDraftHasContentImpl,
 } from "../customers/customer-source.mjs";
 
 export type ProfileDraft={
@@ -31,26 +32,12 @@ type ProfileView={
 const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export function profileDraftHasContent(d:ProfileDraft):boolean{
- return Boolean(d.birthDate||d.address.trim()||d.notes.trim()||d.cameFrom
-  ||d.cameFromDetails.trim()||d.referralCode.trim()||d.grantConsent);
+ return profileDraftHasContentImpl(d);
 }
 /** Cashier rules: source is optional, but if present it must validate. */
 export function buildProfileBody(d:ProfileDraft,consentAction?:"GRANT"|"REVOKE"):
  {body:Record<string,unknown>|null;errors:Record<string,string>}{
- const errors:Record<string,string>={};
- if(d.cameFrom||d.cameFromDetails.trim()||d.referralCode.trim()){
-  const checked=validateCustomerSource(d.cameFrom,d.cameFromDetails,d.referralCode);
-  Object.assign(errors,checked.errors);
- }
- if(Object.keys(errors).length)return {body:null,errors};
- const body:Record<string,unknown>={
-  birthDate:d.birthDate||null,address:d.address.trim()||null,notes:d.notes.trim()||null,
-  cameFrom:d.cameFrom||null,
-  cameFromDetails:d.cameFrom==="word_of_mouth"?d.cameFromDetails.trim()||null:null,
-  referralCode:d.cameFrom==="referral_code"?d.referralCode.trim()||null:null,
- };
- if(consentAction)body.offersConsentAction=consentAction;
- return {body,errors};
+ return buildProfileBodyImpl(d,consentAction);
 }
 
 /** Controlled field set shared by quick-create and complete/edit. */

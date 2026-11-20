@@ -59,18 +59,13 @@ test('profile panel: consent only via explicit action, never inferred, no messag
 });
 
 test('profile body builder follows Cashier source rules (executed, not just grepped)',async()=>{
- const ts=require('typescript');
- const src=read('pos-preview/customer-profile-panel.tsx');
- const start=src.indexOf('export function profileDraftHasContent');
- const end=src.indexOf('/** Controlled field set');
- assert.ok(start>0&&end>start);
+ // Logic lives in customer-source.mjs so Customers CI (api-only npm ci) can execute it
+ // without requiring the apps/web typescript toolchain.
  const web=await import(pathToFileURL(path.join(scope,'customers/customer-source.mjs')).href);
- const js=ts.transpileModule(src.slice(start,end),{compilerOptions:{
-  module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2019}}).outputText;
- const sandbox={validateCustomerSource:web.validateCustomerSource,exports:{}};
- new Function('exports','validateCustomerSource',js+'\nexports.b=buildProfileBody;exports.h=profileDraftHasContent;')(
-  sandbox.exports,sandbox.validateCustomerSource);
- const {b,h}=sandbox.exports;
+ const panel=read('pos-preview/customer-profile-panel.tsx');
+ assert.match(panel,/buildProfileBody as buildProfileBodyImpl/);
+ assert.match(panel,/profileDraftHasContent as profileDraftHasContentImpl/);
+ const {buildProfileBody:b,profileDraftHasContent:h}=web;
  const blank={birthDate:'',address:'',notes:'',cameFrom:'',cameFromDetails:'',referralCode:'',grantConsent:false};
  assert.equal(h(blank),false);
  assert.equal(h({...blank,grantConsent:true}),true);

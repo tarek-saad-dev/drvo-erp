@@ -60,3 +60,36 @@ export function validateCustomerSource(cameFrom,cameFromDetails,referralCode){
  }
  return result;
 }
+/** True when the draft carries any CRM field or an explicit consent grant. */
+export function profileDraftHasContent(d){
+ if(!d||typeof d!=='object')return false;
+ return Boolean(d.birthDate||String(d.address||'').trim()||String(d.notes||'').trim()
+  ||d.cameFrom||String(d.cameFromDetails||'').trim()||String(d.referralCode||'').trim()
+  ||d.grantConsent);
+}
+/**
+ * Build the Customers profile PUT body from a draft.
+ * Source is optional, but if present (or detail/code filled) it must validate.
+ */
+export function buildProfileBody(d,consentAction){
+ const errors={};
+ const draft=d&&typeof d==='object'?d:{};
+ const cameFrom=typeof draft.cameFrom==='string'?draft.cameFrom:'';
+ const cameFromDetails=typeof draft.cameFromDetails==='string'?draft.cameFromDetails:'';
+ const referralCode=typeof draft.referralCode==='string'?draft.referralCode:'';
+ if(cameFrom||cameFromDetails.trim()||referralCode.trim()){
+  const checked=validateCustomerSource(cameFrom,cameFromDetails,referralCode);
+  Object.assign(errors,checked.errors);
+ }
+ if(Object.keys(errors).length)return {body:null,errors};
+ const body={
+  birthDate:draft.birthDate||null,
+  address:String(draft.address||'').trim()||null,
+  notes:String(draft.notes||'').trim()||null,
+  cameFrom:cameFrom||null,
+  cameFromDetails:cameFrom==='word_of_mouth'?cameFromDetails.trim()||null:null,
+  referralCode:cameFrom==='referral_code'?referralCode.trim()||null:null,
+ };
+ if(consentAction)body.offersConsentAction=consentAction;
+ return {body,errors};
+}

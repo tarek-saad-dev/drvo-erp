@@ -198,7 +198,9 @@ async function main(){
   await pass('create package draft → reload snapshots present; finance gated',async()=>{
    const key=id();
    const created=await post(route(x.b,x.br),own,key,packageBody);
-   assert.equal(created.status,200,await created.text().catch(()=>''));
+   if(created.status!==200){
+    throw Error('create package draft HTTP '+created.status+': '+(await created.text().catch(()=>'')));
+   }
    const saved=await created.json();
    assert.equal(saved.status,'DRAFT');
    assert.equal(saved.paymentState,'NOT_COLLECTED');
@@ -219,9 +221,9 @@ async function main(){
    assert.equal(anchor.packageId.toLowerCase(),x.pkg.toLowerCase());
    assert.equal(anchor.packageGroupKey,groupKey);
    assert.equal(anchor.packageRole,'anchor');
-   assert.equal(anchor.commercialPackagePriceMinor,150000);
+   assert.equal(Number(anchor.commercialPackagePriceMinor),150000);
    assert.equal(included.packageRole,'included');
-   assert.equal(included.commercialPackagePriceMinor,150000);
+   assert.equal(Number(included.commercialPackagePriceMinor),150000);
    assert.equal(retail.packageId,null);
    assert.equal(retail.packageGroupKey,null);
    assert.equal(retail.packageRole,null);

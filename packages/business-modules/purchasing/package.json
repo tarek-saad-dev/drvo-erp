@@ -1,0 +1,7 @@
+{
+  "name": "@drvo/purchasing",
+  "version": "0.0.0",
+  "private": true,
+  "type": "commonjs",
+  "main": "src/ap-preview.ts"
+}

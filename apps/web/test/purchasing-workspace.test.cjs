@@ -1,0 +1,30 @@
+'use strict';
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const root=path.join(__dirname,'..','src','app','workspace','[businessId]','[branchId]');
+const read=(rel)=>fs.readFileSync(path.join(root,rel),'utf8');
+test('Purchasing page gated by web flags and uses owned API',()=>{
+ const page=read('purchasing/page.tsx');
+ const client=read('purchasing/purchasing-client.tsx');
+ assert.match(page,/DRVO_PURCHASING_WEB_ENABLED/);
+ assert.match(page,/DRVO_K5_WEB_ENABLED/);
+ assert.match(client,/\/purchasing/);
+ assert.match(client,/NONPOSTING_PURCHASE_RECEIVES_AP_PREVIEW/);
+ assert.match(client,/AP_PREVIEW_ONLY/);
+ assert.match(client,/RECEIVE_DRAFTS_ONLY/);
+ assert.match(client,/NOT_PAID/);
+ assert.match(client,/NOT_POSTED/);
+ assert.match(client,/\/suppliers/);
+ assert.match(client,/\/receives/);
+ assert.doesNotMatch(client,/cashMove|journal|GL_POST|paid:true/i);
+});
+test('Branch launcher reveals Purchasing after purchasing API auth',()=>{
+ const home=read('workspace-home-client.tsx');
+ const route=read('page.tsx');
+ assert.match(home,/purchasingWebEnabled/);
+ assert.match(home,/base\+"\/purchasing"/);
+ assert.match(home,/\/purchasing"/);
+ assert.match(route,/purchasingWebEnabled=\{process\.env\.DRVO_PURCHASING_WEB_ENABLED==="YES"\}/);
+});

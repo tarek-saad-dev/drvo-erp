@@ -89,7 +89,8 @@ async function main(){
    assert.ok(a.every(v=>v.status==='applied'));
    assert.ok(a.some(v=>v.filename==='035_catalog_product_barcode.sql'));
    assert.ok(a.some(v=>v.filename==='037_purchasing_suppliers_receive_ap_preview.sql'));
-   assert.equal(a[a.length-1].filename,'038_pos_draft_package_line_snapshots.sql');
+   assert.ok(a.some(v=>v.filename==='038_pos_draft_package_line_snapshots.sql'));
+   assert.equal(a[a.length-1].filename,'039_operations_shift_handoff.sql');
    const b=await applyMigrations(admin);
    assert.ok(b.every(v=>v.status==='unchanged'));
    for(const table of ['core.Supplier','core.PurchaseReceiveDocument','core.PurchaseReceiveLine']){

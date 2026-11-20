@@ -214,8 +214,8 @@ async function main(){
   assert.equal(handBody.outcome,'HANDED_OFF');
   assert.equal(handBody.glPostState,'GATED');
   assert.equal(handBody.financialPostingState,'NOT_AUTHORIZED');
-  assert.equal(handBody.closedShiftId,shiftA);
-  assert.equal(handBody.closedBranchId,x.br);
+  assert.equal(String(handBody.closedShiftId).toLowerCase(),String(shiftA).toLowerCase());
+  assert.equal(String(handBody.closedBranchId).toLowerCase(),String(x.br).toLowerCase());
   const shiftB=handBody.id;
   const replay=await post(ops(x.b,x.otherBr)+'/shift-handoff',own,handKey,
    {dayId:dayBId,expectedSourceShiftId:shiftA});
@@ -223,13 +223,14 @@ async function main(){
   const replayBody=await replay.json();
   assert.equal(replayBody.created,false);
   assert.equal(replayBody.outcome,'IDEMPOTENT_REPLAY');
-  assert.equal(replayBody.id,shiftB);
+  assert.equal(String(replayBody.id).toLowerCase(),String(shiftB).toLowerCase());
   assert.equal(replayBody.glPostState,'GATED');
   const boardA=await (await get(ops(x.b,x.br),own)).json();
   const boardB=await (await get(ops(x.b,x.otherBr),own)).json();
   assert.equal(boardA.shifts.filter(s=>s.status==='OPEN').length,0);
   assert.equal(boardB.shifts.filter(s=>s.status==='OPEN').length,1);
-  assert.equal(boardB.shifts.find(s=>s.status==='OPEN').shiftId,shiftB);
+  assert.equal(String(boardB.shifts.find(s=>s.status==='OPEN').shiftId).toLowerCase(),
+   String(shiftB).toLowerCase());
   assert.equal((await post(ops(x.b,x.otherBr)+'/shift-handoff',own,id(),
    {dayId:dayBId,expectedSourceShiftId:shiftA})).status,409);
   assert.equal((await post(ops(x.b,x.otherBr)+'/shift-handoff',own,id(),

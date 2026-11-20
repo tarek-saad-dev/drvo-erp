@@ -1,0 +1,22 @@
+{
+  "schema": "drvo.cut-adapter.fixture.sales-history-summary.v1",
+  "meta": {
+    "mode": "EXPORTED_JSON_FIXTURE_ONLY",
+    "sourceSystem": "CUT_CASHIER",
+    "datasetId": "FIX-CUT-SALES-SUM-A",
+    "exportedAt": "2026-11-19T00:00:00.000Z",
+    "sourceTenantKey": "SYN-TENANT-CUT-01",
+    "sourceBranchKey": "SYN-BRANCH-01",
+    "windowStart": "2026-10-18",
+    "windowEnd": "2026-11-18",
+    "notes": "Synthetic non-PII sales history counts only. Not live Cut invoices; never posts tender/stock/loyalty.",
+    "liveConnectionAuthorized": false
+  },
+  "counts": {
+    "saleHeaderCount": 12,
+    "saleLineCount": 34,
+    "tenderCount": 14,
+    "voidOrRefundCount": 1,
+    "uniqueCustomerCount": 8
+  }
+}

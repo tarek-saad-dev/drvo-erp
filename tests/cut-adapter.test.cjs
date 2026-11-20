@@ -9,6 +9,9 @@ const {
   assertFixtureOnlyMode,
 } = require('../tools/cut-adapter/connection-gates.cjs');
 const {planCutFixtureReconciliation} = require('../tools/cut-adapter/reconciliation-planner.cjs');
+const {buildIdentityMappingLedger, composeSourceKey} = require('../tools/cut-adapter/identity-mapping.cjs');
+const {buildReconciliationReport} = require('../tools/cut-adapter/reconciliation-report.cjs');
+const {buildPreactivationGateBoard} = require('../tools/cut-adapter/preactivation-gates.cjs');
 
 const samplePath = path.join(
   __dirname,
@@ -18,9 +21,21 @@ const samplePath = path.join(
   'fixtures',
   'sample-customers-services.json'
 );
+const salesPath = path.join(
+  __dirname,
+  '..',
+  'tools',
+  'cut-adapter',
+  'fixtures',
+  'sample-sales-history-summary.json'
+);
 
 function loadSample() {
   return JSON.parse(fs.readFileSync(samplePath, 'utf8'));
+}
+
+function loadSales() {
+  return JSON.parse(fs.readFileSync(salesPath, 'utf8'));
 }
 
 test('Cut adapter sample fixture plans dry-run characterization with zero writes', () => {
@@ -118,4 +133,107 @@ test('planner rejects PII-shaped fields, duplicate ids, and malformed tokens', (
     mutation(x);
     assert.throws(() => planCutFixtureReconciliation(x), TypeError);
   }
+});
+
+test('identity mapping builds unassigned source keys and refuses UUID binds', () => {
+  const plan = planCutFixtureReconciliation(loadSample());
+  const ledger = buildIdentityMappingLedger(plan, {
+    sourceTenantKey: 'SYN-TENANT-CUT-01',
+    defaultSourceBranchKey: 'SYN-BRANCH-01',
+  });
+  assert.equal(ledger.mode, 'FIXTURE_IDENTITY_MAP_DRY_RUN_ONLY');
+  assert.equal(ledger.entryCount, 4);
+  assert.equal(ledger.writes, 0);
+  assert.equal(ledger.productionVerificationClaimed, false);
+  assert.ok(ledger.entries.every((e) => e.targetDrvoUuid === null));
+  assert.ok(
+    ledger.entries.every((e) => e.mappingStatus === 'UNASSIGNED_PENDING_APPROVED_IMPORT_LEDGER')
+  );
+  assert.equal(
+    ledger.entries[0].sourceKey,
+    composeSourceKey({
+      sourceSystem: 'CUT_CASHIER',
+      sourceTenantKey: 'SYN-TENANT-CUT-01',
+      sourceBranchKey: 'SYN-BRANCH-01',
+      entityType: 'CATALOG_SERVICE',
+      originalId: 501,
+    })
+  );
+  assert.throws(
+    () =>
+      buildIdentityMappingLedger(plan, {
+        approvedImportLedgerEvidence: true,
+      }),
+    TypeError
+  );
+  assert.throws(
+    () =>
+      buildIdentityMappingLedger(plan, {
+        proposedTargetAssignments: [{targetDrvoUuid: '11111111-1111-4111-8111-111111111111'}],
+      }),
+    TypeError
+  );
+});
+
+test('reconciliation report stays redacted and blocks production claims', () => {
+  const plan = planCutFixtureReconciliation(loadSample());
+  const ledger = buildIdentityMappingLedger(plan);
+  const report = buildReconciliationReport(plan, {
+    identityLedger: ledger,
+    salesSummary: loadSales(),
+  });
+  assert.equal(report.mode, 'FIXTURE_RECONCILIATION_REPORT_DRY_RUN_ONLY');
+  assert.equal(report.productionVerificationClaimed, false);
+  assert.equal(report.realDataActivation, 'BLOCKED');
+  assert.equal(report.writes, 0);
+  assert.equal(report.counts.customers.count, 2);
+  assert.equal(report.counts.services.count, 2);
+  assert.equal(report.counts.salesHistory.counts.saleHeaderCount, 12);
+  assert.equal(report.counts.identity.unassignedCount, 4);
+  assert.ok(report.findings.some((f) => f.code === 'PRODUCTION_VERIFICATION_NOT_CLAIMED'));
+  const liveSales = loadSales();
+  liveSales.meta.notes = 'Server=cut-salon.drvotech.com';
+  assert.throws(
+    () => buildReconciliationReport(plan, {salesSummary: liveSales}),
+    TypeError
+  );
+});
+
+test('preactivation gates pass SQL024/025 source only and keep operator gates OPEN', () => {
+  const board = buildPreactivationGateBoard();
+  assert.equal(board.schema, 'drvo.cut-adapter.preactivation-gates.v1');
+  assert.equal(board.realDataActivation, 'BLOCKED');
+  assert.equal(board.productionVerificationClaimed, false);
+  assert.equal(board.cutSqlModifications, 'FORBIDDEN');
+  assert.equal(board.summary.realDataActivationAllowed, false);
+  assert.ok(board.sourceMigrations.sql024.present);
+  assert.ok(board.sourceMigrations.sql025.present);
+  assert.equal(
+    board.gates.find((g) => g.id === 'SQL024_SOURCE_PRESENT').status,
+    'PASS_SOURCE_ONLY'
+  );
+  assert.equal(
+    board.gates.find((g) => g.id === 'SQL025_SOURCE_PRESENT').status,
+    'PASS_SOURCE_ONLY'
+  );
+  for (const id of [
+    'SQL024_TARGET_APPLY',
+    'SQL025_TARGET_APPLY',
+    'ISOLATED_RESTORE',
+    'K5_PERMISSIONS',
+    'OWNER_BROWSER',
+    'FOUNDER_SOURCE_SCOPE',
+    'APPROVED_IMPORT_LEDGER',
+  ]) {
+    assert.ok(board.blockingGateIds.includes(id), id);
+    assert.equal(board.gates.find((g) => g.id === id).status, 'OPEN');
+  }
+  assert.throws(
+    () => buildPreactivationGateBoard({productionVerificationClaimed: true}),
+    TypeError
+  );
+  assert.throws(
+    () => buildPreactivationGateBoard({realDataActivation: 'AUTHORIZED'}),
+    TypeError
+  );
 });

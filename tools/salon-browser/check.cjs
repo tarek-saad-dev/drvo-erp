@@ -85,7 +85,8 @@ async function main(){
   const operations=await exerciseSalonOperations(
    operator,origin,business,branch,value=>{setPhase(value);});
   // S13: real private Next UI -> Nest/K5 -> disposable SQL Employee+Barber.
-  const hr=await exerciseHrOperations(operator,origin,business,branch,value=>{setPhase(value);});
+  const hr=await exerciseHrOperations(operator,origin,business,branch,
+   value=>{setPhase(value);},operations.resource);
   setPhase('S12 restored Salon Overview after UI writes');
   await operator.goto(url(business,branch),{
    waitUntil:'domcontentloaded',timeout:45000,

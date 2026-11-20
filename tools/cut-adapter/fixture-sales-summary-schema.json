@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "drvo.cut-adapter.fixture.sales-history-summary.v1",
+  "title": "Cut Salon exported sales-history summary fixture (counts only)",
+  "description": "Non-PII aggregate counts for Track D historical reference scaffolding. No invoice bodies, phones, names, connection strings, or live SQL payloads.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "meta", "counts"],
+  "properties": {
+    "schema": {
+      "const": "drvo.cut-adapter.fixture.sales-history-summary.v1"
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "sourceSystem",
+        "datasetId",
+        "exportedAt",
+        "liveConnectionAuthorized"
+      ],
+      "properties": {
+        "mode": { "const": "EXPORTED_JSON_FIXTURE_ONLY" },
+        "sourceSystem": { "const": "CUT_CASHIER" },
+        "datasetId": {
+          "type": "string",
+          "pattern": "^FIX-[A-Z0-9-]{3,40}$"
+        },
+        "exportedAt": { "type": "string", "format": "date-time" },
+        "sourceTenantKey": {
+          "type": "string",
+          "pattern": "^SYN-TENANT-[A-Z0-9-]{1,30}$"
+        },
+        "sourceBranchKey": {
+          "type": "string",
+          "pattern": "^SYN-BRANCH-[A-Z0-9-]{1,30}$"
+        },
+        "windowStart": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "windowEnd": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "notes": { "type": "string", "maxLength": 500 },
+        "liveConnectionAuthorized": { "const": false }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "saleHeaderCount",
+        "saleLineCount",
+        "tenderCount",
+        "voidOrRefundCount",
+        "uniqueCustomerCount"
+      ],
+      "properties": {
+        "saleHeaderCount": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+        "saleLineCount": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+        "tenderCount": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+        "voidOrRefundCount": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+        "uniqueCustomerCount": { "type": "integer", "minimum": 0, "maximum": 1000000 }
+      }
+    }
+  }
+}

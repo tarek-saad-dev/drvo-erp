@@ -2,32 +2,25 @@
 /** S13 private HR+Salon Barber UI proof; only called from CI-only S12 flow. */
 const assert=require('node:assert/strict');
 const {randomBytes}=require('node:crypto');
-async function exerciseHrOperations(page,origin,business,branch,onPhase){
+async function exerciseHrOperations(page,origin,business,branch,onPhase,existingResourceName){
  const suffix=randomBytes(5).toString('hex').toUpperCase();
  const code='BARBER_'+suffix;
  const employee='S13 Synthetic Barber '+suffix;
- const resource='S13 Person Resource '+suffix;
  const scope=origin+'/workspace/'+business+'/'+branch;
- onPhase('S13 navigate Booking for PERSON resource');
+ assert.ok(typeof existingResourceName==='string'&&existingResourceName.length>3,
+  'S13 requires S12 PERSON resource name (S12 already proved resource create UI)');
+ onPhase('S13 resolve S12 PERSON resource id from Booking UI');
  await page.goto(scope+'/booking',{waitUntil:'domcontentloaded',timeout:45000});
  await page.getByRole('heading',{name:'المواعيد والحجوزات'}).waitFor({timeout:30000});
- // Resource form mounts only after Booking Core ready (not POS probe).
- onPhase('S13 wait Booking resource form ready');
- const resourceForm=page.locator('form.catalog-form').filter({
-  has:page.getByRole('button',{name:'إضافة المورد'}),
- });
- await resourceForm.waitFor({state:'visible',timeout:45000});
- onPhase('S13 create Booking PERSON resource through real private UI');
- await resourceForm.getByLabel('اسم المورد').fill(resource,{timeout:20000});
- await resourceForm.getByLabel('نوع المورد').selectOption('PERSON',{timeout:20000});
- const [res]=await Promise.all([
-  page.waitForResponse(r=>r.url().endsWith('/booking/resources')&&
-   r.request().method()==='POST',{timeout:20000}),
-  resourceForm.getByRole('button',{name:'إضافة المورد'}).click({timeout:20000}),
- ]);
- assert.equal(res.status(),200,'PERSON resource create HTTP');
- const resourceData=await res.json();
- assert.match(resourceData.id,/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+ const appointment=page.locator('#new-appointment form');
+ await appointment.waitFor({state:'visible',timeout:45000});
+ const resourceOption=appointment.getByLabel('المورد').locator('option')
+  .filter({hasText:existingResourceName});
+ await resourceOption.waitFor({state:'attached',timeout:30000});
+ const resourceId=await resourceOption.getAttribute('value');
+ assert.match(resourceId||'',
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+  'S12 PERSON resource GUID visible in Booking UI');
  onPhase('S13 private HR view and real create through browser');
  await page.goto(scope+'/hr',{waitUntil:'domcontentloaded',timeout:45000});
  await page.getByRole('heading',{name:'الموظفون والحلاقون'}).waitFor({timeout:30000});
@@ -48,7 +41,7 @@ async function exerciseHrOperations(page,origin,business,branch,onPhase){
  await row.waitFor({timeout:20000});
  onPhase('S13 Barber resource selection from independently authorized Booking');
  await row.getByRole('combobox',{name:'مورد حجز '+employee})
-  .selectOption(resourceData.id,{timeout:20000});
+  .selectOption(resourceId,{timeout:20000});
  const [linked]=await Promise.all([
   page.waitForResponse(r=>r.url().endsWith('/hr/employees/'+employeeData.id+'/barber')&&
    r.request().method()==='POST',{timeout:20000}),
@@ -60,6 +53,6 @@ async function exerciseHrOperations(page,origin,business,branch,onPhase){
  await page.reload({waitUntil:'domcontentloaded',timeout:45000});
  await page.getByRole('row').filter({hasText:employee})
   .getByText('حلاق نشط').waitFor({timeout:20000});
- return {employee,employeeId:employeeData.id,resourceId:resourceData.id};
+ return {employee,employeeId:employeeData.id,resourceId};
 }
 module.exports={exerciseHrOperations};

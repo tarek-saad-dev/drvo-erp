@@ -3616,6 +3616,43 @@
       "Status": "BLOCKED",
       "Blocker": "No founder-approved connection + scope; tools/cut-adapter refuses live connection strings/hostnames",
       "NextAction": "Keep BLOCKED until founder-approved read-only connection + Tenant/Branch/time scope recorded outside this repo"
+    },
+    {
+      "ID": "CUT-03",
+      "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
+      "SourcePaths+BlobSHA": [
+        "tools/cut-adapter/identity-mapping.cjs",
+        "tools/cut-adapter/reconciliation-report.cjs",
+        "tools/cut-adapter/preactivation-gates.cjs",
+        "tools/cut-adapter/verify.cjs",
+        "tools/cut-adapter/fixtures/sample-sales-history-summary.json",
+        "docs/04-execution/TRACK-D-CUT-SALON-READINESS-2026-11-19.md"
+      ],
+      "OriginalScreen": "n/a (Track D Cut readiness scaffolds)",
+      "UserAction": "Build unassigned identity map + redacted recon report + preactivation checklist from fixtures",
+      "AuthRole": "n/a (local dry-run tooling)",
+      "TenantBusinessBranchScope": "synthetic FIX-/SYN-* fixture keys only",
+      "Preconditions": "offline JSON fixtures; SQL024/025 present in git source tree",
+      "Reads": "fixture objects + local migration file checksums",
+      "Writes": "none (dry-run scaffolds only)",
+      "Effects": "unassigned id ledger + recon digest + OPEN operator gates; productionVerificationClaimed=false",
+      "FailureAndRaceCases": "must refuse approved-ledger claims, UUID binds, production PASS, realDataActivation AUTHORIZED",
+      "OwnedModule": "Platform tooling / Cut import preflight",
+      "SalonExtension": "Cut Salon pilot data track",
+      "TargetPaths": [
+        "tools/cut-adapter/**",
+        "tests/cut-adapter.test.cjs",
+        "docs/04-execution/TRACK-D-CUT-SALON-READINESS-2026-11-19.md"
+      ],
+      "UIProof": "n/a",
+      "DomainTest": "tests/cut-adapter.test.cjs",
+      "SQLHTTPTest": "n/a (fixture-only; no SQL)",
+      "BrowserProof": "OPEN (Owner browser gate documented, not executed)",
+      "DataProof": "OPEN (synthetic fixtures only; not real Cut export)",
+      "PilotProof": "OPEN",
+      "Status": "SOURCE_IDENTIFIED",
+      "Blocker": "Target SQL024/025 apply, isolated restore, K5 permissions, Owner browser, founder Cut scope, approved import ledger all OPEN",
+      "NextAction": "Keep real-data activation BLOCKED; use offline verify + gate board until independent operator evidence exists"
     }
   ]
 }

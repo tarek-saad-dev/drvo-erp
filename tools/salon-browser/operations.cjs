@@ -190,6 +190,7 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
   }
  };
  page.on('response',posWatcher);
+ try{
  await page.goto(scope+'/pos-preview',{waitUntil:'domcontentloaded',timeout:45000});
  // Cashier-adapted private POS title (not the older preview-only heading).
  await page.getByRole('heading',{name:'نقطة البيع — مسودة تشغيل',exact:true})
@@ -256,5 +257,8 @@ async function exerciseSalonOperations(page,origin,business,branch,onPhase){
  const draft=page.getByRole('row').filter({hasText:service+' × 2'});
  await draft.getByText('مسودة فقط',{exact:true}).waitFor({timeout:20000});
  return Object.freeze({customer,service,resource});
+ }finally{
+  page.off('response',posWatcher);
+ }
 }
 module.exports={exerciseSalonOperations};

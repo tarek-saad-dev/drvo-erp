@@ -1,5 +1,7 @@
 # Project changelog
 
+- **2026-11-19 — TRACK D CUT SALON READINESS (FIXTURE ONLY):** Extended `tools/cut-adapter` with identity-mapping scaffold, redacted reconciliation report, sales-history count fixture, pre-activation gate board (SQL024/025 source probe + OPEN target-apply/restore/K5/Owner/founder/import gates), offline `verify.cjs`, fixture CI, and [TRACK-D-CUT-SALON-READINESS-2026-11-19](TRACK-D-CUT-SALON-READINESS-2026-11-19.md). **No live secrets, no Cut SQL changes, no production verification claimed; real-data activation BLOCKED.**
+
 - **2026-11-19 — POS PACKAGES SQL025 + BARBER→EXECUTOR:** Additive `025_catalog_packages.sql` (REGULAR/GROOM + SERVICE includes), Nest `GET/POST .../catalog/packages`, private POS PackagesSection expand-to-DRAFT, selected Barber seeds SERVICE executors on rich save (PRODUCT null). Prior `2103d50` [K5C PASS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44565099095) / [POS Rich PASS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44565099330). **Primary DB 025 / Owner browser / optional add-ons / paid history / ADR-031 still OPEN; full parity NO.**
 
 - **2026-11-19 — GITHUB + SQL024 CI + POS/BOOKING CONTINUE:** Pushed `5cf2a82`/`537005b` to GitHub `main`. [Customers SQL024 HTTP CI PASS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44563649332). Fixed Web TS cart `1|-1` delta mismatch. Added Barber/HR selector, Booking server `?q=` search, concurrent duplicate-phone race in verify.cjs. **Primary DB / Owner browser / packages / ADR-031 still OPEN; full parity NO.**

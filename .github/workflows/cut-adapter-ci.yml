@@ -1,0 +1,43 @@
+name: Cut Adapter Fixture CI
+on:
+  pull_request:
+    paths:
+      - 'tools/cut-adapter/**'
+      - 'tests/cut-adapter.test.cjs'
+      - 'db/migrations/024_customer_business_search.sql'
+      - 'db/migrations/025_catalog_packages.sql'
+      - 'docs/04-execution/TRACK-D-CUT-SALON-READINESS-2026-11-19.md'
+      - 'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json'
+      - '.github/workflows/cut-adapter-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/cut-adapter/**'
+      - 'tests/cut-adapter.test.cjs'
+      - 'db/migrations/024_customer_business_search.sql'
+      - 'db/migrations/025_catalog_packages.sql'
+      - 'docs/04-execution/TRACK-D-CUT-SALON-READINESS-2026-11-19.md'
+      - 'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json'
+      - '.github/workflows/cut-adapter-ci.yml'
+permissions:
+  contents: read
+jobs:
+  cut-adapter-fixture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fixture-only Cut adapter tests (no SQL)
+        run: |
+          set -euo pipefail
+          node --check tools/cut-adapter/connection-gates.cjs
+          node --check tools/cut-adapter/reconciliation-planner.cjs
+          node --check tools/cut-adapter/identity-mapping.cjs
+          node --check tools/cut-adapter/reconciliation-report.cjs
+          node --check tools/cut-adapter/preactivation-gates.cjs
+          node --check tools/cut-adapter/verify.cjs
+          node --test tests/cut-adapter.test.cjs
+          node tools/cut-adapter/verify.cjs

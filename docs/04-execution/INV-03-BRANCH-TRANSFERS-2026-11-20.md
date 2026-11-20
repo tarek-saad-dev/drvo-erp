@@ -1,6 +1,6 @@
 # INV-03 Inventory branch transfers (SQL032, nonposting)
 
-Date: 2026-11-20. Branch `feat/cashier-inv-transfer-20261120` from `origin/main` `6b9c515`. Cashier pin `046bf19b0d5833a07fe4b2891cbf3032d03b7cef`. Ledger row: **INV-03** (`BLOCKED` -> `PORTING`; not parity-verified).
+Date: 2026-11-20. Branch `feat/cashier-inv-transfer-20261120` from `origin/main` `6b9c515`. Cashier pin `046bf19b0d5833a07fe4b2891cbf3032d03b7cef`. Ledger row: **INV-03** (`BLOCKED` -> `DRVO_CI_PASS` after the disposable SQL HTTP run below; not browser/primary/pilot verified).
 
 ## Landed
 - `db/migrations/032_inventory_branch_transfers.sql`: `core.StockTransferDocument` + `core.StockTransferLine` (Tenant/Business/Branch composite FKs, `FromBranchId<>ToBranchId`, per-source-branch idempotency key, one cancel request per document) and three EXECUTE-only procedures `core.ReadStockTransfers`, `core.CreateStockTransfer`, `core.CancelStockTransfer`. Stock moves only through the SQL027 `core.ApplyBranchStockDelta` on `core.BranchStockBalance`.
@@ -28,7 +28,7 @@ No GL, COGS, AP, Treasury, cost, price or sale-decrement objects. Responses and 
 | Layer | State |
 | --- | --- |
 | Static/pure tests (root, API, web) | run locally (see PR) |
-| Disposable SQL Server 2022 + Nest HTTP (`tools/inventory/verify.cjs`) | **no local Docker/SQL**; proven only if `shared-inventory-ci` is green on the PR head |
+| Disposable SQL Server 2022 + Nest HTTP (`tools/inventory/verify.cjs`) | **PASS** (13 groups incl. 8 SQL032 groups) in [shared-inventory-ci run 44796458585](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44796458585) on `6562f09`; not run locally (no Docker/SQL) |
 | Primary / VPS SQL027 + SQL032 apply | **OPEN** (backup + 001-031 verification first) |
 | Owner browser walk of `/inventory/transfers` | **OPEN** |
 | Pilot | **OPEN** |

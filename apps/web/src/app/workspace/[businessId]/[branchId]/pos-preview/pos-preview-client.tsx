@@ -408,6 +408,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
       {draftsEnabled&&richEnabled&&<CashierDraftHistory
         apiRoot={api.replace(/\/pos-preview$/,"")} draftApi={draftApi}
         revision={richHistoryRevision} disabled={busy||draftBusy}
+        printBasePath={home+"/pos-preview"}
         onUseDraft={savedLines=>createNewFromDraft({lines:savedLines})}/>}
       {lines.length>0&&<CashierPricingPanel key={JSON.stringify(lines)+"-"+cartRevision+"-"+selectedBarberId} api={api} draftApi={draftApi}
   richEnabled={draftsEnabled&&richEnabled} afterSaved={()=>{void loadDrafts();setRichHistoryRevision(v=>v+1);}}

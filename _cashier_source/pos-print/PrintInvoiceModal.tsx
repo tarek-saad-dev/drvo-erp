@@ -1,0 +1,755 @@
+'use client';
+
+import { useEffect, useMemo, useState, useRef, useCallback } from 'react';
+import { Printer, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { createPrintRequestId, printHtmlViaLocalService, openBrowserPrintFallback, type PrintErrorCode } from '@/lib/localPrintClient';
+import LocalPrintConnectionHelp, { isLocalAgentConnectionError } from '@/components/printing/LocalPrintConnectionHelp';
+import { CUT_CLASSIC_ORIGINAL_CSS } from '@/lib/receipt-studio/classicStyle';
+import MissingChromeRepairPrompt from '@/components/printing/MissingChromeRepairPrompt';
+import { validateReceiptTemplateV1 } from '@/lib/receipt-studio/template';
+import { renderStudioReceiptHtml, type StudioInvoiceModel } from '@/lib/receipt-studio/render';
+import { getPrintBrandHtml, usePrintBrand } from '@/lib/tenant/tenantBrandClient';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  buildPackageReceipt,
+  extractGroomPackageNoteFromText,
+  type PackagePrintLine,
+  type PackageReceiptDisplay,
+} from '@/lib/pos/groomPackageCart';
+
+/** Client-safe parse of [groomPackage] note (mirrors booking parser). */
+function parsePackageNote(notes: string | null | undefined): {
+  packageId: number;
+  packagePrice: number;
+  addonProIds: number[];
+  requiredServiceIds: number[];
+  totalPrice: number;
+} | null {
+  const frag = extractGroomPackageNoteFromText(notes);
+  if (!frag) return null;
+  const body = frag.replace(/^\[groomPackage\]\s*/, '');
+  const get = (key: string) => {
+    const hit = body.match(new RegExp(`(?:^|;)${key}=([^;]+)`));
+    return hit?.[1]?.trim() ?? '';
+  };
+  const packageId = Number(get('packageId'));
+  if (!Number.isInteger(packageId) || packageId <= 0) return null;
+  const packagePrice = Number(get('packagePrice'));
+  const totalPrice = Number(String(get('total')).replace(/[^\d.]/g, ''));
+  const addonsRaw = get('addons');
+  const requiredRaw = get('required');
+  return {
+    packageId,
+    packagePrice: Number.isFinite(packagePrice) ? packagePrice : 0,
+    totalPrice: Number.isFinite(totalPrice) ? totalPrice : 0,
+    addonProIds:
+      !addonsRaw || addonsRaw === '-'
+        ? []
+        : addonsRaw
+            .split(',')
+            .map(Number)
+            .filter((n) => Number.isInteger(n) && n > 0),
+    requiredServiceIds: requiredRaw
+      .split(',')
+      .map(Number)
+      .filter((n) => Number.isInteger(n) && n > 0),
+  };
+}
+
+interface PrintItem {
+  ProID?: number;
+  ProName: string;
+  EmpName: string;
+  SPrice: number;
+  Qty: number;
+  SPriceAfterDis: number;
+  Dis?: number;
+  DisVal?: number;
+  SValue?: number;
+}
+
+interface PaymentAllocationRow {
+  PaymentMethodID: number;
+  PaymentMethodName: string | null;
+  PayValue: number;
+}
+
+interface PrintData {
+  invID: number;
+  invDate: string;
+  invTime: string;
+  customerName: string;
+  customerPhone: string | null;
+  SubTotal: number;
+  Dis: number;
+  DisVal: number;
+  GrandTotal: number;
+  PayCash: number;
+  PayVisa: number;
+  PaymentMethodID: number | null;
+  TotalBonus: number;
+  Notes?: string | null;
+  Notes2?: string | null;
+  items: PrintItem[];
+  paymentAllocations?: PaymentAllocationRow[];
+  isSplitPayment?: boolean;
+  packageDisplay?: PackageReceiptDisplay | null;
+}
+
+function buildReceiptModel(data: PrintData) {
+  const pkgMeta = parsePackageNote([data.Notes, data.Notes2].filter(Boolean).join(' '));
+  const packageName = pkgMeta
+    ? (data.items || []).find(
+        (it) =>
+          Number(it.SPriceAfterDis ?? it.SPrice) > 0 &&
+          pkgMeta.requiredServiceIds.includes(Number(it.ProID)),
+      )?.ProName
+    : undefined;
+  return buildPackageReceipt(
+    (data.items || []).map((item) => ({
+      ProID: Number(item.ProID) || 0,
+      ProName: item.ProName,
+      SPrice: Number(item.SPrice) || 0,
+      SPriceAfterDis: item.SPriceAfterDis,
+      SValue: item.SValue,
+      Qty: item.Qty,
+      DisVal: item.DisVal,
+      EmpName: item.EmpName,
+    })),
+    pkgMeta
+      ? {
+          packageId: pkgMeta.packageId,
+          packagePrice: pkgMeta.packagePrice,
+          requiredServiceIds: pkgMeta.requiredServiceIds,
+          addonProIds: pkgMeta.addonProIds,
+          packageName: packageName || undefined,
+          display: data.packageDisplay ?? null,
+        }
+      : null,
+  );
+}
+
+function printedAmount(line: PackagePrintLine): number | null {
+  return line.shownAmount === undefined ? line.amount : line.shownAmount;
+}
+
+/** Row numbers for the receipt table; package item rows are not numbered. */
+function rowNumbers(lines: PackagePrintLine[]): Array<number | null> {
+  let n = 0;
+  return lines.map((l) => (l.variant === 'package_item' ? null : ++n));
+}
+
+interface PrintInvoiceModalProps {
+  open: boolean;
+  invID: number | null;
+  onClose: () => void;
+}
+
+// ──── Premium Receipt CSS (80mm) — Elegant vintage barber style ────
+const THERMAL_CSS = CUT_CLASSIC_ORIGINAL_CSS;
+
+export default function PrintInvoiceModal({ open, invID, onClose }: PrintInvoiceModalProps) {
+  const printBrand = usePrintBrand();
+  const [data, setData] = useState<PrintData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [printing, setPrinting] = useState(false);
+  const [printError, setPrintError] = useState<string | null>(null);
+  const [printErrorCode, setPrintErrorCode] = useState<PrintErrorCode | null>(null);
+  const [printSuccess, setPrintSuccess] = useState(false);
+  const [policyBlocked, setPolicyBlocked] = useState(false);
+  const printLockRef = useRef(false);
+  const printWindowRef = useRef<Window | null>(null);
+  const receiptModel = useMemo(() => (data ? buildReceiptModel(data) : null), [data]);
+
+  // Fetch invoice data when modal opens
+  useEffect(() => {
+    if (!open || !invID) { setData(null); return; }
+    setLoading(true);
+    setPrinting(false);
+    setPrintError(null);
+    setPrintErrorCode(null);
+    setPolicyBlocked(false);
+    setPrintSuccess(false);
+    fetch(`/api/sales/${invID}`)
+      .then(r => r.json())
+      .then(d => setData(d))
+      .catch(() => setData(null))
+      .finally(() => setLoading(false));
+  }, [open, invID]);
+
+  // Build receipt HTML with the tenant brand
+  const buildReceiptHTML = useCallback(() => {
+    if (!data) return '';
+    const brand = getPrintBrandHtml();
+    const fmtDate = (d: string) => {
+      try { return new Date(d).toLocaleDateString('ar-EG', { day: '2-digit', month: '2-digit', year: 'numeric' }); } catch { return d; }
+    };
+
+    const money = (n: number) => (Math.round(n * 100) / 100).toFixed(2);
+
+    const { lines: printLines, packageDiscount } = buildReceiptModel(data);
+    const numbers = rowNumbers(printLines);
+
+    const itemRows = printLines
+      .map((line, i) => {
+        const shown = printedAmount(line);
+        if (line.variant === 'package_item') {
+          return `<tr class="pkg-item">
+        <td></td>
+        <td><div class="pkg-item-name">${line.label || ''}</div></td>
+        <td>${shown != null ? `<div class="pkg-item-price">${money(shown)}</div>` : ''}</td>
+      </tr>`;
+        }
+        const serviceName = `<div class="service-name">${line.label || ''}</div>`;
+        const includes =
+          line.sublabel
+            ? `<div class="barber-name">${line.sublabel}</div>`
+            : '';
+        const barberName =
+          line.empName ? `<div class="barber-name">${line.empName}</div>` : '';
+        const priceCell = shown != null ? `<div class="line-price-net">${money(shown)} ج.م</div>` : '';
+        return `<tr>
+        <td>${numbers[i] ?? ''}</td>
+        <td>${serviceName}${includes}${barberName}</td>
+        <td>${priceCell}</td>
+      </tr>`;
+      })
+      .join('');
+    const subtotalRow =
+      packageDiscount > 0
+        ? `<div class="total-row subtotal"><span>المجموع قبل الخصم:</span><span class="total-amount">${money(Number(data.SubTotal) + packageDiscount)} ج.م</span></div>
+      <div class="total-row discount"><span>خصم الباكدج:</span><span>- ${money(packageDiscount)} ج.م</span></div>`
+        : `<div class="total-row subtotal"><span>المجموع الفرعي:</span><span class="total-amount">${data.SubTotal} ج.م</span></div>`;
+
+    const lineDiscountTotal = (data.items || []).reduce(
+      (sum, item) => sum + Math.max(0, Number(item.DisVal || 0)),
+      0,
+    );
+    const headerDiscount = Math.max(0, Number(data.DisVal || 0));
+    const discountRows = [
+      lineDiscountTotal > 0
+        ? `<div class="total-row discount"><span>إجمالي خصومات الخدمات:</span><span>- ${money(lineDiscountTotal)} ج.م</span></div>`
+        : '',
+      headerDiscount > 0
+        ? `<div class="total-row discount"><span>خصم الفاتورة:</span><span>- ${money(headerDiscount)} ج.م</span></div>`
+        : '',
+    ].join('');
+    const discountRow = discountRows;
+
+    // Payment method display: use real allocations if available, else fall back to legacy PayCash/PayVisa
+    let paymentMethodHtml: string;
+    if (data.isSplitPayment && data.paymentAllocations && data.paymentAllocations.length > 1) {
+      const allocLines = data.paymentAllocations
+        .map(a => `<div style="display:flex;justify-content:space-between;font-size:9px;padding:1px 0"><span>${a.PaymentMethodName || 'غير محدد'}</span><span>${Number(a.PayValue).toFixed(2)} ج.م</span></div>`)
+        .join('');
+      paymentMethodHtml = `دفع متعدد<div style="margin-top:3px;border-top:1px dashed #ccc;padding-top:2px">${allocLines}</div>`;
+    } else if (data.paymentAllocations && data.paymentAllocations.length === 1) {
+      paymentMethodHtml = data.paymentAllocations[0].PaymentMethodName || 'نقدي';
+    } else {
+      paymentMethodHtml = data.PayCash > 0 && data.PayVisa > 0 ? 'نقدي + فيزا'
+        : data.PayVisa > 0 ? 'فيزا'
+        : 'نقدي';
+    }
+
+    return `<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="utf-8"/>
+  <title>فاتورة #${data.invID}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>${THERMAL_CSS}</style>
+</head>
+<body>
+  <div class="receipt-frame">
+    <!-- Header with Ornaments -->
+    <div class="receipt-header">
+      <div class="header-ornaments">
+        <div class="barber-pole"></div>
+        <div class="logo-circle">
+          <div class="crown">👑</div>
+          <div class="logo-text">${brand.wordmark}</div>
+          <div class="mustache">〰</div>
+          <div class="scissors">✂</div>
+        </div>
+        <div class="barber-pole"></div>
+      </div>
+      <div class="salon-name-main">${brand.title}</div>
+      ${brand.address ? `<div class="salon-name-ar">${brand.address}</div>` : ''}
+      ${brand.primaryPhone ? `<div class="salon-phone">📞 ${brand.primaryPhone}</div>` : ''}
+    </div>
+    
+    <!-- Divider -->
+    <div class="divider-ornate">
+      <div class="divider-line"></div>
+      <span class="divider-diamond">◆</span>
+      <div class="divider-line"></div>
+    </div>
+    
+    <!-- Receipt Title -->
+    <div class="receipt-title">✦ فاتورة مبيعات ✦</div>
+    
+    <!-- Invoice Info -->
+    <div class="receipt-info">
+      <div class="info-row">
+        <span class="info-label"><span class="info-icon">📄</span> رقم الفاتورة:</span>
+        <span class="info-value">#${data.invID}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label"><span class="info-icon">📅</span> التاريخ:</span>
+        <span class="info-value">${fmtDate(data.invDate)}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label"><span class="info-icon">🕐</span> الوقت:</span>
+        <span class="info-value">${data.invTime}</span>
+      </div>
+      ${data.customerName ? `<div class="info-row">
+        <span class="info-label"><span class="info-icon">👤</span> العميل:</span>
+        <span class="info-value">${data.customerName}</span>
+      </div>` : ''}
+      ${data.customerPhone ? `<div class="info-row">
+        <span class="info-label"><span class="info-icon">📞</span> الهاتف:</span>
+        <span class="info-value">${data.customerPhone}</span>
+      </div>` : ''}
+      <div class="info-row">
+        <span class="info-label"><span class="info-icon">💳</span> طريقة الدفع:</span>
+        <span class="info-value">${paymentMethodHtml}</span>
+      </div>
+    </div>
+    
+    <!-- Divider -->
+    <div class="divider-ornate">
+      <div class="divider-line"></div>
+      <span class="divider-diamond">✂</span>
+      <div class="divider-line"></div>
+    </div>
+    
+    <!-- Services Table -->
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>الخدمة / الحلاق</th>
+          <th>السعر</th>
+        </tr>
+      </thead>
+      <tbody>${itemRows}</tbody>
+    </table>
+    
+    <!-- Totals -->
+    <div class="receipt-totals">
+      ${subtotalRow}
+      ${discountRow}
+      <div class="total-row grand">
+        <span>الإجمالي:</span>
+        <span class="total-amount">${data.GrandTotal} ج.م</span>
+      </div>
+    </div>
+    
+    <!-- Gift Promotion -->
+    <div class="gift-section">
+      <div class="gift-icon">🎁</div>
+      <div class="gift-text">اسأل على هديتك</div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="receipt-footer">
+      <div class="thank-you-row">
+        <span class="star-icon">★</span>
+        <span class="thank-you">شكراً لزيارتكم</span>
+        <span class="star-icon">★</span>
+      </div>
+      <div class="footer-tagline">نسعد بخدمتكم دائماً</div>
+      ${brand.phone ? `<div class="footer-contact">📞 ${brand.phone}</div>` : ''}
+    </div>
+    
+    <!-- Bottom Ornament -->
+    <div class="footer-ornament">
+      <div class="barber-pole-small"></div>
+    </div>
+  </div>
+</body>
+</html>`;
+  }, [data]);
+
+  // Primary receipt path: direct local agent, no Chrome preview.
+  // Never invoke browser fallback automatically: the spooler may already have the job.
+  const handlePrint = useCallback(async () => {
+    if (printLockRef.current || !data) return;
+    printLockRef.current = true;
+    setPrinting(true);
+    setPrintError(null);
+    setPrintErrorCode(null);
+    setPrintSuccess(false);
+    try {
+      // Resolve the authorized tenant/branch published design on every print.
+      // Legacy remains the safe fallback if the optional schema or design is absent.
+      let html = buildReceiptHTML();
+      try {
+        const activeResponse = await fetch('/api/receipt-studio/active', { cache: 'no-store' });
+        if (activeResponse.ok) {
+          const active = await activeResponse.json();
+          const checked = validateReceiptTemplateV1(active.published);
+          if (checked.ok) {
+            const brand = getPrintBrandHtml();
+            const { lines, packageDiscount } = buildReceiptModel(data);
+            const lineDiscount = (data.items || []).reduce(
+              (total, item) => total + Math.max(0, Number(item.DisVal || 0)), 0,
+            );
+            const headerDiscount = Math.max(0, Number(data.DisVal || 0));
+            const discounts = [
+              ...(packageDiscount > 0 ? [{ label: 'Package Discount', amount: packageDiscount }] : []),
+              ...(lineDiscount > 0 ? [{ label: 'Service Discounts', amount: lineDiscount }] : []),
+              ...(headerDiscount > 0 ? [{ label: 'Invoice Discount', amount: headerDiscount }] : []),
+            ];
+            const allocations = data.paymentAllocations?.filter((allocation) => Number(allocation.PayValue) > 0) || [];
+            const payments = allocations.length
+              ? allocations.map((allocation) => ({
+                  label: allocation.PaymentMethodName || 'Payment',
+                  amount: Number(allocation.PayValue),
+                }))
+              : [{ label: data.PayCash > 0 && data.PayVisa > 0 ? 'Cash + Visa' : data.PayVisa > 0 ? 'Visa' : 'Cash' }];
+            const fmtDate = (() => {
+              try { return new Date(data.invDate).toLocaleDateString('en-GB'); }
+              catch { return data.invDate; }
+            })();
+            const invoice: StudioInvoiceModel = {
+              invoiceNo: String(data.invID), date: fmtDate, time: data.invTime,
+              branch: active.branchCode || brand.address || 'CUT SALON',
+              brand: brand.title || 'CUT SALON',
+              customer: data.customerName || 'Walk-in Customer',
+              phone: brand.phone || undefined,
+              customerPhone: data.customerPhone || undefined,
+              brandWordmark: brand.wordmark || undefined,
+              items: lines.filter((line) => !line.hide).map((line) => ({
+                name: line.label || '',
+                sublabel: line.sublabel,
+                employee: line.empName || undefined,
+                price: printedAmount(line),
+              })),
+              subtotal: Number(data.SubTotal || 0) + packageDiscount,
+              discounts, grandTotal: Number(data.GrandTotal || 0),
+              payments,
+              footer: 'شكراً لزيارتكم',
+            };
+            html = renderStudioReceiptHtml(checked.template, invoice, active.assets || {});
+          }
+        }
+      } catch (studioError) {
+        console.warn('[receipt-studio] Could not render published template; using legacy print layout', studioError);
+      }
+      const result = await printHtmlViaLocalService({
+        html,
+        width: '72mm',
+        printer: 'default',
+        receiptType: 'invoice',
+        requestId: createPrintRequestId(`invoice-${data.invID}`),
+      });
+      if (result.ok) {
+        setPrintSuccess(true);
+        setPrintErrorCode(null);
+      } else {
+        setPrintError(result.userMessage);
+        setPrintErrorCode(result.code);
+        setPolicyBlocked(result.code === 'PRINT_DISABLED' || result.code === 'PRINT_TYPE_DISABLED');
+      }
+    } catch {
+      setPrintError('تعذر إرسال الفاتورة للطابعة المحلية.');
+    } finally {
+      printLockRef.current = false;
+      setPrinting(false);
+    }
+  }, [data, buildReceiptHTML]);
+
+  const handleBrowserFallback = useCallback(() => {
+    const result = openBrowserPrintFallback(buildReceiptHTML(), createPrintRequestId('invoice-browser'));
+    if (result.ok === false) {
+      setPrintError(result.userMessage);
+      setPrintErrorCode(result.code);
+    }
+  }, [buildReceiptHTML]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (printWindowRef.current && !printWindowRef.current.closed) {
+        printWindowRef.current.close();
+      }
+    };
+  }, []);
+
+  const fmtDate = (d: string) => {
+    try { return new Date(d).toLocaleDateString('ar-EG'); } catch { return d; }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) { setPrinting(false); onClose(); } }}>
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Printer className="w-5 h-5" />
+            طباعة الفاتورة
+          </DialogTitle>
+        </DialogHeader>
+
+        {loading && <p className="text-center py-8 text-muted-foreground">جاري التحميل...</p>}
+
+        {!loading && data && (
+          <>
+            {/* Receipt preview (screen only — matches thermal layout) */}
+            <div className="text-sm border-2 border-black rounded-lg p-2 bg-white text-black max-w-[260px] mx-auto font-sans" dir="rtl">
+              {/* Frame */}
+              <div className="border-2 border-black rounded-lg p-2 relative">
+                {/* Header with Ornaments */}
+                <div className="text-center pb-3 mb-3">
+                  <div className="flex justify-center items-center gap-2 mb-3">
+                    {/* Barber Pole */}
+                    <div className="w-4 h-8 border-2 border-black rounded-full" style={{ background: 'repeating-linear-gradient(45deg, #fff, #fff 2px, #000 2px, #000 4px, #dc2626 4px, #dc2626 6px, #000 6px, #000 8px)' }}></div>
+                    
+                    {/* Logo */}
+                    <div className="w-20 h-20 border-[3px] border-black rounded-full flex flex-col items-center justify-center bg-white">
+                      <span className="text-lg">👑</span>
+                      <span className="font-black text-xl tracking-wider">{printBrand.wordmark}</span>
+                      <span className="text-lg">〰</span>
+                      <span className="text-xs">✂</span>
+                    </div>
+                    
+                    {/* Barber Pole */}
+                    <div className="w-4 h-8 border-2 border-black rounded-full" style={{ background: 'repeating-linear-gradient(45deg, #fff, #fff 2px, #000 2px, #000 4px, #dc2626 4px, #dc2626 6px, #000 6px, #000 8px)' }}></div>
+                  </div>
+                  <p className="font-black text-2xl tracking-widest mb-1">{printBrand.title}</p>
+                  {printBrand.address && <p className="font-bold text-base mb-1">{printBrand.address}</p>}
+                  {printBrand.primaryPhone && <p className="font-bold text-sm">📞 {printBrand.primaryPhone}</p>}
+                </div>
+                
+                {/* Divider with Diamonds */}
+                <div className="flex items-center justify-center gap-2 my-3">
+                  <div className="flex-1 h-px bg-black"></div>
+                  <span className="text-xs">◆</span>
+                  <div className="flex-1 h-px bg-black"></div>
+                </div>
+              
+              {/* Receipt Title */}
+              <div className="text-center font-black text-xs my-2 py-1 border-y border-black bg-gray-100">
+                ✦ فاتورة مبيعات ✦
+              </div>
+              
+              {/* Info */}
+              <div className="text-[10px] font-semibold space-y-1 mb-2">
+                <div className="flex justify-between">
+                  <span className="font-bold">رقم الفاتورة:</span>
+                  <span className="font-semibold">#{data.invID}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-bold">التاريخ:</span>
+                  <span className="font-semibold">{fmtDate(data.invDate)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-bold">الوقت:</span>
+                  <span className="font-semibold">{data.invTime}</span>
+                </div>
+                {data.customerName && (
+                  <div className="flex justify-between">
+                    <span className="font-bold">العميل:</span>
+                    <span className="font-semibold truncate max-w-[120px]">{data.customerName}</span>
+                  </div>
+                )}
+                {data.customerPhone && (
+                  <div className="flex justify-between">
+                    <span className="font-bold">الهاتف:</span>
+                    <span className="font-semibold">{data.customerPhone}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="font-bold">طريقة الدفع:</span>
+                  <span className="font-semibold">
+                    {data.PayCash > 0 && data.PayVisa > 0 ? 'نقدي + فيزا' : data.PayVisa > 0 ? 'فيزا' : 'نقدي'}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="border-t-2 border-dashed border-black my-2" />
+              
+              {/* Table */}
+              <table className="w-full text-[10px] mb-2 table-fixed">
+                <colgroup>
+                  <col className="w-8" />
+                  <col />
+                  <col className="w-16" />
+                </colgroup>
+                <thead>
+                  <tr className="bg-black text-white">
+                    <th className="p-1 text-center text-[10px] font-black">#</th>
+                    <th className="p-1 text-right text-[10px] font-black">الخدمة / الحلاق</th>
+                    <th className="p-1 text-left text-[10px] font-black">السعر</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(() => {
+                    const lines = receiptModel?.lines ?? [];
+                    const numbers = rowNumbers(lines);
+                    return lines.map((line, i) => {
+                      const shown = printedAmount(line);
+                      if (line.variant === 'package_item') {
+                        return (
+                          <tr key={i} className="border-b border-dotted border-black">
+                            <td className="p-0.5" />
+                            <td className="p-0.5 ps-3 text-[9px] font-semibold break-words">{line.label}</td>
+                            <td className="p-0.5 text-left text-[9px] font-semibold">
+                              {shown != null ? shown.toFixed(2) : ''}
+                            </td>
+                          </tr>
+                        );
+                      }
+                      return (
+                        <tr key={i} className="border-b border-black">
+                          <td className="p-1 text-center font-bold">{numbers[i]}</td>
+                          <td className="p-1 break-words">
+                            <div className="font-bold">{line.label}</div>
+                            {line.sublabel && (
+                              <div className="text-[9px] font-semibold">{line.sublabel}</div>
+                            )}
+                            {line.empName && (
+                              <div className="text-[9px] font-semibold">{line.empName}</div>
+                            )}
+                          </td>
+                          <td className="p-1 text-left font-bold">
+                            {shown != null && <span>{shown.toFixed(2)} ج.م</span>}
+                          </td>
+                        </tr>
+                      );
+                    });
+                  })()}
+                </tbody>
+              </table>
+              
+              {/* Divider */}
+              <div className="flex items-center justify-center gap-2 my-2">
+                <div className="flex-1 h-px bg-black"></div>
+                <span className="text-xs">✂</span>
+                <div className="flex-1 h-px bg-black"></div>
+              </div>
+              
+              {/* Totals Box */}
+              <div className="border-2 border-black rounded p-2 mb-2 text-[11px]">
+                {receiptModel && receiptModel.packageDiscount > 0 ? (
+                  <>
+                    <div className="flex justify-between font-semibold mb-1">
+                      <span>المجموع قبل الخصم:</span>
+                      <span className="font-mono">
+                        {(Number(data.SubTotal) + receiptModel.packageDiscount).toFixed(2)} ج.م
+                      </span>
+                    </div>
+                    <div className="flex justify-between font-bold text-red-600 mb-1">
+                      <span>خصم الباكدج:</span>
+                      <span className="font-mono">- {receiptModel.packageDiscount.toFixed(2)} ج.م</span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex justify-between font-semibold mb-1">
+                    <span>المجموع الفرعي:</span>
+                    <span className="font-mono">{data.SubTotal} ج.م</span>
+                  </div>
+                )}
+                {(() => {
+                  const lineDiscountTotal = (data.items || []).reduce(
+                    (sum, item) => sum + Math.max(0, Number(item.DisVal || 0)),
+                    0,
+                  );
+                  const headerDiscount = Math.max(0, Number(data.DisVal || 0));
+                  if (lineDiscountTotal <= 0 && headerDiscount <= 0) return null;
+                  return (
+                    <>
+                      {lineDiscountTotal > 0 && (
+                        <div className="flex justify-between font-bold text-red-600 mb-1">
+                          <span>إجمالي خصومات الخدمات:</span>
+                          <span className="font-mono">- {lineDiscountTotal.toFixed(2)} ج.م</span>
+                        </div>
+                      )}
+                      {headerDiscount > 0 && (
+                        <div className="flex justify-between font-bold text-red-600 mb-1">
+                          <span>خصم الفاتورة:</span>
+                          <span className="font-mono">- {headerDiscount.toFixed(2)} ج.م</span>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+                <div className="flex justify-between font-black text-base border-t-2 border-double border-black pt-2 mt-2">
+                  <span>الإجمالي:</span>
+                  <span className="font-mono">{data.GrandTotal} ج.م</span>
+                </div>
+              </div>
+              
+              {/* Gift Promotion Section */}
+              <div className="border-2 border-black rounded-md p-3 my-3 text-center relative bg-gradient-to-r from-gray-100 via-white to-gray-100">
+                <span className="absolute top-1 left-2 text-[10px]">✦</span>
+                <span className="absolute top-1 right-2 text-[10px]">✦</span>
+                <div className="text-2xl mb-1">🎁</div>
+                <div className="font-black text-base tracking-wide">اسأل على هديتك</div>
+              </div>
+              
+              {/* Footer */}
+              <div className="text-center mt-3 pt-2 border-t border-black">
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <span className="text-[10px]">★</span>
+                  <span className="font-black text-sm">شكراً لزيارتكم</span>
+                  <span className="text-[10px]">★</span>
+                </div>
+                <p className="text-[10px] font-semibold">نسعد بخدمتكم دائماً</p>
+                {printBrand.phone && (
+                  <p className="text-[9px] font-bold mt-1 pt-1 border-t border-black">📞 {printBrand.phone}</p>
+                )}
+              </div>
+              
+              {/* Bottom Barber Pole */}
+              <div className="flex justify-center mt-2">
+                <div className="w-4 h-6 border-2 border-black rounded-full" style={{ background: 'repeating-linear-gradient(45deg, #fff, #fff 1.5px, #000 1.5px, #000 3px, #dc2626 3px, #dc2626 4.5px, #000 4.5px, #000 6px)' }} />
+              </div>
+              </div>
+            </div>
+
+            {printError && (
+              <p role="alert" className="text-sm text-destructive mt-2">{printError}</p>
+            )}
+            {/* Error-based recovery: never show Chrome download for other failures. */}
+            <MissingChromeRepairPrompt errorCode={printError ? printErrorCode : null} />
+            {isLocalAgentConnectionError(printErrorCode) && (
+              <div className="mt-3">
+                <LocalPrintConnectionHelp errorCode={printErrorCode} compact />
+              </div>
+            )}
+            {printSuccess && (
+              <p role="status" className="text-sm text-green-700 mt-2">تم إرسال الفاتورة إلى قائمة انتظار الطابعة.</p>
+            )}
+            {/* Action buttons */}
+            <div className="flex gap-2 justify-end mt-3">
+              <Button variant="outline" onClick={onClose}>
+                <X className="w-4 h-4 ml-2" />
+                إغلاق
+              </Button>
+              {printError && !policyBlocked && !isLocalAgentConnectionError(printErrorCode) && (
+                <Button variant="secondary" onClick={handleBrowserFallback} disabled={printing} data-testid="invoice-browser-fallback">
+                  طباعة من المتصفح
+                </Button>
+              )}
+              <Button onClick={handlePrint} disabled={printing} data-testid="print-button">
+                <Printer className="w-4 h-4 ml-2" />
+                {printing ? 'جاري الطباعة...' : 'طباعة'}
+              </Button>
+            </div>
+          </>
+        )}
+
+        {!loading && !data && (
+          <p className="text-center py-8 text-destructive">خطأ في تحميل بيانات الفاتورة</p>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}

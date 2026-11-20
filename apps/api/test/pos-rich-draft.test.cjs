@@ -109,3 +109,75 @@ test('rich read returns separate immutable snapshots instead of paid invoices',a
   assert.equal(r.paymentState,'NOT_COLLECTED');
  });
 });
+function draftPool(){
+ return {request(){return {input(){return this},execute:async()=>({recordsets:[
+  [{draftId:ID(10),createdAtUtc:new Date('2026-11-17T00:00:00Z'),currency:'EGP',
+   subtotalMinor:'20000',customerId:ID(5),headerDiscountMinor:'1800',
+   linesNetMinor:'18000',totalDiscountMinor:'3800',grandTotalMinor:'16200'}],
+  [{draftId:ID(10),lineNo:1,offeringId:ID(3),displayName:'Haircut',kind:'SERVICE',
+   quantity:2,unitPriceMinor:'10000',grossMinor:'20000',executorEmployeeId:ID(4),
+   discountMinor:'2000',netMinor:'18000'}],
+ ]})}}};
+}
+test('draft print-preview is disabled by default before identity or SQL',async()=>{
+ await env({...active,DRVO_POS_RICH_ENABLED:undefined},async()=>{
+  const svc=new PosRichService(dead);
+  await assert.rejects(()=>svc.printPreview(actor,token,ID(7),ID(8),ID(10)),
+   e=>e.getStatus?.()===503);
+  const ctrl=new PosRichController({actorFromToken(){throw Error('auth touched')}},svc);
+  await assert.rejects(()=>ctrl.printPreviewGet(undefined,{headers:{}},{setHeader(){}},
+   ID(7),ID(8),ID(10)),e=>e.getStatus?.()===503);
+ });
+});
+test('POST print-preview exact origin is enforced before auth',async()=>{
+ await env({...active,DRVO_K5_ORIGIN:'https://erp-stage.drvotech.com'},async()=>{
+  const c=new PosRichController({actorFromToken(){throw Error('auth touched')}},{});
+  for(const origin of [undefined,'http://erp-stage.drvotech.com','https://evil.example'])
+   await assert.rejects(()=>c.printPreviewPost(origin,undefined,{headers:{}},{setHeader(){}},
+    ID(7),ID(8),ID(10),{}),e=>e.getStatus?.()===401);
+ });
+});
+test('print-preview returns POS_DRAFT_RECEIPT from scoped draft read without finance writes',async()=>{
+ await env(active,async()=>{
+  const calls=[];
+  const pool={request(){return {input(){return this},execute:async name=>{
+   calls.push(name);return draftPool().request().execute(name);
+  }}}};
+  const svc=new PosRichService({getInternalPool(){return pool}});
+  const preview=await svc.printPreview(actor,token,ID(7),ID(8),ID(10),{
+   customerDisplayName:'عميل',executorNames:{[ID(4)]:'حلاق'},businessLabel:'DRVO POS',
+  });
+  assert.deepEqual(calls,['core.ReadBranchPosCashierDrafts']);
+  assert.equal(preview.state,'POS_DRAFT_PRINT_PREVIEW');
+  assert.equal(preview.receipt.documentKind,'POS_DRAFT_RECEIPT');
+  assert.equal(preview.receipt.posting,'NOT_POSTED');
+  assert.equal(preview.receipt.paymentState,'NOT_COLLECTED');
+  assert.equal(preview.receipt.thermalAgent,'NOT_AVAILABLE');
+  assert.equal(preview.receipt.postedReprint,'NOT_AUTHORIZED');
+  assert.equal(preview.receipt.grandTotalMinor,16200);
+  assert.equal(preview.receipt.lines[0].executorDisplayName,'حلاق');
+  assert.match(preview.html,/مسودة — غير محصّلة \/ غير مرحّلة/);
+  assert.equal(preview.paymentState,'NOT_COLLECTED');
+  assert.equal(preview.accountingState,'NOT_POSTED');
+  assert.equal(preview.inventoryState,'NOT_DECREMENTED');
+  await assert.rejects(()=>svc.printPreview(actor,token,ID(7),ID(8),ID(99)),
+   e=>e.getStatus?.()===404);
+ });
+});
+test('GET print-preview can alternate text/html without Origin; POST keeps Origin',async()=>{
+ await env({...active,DRVO_K5_ORIGIN:'https://erp-stage.drvotech.com'},async()=>{
+  const svc=new PosRichService({getInternalPool(){return draftPool()}});
+  const identity={async actorFromToken(){return actor;}};
+  const headers=[];
+  const ctrl=new PosRichController(identity,svc);
+  const cookie='__Host-drvo-session='+token;
+  const html=await ctrl.printPreviewGet('text/html',{headers:{cookie}},
+   {setHeader(k,v){headers.push([k,v]);}},ID(7),ID(8),ID(10));
+  assert.match(String(html),/POS_DRAFT_RECEIPT/);
+  assert.ok(headers.some(([k,v])=>k==='Content-Type'&&String(v).includes('text/html')));
+  const json=await ctrl.printPreviewPost('https://erp-stage.drvotech.com','application/json',
+   {headers:{cookie}},{setHeader(){}},ID(7),ID(8),ID(10),
+   {customerDisplayName:'X'});
+  assert.equal(json.state,'POS_DRAFT_PRINT_PREVIEW');
+ });
+});

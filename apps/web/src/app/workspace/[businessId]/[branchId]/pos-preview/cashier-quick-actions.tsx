@@ -11,7 +11,7 @@ const BLOCKED=[
  {id:"expense",label:"مصروف سريع",reason:"Expenses draft only elsewhere"},
  {id:"income",label:"إيراد غير بيعي",reason:"Other Income owner pending"},
  {id:"transfer",label:"تحويل طريقة دفع",reason:"Treasury gated"},
- {id:"print",label:"طباعة إيصال مدفوع",reason:"No posted receipt source"},
+ {id:"print",label:"طباعة إيصال مدفوع",reason:"POSTED reprint OPEN — استخدم طباعة المسودة من سجل المسودات (DRAFT فقط)"},
  {id:"whatsapp",label:"واتساب سريع",reason:"Messaging+consent pending"},
 ] as const;
 

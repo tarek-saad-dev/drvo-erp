@@ -184,8 +184,8 @@ export default function CashierPackagesSection({apiRoot,offerings,lines,disabled
    setOverlapConfirm(null);
    setError(false);
    setMessage(selectedBarberId
-    ?`اتوسّعت ${data.name} تجاريًا للمجموعة في السلة (+إضافات). التجميع للعرض فقط حتى SQL026؛ الحفظ الغني ما زال يعيد تسعير الكتالوج. مفيش تحصيل.`
-    :`اتوسّعت ${data.name} تجاريًا للمجموعة في السلة. التجميع للعرض فقط حتى SQL026. مفيش تحصيل.`);
+    ?`اتوسّعت ${data.name} تجاريًا للمجموعة في السلة (+إضافات). لقطات الباقة تتحفظ مع المسودة الغنية (SQL038)؛ التسعير وقت الحفظ من الكتالوج. مفيش تحصيل.`
+    :`اتوسّعت ${data.name} تجاريًا للمجموعة في السلة. لقطات الباقة تتحفظ مع المسودة الغنية (SQL038)؛ التسعير وقت الحفظ من الكتالوج. مفيش تحصيل.`);
   }catch{
    setError(true);setMessage("تعذر الاتصال بحل الباقة.");
   }finally{setSubmitting(false);}

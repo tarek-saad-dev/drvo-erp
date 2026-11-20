@@ -26,7 +26,8 @@ test('saved Cashier price snapshot includes review quote, discount lines, custom
  assert.match(pricing,/CashierRichDraftActions/);
  assert.match(pricing,/expectedTotalMinor|quoteTotalMinor/);
  for(const field of ['lineDiscountMinor','lineDiscountPercentBps','executorEmployeeId',
-  'customerId','expectedTotalMinor','Idempotency-Key','NOT_COLLECTED','NOT_POSTED'])
+  'customerId','expectedTotalMinor','Idempotency-Key','NOT_COLLECTED','NOT_POSTED',
+  'packageId','packageGroupKey','packageRole','commercialPackagePriceMinor'])
   assert.ok(rich.includes(field),'Missing persisted field or safeguard '+field);
  assert.doesNotMatch(rich,/\/api\/payments|\/api\/sales|\/api\/ledger|paidSale|CashMove/);
 });

@@ -17,9 +17,14 @@ const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const TOKEN=/^[A-Za-z0-9_-]{43}$/;
 const MAX=9_000_000_000_000;
 const uuid=(v:unknown):v is string=>typeof v==="string"&&GUID.test(v);
+const PACKAGE_ROLES=new Set(["anchor","included","addon"]);
+const GROUP_KEY=/^[A-Za-z0-9._:-]{1,80}$/;
+type PackageRole="anchor"|"included"|"addon";
 type InputLine={
  offeringId:string;quantity:number;lineDiscountMinor?:number|null;
  lineDiscountPercentBps?:number|null;executorEmployeeId?:string|null;
+ packageId?:string|null;packageGroupKey?:string|null;packageRole?:PackageRole|null;
+ commercialPackagePriceMinor?:number|null;
 };
 type RichInput={lines:InputLine[];customerId:string|null;
  headerDiscountMinor:number|null;headerDiscountPercentBps:number|null;
@@ -44,6 +49,72 @@ function bps(v:unknown,nullable=false):number|null{
   throw new BadRequestException("Invalid discount basis points");
  return v;
 }
+function optionalString(v:unknown):string|null{
+ if(v===undefined||v===null)return null;
+ if(typeof v!=="string")throw new BadRequestException("Invalid package field");
+ return v;
+}
+function parsePackageFields(l:Record<string,unknown>):Pick<InputLine,"packageId"|"packageGroupKey"|"packageRole"|"commercialPackagePriceMinor">{
+
+ const packageIdRaw=optionalString(l.packageId);
+ const packageGroupKeyRaw=optionalString(l.packageGroupKey);
+ const packageRoleRaw=optionalString(l.packageRole);
+ const commercial=money(l.commercialPackagePriceMinor,true);
+ const anySet=packageIdRaw!==null||packageGroupKeyRaw!==null||packageRoleRaw!==null||commercial!==null;
+ if(!anySet){
+  return {packageId:null,packageGroupKey:null,packageRole:null,commercialPackagePriceMinor:null};
+ }
+ if(packageIdRaw===null||!uuid(packageIdRaw)||packageGroupKeyRaw===null||
+    !GROUP_KEY.test(packageGroupKeyRaw)||packageRoleRaw===null||
+    !PACKAGE_ROLES.has(packageRoleRaw)||commercial===null)
+  throw new BadRequestException("Invalid POS package snapshot fields");
+ return {
+  packageId:packageIdRaw.toLowerCase(),
+  packageGroupKey:packageGroupKeyRaw,
+  packageRole:packageRoleRaw as PackageRole,
+  commercialPackagePriceMinor:commercial,
+ };
+}
+function assertPackageGroups(lines:InputLine[]){
+ const groups=new Map<string,{packageId:string;price:number;anchors:number}>();
+ for(const line of lines){
+  if(!line.packageId||!line.packageGroupKey||!line.packageRole||
+     line.commercialPackagePriceMinor===null||line.commercialPackagePriceMinor===undefined)continue;
+  const g=groups.get(line.packageGroupKey);
+  if(!g){
+   groups.set(line.packageGroupKey,{
+    packageId:line.packageId,price:line.commercialPackagePriceMinor,
+    anchors:line.packageRole==="anchor"?1:0,
+   });
+   continue;
+  }
+  if(g.packageId!==line.packageId||g.price!==line.commercialPackagePriceMinor)
+   throw new BadRequestException("Invalid POS package group");
+  if(line.packageRole==="anchor")g.anchors+=1;
+ }
+ for(const g of groups.values()){
+  if(g.anchors!==1)throw new BadRequestException("Invalid POS package group");
+ }
+}
+/** Compact LinesJson: omit null package fields so non-package drafts stay short. */
+export function linesJsonForSql(lines:InputLine[]):string{
+ return JSON.stringify(lines.map(l=>{
+  const row:Record<string,unknown>={offeringId:l.offeringId,quantity:l.quantity};
+  if(l.lineDiscountMinor!==null&&l.lineDiscountMinor!==undefined)
+   row.lineDiscountMinor=l.lineDiscountMinor;
+  if(l.lineDiscountPercentBps!==null&&l.lineDiscountPercentBps!==undefined)
+   row.lineDiscountPercentBps=l.lineDiscountPercentBps;
+  if(l.executorEmployeeId!==null&&l.executorEmployeeId!==undefined)
+   row.executorEmployeeId=l.executorEmployeeId;
+  if(l.packageId){
+   row.packageId=l.packageId;
+   row.packageGroupKey=l.packageGroupKey;
+   row.packageRole=l.packageRole;
+   row.commercialPackagePriceMinor=l.commercialPackagePriceMinor;
+  }
+  return row;
+ }));
+}
 export function parseCashierRichDraftInput(body:unknown){
  const b=shape(body,["lines","expectedTotalMinor"],
   ["customerId","headerDiscountMinor","headerDiscountPercentBps"]);
@@ -52,7 +123,8 @@ export function parseCashierRichDraftInput(body:unknown){
  const seen=new Set<string>();
  const lines:InputLine[]=b.lines.map((raw:unknown)=>{
   const l=shape(raw,["offeringId","quantity"],
-   ["lineDiscountMinor","lineDiscountPercentBps","executorEmployeeId"]);
+   ["lineDiscountMinor","lineDiscountPercentBps","executorEmployeeId",
+    "packageId","packageGroupKey","packageRole","commercialPackagePriceMinor"]);
   if(!uuid(l.offeringId)||typeof l.quantity!=="number"||
      !Number.isSafeInteger(l.quantity)||l.quantity<1||l.quantity>20||
      seen.has(l.offeringId.toLowerCase()))
@@ -63,11 +135,13 @@ export function parseCashierRichDraftInput(body:unknown){
     (()=>{throw new BadRequestException("Invalid assigned employee")})();
   const lineDiscountMinor=money(l.lineDiscountMinor,true);
   const lineDiscountPercentBps=bps(l.lineDiscountPercentBps,true);
+  const pkg=parsePackageFields(l);
   return {
    offeringId,quantity:l.quantity as number,
-   lineDiscountMinor,lineDiscountPercentBps,executorEmployeeId,
+   lineDiscountMinor,lineDiscountPercentBps,executorEmployeeId,...pkg,
   };
  });
+ assertPackageGroups(lines);
  const customerId=b.customerId===undefined||b.customerId===null?null:
   uuid(b.customerId)?b.customerId.toLowerCase():
   (()=>{throw new BadRequestException("Invalid POS customer")})();
@@ -76,8 +150,8 @@ export function parseCashierRichDraftInput(body:unknown){
   headerDiscountPercentBps:bps(b.headerDiscountPercentBps,true),
   expectedTotalMinor:money(b.expectedTotalMinor,false)!,
  };
- const json=JSON.stringify(data.lines);
- if(json.length>8000)throw new BadRequestException("POS V2 payload too long");
+ const json=linesJsonForSql(data.lines);
+ if(json.length>16000)throw new BadRequestException("POS V2 payload too long");
  const hash=createHash("sha256").update(JSON.stringify(data)).digest("hex");
  return {data,linesJson:json,hash};
 }
@@ -168,12 +242,20 @@ export class PosRichService{
   for(const row of sets[1]??[]){
    const parent=index.get(String(row.draftId).toLowerCase());
    if(!parent)throw new ServiceUnavailableException("Orphan POS V2 line");
+   const packageId=row.packageId===null||row.packageId===undefined?null:String(row.packageId);
+   const packageGroupKey=row.packageGroupKey===null||row.packageGroupKey===undefined?null:
+    String(row.packageGroupKey);
+   const packageRole=row.packageRole===null||row.packageRole===undefined?null:
+    String(row.packageRole);
+   const commercialPackagePriceMinor=row.commercialPackagePriceMinor===null||
+    row.commercialPackagePriceMinor===undefined?null:Number(row.commercialPackagePriceMinor);
    parent.lines.push({
     lineNo:Number(row.lineNo),offeringId:String(row.offeringId),
     displayName:String(row.displayName),kind:String(row.kind),quantity:Number(row.quantity),
     unitPriceMinor:Number(row.unitPriceMinor),grossMinor:Number(row.grossMinor),
     executorEmployeeId:row.executorEmployeeId===null?null:String(row.executorEmployeeId),
     discountMinor:Number(row.discountMinor),netMinor:Number(row.netMinor),
+    packageId,packageGroupKey,packageRole,commercialPackagePriceMinor,
    });
   }
   for(const d of drafts){

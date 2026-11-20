@@ -28,8 +28,34 @@ test('SQL022 source rich parser preserves Cashier inputs and canonical idempoten
  assert.equal(a.data.lines[0].executorEmployeeId,ID(4));
  assert.equal(a.data.lines[0].lineDiscountPercentBps,1000);
  assert.equal(a.data.expectedTotalMinor,16200);
+ assert.equal(a.data.lines[0].packageId,null);
  assert.match(a.linesJson,/executorEmployeeId/);
+ assert.doesNotMatch(a.linesJson,/packageId/);
  assert.match(a.hash,/^[0-9a-f]{64}$/);
+});
+test('SQL038 package snapshots parse, hash, and reject broken groups',()=>{
+ const pkg=ID(40),svcA=ID(41),svcB=ID(42),group='pkg-'+pkg+'-ci';
+ const withPkg={
+  lines:[
+   {offeringId:svcA,quantity:1,packageId:pkg,packageGroupKey:group,
+    packageRole:'anchor',commercialPackagePriceMinor:150000},
+   {offeringId:svcB,quantity:1,packageId:pkg,packageGroupKey:group,
+    packageRole:'included',commercialPackagePriceMinor:150000},
+  ],
+  expectedTotalMinor:150000,
+ };
+ const parsed=parseCashierRichDraftInput(withPkg);
+ assert.equal(parsed.data.lines[0].packageId,pkg);
+ assert.equal(parsed.data.lines[0].packageRole,'anchor');
+ assert.equal(parsed.data.lines[1].packageRole,'included');
+ assert.equal(parsed.data.lines[1].commercialPackagePriceMinor,150000);
+ assert.match(parsed.linesJson,/packageGroupKey/);
+ assert.throws(()=>parseCashierRichDraftInput({
+  ...withPkg,lines:[{...withPkg.lines[0]},{...withPkg.lines[1],packageRole:'anchor'}],
+ }),e=>e.getStatus?.()===400);
+ assert.throws(()=>parseCashierRichDraftInput({
+  ...withPkg,lines:[{...withPkg.lines[0],packageId:null}],
+ }),e=>e.getStatus?.()===400);
 });
 test('strict input denies spoofed price, paid flag, foreign tenant, malformed numeric or duplicate',()=>{
  for(const input of [
@@ -93,18 +119,27 @@ test('rich read returns separate immutable snapshots instead of paid invoices',a
  await env(active,async()=>{
   const pool={request(){return {input(){return this},execute:async()=>({recordsets:[
    [{draftId:ID(10),createdAtUtc:new Date('2026-11-17T00:00:00Z'),currency:'EGP',
-    subtotalMinor:'20000',customerId:ID(5),headerDiscountMinor:'1800',
-    linesNetMinor:'18000',totalDiscountMinor:'3800',grandTotalMinor:'16200'}],
+    subtotalMinor:'25000',customerId:ID(5),headerDiscountMinor:'2300',
+    linesNetMinor:'23000',totalDiscountMinor:'4500',grandTotalMinor:'20700'}],
    [{draftId:ID(10),lineNo:1,offeringId:ID(3),displayName:'Haircut',kind:'SERVICE',
     quantity:2,unitPriceMinor:'10000',grossMinor:'20000',executorEmployeeId:ID(4),
-    discountMinor:'2000',netMinor:'18000'}],
+    discountMinor:'2000',netMinor:'18000',packageId:null,packageGroupKey:null,
+    packageRole:null,commercialPackagePriceMinor:null},
+    {draftId:ID(10),lineNo:2,offeringId:ID(11),displayName:'Pkg Anchor',kind:'SERVICE',
+    quantity:1,unitPriceMinor:'5000',grossMinor:'5000',executorEmployeeId:null,
+    discountMinor:'0',netMinor:'5000',packageId:ID(40),packageGroupKey:'pkg-ci',
+    packageRole:'anchor',commercialPackagePriceMinor:150000}],
   ]})}}};
   const svc=new PosRichService({getInternalPool(){return pool}});
   const r=await svc.list(actor,token,ID(7),ID(8));
   assert.equal(r.state,'CASHIER_PRICE_SNAPSHOT_DRAFTS_ONLY');
   assert.equal(r.drafts.length,1);
-  assert.equal(r.drafts[0].grandTotalMinor,16200);
+  assert.equal(r.drafts[0].grandTotalMinor,20700);
   assert.equal(r.drafts[0].lines[0].executorEmployeeId,ID(4));
+  assert.equal(r.drafts[0].lines[0].packageId,null);
+  assert.equal(r.drafts[0].lines[1].packageId,ID(40));
+  assert.equal(r.drafts[0].lines[1].packageRole,'anchor');
+  assert.equal(r.drafts[0].lines[1].commercialPackagePriceMinor,150000);
   assert.equal(r.accountingState,'NOT_POSTED');
   assert.equal(r.paymentState,'NOT_COLLECTED');
  });

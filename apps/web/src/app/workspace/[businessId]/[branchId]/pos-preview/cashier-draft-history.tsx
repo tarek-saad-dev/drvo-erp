@@ -1,17 +1,21 @@
 "use client";
 import {useEffect,useState} from "react";
 import Link from "next/link";
+import {hydratePackageMetaFromSnapshots,type PackageAwareCartLine} from "./cashier-package-cart";
 
 /**
  * Read-only Cashier V2 DRAFT history, not Customer purchase history.
  * GETs are independently authorized by the existing scoped SQL022–023 owner.
  * Restoring offers only a NEW cart; saved prices/discounts are never reused.
+ * SQL038 package snapshots rebuild cart grouping on reload.
  * Draft print opens the NONPOSTING print view (Cashier PrintInvoiceModal adaptation).
  */
 type Customer={customerId:string;displayName:string;isActive:boolean};
 type Employee={employeeId:string;displayName:string;isActive:boolean;branchActive:boolean};
 type DraftLine={offeringId:string;displayName:string;kind:string;quantity:number;
- discountMinor:number;netMinor:number;executorEmployeeId:string|null};
+ discountMinor:number;netMinor:number;executorEmployeeId:string|null;
+ packageId:string|null;packageGroupKey:string|null;packageRole:string|null;
+ commercialPackagePriceMinor:number|null};
 type Draft={draftId:string;createdAtUtc:string;currency:string;customerId:string|null;
  totalDiscountMinor:number;grandTotalMinor:number;status:"DRAFT";lines:DraftLine[]};
 const money=(n:number,c:string)=>(n/100).toFixed(2)+" "+c;
@@ -19,7 +23,7 @@ const money=(n:number,c:string)=>(n/100).toFixed(2)+" "+c;
 export default function CashierDraftHistory({apiRoot,draftApi,revision,disabled,onUseDraft,
  printBasePath}:{
  apiRoot:string;draftApi:string;revision:number;disabled:boolean;
- onUseDraft:(lines:Array<{offeringId:string;quantity:number}>)=>void;
+ onUseDraft:(lines:PackageAwareCartLine[])=>void;
  printBasePath:string;
 }){
  const [state,setState]=useState<"loading"|"ready"|"denied">("loading");
@@ -100,7 +104,9 @@ export default function CashierDraftHistory({apiRoot,draftApi,revision,disabled,
       <td dir="ltr">{money(d.grandTotalMinor,d.currency)}</td>
       <td><details><summary>عرض الأصناف والمنفّذين</summary>
        <ul>{d.lines.map((l,i)=><li key={l.offeringId+"-"+i}>
-        {l.displayName} × {l.quantity} — {employeeName(l.executorEmployeeId)}
+        {l.displayName} × {l.quantity}
+        {l.packageRole?` · باقة/${l.packageRole}`:""}
+        {" — "+employeeName(l.executorEmployeeId)}
         {" — خصم "+money(l.discountMinor,d.currency)+" — صافي "+money(l.netMinor,d.currency)}
        </li>)}</ul>
        <p className="k5-muted">DRAFT · NOT_COLLECTED · NOT_POSTED</p>
@@ -113,7 +119,8 @@ export default function CashierDraftHistory({apiRoot,draftApi,revision,disabled,
        طباعة المسودة
       </Link></td>
       <td><button type="button" className="k5-salon-refresh" disabled={disabled}
-       onClick={()=>onUseDraft(d.lines.map(l=>({offeringId:l.offeringId,quantity:l.quantity})))}>
+       data-cashier-pos="draft-reload-package-snapshots"
+       onClick={()=>onUseDraft(hydratePackageMetaFromSnapshots(d.lines))}>
        جهّز سلة بالأسعار الحالية
       </button></td>
      </tr>)}</tbody>

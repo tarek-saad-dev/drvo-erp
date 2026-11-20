@@ -9,7 +9,10 @@ import CashierRichDraftActions from "./cashier-rich-draft-actions";
  */
 type Offering={offeringId:string;kind:"SERVICE"|"PRODUCT";displayName:string;
  priceMinor:number;currency:string;isActive:boolean};
-type Line={offeringId:string;quantity:number};
+type PackageMeta={packageId:string;packageName:string;role:"anchor"|"included"|"addon";
+ groupKey:string;includedCount:number;commercialPackagePriceMinor:number;
+ optionalGroup?:"groom_addons"|"home_visit"|null};
+type Line={offeringId:string;quantity:number;packageMeta?:PackageMeta};
 type Mode="amount"|"percent";
 type Discount={mode:Mode;text:string};
 type Quote={
@@ -147,7 +150,10 @@ export default function CashierPricingPanel({api,draftApi,richEnabled,afterSaved
    {richEnabled&&quote&&approvedInput&&
     <CashierRichDraftActions
      apiRoot={api.replace(/\/pos-preview$/,"")}
-     draftApi={draftApi} lines={approvedInput.lines}
+     draftApi={draftApi} lines={approvedInput.lines.map(l=>{
+      const cart=lines.find(c=>c.offeringId===l.offeringId);
+      return cart?.packageMeta?{...l,packageMeta:cart.packageMeta}:l;
+     })}
      header={{
       ...(approvedInput.headerDiscountMinor!==undefined?
        {headerDiscountMinor:approvedInput.headerDiscountMinor}:{}),

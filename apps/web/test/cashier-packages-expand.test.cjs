@@ -13,7 +13,20 @@ test('packages section expands via commercial resolve without payment APIs',()=>
  assert.match(ui,/expandPackageToDraftLines/);
  assert.match(ui,/mutuallyExclusive|home_visit|زيارة/);
  assert.match(ui,/مفيش دفع/);
+ assert.match(ui,/SQL038/);
  assert.doesNotMatch(ui,/\/api\/sales|localStorage|ADR-031/);
+});
+test('SQL038 package snapshots persist on rich save and reload into cart',()=>{
+ const rich=fs.readFileSync(path.join(root,'cashier-rich-draft-actions.tsx'),'utf8');
+ assert.match(rich,/packageGroupKey/);
+ assert.match(rich,/commercialPackagePriceMinor/);
+ assert.match(rich,/packageRole/);
+ const history=fs.readFileSync(path.join(root,'cashier-draft-history.tsx'),'utf8');
+ assert.match(history,/hydratePackageMetaFromSnapshots/);
+ assert.match(history,/data-cashier-pos="draft-reload-package-snapshots"/);
+ const helper=fs.readFileSync(path.join(root,'cashier-package-cart.ts'),'utf8');
+ assert.match(helper,/hydratePackageMetaFromSnapshots/);
+ assert.match(helper,/PACKAGE_SNAPSHOT_ROLES/);
 });
 
 test('cart groups commercial package rows for display',()=>{

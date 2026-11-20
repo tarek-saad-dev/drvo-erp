@@ -1,0 +1,49 @@
+name: Shared Treasury / Operations readiness preview CI
+on:
+  pull_request:
+    paths:
+      - '_cashier_source/operations/**'
+      - '_cashier_source/treasury/**'
+      - 'packages/business-modules/treasury/**'
+      - 'apps/api/src/treasury/**'
+      - 'apps/api/src/operations/**'
+      - 'apps/api/src/app.module.ts'
+      - 'apps/api/test/treasury-readiness-preview.test.cjs'
+      - 'tests/treasury-readiness-source.test.cjs'
+      - 'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json'
+      - '.github/workflows/shared-treasury-readiness-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - '_cashier_source/operations/**'
+      - '_cashier_source/treasury/**'
+      - 'packages/business-modules/treasury/**'
+      - 'apps/api/src/treasury/**'
+      - 'apps/api/src/operations/**'
+      - 'apps/api/test/treasury-readiness-preview.test.cjs'
+      - 'tests/treasury-readiness-source.test.cjs'
+      - '.github/workflows/shared-treasury-readiness-ci.yml'
+permissions:
+  contents: read
+jobs:
+  treasury-readiness-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # No SQL Server: readiness/preview only executes core.Read* mocks (no migration, no writes).
+      - name: Package characterization against pinned Cashier source
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          npm run build
+          node --test tests/treasury-readiness-source.test.cjs tests/ops-treasury-source.test.cjs tests/cashier-workflow-ledger.test.cjs
+      - name: Nest preview contract
+        run: |
+          set -euo pipefail
+          npm ci --prefix apps/api --no-audit --no-fund
+          npm run build --prefix apps/api
+          node --test apps/api/test/treasury-readiness-preview.test.cjs apps/api/test/treasury-ops.test.cjs apps/api/test/operations.test.cjs

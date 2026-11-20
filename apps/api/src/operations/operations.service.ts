@@ -8,6 +8,7 @@ import type {Actor} from "../identity/identity.service";
 import {
  evaluateShiftReadiness,planBusinessDay,type BusinessDayAction,type ShiftReadiness,
 } from "./ops-policy";
+import {previewShiftHandoff} from "../treasury/treasury-readiness-rules";
 
 export type DayView={
  dayId:string;businessDate:string;status:"OPEN"|"CLOSED";
@@ -139,6 +140,34 @@ export class OperationsService {
    state:"NONPOSTING_OPERATIONS_DAY_SHIFT_ONLY",openDay,shifts,planAction,readiness,
    accountingState:"NOT_POSTED",glPostState:"GATED",
   };
+ }
+ /**
+  * NON-POSTING Cashier handoff plan (OPS-03). Reads this branch's day/shift through the existing
+  * trusted SQL read; the only caller-supplied fact is a hypothetical "my OPEN shift is on another
+  * branch" id, which is reported as unverified. Nothing is closed, opened or moved.
+  */
+ async previewHandoff(actor:Actor,token:string,businessId:string,branchId:string,
+  payload:unknown){
+  const scope=this.scope(actor,token,businessId,branchId);
+  const data=body(payload,["actorOpenShiftElsewhereBranchId"]);
+  const elsewhere=data.actorOpenShiftElsewhereBranchId;
+  if(elsewhere!==null&&(!valid(elsewhere)||elsewhere.toLowerCase()===branchId.toLowerCase()))
+   throw new BadRequestException("Invalid actorOpenShiftElsewhereBranchId");
+  const read=await this.read(actor,token,businessId,branchId);
+  let preview;
+  try{
+   preview=previewShiftHandoff({
+    targetBranchId:branchId,targetDayOpen:read.openDay?.status==="OPEN",
+    actorHasOpenShiftHere:read.shifts.some(s=>s.status==="OPEN"&&s.actorAccountId===scope.account),
+    actorOpenShiftElsewhereBranchId:elsewhere as string|null,
+   });
+  }catch(error){
+   if(error instanceof TypeError)throw new BadRequestException("Invalid handoff preview");
+   throw error;
+  }
+  return {state:"NONPOSTING_OPERATIONS_HANDOFF_PREVIEW" as const,targetBranchId:branchId,
+   ...preview,persisted:false as const,accountingState:"NOT_POSTED" as const,
+   glPostState:"GATED" as const};
  }
  async openDay(actor:Actor,token:string,businessId:string,branchId:string,
   requestId:unknown,payload:unknown){

@@ -29,6 +29,25 @@ export class TreasuryOpsController {
   const actor=await this.identity.actorFromToken(token);
   return this.treasury.list(actor,token!,businessId,branchId);
  }
+ @Get("day-close-readiness")
+ async dayCloseReadiness(@Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,
+  @Param("businessId") businessId:string,@Param("branchId") branchId:string){
+  res.setHeader("Cache-Control","no-store");enabled();
+  const token=extractSessionCookie(req.headers.cookie);
+  const actor=await this.identity.actorFromToken(token);
+  return this.treasury.dayCloseReadiness(actor,token!,businessId,branchId);
+ }
+ /** Read-only filter/rail-total preview. POST only carries the filter body; nothing is written. */
+ @Post("movements-preview") @HttpCode(200)
+ async previewMovements(@Headers("origin") origin:string|undefined,
+  @Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,
+  @Param("businessId") businessId:string,@Param("branchId") branchId:string,
+  @Body() body:unknown){
+  res.setHeader("Cache-Control","no-store");enabled();allowedOrigin(origin);
+  const token=extractSessionCookie(req.headers.cookie);
+  const actor=await this.identity.actorFromToken(token);
+  return this.treasury.previewMovements(actor,token!,businessId,branchId,body);
+ }
  @Post("movements") @HttpCode(200)
  async createMovement(@Headers("origin") origin:string|undefined,
   @Headers("idempotency-key") key:string|undefined,

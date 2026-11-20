@@ -1,5 +1,5 @@
 /**
- * Intentional operational invariant ΓÇö not an accidental leftover of the
+ * Intentional operational invariant — not an accidental leftover of the
  * pre-multi-branch schema.
  *
  * A user may have AT MOST ONE OPEN shift globally
@@ -34,4 +34,4 @@ export const AUTO_BUSINESS_DAY_ROLLOVER = 'AUTO_BUSINESS_DAY_ROLLOVER' as const;
 
 /** User-facing message when catch-up cannot make the current BusinessDay usable. */
 export const BUSINESS_DAY_RECONCILE_USER_MESSAGE =
-  '╪¬╪╣╪░╪▒ ╪¬╪¼┘ç┘è╪▓ ┘è┘ê┘à ╪º┘ä╪╣┘à┘ä ╪º┘ä╪¡╪º┘ä┘è. ╪¡╪º┘ê┘ä ┘à╪▒╪⌐ ╪ú╪«╪▒┘ë ╪ú┘ê ╪¬┘ê╪º╪╡┘ä ┘à╪╣ ╪º┘ä┘à╪│╪ñ┘ê┘ä.';
+  'تعذر تجهيز يوم العمل الحالي. حاول مرة أخرى أو تواصل مع المسؤول.';

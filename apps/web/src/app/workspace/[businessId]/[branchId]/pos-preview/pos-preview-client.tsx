@@ -66,7 +66,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
   const [customerRevision,setCustomerRevision]=useState(0);
   const [selectedBarberId,setSelectedBarberId]=useState("");
   const [rosterNames,setRosterNames]=useState<Record<string,string>>({});
-  const [productStock,setProductStock]=useState<Record<string,ProductStockHint>|{}};
+  const [productStock,setProductStock]=useState<Record<string,ProductStockHint>>({});
   const onRoster=useCallback((employees:BarberEmployee[])=>{
     const names:Record<string,string>={};
     for(const e of employees)names[e.employeeId.toLowerCase()]=e.displayName;

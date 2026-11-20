@@ -47,7 +47,7 @@ Accepted directions are **not implemented features**.
 
 | ADR-030 | Enforce Tenant/Business/Branch isolation through trusted scopes, scoped data, workers and exports | **FOUNDER-ACCEPTED BASELINE (2026-11-11); RLS + broader policies still OPEN** | [ADR-030](ADR-030-TENANT-ISOLATION-ENFORCEMENT.md) |
 
-| ADR-031 | First POS sale + mandatory Accounting journal atomic A vs durable pending B; separated tender/stock/commission truth | **PROPOSED — founder/finance/architecture choice pending** | [ADR-031](ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md) |
+| ADR-031 | First POS sale + mandatory Accounting journal atomic A vs durable pending B; separated tender/stock/commission truth | **PROPOSED — founder/finance/architecture/security choice pending** ([2026-11-20 readiness package](../04-execution/ADR-031-POSTING-READINESS-PACKAGE-2026-11-20.md); posting BLOCKED) | [ADR-031](ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md) |
 
 | ADR-032 | Business-scoped immutable module activation plan and quote, idempotent entitlement and safe version/dependency lifecycle | **FOUNDER-ACCEPTED V1 BASELINE ACT-01–07 (2026-11-14); finance/security/detail/real activation OPEN** | [ADR-032](ADR-032-ATOMIC-BUSINESS-MODULE-ACTIVATION-AND-VERSION-CONTRACT.md) |
 

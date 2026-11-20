@@ -1,0 +1,43 @@
+name: ADR-031 Posting Readiness CI
+on:
+  pull_request:
+    paths:
+      - 'docs/04-execution/ADR-031-POSTING-READINESS-PACKAGE-2026-11-20.md'
+      - 'docs/04-execution/ADR-031-FOUNDER-FINANCE-DECISION-PACKET-2026-11-12.md'
+      - 'docs/05-decisions/ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md'
+      - 'docs/05-decisions/DECISIONS.md'
+      - 'tools/finance/adr031-*.cjs'
+      - 'tools/finance/verify-adr031-readiness.cjs'
+      - 'tests/adr031-*.test.cjs'
+      - '.github/workflows/adr031-readiness-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/04-execution/ADR-031-POSTING-READINESS-PACKAGE-2026-11-20.md'
+      - 'docs/04-execution/ADR-031-FOUNDER-FINANCE-DECISION-PACKET-2026-11-12.md'
+      - 'docs/05-decisions/ADR-031-FINANCIAL-CONSISTENCY-AND-POSTING-BOUNDARY.md'
+      - 'docs/05-decisions/DECISIONS.md'
+      - 'tools/finance/adr031-*.cjs'
+      - 'tools/finance/verify-adr031-readiness.cjs'
+      - 'tests/adr031-*.test.cjs'
+      - '.github/workflows/adr031-readiness-ci.yml'
+permissions:
+  contents: read
+jobs:
+  adr031-readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # Docs + pure classifiers only: no SQL Server, no GL writes, no pos.sale.post.
+      - name: ADR-031 decision evidence + readiness board
+        run: |
+          set -euo pipefail
+          node --check tools/finance/adr031-decision-evidence.cjs
+          node --check tools/finance/adr031-readiness-board.cjs
+          node --check tools/finance/verify-adr031-readiness.cjs
+          node --test tests/adr031-decision-evidence.test.cjs tests/adr031-readiness-board.test.cjs
+          node tools/finance/verify-adr031-readiness.cjs

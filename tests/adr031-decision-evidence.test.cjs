@@ -44,3 +44,16 @@ test('malformed or injected business scope and unsupported finance strategy fail
  assert.throws(()=>tenderTruth({evidenceKind:'BANK_NOTE',verifiedByAuthority:true}),TypeError);
  assert.throws(()=>tenderTruth({evidenceKind:'PROVIDER_CONFIRMED',verifiedByAuthority:true,amountMinor:50}),TypeError);
 });
+test('readiness package keeps Option A/B evidence classifier as non-authority',()=>{
+ // Cross-link: Track C readiness board must continue to use this classifier without approving ADR-031.
+ const {buildAdr031ReadinessBoard}=require('../tools/finance/adr031-readiness-board.cjs');
+ const board=buildAdr031ReadinessBoard();
+ assert.equal(board.adr031Status,'PROPOSED');
+ assert.equal(board.postingActivation,'BLOCKED');
+ assert.equal(board.classifierSmoke.atomicPosted,
+  firstJournalTruth(make('ATOMIC_A',true,true,true,true)));
+ assert.equal(board.classifierSmoke.asyncPending,
+  firstJournalTruth(make('ASYNC_B',true,false,false,true)));
+ assert.equal(board.classifierSmoke.screenshot,
+  tenderTruth({evidenceKind:'SCREENSHOT_ONLY',verifiedByAuthority:false}));
+});

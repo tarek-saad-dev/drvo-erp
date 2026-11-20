@@ -182,7 +182,7 @@ async function main(){
   const tr=(b,br)=>endpoint(b,br)+'/transfers';
   const qtyAt=async(br)=>{
    const data=await (await get(endpoint(x.b,br),own)).json();
-   return data.items.find(i=>i.offeringId===x.offering).qtyMilli;
+   return data.items.find(i=>i.offeringId.toLowerCase()===x.offering).qtyMilli;
   };
   const line=(qtyMilli,offeringId=x.offering)=>({lineNo:1,offeringId,qtyMilli});
   let transferId;
@@ -219,7 +219,7 @@ async function main(){
    assert.equal(src.transfers[0].direction,'OUT');
    assert.equal(src.transfers[0].status,'APPLIED');
    assert.equal(src.transfers[0].lines[0].qtyMilli,2000);
-   assert.equal(src.destinations.length,1);assert.equal(src.destinations[0].branchId,x.br2);
+   assert.equal(src.destinations.length,1);assert.equal(src.destinations[0].branchId.toLowerCase(),x.br2);
    const dst=await (await get(tr(x.b,x.br2),own)).json();
    assert.equal(dst.transfers[0].direction,'IN');
    assert.equal(dst.transfers[0].transferId,transferId);

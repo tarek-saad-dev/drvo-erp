@@ -37,7 +37,10 @@ export function profileDraftHasContent(d:ProfileDraft):boolean{
 /** Cashier rules: source is optional, but if present it must validate. */
 export function buildProfileBody(d:ProfileDraft,consentAction?:"GRANT"|"REVOKE"):
  {body:Record<string,unknown>|null;errors:Record<string,string>}{
- return buildProfileBodyImpl(d,consentAction);
+ const result=buildProfileBodyImpl(d,consentAction) as {
+  body:Record<string,unknown>|null;errors:Record<string,string>;
+ };
+ return {body:result.body??null,errors:result.errors??{}};
 }
 
 /** Controlled field set shared by quick-create and complete/edit. */

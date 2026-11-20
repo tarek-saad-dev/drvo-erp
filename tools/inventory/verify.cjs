@@ -307,7 +307,7 @@ async function main(){
    for(const row of deps.recordset)
     assert.doesNotMatch(row.name,/Journal|Ledger|Payable|Cogs|Cash|Treasury|Sale|Invoice|Payment/i);
    const docs=await admin.query("SELECT COUNT(*) AS n FROM core.StockTransferDocument");
-   assert.equal(Number(docs.recordset[0].n),4);
+   assert.equal(Number(docs.recordset[0].n),3,'applied+cancelled transfer documents only; rejected attempts leave no rows');
   });
   console.log('INVENTORY SQL2022 + NEST HTTP PASS: '+checks+' independent groups');
  }finally{

@@ -5,21 +5,33 @@ import {createHash} from "node:crypto";
 import * as sql from "mssql";
 import {FoundationDatabaseService} from "../data/foundation-database.service";
 import type {Actor} from "../identity/identity.service";
+import {
+ QUEUE_GRACE_MINUTES_DEFAULT,QUEUE_LIFECYCLE_STATE,computeQueueLifecycle,
+ type QueueEffectiveStatus,type QueueTicketStatus,
+} from "./queue-lifecycle-rules";
 
-// Salon Queue Extension: walk-in + Booking handoff only. No sale/Treasury/GL writes.
+// Salon Queue Extension: walk-in + Booking handoff + operator settle. No sale/Treasury/GL.
 export type QueueTicketView={
  ticketId:string;ticketCode:string;customerId:string|null;resourceId:string|null;
  offeringId:string|null;bookingId:string|null;customerName:string;resourceName:string;
  offeringName:string;durationMinutes:number;expectedStartAtUtc:string;expectedEndAtUtc:string;
- status:"WAITING"|"CALLED"|"IN_SERVICE"|"DONE"|"CANCELLED"|"NO_SHOW";
- source:"WALK_IN"|"BOOKING_HANDOFF";createdAtUtc:string;
+ status:QueueTicketStatus;source:"WALK_IN"|"BOOKING_HANDOFF";createdAtUtc:string;
+ effectiveStatus:QueueEffectiveStatus;needsOperatorAction:boolean;
+ isBlockingAvailability:boolean;isCountingAhead:boolean;overdueMinutes:number;
+ settleEligible:boolean;
 };
 export type QueueRead={
- state:"NONPOSTING_QUEUE_TICKETS_ONLY";tickets:QueueTicketView[];limit:200;
- mayBeTruncated:boolean;treasuryState:"NOT_PAID";accountingState:"NOT_POSTED";
+ state:"NONPOSTING_QUEUE_TICKETS_ONLY";lifecycleState:typeof QUEUE_LIFECYCLE_STATE;
+ tickets:QueueTicketView[];limit:200;mayBeTruncated:boolean;
+ actionRequiredCount:number;settleEligibleCount:number;graceMinutes:number;
+ treasuryState:"NOT_PAID";accountingState:"NOT_POSTED";
 };
 export type Created={id:string;created:boolean};
-export type StatusChange={id:string;status:QueueTicketView["status"];changed:boolean};
+export type StatusChange={id:string;status:QueueTicketStatus;changed:boolean};
+export type SettleExpired={
+ settledCount:number;ticketIds:string[];graceMinutes:number;
+ treasuryState:"NOT_PAID";accountingState:"NOT_POSTED";
+};
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const TOKEN=/^[A-Za-z0-9_-]{43}$/;
 const ISO=/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00\.000Z$/;
@@ -70,11 +82,11 @@ export class QueueService {
    throw new ServiceUnavailableException("Queue unavailable");
   }
  }
- private mapTicket(row:Record<string,unknown>):QueueTicketView{
+ private mapTicket(row:Record<string,unknown>,now:Date):QueueTicketView{
   const status=String(row.status);
-  if(!STATUSES.includes(status as QueueTicketView["status"]))
+  if(!STATUSES.includes(status as QueueTicketStatus))
    throw new ServiceUnavailableException("Invalid queue status");
-  return {
+  const base={
    ticketId:String(row.ticketId),ticketCode:String(row.ticketCode),
    customerId:row.customerId?String(row.customerId):null,
    resourceId:row.resourceId?String(row.resourceId):null,
@@ -85,9 +97,20 @@ export class QueueService {
    durationMinutes:Number(row.durationMinutes),
    expectedStartAtUtc:new Date(row.expectedStartAtUtc as string|number|Date).toISOString(),
    expectedEndAtUtc:new Date(row.expectedEndAtUtc as string|number|Date).toISOString(),
-   status:status as QueueTicketView["status"],
-   source:row.source==="BOOKING_HANDOFF"?"BOOKING_HANDOFF":"WALK_IN",
+   status:status as QueueTicketStatus,
+   source:row.source==="BOOKING_HANDOFF"?"BOOKING_HANDOFF" as const:"WALK_IN" as const,
    createdAtUtc:new Date(row.createdAtUtc as string|number|Date).toISOString(),
+  };
+  const life=computeQueueLifecycle({
+   status:base.status,expectedStartAtUtc:base.expectedStartAtUtc,
+   expectedEndAtUtc:base.expectedEndAtUtc,durationMinutes:base.durationMinutes,
+  },now);
+  return {
+   ...base,effectiveStatus:life.effectiveStatus,
+   needsOperatorAction:life.needsOperatorAction,
+   isBlockingAvailability:life.isBlockingAvailability,
+   isCountingAhead:life.isCountingAhead,overdueMinutes:life.overdueMinutes,
+   settleEligible:life.settleEligible,
   };
  }
  async list(actor:Actor,token:string,businessId:string,branchId:string):Promise<QueueRead>{
@@ -95,10 +118,14 @@ export class QueueService {
    "core.ReadBranchQueue");
   if(!Array.isArray(result.recordset))
    throw new ServiceUnavailableException("Queue data unavailable");
-  const tickets=result.recordset.map((row:Record<string,unknown>)=>this.mapTicket(row));
-  return {state:"NONPOSTING_QUEUE_TICKETS_ONLY",tickets,limit:200,
-   mayBeTruncated:tickets.length===200,treasuryState:"NOT_PAID",
-   accountingState:"NOT_POSTED"};
+  const now=new Date();
+  const tickets=result.recordset.map((row:Record<string,unknown>)=>this.mapTicket(row,now));
+  return {state:"NONPOSTING_QUEUE_TICKETS_ONLY",lifecycleState:QUEUE_LIFECYCLE_STATE,
+   tickets,limit:200,mayBeTruncated:tickets.length===200,
+   actionRequiredCount:tickets.filter((t:QueueTicketView)=>t.needsOperatorAction).length,
+   settleEligibleCount:tickets.filter((t:QueueTicketView)=>t.settleEligible).length,
+   graceMinutes:QUEUE_GRACE_MINUTES_DEFAULT,
+   treasuryState:"NOT_PAID",accountingState:"NOT_POSTED"};
  }
  async createWalkIn(actor:Actor,token:string,businessId:string,branchId:string,
   requestId:unknown,payload:unknown):Promise<Created>{
@@ -158,7 +185,26 @@ export class QueueService {
    .input("TargetStatus",sql.VarChar(12),d.status));
   const row=result.recordset?.[0];
   if(!row)throw new ServiceUnavailableException("Queue transition unavailable");
-  return {id:String(row.id),status:String(row.status) as QueueTicketView["status"],
+  return {id:String(row.id),status:String(row.status) as QueueTicketStatus,
    changed:Boolean(row.changed)};
+ }
+ async settleExpired(actor:Actor,token:string,businessId:string,branchId:string,
+  payload:unknown):Promise<SettleExpired>{
+  const scope=this.scope(actor,token,businessId,branchId);
+  const d=body(payload,["graceMinutes"]);
+  if(typeof d.graceMinutes!=="number"||!Number.isInteger(d.graceMinutes)||
+   d.graceMinutes<0||d.graceMinutes>240)
+   throw new BadRequestException("Invalid graceMinutes");
+  const result=await this.execute(scope,"core.SettleExpiredQueueTickets",r=>r
+   .input("GraceMinutes",sql.Int,d.graceMinutes));
+  const sets=Array.isArray(result.recordsets)?result.recordsets as Array<Array<Record<string,unknown>>>:[];
+  const summary=(sets[0]?.[0]??result.recordset?.[0]) as Record<string,unknown>|undefined;
+  if(!summary)throw new ServiceUnavailableException("Queue settle unavailable");
+  const settledCount=Number(summary.settledCount??0);
+  const idRows=Array.isArray(sets[1])?sets[1]:[];
+  return {
+   settledCount,ticketIds:idRows.map((row)=>String(row.ticketId)),
+   graceMinutes:d.graceMinutes,treasuryState:"NOT_PAID",accountingState:"NOT_POSTED",
+  };
  }
 }

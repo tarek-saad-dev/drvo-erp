@@ -1,7 +1,7 @@
 'use strict';
 /**
- * Cashier Booking/Queue characterization vs DRVO Nest/SQL026/private Light.
- * Pin: casher@046bf19 queueLifecycleEngine + booking/queue ledger rows.
+ * Cashier Booking/Queue characterization vs DRVO Nest/SQL026/SQL036/private Light.
+ * Pin: casher@046bf19 queueLifecycleEngine + settle-expired + booking/queue ledger rows.
  */
 const test=require('node:test');
 const assert=require('node:assert/strict');
@@ -13,6 +13,7 @@ const vm=require('node:vm');
 
 const PIN='046bf19b0d5833a07fe4b2891cbf3032d03b7cef';
 const LIFE_BLOB='1aaa037e7b31da6df214bb736b1ae17363bf14fc';
+const SETTLE_BLOB='6104edeb8111e2b69710782c92f390ce6338dd72';
 
 function pinnedSource(file,gitBlob){
  const s=readFileSync(resolve(__dirname,'fixtures/cashier',file),'utf8');
@@ -42,24 +43,31 @@ const q05=ledger.workflows.find(w=>w.ID==='Q-05');
 const q06=ledger.workflows.find(w=>w.ID==='Q-06');
 
 const sql026=readFileSync(resolve(__dirname,'../db/migrations/026_salon_queue_tickets.sql'),'utf8');
+const sql036=readFileSync(resolve(__dirname,'../db/migrations/036_salon_queue_settle_expired.sql'),'utf8');
 const apiSvc=readFileSync(resolve(__dirname,'../apps/api/src/queue/queue.service.ts'),'utf8');
 const apiCtrl=readFileSync(resolve(__dirname,'../apps/api/src/queue/queue.controller.ts'),'utf8');
+const lifePkg=readFileSync(resolve(__dirname,
+ '../packages/business-modules/queue/src/queue-lifecycle-rules.ts'));
+const lifeNest=readFileSync(resolve(__dirname,'../apps/api/src/queue/queue-lifecycle-rules.ts'));
 const bookingClient=readFileSync(resolve(__dirname,
  '../apps/web/src/app/workspace/[businessId]/[branchId]/booking/booking-client.tsx'),'utf8');
 const queueClient=readFileSync(resolve(__dirname,
  '../apps/web/src/app/workspace/[businessId]/[branchId]/queue/queue-client.tsx'),'utf8');
 const cashierCopy=readFileSync(resolve(__dirname,
  '../_cashier_source/queue/queueLifecycleEngine.ts'));
+const settleCopy=readFileSync(resolve(__dirname,
+ '../_cashier_source/queue/settle-expired-route.ts'));
 
 test('ledger source pin + blob evidence remain for Booking/Queue rows',()=>{
  assert.equal(ledger.sourceRevision,PIN);
- for(const row of [bk01,bk02,bk03,bk04,bk05,q01,q02,q03]){
+ for(const row of [bk01,bk02,bk03,bk04,bk05,q01,q02,q03,q05]){
   assert.ok(row,row?.ID);
   assert.equal(row.SourceSHA,PIN);
  }
  assert.ok(bk01['SourcePaths+BlobSHA'].some(p=>p.includes('src/app/bookings/page.tsx#')));
  assert.ok(q01['SourcePaths+BlobSHA'].some(p=>p.includes('queueLifecycleEngine.ts#')||
   p.includes('src/app/api/queue/route.ts#')));
+ assert.ok(q05['SourcePaths+BlobSHA'].some(p=>p.includes('settle-expired/route.ts#'+SETTLE_BLOB)));
 });
 
 test('Cashier lifecycle contract: expired waiting stops blocking availability',()=>{
@@ -83,22 +91,36 @@ test('Cashier lifecycle contract: expired waiting stops blocking availability',(
  assert.equal(expired.needsOperatorAction,true);
 });
 
-test('_cashier_source mirrors pinned lifecycle blob exactly',()=>{
+test('_cashier_source mirrors pinned lifecycle + settle-expired blobs exactly',()=>{
  assert.equal(
   createHash('sha1').update('blob '+cashierCopy.length+'\0').update(cashierCopy).digest('hex'),
   LIFE_BLOB);
+ assert.equal(
+  createHash('sha1').update('blob '+settleCopy.length+'\0').update(settleCopy).digest('hex'),
+  SETTLE_BLOB);
 });
 
-test('DRVO Queue ADAPT: SQL026 Nest Light nonposting; ADR-031 gated',()=>{
+test('Nest lifecycle rules stay byte-identical to package source',()=>{
+ assert.equal(lifeNest.equals(lifePkg),true);
+});
+
+test('DRVO Queue ADAPT: SQL026/036 Nest Light nonposting; ADR-031 gated',()=>{
  for(const token of [
   'QueueTicket','CreateQueueTicketFromBooking','NONPOSTING_QUEUE_TICKETS_ONLY',
-  'NOT_PAID','NOT_POSTED','BOOKING_HANDOFF','WALK_IN',
- ])assert.ok((sql026+apiSvc+queueClient).includes(token),'missing '+token);
+  'NOT_PAID','NOT_POSTED','BOOKING_HANDOFF','WALK_IN','SettleExpiredQueueTickets',
+  'NONPOSTING_QUEUE_LIFECYCLE',
+ ])assert.ok((sql026+sql036+apiSvc+queueClient).includes(token),'missing '+token);
  assert.match(apiCtrl,/workspaces\/:businessId\/branches\/:branchId\/queue/);
+ assert.match(apiCtrl,/settle-expired/);
  assert.match(sql026,/UX_QueueTicket_ActiveBooking/);
+ assert.match(sql036,/SQL036/);
+ assert.match(sql036,/SETTLED_BY_OPERATOR/);
+ assert.doesNotMatch(sql036,/SQL035/);
  assert.doesNotMatch(apiSvc,/CashMove|Tblinv|settlePayment|accountingPosted/);
  assert.match(apiSvc,/NOT_POSTED/);
  assert.doesNotMatch(queueClient,/localStorage|paid invoice|GL post/i);
+ assert.match(queueClient,/drvo-queue-board/);
+ assert.match(queueClient,/\/queue\/settle-expired/);
  assert.match(bookingClient,/\/queue\/from-booking/);
  assert.match(bookingClient,/drvo-booking-calendar/);
 });
@@ -113,9 +135,9 @@ test('honest ledger Status + TargetPaths for operational Booking/Queue rows',()=
  assert.equal(q02.Status,'PORTING');
  assert.equal(q03.Status,'PORTING');
  assert.equal(q04.Status,'SOURCE_IDENTIFIED');
- assert.equal(q05.Status,'SOURCE_IDENTIFIED');
+ assert.equal(q05.Status,'PORTING');
  assert.equal(q06.Status,'SOURCE_IDENTIFIED');
- for(const row of [bk01,bk02,bk03,bk04,q01,q02,q03]){
+ for(const row of [bk01,bk02,bk03,bk04,q01,q02,q03,q05]){
   assert.ok(Array.isArray(row.TargetPaths)&&row.TargetPaths.length>0,row.ID+' TargetPaths');
   assert.equal(row.PilotProof,'OPEN');
   assert.equal(row.BrowserProof,'OPEN');
@@ -125,6 +147,10 @@ test('honest ledger Status + TargetPaths for operational Booking/Queue rows',()=
  assert.ok(bk04.TargetPaths.some(p=>p.includes('026_salon_queue_tickets.sql')));
  assert.ok(q01.TargetPaths.some(p=>p.includes('queue-client.tsx')));
  assert.ok(q02.TargetPaths.some(p=>p.includes('queue.service.ts')));
+ assert.ok(q03.TargetPaths.some(p=>p.includes('036_salon_queue_settle_expired.sql')));
+ assert.ok(q05.TargetPaths.some(p=>p.includes('036_salon_queue_settle_expired.sql')));
  assert.equal(bk05.TargetPaths.length,0);
  assert.match(bk05.Blocker,/ADR-031/);
+ assert.match(q05.Blocker,/SQL036|operator settle/i);
+ assert.doesNotMatch(q05.Blocker,/SQL035/);
 });

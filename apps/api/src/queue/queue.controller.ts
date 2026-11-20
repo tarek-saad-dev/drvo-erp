@@ -4,7 +4,9 @@ import {
 } from "@nestjs/common";
 import type {IncomingMessage,ServerResponse} from "node:http";
 import {IdentityService,extractSessionCookie} from "../identity/identity.service";
-import {QueueService,type Created,type QueueRead,type StatusChange} from "./queue.service";
+import {
+ QueueService,type Created,type QueueRead,type SettleExpired,type StatusChange,
+} from "./queue.service";
 
 function enabled():void{
  if(process.env.DRVO_K5_AUTH_ENABLED!=="YES"||process.env.DRVO_QUEUE_ENABLED!=="YES")
@@ -59,5 +61,15 @@ export class QueueController {
   const token=extractSessionCookie(req.headers.cookie);
   const actor=await this.identity.actorFromToken(token);
   return this.queue.changeStatus(actor,token!,businessId,branchId,key,ticketId,body);
+ }
+ @Post("settle-expired") @HttpCode(200)
+ async settleExpired(@Headers("origin") origin:string|undefined,
+  @Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,
+  @Param("businessId") businessId:string,@Param("branchId") branchId:string,
+  @Body() body:unknown):Promise<SettleExpired>{
+  res.setHeader("Cache-Control","no-store");enabled();allowedOrigin(origin);
+  const token=extractSessionCookie(req.headers.cookie);
+  const actor=await this.identity.actorFromToken(token);
+  return this.queue.settleExpired(actor,token!,businessId,branchId,body);
  }
 }

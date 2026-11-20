@@ -11,6 +11,7 @@ on:
       - 'tests/booking-queue-source.test.cjs'
       - 'tests/fixtures/cashier/queueLifecycleEngine.ts'
       - '_cashier_source/**'
+      - 'packages/business-modules/queue/**'
       - 'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json'
       - 'tools/queue/verify.cjs'
       - '.github/workflows/salon-queue-ci.yml'
@@ -26,6 +27,7 @@ on:
       - 'tests/booking-queue-source.test.cjs'
       - 'tests/fixtures/cashier/queueLifecycleEngine.ts'
       - '_cashier_source/**'
+      - 'packages/business-modules/queue/**'
       - 'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json'
       - 'tools/queue/verify.cjs'
       - '.github/workflows/salon-queue-ci.yml'
@@ -58,7 +60,7 @@ jobs:
             -e MSSQL_SA_PASSWORD="$pass" \
             -p 127.0.0.1:14347:1433 -p 127.0.0.1:1433:1433 \
             mcr.microsoft.com/mssql/server:2022-latest
-      - name: SQL026 queue tickets + Nest HTTP authorization checks
+      - name: SQL026/036 queue tickets + Nest HTTP authorization checks
         env:
           QUEUE_SQL_DISPOSABLE: 'YES'
           QUEUE_TEST_PORT: '14347'

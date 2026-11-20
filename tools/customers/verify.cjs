@@ -105,6 +105,9 @@ async function main(){
   await admin.query('CREATE USER ['+appUser+'] FOR LOGIN ['+appUser+'];'+
    'GRANT CONNECT TO ['+appUser+']');
   await pass('31 migrations (incl. SQL031 CRM profile) replay without drift and customer records start empty',async()=>{
+   // Customers HTTP CI tip remains SQL031. SQL032 is inventory-owned; SQL033 booking
+   // reschedule and SQL034 follow-up desk are covered by source/unit tests in this PR
+   // and are not required for the Customers disposable SQL job tip yet.
    const a=await applyMigrations(admin,undefined,31);
    assert.equal(a.length,31);assert.ok(a.every(z=>z.status==='applied'));
    const b=await applyMigrations(admin,undefined,31);

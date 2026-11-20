@@ -4,6 +4,10 @@ import Link from "next/link";
 import {useCallback,useEffect,useMemo,useRef,useState} from "react";
 import {suggestBookingStarts} from "./booking-availability-preview.mjs";
 import {toLocalMinute,windowCorrectionStage} from "./window-correction.mjs";
+import {
+  advisoryMoveConflict,appointmentDurationMinutes,buildMoveBody,canOfferReschedule,
+  describeMoveFailure,moveRequestKeyId,suggestMoveStarts,
+} from "./booking-reschedule.mjs";
 import {useRouter} from "next/navigation";
 
 type Resource={resourceId:string;displayName:string;kind:"PERSON"|"CHAIR"|"ROOM"|"EQUIPMENT";isActive:boolean};
@@ -55,6 +59,14 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
   const windowRequest=useRef<string|null>(null);
   const closeWindowKeys=useRef<Map<string,string>>(new Map());
   const statusKeys=useRef<Map<string,string>>(new Map());
+  // BK-06: one move panel at a time. `moveChecked` records the exact target SQL accepted
+  // in validate-move; any edit clears it, so confirm always matches what was validated.
+  const [moveTarget,setMoveTarget]=useState<Appointment|null>(null);
+  const [moveResourceId,setMoveResourceId]=useState("");
+  const [moveLocalStart,setMoveLocalStart]=useState("");
+  const [moveDay,setMoveDay]=useState("");
+  const [moveChecked,setMoveChecked]=useState<string|null>(null);
+  const moveKeys=useRef<Map<string,string>>(new Map());
   const scope="/api/workspaces/"+encodeURIComponent(businessId)+"/branches/"+encodeURIComponent(branchId);
   const home="/workspace/"+encodeURIComponent(businessId)+"/"+encodeURIComponent(branchId);
   const correctionStage=windowCorrectionStage(replacementWindowId,windowResourceId,windows);
@@ -326,6 +338,77 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
     }catch{setNotice("تعذر الاتصال. أعد المحاولة بنفس الطلب لتفادي التكرار.");}
     finally{setBusy(false);}
   }
+  function openMove(a:Appointment){
+    if(busy||!canOfferReschedule(a))return;
+    setMoveTarget(a);setMoveResourceId(a.resourceId);
+    setMoveLocalStart("");setMoveDay(toLocalMinute(a.startsAtUtc).slice(0,10));
+    setMoveChecked(null);setNotice("");
+  }
+  function closeMove(){
+    setMoveTarget(null);setMoveResourceId("");setMoveLocalStart("");
+    setMoveDay("");setMoveChecked(null);
+  }
+  function editMove(resource:string,start:string){
+    setMoveResourceId(resource);setMoveLocalStart(start);setMoveChecked(null);
+  }
+  const moveBody=moveTarget?buildMoveBody({resourceId:moveResourceId,localStart:moveLocalStart}):null;
+  const moveAdvisory=moveTarget&&moveBody?advisoryMoveConflict({
+    appointments:data.appointments,bookingId:moveTarget.bookingId,
+    resourceId:moveBody.resourceId,startsAtUtc:moveBody.startsAtUtc,
+    durationMinutes:appointmentDurationMinutes(moveTarget),
+  }):null;
+  const moveSuggestions=moveTarget?suggestMoveStarts({
+    appointment:moveTarget,resourceId:moveResourceId,dayLocal:moveDay,
+    windows,appointments:data.appointments,
+  }):null;
+  async function sendMove(kind:"validate-move"|"reschedule"){
+    if(busy||!moveTarget||!moveBody||!GUID.test(moveTarget.bookingId))return;
+    const bookingId=moveTarget.bookingId;
+    const retryId=moveRequestKeyId(bookingId,moveBody);
+    if(kind==="reschedule"&&moveChecked!==retryId){
+      setNotice("لازم تتحقق من التعارض الأول لنفس المورد والموعد.");return;
+    }
+    if(kind==="reschedule"&&!moveKeys.current.has(retryId))
+      moveKeys.current.set(retryId,crypto.randomUUID());
+    setBusy(true);setNotice("");
+    try{
+      const headers:Record<string,string>={"Content-Type":"application/json"};
+      if(kind==="reschedule")headers["Idempotency-Key"]=moveKeys.current.get(retryId)!;
+      const response=await fetch(scope+"/booking/appointments/"+encodeURIComponent(bookingId)+"/"+kind,{
+        method:"POST",credentials:"same-origin",cache:"no-store",headers,
+        body:JSON.stringify(moveBody),
+      });
+      if(response.status===401){router.replace("/sign-in");return;}
+      if(!response.ok){
+        const failure=describeMoveFailure(response.status);
+        if(failure.key==="reset")moveKeys.current.delete(retryId);
+        setMoveChecked(null);setNotice(failure.message);
+        if(response.status===409)await load();
+        return;
+      }
+      const result=await response.json() as {
+        id:string;resourceId:string;startsAtUtc:string;changed:boolean;validateOnly:boolean;
+      };
+      if(result.id.toLowerCase()!==bookingId.toLowerCase()||
+         result.resourceId.toLowerCase()!==moveBody.resourceId.toLowerCase()||
+         result.startsAtUtc!==moveBody.startsAtUtc||
+         result.validateOnly!==(kind==="validate-move")){
+        setMoveChecked(null);setNotice("استجابة النقل غير صحيحة.");return;
+      }
+      if(kind==="validate-move"){
+        setMoveChecked(retryId);
+        setNotice("SQL راجع التعارض والتوافر دلوقتي: النقل ممكن. ده مش حجز؛ اضغط تأكيد النقل.");
+        return;
+      }
+      moveKeys.current.delete(retryId);
+      closeMove();
+      setNotice("تم نقل الموعد بنفس المدة. مفيش إشعار اتبعت للعميل، ولا بيع أو تحصيل.");
+      await load();
+    }catch{
+      setMoveChecked(null);
+      setNotice("تعذر الاتصال. أعد المحاولة بنفس الطلب لتفادي التكرار.");
+    }finally{setBusy(false);}
+  }
   async function handoffToQueue(bookingId:string){
     if(busy||!canQueueHandoff||!GUID.test(bookingId))return;
     if(!handoffKeys.current.has(bookingId))handoffKeys.current.set(bookingId,crypto.randomUUID());
@@ -544,6 +627,45 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
             </div>)}
         </div>
       </section>
+      {moveTarget&&<section className="k5-admin-card k5-invite-card drvo-booking-move" id="move-appointment"
+        aria-label="نقل موعد">
+        <h2>نقل موعد: {moveTarget.customerName}</h2>
+        <p className="k5-muted">{moveTarget.offeringName} · الحالي: {moveTarget.resourceName} ·{" "}
+          <span dir="ltr">{new Date(moveTarget.startsAtUtc).toLocaleString("ar-EG")}</span>
+          {" "}· المدة بتفضل {appointmentDurationMinutes(moveTarget)} دقيقة.
+          النقل على خطوتين: تحقق من التعارض ثم تأكيد. مفيش إشعار بيتبعت للعميل، ومفيش بيع أو تحصيل.</p>
+        <div className="catalog-form">
+          <label>المورد الجديد<select value={moveResourceId} disabled={busy}
+            onChange={e=>editMove(e.target.value,moveLocalStart)}>
+            {data.resources.filter(r=>r.isActive).map(r=>
+              <option key={r.resourceId} value={r.resourceId}>{r.displayName}</option>)}
+          </select></label>
+          <label>الموعد الجديد (حسب جهازك)<input type="datetime-local" step={60} value={moveLocalStart}
+            disabled={busy} onChange={e=>editMove(moveResourceId,e.target.value)}/></label>
+          <label>يوم الاقتراحات<input type="date" value={moveDay} onChange={e=>setMoveDay(e.target.value)}/></label>
+        </div>
+        {moveSuggestions&&moveSuggestions.status==="SUGGESTIONS"&&<div className="k5-salon-steps"
+          aria-label="أوقات مرشحة للنقل">
+          {moveSuggestions.slots.map(slot=><button key={slot.startsAtUtc} type="button"
+            className="k5-salon-refresh" disabled={busy}
+            onClick={()=>editMove(moveResourceId,slot.localInput)}>{slot.localLabel} — اختيار الوقت</button>)}
+        </div>}
+        <p className="k5-muted">الاقتراحات والتحذير التقريبي من آخر 200 حجز / 300 فترة محملة، مش دليل توافر.
+          SQL هو اللي بيحكم عند التحقق والتأكيد.</p>
+        {moveAdvisory&&<p role="alert" className="k5-error">تحذير تقريبي: فيه حجز {moveAdvisory.customerName}
+          {" "}متداخل على نفس المورد. هتقدر تجرب التحقق، لكن SQL غالبًا هيرفض.</p>}
+        {moveTarget.resourceId===moveResourceId&&!moveLocalStart&&
+          <p className="k5-muted">اختار موعد جديد أو مورد مختلف.</p>}
+        <div className="k5-booking-actions">
+          <button type="button" className="k5-salon-refresh" disabled={busy||!moveBody}
+            onClick={()=>void sendMove("validate-move")}>١. تحقق من التعارض</button>
+          <button type="button" className="k5-save"
+            disabled={busy||!moveBody||moveChecked!==moveRequestKeyId(moveTarget.bookingId,moveBody)}
+            onClick={()=>void sendMove("reschedule")}>٢. تأكيد النقل</button>
+          <button type="button" className="k5-salon-refresh" disabled={busy}
+            onClick={closeMove}>إلغاء</button>
+        </div>
+      </section>}
       <section className="k5-admin-card">
         <div className="k5-admin-summary"><h2>حجوزات الفرع</h2>
           <div className="k5-booking-actions">
@@ -568,6 +690,9 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
                 {canQueueHandoff&&
                   <button type="button" className="k5-salon-refresh" disabled={busy}
                     onClick={()=>void handoffToQueue(b.bookingId)}>إلى الطابور</button>}
+                {canOfferReschedule(b)&&
+                  <a href="#move-appointment" className="k5-salon-refresh"
+                    onClick={()=>openMove(b)}>نقل الموعد</a>}
                 <button type="button" disabled={busy} onClick={()=>void changeStatus(b.bookingId,"CANCELLED")}>
                   إلغاء الحجز
                 </button>

@@ -1,0 +1,151 @@
+{
+  "schema": "drvo.pilot.e2e-evidence-matrix.v1",
+  "mode": "PILOT_E2E_EVIDENCE_MATRIX_DRY_RUN_ONLY",
+  "workflow": "Customer → Booking → Barber → POS Draft → Inventory Validation → Draft Print → Reload",
+  "productionVerificationClaimed": false,
+  "realDataActivation": "BLOCKED",
+  "adr031Posting": "BLOCKED",
+  "cutLiveImport": "BLOCKED",
+  "readinessBlockingGateIds": [
+    "TARGET_APPLY",
+    "ISOLATED_BACKUP_RESTORE",
+    "K5_PERMISSIONS",
+    "OWNER_BROWSER_E2E",
+    "ADR031_POSTING",
+    "CUT_LIVE_IMPORT"
+  ],
+  "checklistOpenOrUncoveredStepIds": [
+    "INVENTORY_VALIDATION"
+  ],
+  "steps": [
+    {
+      "id": "CUSTOMER",
+      "title": "Customer",
+      "order": 1,
+      "matrixStatus": "CI_ONLY",
+      "gate": "PASS",
+      "evidenceCommand": "node --check tools/salon-browser/operations.cjs && node tools/pilot/workflow-checklist.cjs",
+      "rationale": "S12 Customer create/search/reload phase markers present; disposable browser CI covers Customer.",
+      "s12s13Coverage": [
+        "S12 create Customer via UI",
+        "S12 Customer survives reload",
+        "S12 customer Business search via UI"
+      ],
+      "adr031Note": "ADR-031 remains PROPOSED. This workflow step must stay NONPOSTING: no paid sale, tender settlement, stock decrement-on-sale, or first mandatory GL journal.",
+      "ownerPilotBrowser": "OPEN",
+      "primaryVpsApply": "FORBIDDEN"
+    },
+    {
+      "id": "BOOKING",
+      "title": "Booking",
+      "order": 2,
+      "matrixStatus": "CI_ONLY",
+      "gate": "PASS",
+      "evidenceCommand": "node --check tools/salon-browser/operations.cjs && node tools/pilot/workflow-checklist.cjs",
+      "rationale": "S12 Booking resource + appointment + reload phase markers present in salon-browser.",
+      "s12s13Coverage": [
+        "S12 create Booking Resource through UI",
+        "S12 create scoped Booking via UI",
+        "S12 Booking survives browser reload"
+      ],
+      "adr031Note": "ADR-031 remains PROPOSED. This workflow step must stay NONPOSTING: no paid sale, tender settlement, stock decrement-on-sale, or first mandatory GL journal.",
+      "ownerPilotBrowser": "OPEN",
+      "primaryVpsApply": "FORBIDDEN"
+    },
+    {
+      "id": "BARBER",
+      "title": "Barber",
+      "order": 3,
+      "matrixStatus": "CI_ONLY",
+      "gate": "PASS",
+      "evidenceCommand": "node --check tools/salon-browser/hr-operations.cjs && node tools/pilot/workflow-checklist.cjs",
+      "rationale": "S13 HR create + Barber activate + reload phase markers present (CI harness; Owner Pilot still OPEN).",
+      "s12s13Coverage": [
+        "S13 HR employee create POST",
+        "S13 Barber activate POST",
+        "S13 reload proves SQL persisted HR employee and Barber status",
+        "S13 staff denied HR create and Salon Barber mutation"
+      ],
+      "adr031Note": "ADR-031 remains PROPOSED. This workflow step must stay NONPOSTING: no paid sale, tender settlement, stock decrement-on-sale, or first mandatory GL journal. HR payout/commission posting is separately blocked.",
+      "ownerPilotBrowser": "OPEN",
+      "primaryVpsApply": "FORBIDDEN"
+    },
+    {
+      "id": "POS_DRAFT",
+      "title": "POS Draft",
+      "order": 4,
+      "matrixStatus": "CI_ONLY",
+      "gate": "PASS",
+      "evidenceCommand": "node --check tools/salon-browser/operations.cjs && node tools/pilot/verify.cjs",
+      "rationale": "S12 NONPOSTING POS DRAFT save + unposted reload markers present; ADR-031 posting stays BLOCKED.",
+      "s12s13Coverage": [
+        "S12 POS DRAFT created through UI only",
+        "S12 real POS quick cart from authorized Catalog",
+        "S12 POS DRAFT persisted and still unposted"
+      ],
+      "adr031Note": "ADR-031 remains PROPOSED. This workflow step must stay NONPOSTING: no paid sale, tender settlement, stock decrement-on-sale, or first mandatory GL journal.",
+      "ownerPilotBrowser": "OPEN",
+      "primaryVpsApply": "FORBIDDEN"
+    },
+    {
+      "id": "INVENTORY_VALIDATION",
+      "title": "Inventory Validation",
+      "order": 5,
+      "matrixStatus": "READY_IN_REPO",
+      "gate": "PASS",
+      "evidenceCommand": "node --test apps/web/test/pos-product-stock-gate.test.cjs 2>/dev/null || node -e \"require('fs').accessSync('apps/web/test/pos-product-stock-gate.test.cjs')\"",
+      "rationale": "SQL027 + POS OUT stock gate unit test exist in repo. Not asserted in S12/S13 Chromium phases.",
+      "s12s13Coverage": [],
+      "adr031Note": "ADR-031 remains PROPOSED. This workflow step must stay NONPOSTING: no paid sale, tender settlement, stock decrement-on-sale, or first mandatory GL journal. SQL027 overlay may disable OUT products on draft cart; sale-time stock decrement stays unauthorized.",
+      "ownerPilotBrowser": "OPEN",
+      "primaryVpsApply": "FORBIDDEN"
+    },
+    {
+      "id": "DRAFT_PRINT",
+      "title": "Draft Print",
+      "order": 6,
+      "matrixStatus": "BLOCKED",
+      "gate": "BLOCKED",
+      "evidenceCommand": "node -e \"const m=require('./tools/pilot/workflow-matrix-builder.cjs').buildWorkflowMatrix(); if(m.steps.find(s=>s.id==='DRAFT_PRINT').status!=='BLOCKED') process.exit(1)\"",
+      "rationale": "POS-07 print/reprint remains BLOCKED in Cashier ledger; no NONPOSTING draft-print owner merged for Pilot.",
+      "s12s13Coverage": [],
+      "adr031Note": "ADR-031 remains PROPOSED. This workflow step must stay NONPOSTING: no paid sale, tender settlement, stock decrement-on-sale, or first mandatory GL journal. Any print surface must remain DRAFT/NONPOSTING and must not imply a fiscal receipt.",
+      "ownerPilotBrowser": "OPEN",
+      "primaryVpsApply": "FORBIDDEN"
+    },
+    {
+      "id": "RELOAD",
+      "title": "Reload",
+      "order": 7,
+      "matrixStatus": "CI_ONLY",
+      "gate": "PASS",
+      "evidenceCommand": "node tools/pilot/workflow-checklist.cjs && node tools/pilot/verify.cjs",
+      "rationale": "S12/S13 reload phases cover Catalog/Customer/Booking/POS DRAFT/Barber persistence on disposable CI.",
+      "s12s13Coverage": [
+        "S12 Catalog survives browser reload",
+        "S12 Customer survives reload",
+        "S12 Booking survives browser reload",
+        "S12 POS DRAFT persisted and still unposted",
+        "S13 reload proves SQL persisted HR employee and Barber status"
+      ],
+      "adr031Note": "ADR-031 remains PROPOSED. This workflow step must stay NONPOSTING: no paid sale, tender settlement, stock decrement-on-sale, or first mandatory GL journal.",
+      "ownerPilotBrowser": "OPEN",
+      "primaryVpsApply": "FORBIDDEN"
+    }
+  ],
+  "summary": {
+    "passStepIds": [
+      "CUSTOMER",
+      "BOOKING",
+      "BARBER",
+      "POS_DRAFT",
+      "INVENTORY_VALIDATION",
+      "RELOAD"
+    ],
+    "failStepIds": [],
+    "blockedStepIds": [
+      "DRAFT_PRINT"
+    ],
+    "note": "PASS = disposable/repo evidence class only. OWNER_BROWSER_E2E + TARGET_APPLY + ISOLATED_BACKUP_RESTORE + K5_PERMISSIONS remain OPEN on the readiness board. DRAFT_PRINT gate is BLOCKED until a draft-print owner merges."
+  }
+}

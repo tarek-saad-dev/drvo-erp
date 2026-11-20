@@ -1,0 +1,377 @@
+{
+  "schema": "drvo.pilot.readiness-board.v1",
+  "mode": "PILOT_READINESS_CHECKLIST_DRY_RUN_ONLY",
+  "architectureNote": "Modular Monolith with Tenant/Business/Branch isolation; Pilot DB must remain isolated from Cut live SQL.",
+  "liveAccess": "BLOCKED",
+  "writes": 0,
+  "networkDbCalls": 0,
+  "productionVerificationClaimed": false,
+  "realDataActivation": "BLOCKED",
+  "adr031Posting": "BLOCKED",
+  "cutLiveImport": "BLOCKED",
+  "primaryVpsSqlApply": "FORBIDDEN",
+  "sourceMigrations": {
+    "from": 1,
+    "to": 34,
+    "expectedCount": 34,
+    "presentCount": 34,
+    "complete": true,
+    "missingIds": [],
+    "migrations": [
+      {
+        "id": "001",
+        "fileName": "001_platform_identity_foundation.sql",
+        "path": "db/migrations/001_platform_identity_foundation.sql",
+        "present": true,
+        "checksumSha256": "0edc3afee84ee681710e85557600a11265cefa65fcdcfb70fea581989d39ed45"
+      },
+      {
+        "id": "002",
+        "fileName": "002_identity_sessions_and_roles.sql",
+        "path": "db/migrations/002_identity_sessions_and_roles.sql",
+        "present": true,
+        "checksumSha256": "a27bc375cb9613e425b5bab705be9c01fe827713c1ac33c9eeb9fcac62dc5ab9"
+      },
+      {
+        "id": "003",
+        "fileName": "003_branch_role_change_audit.sql",
+        "path": "db/migrations/003_branch_role_change_audit.sql",
+        "present": true,
+        "checksumSha256": "69192a2c5c75168c19b62fbfd5b2a2a4895dbece39036f8af27bc46d10ccb6f2"
+      },
+      {
+        "id": "004",
+        "fileName": "004_verified_onboarding_foundation.sql",
+        "path": "db/migrations/004_verified_onboarding_foundation.sql",
+        "present": true,
+        "checksumSha256": "ffe331bf86c5d05d79bfbd419a2ac5b51b22da7ac5173f5777cb1ac31fe0a81a"
+      },
+      {
+        "id": "005",
+        "fileName": "005_owner_bootstrap_claim_permission.sql",
+        "path": "db/migrations/005_owner_bootstrap_claim_permission.sql",
+        "present": true,
+        "checksumSha256": "48c5b59fd562c3439579d2c5e2ff1dea161c7a29eea4bc0dc5c212d84c5091ad"
+      },
+      {
+        "id": "006",
+        "fileName": "006_owner_operator_approval_audit.sql",
+        "path": "db/migrations/006_owner_operator_approval_audit.sql",
+        "present": true,
+        "checksumSha256": "91341051e90c23e42c9ba98b15173a70f8b7238e2d0258f296efdb6b29625746"
+      },
+      {
+        "id": "007",
+        "fileName": "007_scoped_employee_invitation_procedures.sql",
+        "path": "db/migrations/007_scoped_employee_invitation_procedures.sql",
+        "present": true,
+        "checksumSha256": "8fd3b1e070b1ea6cf44178587c86373c6b9d39cc0cba27f9af976a7c4e1a0011"
+      },
+      {
+        "id": "008",
+        "fileName": "008_invitation_management.sql",
+        "path": "db/migrations/008_invitation_management.sql",
+        "present": true,
+        "checksumSha256": "0951e3e666fb7bb8f88fca6e0f74c3ee882475a8fcd50f48cbd08efdf95b9848"
+      },
+      {
+        "id": "009",
+        "fileName": "009_operator_owner_approval_revocation.sql",
+        "path": "db/migrations/009_operator_owner_approval_revocation.sql",
+        "present": true,
+        "checksumSha256": "9dc8e06e33b83321cf933d13f9ee51dbeeec3686c3acba6ea4d4bda25c745345"
+      },
+      {
+        "id": "010",
+        "fileName": "010_business_module_candidate_registry.sql",
+        "path": "db/migrations/010_business_module_candidate_registry.sql",
+        "present": true,
+        "checksumSha256": "e7eb81527f4f56f2a93683a8802206d43f1b87d405ba9e1fa8bda11dbd6565d3"
+      },
+      {
+        "id": "011",
+        "fileName": "011_shared_business_catalog.sql",
+        "path": "db/migrations/011_shared_business_catalog.sql",
+        "present": true,
+        "checksumSha256": "b3e1134b89c04801449ebf3b3aaff3fdd64f23f132fd99c42d5fc39ddbd665aa"
+      },
+      {
+        "id": "012",
+        "fileName": "012_business_customers.sql",
+        "path": "db/migrations/012_business_customers.sql",
+        "present": true,
+        "checksumSha256": "382e181797f15cc89617150ac218bd2e374f64af737f7ac0a820f6fec49566ea"
+      },
+      {
+        "id": "013",
+        "fileName": "013_branch_booking_foundation.sql",
+        "path": "db/migrations/013_branch_booking_foundation.sql",
+        "present": true,
+        "checksumSha256": "8c0fd76b22c2574e5abc92e84757076794d9fe139368bf77ba2a721cc700e95b"
+      },
+      {
+        "id": "014",
+        "fileName": "014_branch_pos_drafts.sql",
+        "path": "db/migrations/014_branch_pos_drafts.sql",
+        "present": true,
+        "checksumSha256": "0ef88b8b0772fe7a44e00391c28f66c341be5d19699cba484d8c03d60f547dc6"
+      },
+      {
+        "id": "015",
+        "fileName": "015_booking_appointment_lifecycle.sql",
+        "path": "db/migrations/015_booking_appointment_lifecycle.sql",
+        "present": true,
+        "checksumSha256": "dc64c169ac2979061aa61867d5c203833df7e266b99e79403ba1bc61ae128dca"
+      },
+      {
+        "id": "016",
+        "fileName": "016_resource_dated_availability.sql",
+        "path": "db/migrations/016_resource_dated_availability.sql",
+        "present": true,
+        "checksumSha256": "464e95162fc0ce6c40081ff88734a7309f264694b08cd4f61c6d524d71064385"
+      },
+      {
+        "id": "017",
+        "fileName": "017_booking_resource_window_close.sql",
+        "path": "db/migrations/017_booking_resource_window_close.sql",
+        "present": true,
+        "checksumSha256": "7d2a7ff07abd7c3441bf5f4194b909c6bce13811278b0608acaec80dfc29daf8"
+      },
+      {
+        "id": "018",
+        "fileName": "018_hr_employee_salon_barber.sql",
+        "path": "db/migrations/018_hr_employee_salon_barber.sql",
+        "present": true,
+        "checksumSha256": "8306b072e10c4daf090ebf31cf35599cf988993c7e4641cccac112fa27d45906"
+      },
+      {
+        "id": "019",
+        "fileName": "019_expenses_documents_draft.sql",
+        "path": "db/migrations/019_expenses_documents_draft.sql",
+        "present": true,
+        "checksumSha256": "190c3ef620fffa05a70bf46ef0edc18d9dc7439455927531b6aa5c65aaebca32"
+      },
+      {
+        "id": "020",
+        "fileName": "020_hr_attendance_sessions.sql",
+        "path": "db/migrations/020_hr_attendance_sessions.sql",
+        "present": true,
+        "checksumSha256": "53d3921bcf6f4fb59ff81b2356b229a14f51746a548fa208fcd7e2e9378b8961"
+      },
+      {
+        "id": "021",
+        "fileName": "021_treasury_cash_count_drafts.sql",
+        "path": "db/migrations/021_treasury_cash_count_drafts.sql",
+        "present": true,
+        "checksumSha256": "35a74f373c1db3400721ee3c0a30eee23ef4755cf0b4edb8a2daad6aaf644850"
+      },
+      {
+        "id": "022",
+        "fileName": "022_pos_cashier_draft_pricing.sql",
+        "path": "db/migrations/022_pos_cashier_draft_pricing.sql",
+        "present": true,
+        "checksumSha256": "263f7804653ab458ddf5b46a472fd1e2f76f19abb385c2cf44dc4d0b640e2a6b"
+      },
+      {
+        "id": "023",
+        "fileName": "023_pos_cashier_draft_read_permission.sql",
+        "path": "db/migrations/023_pos_cashier_draft_read_permission.sql",
+        "present": true,
+        "checksumSha256": "b7846eb70f1d6be2d8af0d70ac749396f6d8cb9d8ffc1650b66c3d78394e7c88"
+      },
+      {
+        "id": "024",
+        "fileName": "024_customer_business_search.sql",
+        "path": "db/migrations/024_customer_business_search.sql",
+        "present": true,
+        "checksumSha256": "6e089c1c3a8c8fc3831692a514d69227cbae247cdb9f5fb4e623f53d9df59923"
+      },
+      {
+        "id": "025",
+        "fileName": "025_catalog_packages.sql",
+        "path": "db/migrations/025_catalog_packages.sql",
+        "present": true,
+        "checksumSha256": "b1acf81b6962face61cb593d4a3b98fd4d866859422ef1d973a07bdcdd5cb359"
+      },
+      {
+        "id": "026",
+        "fileName": "026_salon_queue_tickets.sql",
+        "path": "db/migrations/026_salon_queue_tickets.sql",
+        "present": true,
+        "checksumSha256": "c3b8674f05a2913237cae5f65ee18e91bcbe98fdfbd58f01a77f58a31220c41b"
+      },
+      {
+        "id": "027",
+        "fileName": "027_inventory_branch_stock.sql",
+        "path": "db/migrations/027_inventory_branch_stock.sql",
+        "present": true,
+        "checksumSha256": "77eac60bad1965693d59fa7be409a56d2df0fc141a066e680de3ff8a93dc50e2"
+      },
+      {
+        "id": "028",
+        "fileName": "028_other_income_documents_draft.sql",
+        "path": "db/migrations/028_other_income_documents_draft.sql",
+        "present": true,
+        "checksumSha256": "1896d479a581f20a8a7026f31966bd792bef4cf6adad58bb8f47f63a8d34ab03"
+      },
+      {
+        "id": "029",
+        "fileName": "029_operations_business_day_shift.sql",
+        "path": "db/migrations/029_operations_business_day_shift.sql",
+        "present": true,
+        "checksumSha256": "eecd92f096ac37dccdcc8e06fb455a712f69177f0e412d211881d2e117dd5736"
+      },
+      {
+        "id": "030",
+        "fileName": "030_treasury_cash_movements_recon.sql",
+        "path": "db/migrations/030_treasury_cash_movements_recon.sql",
+        "present": true,
+        "checksumSha256": "0ca825f07a948d9cc2e9600940bd3038bd94efb482326cc5fb33c0400cb702ef"
+      },
+      {
+        "id": "031",
+        "fileName": "031_customer_profile_consent.sql",
+        "path": "db/migrations/031_customer_profile_consent.sql",
+        "present": true,
+        "checksumSha256": "e0d184d27f832c062980aa2ec1bb2c3f34f7ca2a83c42745c20e093c8be20e73"
+      },
+      {
+        "id": "032",
+        "fileName": "032_inventory_branch_transfers.sql",
+        "path": "db/migrations/032_inventory_branch_transfers.sql",
+        "present": true,
+        "checksumSha256": "29c3846fc9032856b10b70586ec1a0323fa7ac6bd0f5aa356205965b1c317f0c"
+      },
+      {
+        "id": "033",
+        "fileName": "033_booking_reschedule.sql",
+        "path": "db/migrations/033_booking_reschedule.sql",
+        "present": true,
+        "checksumSha256": "bf7bddaac2cef5d5bbda0f1a2b4926b4bb3db6b6a09ee5204020693a7d152cfb"
+      },
+      {
+        "id": "034",
+        "fileName": "034_customer_follow_up.sql",
+        "path": "db/migrations/034_customer_follow_up.sql",
+        "present": true,
+        "checksumSha256": "dc63c51ae93856bb65ab95f4b864e8bd25aca16527adac669fe2d999cf49339c"
+      }
+    ],
+    "checksumIndex": {
+      "001_platform_identity_foundation.sql": "0edc3afee84ee681710e85557600a11265cefa65fcdcfb70fea581989d39ed45",
+      "002_identity_sessions_and_roles.sql": "a27bc375cb9613e425b5bab705be9c01fe827713c1ac33c9eeb9fcac62dc5ab9",
+      "003_branch_role_change_audit.sql": "69192a2c5c75168c19b62fbfd5b2a2a4895dbece39036f8af27bc46d10ccb6f2",
+      "004_verified_onboarding_foundation.sql": "ffe331bf86c5d05d79bfbd419a2ac5b51b22da7ac5173f5777cb1ac31fe0a81a",
+      "005_owner_bootstrap_claim_permission.sql": "48c5b59fd562c3439579d2c5e2ff1dea161c7a29eea4bc0dc5c212d84c5091ad",
+      "006_owner_operator_approval_audit.sql": "91341051e90c23e42c9ba98b15173a70f8b7238e2d0258f296efdb6b29625746",
+      "007_scoped_employee_invitation_procedures.sql": "8fd3b1e070b1ea6cf44178587c86373c6b9d39cc0cba27f9af976a7c4e1a0011",
+      "008_invitation_management.sql": "0951e3e666fb7bb8f88fca6e0f74c3ee882475a8fcd50f48cbd08efdf95b9848",
+      "009_operator_owner_approval_revocation.sql": "9dc8e06e33b83321cf933d13f9ee51dbeeec3686c3acba6ea4d4bda25c745345",
+      "010_business_module_candidate_registry.sql": "e7eb81527f4f56f2a93683a8802206d43f1b87d405ba9e1fa8bda11dbd6565d3",
+      "011_shared_business_catalog.sql": "b3e1134b89c04801449ebf3b3aaff3fdd64f23f132fd99c42d5fc39ddbd665aa",
+      "012_business_customers.sql": "382e181797f15cc89617150ac218bd2e374f64af737f7ac0a820f6fec49566ea",
+      "013_branch_booking_foundation.sql": "8c0fd76b22c2574e5abc92e84757076794d9fe139368bf77ba2a721cc700e95b",
+      "014_branch_pos_drafts.sql": "0ef88b8b0772fe7a44e00391c28f66c341be5d19699cba484d8c03d60f547dc6",
+      "015_booking_appointment_lifecycle.sql": "dc64c169ac2979061aa61867d5c203833df7e266b99e79403ba1bc61ae128dca",
+      "016_resource_dated_availability.sql": "464e95162fc0ce6c40081ff88734a7309f264694b08cd4f61c6d524d71064385",
+      "017_booking_resource_window_close.sql": "7d2a7ff07abd7c3441bf5f4194b909c6bce13811278b0608acaec80dfc29daf8",
+      "018_hr_employee_salon_barber.sql": "8306b072e10c4daf090ebf31cf35599cf988993c7e4641cccac112fa27d45906",
+      "019_expenses_documents_draft.sql": "190c3ef620fffa05a70bf46ef0edc18d9dc7439455927531b6aa5c65aaebca32",
+      "020_hr_attendance_sessions.sql": "53d3921bcf6f4fb59ff81b2356b229a14f51746a548fa208fcd7e2e9378b8961",
+      "021_treasury_cash_count_drafts.sql": "35a74f373c1db3400721ee3c0a30eee23ef4755cf0b4edb8a2daad6aaf644850",
+      "022_pos_cashier_draft_pricing.sql": "263f7804653ab458ddf5b46a472fd1e2f76f19abb385c2cf44dc4d0b640e2a6b",
+      "023_pos_cashier_draft_read_permission.sql": "b7846eb70f1d6be2d8af0d70ac749396f6d8cb9d8ffc1650b66c3d78394e7c88",
+      "024_customer_business_search.sql": "6e089c1c3a8c8fc3831692a514d69227cbae247cdb9f5fb4e623f53d9df59923",
+      "025_catalog_packages.sql": "b1acf81b6962face61cb593d4a3b98fd4d866859422ef1d973a07bdcdd5cb359",
+      "026_salon_queue_tickets.sql": "c3b8674f05a2913237cae5f65ee18e91bcbe98fdfbd58f01a77f58a31220c41b",
+      "027_inventory_branch_stock.sql": "77eac60bad1965693d59fa7be409a56d2df0fc141a066e680de3ff8a93dc50e2",
+      "028_other_income_documents_draft.sql": "1896d479a581f20a8a7026f31966bd792bef4cf6adad58bb8f47f63a8d34ab03",
+      "029_operations_business_day_shift.sql": "eecd92f096ac37dccdcc8e06fb455a712f69177f0e412d211881d2e117dd5736",
+      "030_treasury_cash_movements_recon.sql": "0ca825f07a948d9cc2e9600940bd3038bd94efb482326cc5fb33c0400cb702ef",
+      "031_customer_profile_consent.sql": "e0d184d27f832c062980aa2ec1bb2c3f34f7ca2a83c42745c20e093c8be20e73",
+      "032_inventory_branch_transfers.sql": "29c3846fc9032856b10b70586ec1a0323fa7ac6bd0f5aa356205965b1c317f0c",
+      "033_booking_reschedule.sql": "bf7bddaac2cef5d5bbda0f1a2b4926b4bb3db6b6a09ee5204020693a7d152cfb",
+      "034_customer_follow_up.sql": "dc63c51ae93856bb65ab95f4b864e8bd25aca16527adac669fe2d999cf49339c"
+    }
+  },
+  "gates": [
+    {
+      "id": "SOURCE_MIGRATIONS_001_034",
+      "title": "SQL001–034 present in DRVO source tree with SHA-256 checksums",
+      "evidenceClass": "SOURCE_ARTIFACT",
+      "status": "PASS_SOURCE_ONLY",
+      "evidence": "source checksums for SQL001–034 recorded (34/34)",
+      "howToVerify": "Confirm db/migrations contains exactly one forward migration file for each id 001–034 and record SHA-256. Source presence ≠ target DB apply on primary/VPS or isolated pilot.",
+      "blocksPilotActivation": false
+    },
+    {
+      "id": "TARGET_APPLY",
+      "title": "SQL001–034 applied on verified isolated DRVO Pilot DB only",
+      "evidenceClass": "OPERATOR_TARGET_DB",
+      "status": "OPEN",
+      "evidence": "NOT_VERIFIED_IN_THIS_SCAFFOLD",
+      "howToVerify": "On a dedicated DRVO Pilot database (not Cut/Cashier/AutoResponse/primary VPS production), read-only inspect core.SchemaMigration for 001–034 with matching checksums after authorized backup. Do not apply from chat; use restricted migrator only.",
+      "blocksPilotActivation": true
+    },
+    {
+      "id": "ISOLATED_BACKUP_RESTORE",
+      "title": "Independent encrypted backup restore into a separate DRVO-only recovery DB",
+      "evidenceClass": "OPERATOR_RECOVERY",
+      "status": "OPEN",
+      "evidence": "NOT_VERIFIED_IN_THIS_SCAFFOLD",
+      "howToVerify": "Take COPY_ONLY (or approved equivalent) backup of the Pilot DB, RESTORE VERIFYONLY, restore into a newly named isolated recovery database, compare SchemaMigration rows/checksums. Never restore into Cut production or primary live DBs. Record RPO/RTO outside the repo.",
+      "blocksPilotActivation": true
+    },
+    {
+      "id": "K5_PERMISSIONS",
+      "title": "K5 private permissions/flags for Modular Monolith Tenant/Business/Branch scope",
+      "evidenceClass": "OPERATOR_K5",
+      "status": "OPEN",
+      "evidence": "NOT_VERIFIED_IN_THIS_SCAFFOLD",
+      "howToVerify": "With trusted K5 session on the intended private Pilot environment: confirm customers/booking/hr/pos.draft/inventory scopes, default-deny for foreign Tenant/Business/Branch, and that ADR-031 posting flags remain OFF. Use K5F readiness checker where installed; do not paste secrets.",
+      "blocksPilotActivation": true
+    },
+    {
+      "id": "OWNER_BROWSER_E2E",
+      "title": "Authenticated Owner browser E2E on private Pilot workspace",
+      "evidenceClass": "OPERATOR_BROWSER",
+      "status": "OPEN",
+      "evidence": "NOT_VERIFIED_IN_THIS_SCAFFOLD",
+      "howToVerify": "Authorized Owner signs in to the private workspace (not /demo/salon): Customer → Booking → Barber → POS NONPOSTING DRAFT → inventory validation → reload. Disposable Chromium CI ≠ Owner browser proof. Draft print remains separately tracked.",
+      "blocksPilotActivation": true
+    },
+    {
+      "id": "ADR031_POSTING",
+      "title": "ADR-031 financial posting / paid sale / GL settlement",
+      "evidenceClass": "FOUNDER_FINANCE_GATE",
+      "status": "BLOCKED",
+      "evidence": "ADR-031 PROPOSED; paid posting / GL settlement not authorized by this scaffold",
+      "howToVerify": "ADR-031 remains PROPOSED. Paid POS, tender settlement, stock decrement-on-sale, and first mandatory journal stay blocked until Founder+Finance+Architecture acceptance. This gate must stay BLOCKED in the readiness scaffold.",
+      "blocksPilotActivation": true
+    },
+    {
+      "id": "CUT_LIVE_IMPORT",
+      "title": "Cut Salon live SQL connection / real-data import",
+      "evidenceClass": "FOUNDER_APPROVAL",
+      "status": "BLOCKED",
+      "evidence": "Cut live connection/import forbidden; use fixture-only Track D until founder scope + ledger",
+      "howToVerify": "Live Cut/Cashier connection strings and real-data import remain forbidden from this package. Use Track D fixture-only tools until founder-approved read-only export + approved identity ledger exist outside chat.",
+      "blocksPilotActivation": true
+    }
+  ],
+  "blockingGateIds": [
+    "TARGET_APPLY",
+    "ISOLATED_BACKUP_RESTORE",
+    "K5_PERMISSIONS",
+    "OWNER_BROWSER_E2E",
+    "ADR031_POSTING",
+    "CUT_LIVE_IMPORT"
+  ],
+  "summary": {
+    "sourceArtifactPassCount": 1,
+    "openOperatorGateCount": 4,
+    "blockedGateCount": 2,
+    "pilotActivationAllowed": false,
+    "note": "PASS_SOURCE_ONLY means SQL001–034 files exist in git with checksums. Target apply, isolated backup/restore, K5, and Owner browser E2E remain OPEN. ADR-031 posting and Cut live import remain BLOCKED."
+  }
+}

@@ -1,0 +1,91 @@
+name: Pilot Readiness CI
+on:
+  pull_request:
+    paths:
+      - 'tools/pilot/**'
+      - 'tests/pilot-readiness.test.cjs'
+      - 'db/migrations/**'
+      - 'tools/cut-adapter/connection-gates.cjs'
+      - 'tools/k4-db/migrate.cjs'
+      - 'tools/salon-browser/**'
+      - 'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json'
+      - 'docs/04-execution/PILOT-OPERATIONAL-READINESS-2026-11-20.md'
+      - '.github/workflows/pilot-readiness-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/pilot/**'
+      - 'tests/pilot-readiness.test.cjs'
+      - 'db/migrations/**'
+      - 'tools/cut-adapter/connection-gates.cjs'
+      - 'tools/k4-db/migrate.cjs'
+      - 'tools/salon-browser/**'
+      - 'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json'
+      - 'docs/04-execution/PILOT-OPERATIONAL-READINESS-2026-11-20.md'
+      - '.github/workflows/pilot-readiness-ci.yml'
+permissions:
+  contents: read
+jobs:
+  pilot-readiness-offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Offline Pilot readiness verify (no SQL)
+        run: |
+          set -euo pipefail
+          node --check tools/pilot/readiness-board.cjs
+          node --check tools/pilot/workflow-matrix-builder.cjs
+          node --check tools/pilot/workflow-checklist.cjs
+          node --check tools/pilot/e2e-matrix.cjs
+          node --check tools/pilot/backup-restore-evidence.cjs
+          node --check tools/pilot/k5-owner-bootstrap-evidence.cjs
+          node --check tools/pilot/isolated-db-harness.cjs
+          node --check tools/pilot/render-board.cjs
+          node --check tools/pilot/verify.cjs
+          node --test tests/pilot-readiness.test.cjs
+          node tools/pilot/verify.cjs
+          node tools/pilot/render-board.cjs
+          test -f tools/pilot/artifacts/readiness-board.json
+          test -f tools/pilot/artifacts/readiness-board.md
+          test -f tools/pilot/workflow-matrix.json
+          node -e "const b=require('./tools/pilot/artifacts/readiness-board.json'); if(b.productionVerificationClaimed!==false||b.adr031Posting!=='BLOCKED') process.exit(1)"
+
+  pilot-isolated-sql:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    needs: pilot-readiness-offline
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned API dependencies (mssql)
+        run: npm ci --prefix apps/api --no-audit --no-fund
+      - name: Start disposable Pilot SQL Server (localhost only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo install -d -m 0777 /var/opt/mssql/data
+          pass="DrvoPilot_$(openssl rand -hex 16)!"
+          echo "::add-mask::$pass"
+          echo "SQL_TEST_SA_PASSWORD=$pass" >> "$GITHUB_ENV"
+          docker run --detach --name drvo-pilot-sql-disposable \
+            -e ACCEPT_EULA=Y \
+            -e MSSQL_PID=Developer \
+            -e MSSQL_SA_PASSWORD="$pass" \
+            -p 127.0.0.1:14345:1433 \
+            -v /var/opt/mssql/data:/var/opt/mssql/data \
+            mcr.microsoft.com/mssql/server:2022-latest
+      - name: Run isolated Pilot DB harness (never primary/VPS/Cut)
+        env:
+          GITHUB_ACTIONS: 'true'
+          DRVO_PILOT_CI_DISPOSABLE: 'YES'
+          DRVO_PILOT_CI_PORT: '14345'
+        run: node tools/pilot/isolated-db-harness.cjs
+      - name: Inspect container on failure
+        if: failure()
+        run: docker logs drvo-pilot-sql-disposable || true

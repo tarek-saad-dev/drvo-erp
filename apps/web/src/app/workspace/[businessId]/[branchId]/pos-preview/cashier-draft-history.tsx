@@ -1,10 +1,12 @@
 "use client";
 import {useEffect,useState} from "react";
+import Link from "next/link";
 
 /**
  * Read-only Cashier V2 DRAFT history, not Customer purchase history.
  * GETs are independently authorized by the existing scoped SQL022–023 owner.
  * Restoring offers only a NEW cart; saved prices/discounts are never reused.
+ * Draft print opens the NONPOSTING print view (Cashier PrintInvoiceModal adaptation).
  */
 type Customer={customerId:string;displayName:string;isActive:boolean};
 type Employee={employeeId:string;displayName:string;isActive:boolean;branchActive:boolean};
@@ -14,9 +16,11 @@ type Draft={draftId:string;createdAtUtc:string;currency:string;customerId:string
  totalDiscountMinor:number;grandTotalMinor:number;status:"DRAFT";lines:DraftLine[]};
 const money=(n:number,c:string)=>(n/100).toFixed(2)+" "+c;
 
-export default function CashierDraftHistory({apiRoot,draftApi,revision,disabled,onUseDraft}:{
+export default function CashierDraftHistory({apiRoot,draftApi,revision,disabled,onUseDraft,
+ printBasePath}:{
  apiRoot:string;draftApi:string;revision:number;disabled:boolean;
  onUseDraft:(lines:Array<{offeringId:string;quantity:number}>)=>void;
+ printBasePath:string;
 }){
  const [state,setState]=useState<"loading"|"ready"|"denied">("loading");
  const [customers,setCustomers]=useState<Customer[]>([]);
@@ -87,7 +91,8 @@ export default function CashierDraftHistory({apiRoot,draftApi,revision,disabled,
     النتائج محدودة بأحدث 50 مسودة في الفرع؛ الفلترة ليست سجلًا تاريخيًا كاملًا.</p>}
    {visible.length===0?<p className="k5-muted">لا توجد مسودات مطابقة في النتائج المتاحة.</p>:
     <div className="k5-table-wrap"><table className="k5-table">
-     <thead><tr><th>وقت الحفظ</th><th>العميل</th><th>الخصم</th><th>صافي المسودة</th><th>تفاصيل</th><th>سلة جديدة</th></tr></thead>
+     <thead><tr><th>وقت الحفظ</th><th>العميل</th><th>الخصم</th><th>صافي المسودة</th>
+      <th>تفاصيل</th><th>طباعة مسودة</th><th>سلة جديدة</th></tr></thead>
      <tbody>{visible.map(d=><tr key={d.draftId}>
       <td>{new Date(d.createdAtUtc).toLocaleString("ar-EG")}</td>
       <td>{customerName(d.customerId)}</td>
@@ -100,6 +105,13 @@ export default function CashierDraftHistory({apiRoot,draftApi,revision,disabled,
        </li>)}</ul>
        <p className="k5-muted">DRAFT · NOT_COLLECTED · NOT_POSTED</p>
       </details></td>
+      <td><Link className="k5-salon-refresh" data-cashier-pos="draft-print-open"
+       href={printBasePath+"/draft-print?draftId="+encodeURIComponent(d.draftId)}
+       aria-disabled={disabled?true:undefined}
+       onClick={e=>{if(disabled)e.preventDefault();}}
+       title="مسودة — غير محصّلة / غير مرحّلة">
+       طباعة المسودة
+      </Link></td>
       <td><button type="button" className="k5-salon-refresh" disabled={disabled}
        onClick={()=>onUseDraft(d.lines.map(l=>({offeringId:l.offeringId,quantity:l.quantity})))}>
        جهّز سلة بالأسعار الحالية

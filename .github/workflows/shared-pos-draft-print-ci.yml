@@ -1,0 +1,51 @@
+name: Shared POS draft print CI
+on:
+  pull_request:
+    paths:
+      - '_cashier_source/pos-print/**'
+      - 'packages/business-modules/pos/**'
+      - 'apps/api/src/pos-drafts/**'
+      - 'apps/api/test/pos-rich-draft.test.cjs'
+      - 'apps/web/src/app/workspace/**/pos-preview/**'
+      - 'apps/web/test/pos-draft-print.test.cjs'
+      - 'tests/pos-draft-print-source.test.cjs'
+      - 'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json'
+      - '.github/workflows/shared-pos-draft-print-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - '_cashier_source/pos-print/**'
+      - 'packages/business-modules/pos/**'
+      - 'apps/api/src/pos-drafts/**'
+      - 'apps/api/test/pos-rich-draft.test.cjs'
+      - 'apps/web/src/app/workspace/**/pos-preview/**'
+      - 'apps/web/test/pos-draft-print.test.cjs'
+      - 'tests/pos-draft-print-source.test.cjs'
+      - '.github/workflows/shared-pos-draft-print-ci.yml'
+permissions:
+  contents: read
+jobs:
+  pos-draft-print:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # No new SQL: print-preview reuses ReadBranchPosCashierDrafts (SQL022/023).
+      - name: Package + pinned Cashier print characterization
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          npm run build
+          node --test tests/pos-draft-print-source.test.cjs tests/cashier-workflow-ledger.test.cjs
+      - name: Nest print-preview unit guards
+        run: |
+          set -euo pipefail
+          npm ci --prefix apps/api --no-audit --no-fund
+          npm test --prefix apps/api
+      - name: Private UI source guards
+        run: |
+          set -euo pipefail
+          node --test apps/web/test/pos-draft-print.test.cjs apps/web/test/pos-rich-customer-draft-history.test.cjs apps/web/test/cashier-pos-workstation.test.cjs

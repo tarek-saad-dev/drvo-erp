@@ -7,6 +7,8 @@ test('customer draft history is private, scoped to existing SQL V2 read and defa
  const page=read('page.tsx'),client=read('pos-preview-client.tsx'),history=read('cashier-draft-history.tsx');
  assert.match(page,/DRVO_POS_RICH_WEB_ENABLED==="YES"/);
  assert.match(client,/draftsEnabled&&richEnabled&&<CashierDraftHistory/);
+ assert.match(client,/printBasePath=\{home\+"\/pos-preview"\}/);
+ assert.match(history,/data-cashier-pos="draft-print-open"/);
  for(const route of ['/customers','/hr/employees','/cashier'])
   assert.ok(history.includes(route),route);
  assert.match(history,/credentials:"same-origin",cache:"no-store"/);

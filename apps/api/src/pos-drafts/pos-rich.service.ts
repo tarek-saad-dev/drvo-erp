@@ -5,6 +5,7 @@ import {createHash} from "node:crypto";
 import * as sql from "mssql";
 import {FoundationDatabaseService} from "../data/foundation-database.service";
 import type {Actor} from "../identity/identity.service";
+import {buildPosDraftReceipt,renderPosDraftReceiptHtml} from "./draft-print";
 
 /**
  * POS V2: exact Cashier pricing inputs are server-repriced and snapshotted in
@@ -186,5 +187,55 @@ export class PosRichService{
    limit:50,mayBeTruncated:drafts.length===50,
    discountsPersisted:true as const,paymentState:"NOT_COLLECTED" as const,
    accountingState:"NOT_POSTED" as const,inventoryState:"NOT_DECREMENTED" as const};
+ }
+ /**
+  * NON-POSTING DRAFT print preview. Reuses scoped ReadBranchPosCashierDrafts (no new SQL).
+  * Labels are optional caller-supplied display strings already authorized in the private UI;
+  * Nest never invents paid/posted fields or touches GL/payment/stock.
+  */
+ async printPreview(actor:Actor,token:string,businessId:string,branchId:string,
+  draftId:string,labels?:{
+   customerDisplayName?:string|null;customerPhone?:string|null;
+   branchLabel?:string|null;businessLabel?:string|null;
+   executorNames?:Record<string,string>;
+  }){
+  if(!uuid(draftId))throw new BadRequestException("Invalid draft id");
+  const listed=await this.list(actor,token,businessId,branchId);
+  const draft=listed.drafts.find(d=>d.draftId.toLowerCase()===draftId.toLowerCase());
+  if(!draft)throw new NotFoundException();
+  const executorNames=labels?.executorNames&&typeof labels.executorNames==="object"&&
+   !Array.isArray(labels.executorNames)?labels.executorNames:{};
+  const receipt=buildPosDraftReceipt({
+   draftId:draft.draftId,createdAtUtc:draft.createdAtUtc,currency:draft.currency,
+   customerId:draft.customerId,customerDisplayName:labels?.customerDisplayName??null,
+   customerPhone:labels?.customerPhone??null,
+   headerDiscountMinor:draft.headerDiscountMinor,subtotalMinor:draft.subtotalMinor,
+   linesNetMinor:draft.linesNetMinor,totalDiscountMinor:draft.totalDiscountMinor,
+   grandTotalMinor:draft.grandTotalMinor,
+   branchLabel:labels?.branchLabel??null,businessLabel:labels?.businessLabel??null,
+   lines:draft.lines.map(l=>{
+    const executorId=l.executorEmployeeId===null||l.executorEmployeeId===undefined?null:
+     String(l.executorEmployeeId);
+    const nameKey=executorId?executorId.toLowerCase():"";
+    const executorDisplayName=nameKey&&typeof executorNames[nameKey]==="string"?
+     executorNames[nameKey]:null;
+    return {
+     lineNo:Number(l.lineNo),offeringId:String(l.offeringId),
+     displayName:String(l.displayName),kind:String(l.kind),quantity:Number(l.quantity),
+     unitPriceMinor:Number(l.unitPriceMinor),grossMinor:Number(l.grossMinor),
+     discountMinor:Number(l.discountMinor),netMinor:Number(l.netMinor),
+     executorEmployeeId:executorId,executorDisplayName,
+    };
+   }),
+  });
+  return {
+   state:"POS_DRAFT_PRINT_PREVIEW" as const,
+   sourceState:listed.state,
+   receipt,
+   html:renderPosDraftReceiptHtml(receipt),
+   paymentState:"NOT_COLLECTED" as const,
+   accountingState:"NOT_POSTED" as const,
+   inventoryState:"NOT_DECREMENTED" as const,
+  };
  }
 }

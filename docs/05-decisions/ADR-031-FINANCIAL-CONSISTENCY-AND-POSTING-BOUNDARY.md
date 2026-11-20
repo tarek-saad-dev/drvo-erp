@@ -1,5 +1,8 @@
 # ADR-031 — Financial Source-of-Truth Posting Boundary and Reconciliation (PROPOSED)
 
+> **2026-11-20 POSTING READINESS PACKAGE (STILL PROPOSED):** [Track C decision package](../04-execution/ADR-031-POSTING-READINESS-PACKAGE-2026-11-20.md) consolidates nonposting inventory, ownership matrix, Option A (conditional) vs B, open tender questions, idempotency/reconciliation/reversal/failure gates, and exact PENDING Founder/Finance/Architecture/Security approvals + evidence checklists. Machine board: `tools/finance/adr031-readiness-board.cjs`. **ADR-031 remains PROPOSED; postingActivation BLOCKED; no `pos.sale.post`, no live GL SQL.**
+
+
 > **2026-11-12 OPTION A MECHANICS PROOF — STILL PROPOSED:** [F-1a disposable SQL probe](../04-execution/FINANCE-F1A-OPTION-A-ATOMIC-SQL-PROBE-2026-11-12.md), PR #70 merged, demonstrates source+balanced synthetic first journal+Outbox single SQL transaction, rollback and concurrent idempotent replay. This does **not** decide Option A over B, approve journal accounts/tax/tender policies, establish real SQL/HTTP financial posting, or relax K5F/ADR-032 operational gates. ADR-031 retains PROPOSED status pending explicit Founder+Finance+Architecture sign-off.
 
 
@@ -7,7 +10,7 @@
 
 
 **Date:** 2026-10-30  
-**Status:** **PROPOSED / FOUNDER + FINANCE + ARCHITECTURE REVIEW REQUIRED — NOT ACCEPTED**. Phase 0 docs only; no code/SQL/tests/deployment.  
+**Status:** **PROPOSED / FOUNDER + FINANCE + ARCHITECTURE + SECURITY REVIEW REQUIRED — NOT ACCEPTED**. Readiness package published 2026-11-20; no posting activation, no live GL SQL, no `pos.sale.post`.  
 **Severity:** Foundation Review FND-02 (P0 financial first-journal boundary), FND-04 (P0 domain contracts).  
 **Previous accepted founder decisions:** ADR-009 SQL Server/PWA IndexedDB, ADR-010 offline credit+post-sync credit hold, ADR-011 customer electronic evidence is NOT settlement, ADR-012 last known negative-stock cost or COST_PENDING, ADR-013 late-offline posting in open period with original occurredAt preserved, ADR-029 national-scale reusable ERP Charter.
 

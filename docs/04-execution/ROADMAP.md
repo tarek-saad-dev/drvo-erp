@@ -1,5 +1,7 @@
 # Roadmap
 
+> **2026-11-20 ADR-031 POSTING READINESS PACKAGE (PROPOSED, NOT APPROVED):** Humans review [Track C package](ADR-031-POSTING-READINESS-PACKAGE-2026-11-20.md) for Option A (conditional) vs B, tender maps, ownership, idempotency/reconciliation/reversals. Activation remains blocked until Founder+Finance+Architecture+Security sign-off and E1–E4 evidence. See `tools/finance/adr031-readiness-board.cjs`. **No paid posting enablement in this track.**
+
 > **2026-11-20 K0 / S13 FAILURE TRIAGE — DIAGNOSTIC PR ONLY:** [RCA and minimal test-harness hardening](CASHIER-S13-K0-FAILURE-TRIAGE-2026-11-20.md) records K0 #44751858614 CUT-03 incorrectly referencing DRVO docs as Cashier source, and S12→S13 Chromium run #44751858621 hanging at broad HR marker for 720s. Keep S13 real UI/SQL assertions; new action-level breadcrumbs + 120s phase idle limit enable next diagnosis. **No S13 PASS, primary SQL, Owner browser or Cut go-live claimed.**
 
 > **2026-11-19 PR0+PR1 IN PROGRESS:** Source lock + ledger coded; SQL024/Nest/POS server Customer search coded with unit/source tests. **NEXT:** run Shared Customers SQL2022 HTTP CI for SQL024; wire Booking to same search; PR2 Cashier POS UX transplant into private workspace; PR3 read-only historical adapter. Primary DB/SQL024 apply, Owner browser, Cut import and ADR-031 remain gated.

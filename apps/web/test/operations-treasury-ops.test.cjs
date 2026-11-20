@@ -12,9 +12,15 @@ test('private Operations route gated by K5 and operations feature switch',()=>{
 test('Operations UI never claims financial posting authorization',()=>{
  const client=read('operations/operations-client.tsx');
  for(const token of ['NONPOSTING_OPERATIONS_DAY_SHIFT_ONLY','NOT_POSTED','GATED',
-  'NOT_AUTHORIZED','Idempotency-Key','forceCloseShifts'])
+  'NOT_AUTHORIZED','Idempotency-Key','forceCloseShifts','shift-handoff','SQL039'])
   assert.ok(client.includes(token),'Required: '+token);
  assert.doesNotMatch(client,/localStorage|sessionStorage|\/api\/ledger|POSTED_SALE/);
+});
+test('Operations UI exposes Arabic soft handoff control',()=>{
+ const client=read('operations/operations-client.tsx');
+ assert.match(client,/نقل ورديتي لهذا الفرع/);
+ assert.match(client,/expectedSourceShiftId:null/);
+ assert.match(client,/financialPostingState/);
 });
 test('private Treasury ops route gated separately from cash counts',()=>{
  const page=read('treasury/ops/page.tsx');

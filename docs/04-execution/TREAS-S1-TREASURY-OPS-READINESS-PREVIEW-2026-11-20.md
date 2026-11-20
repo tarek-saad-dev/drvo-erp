@@ -21,7 +21,7 @@ Every response carries `persisted: false`, `accountingState: NOT_POSTED`, `glPos
 ## Findings from the pinned source / DRVO SQL (kept honest)
 - SQL030 shift recon sums `AmountMinor` per rail **across currencies**; the readiness preview warns (`MIXED_CURRENCY_RECON_AMBIGUOUS`) instead of silently "fixing" it.
 - `CloseBusinessDay(forceCloseShifts=1)` closes OPEN shifts with no reconciliation row; Cashier documents the force-close reason as "not persisted (no column yet)". Readiness surfaces `FORCE_CLOSE_SKIPS_RECON` and the shift ids it would close.
-- Cashier handoff atomically closes the user's open shift (any branch) and opens one on the target. DRVO has `UX_OperationalShift_OneOpenPerAccount` (tenant-wide) but no handoff SQL, so the plan is `CLOSE_ELSEWHERE_AND_OPEN_HERE` with `atomicHandoff: NOT_IMPLEMENTED_IN_DRVO`. The elsewhere-branch id is caller-supplied and reported `CALLER_SUPPLIED_UNVERIFIED`; trusted local evidence wins over a contradicting claim.
+- Cashier handoff atomically closes the user's open shift (any branch) and opens one on the target. Preview still plans `CLOSE_ELSEWHERE_AND_OPEN_HERE` with `mutation: NOT_PERFORMED`; `atomicHandoff` is now `AVAILABLE_VIA_SQL039` (see [OPS-03 soft-gate](OPS-03-SHIFT-HANDOFF-SOFT-GATE-2026-11-20.md)). Elsewhere-branch id on the preview route remains caller-supplied/`UNVERIFIED`; trusted local evidence wins over a contradicting claim.
 - Reads are bounded (200 movements / 50 shifts / 50 recons); filtering is in memory over that window and the response flags truncation. Closed days are not read (only the OPEN day), so the daily summary is `SINGLE_BRANCH_OPEN_DAY_ONLY`.
 - Day dates use the UTC interim (BusinessClock branch timezone is still OPEN).
 

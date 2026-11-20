@@ -230,4 +230,38 @@ export class OperationsService {
   return {id:String(row.id),changed:Boolean(row.changed),status:String(row.status),
    accountingState:"NOT_POSTED" as const,glPostState:"GATED" as const};
  }
+ /**
+  * OPS-03 NONPOSTING custody handoff. SQL039 closes any tenant-wide OPEN shift for the actor
+  * and opens on the target branch day in one transaction. Soft-gate only — no Treasury/GL.
+  * BusinessClock remains UTC interim (no timezone catch-up invented here).
+  */
+ async handoffShift(actor:Actor,token:string,businessId:string,branchId:string,
+  requestId:unknown,payload:unknown){
+  const scope=this.scope(actor,token,businessId,branchId);
+  if(!valid(requestId))throw new BadRequestException("Invalid Idempotency-Key");
+  const data=body(payload,["dayId","expectedSourceShiftId"]);
+  if(!valid(data.dayId))throw new BadRequestException("Invalid dayId");
+  const expected=data.expectedSourceShiftId;
+  if(expected!==null&&!valid(expected))
+   throw new BadRequestException("Invalid expectedSourceShiftId");
+  const result=await this.execute(scope,"core.HandoffOperationalShift",r=>r
+   .input("ClientRequestId",sql.UniqueIdentifier,requestId)
+   .input("DayId",sql.UniqueIdentifier,data.dayId)
+   .input("ExpectedSourceShiftId",sql.UniqueIdentifier,expected));
+  const row=result.recordset?.[0];
+  if(!row)throw new ServiceUnavailableException("Shift handoff failed");
+  const outcome=String(row.outcome);
+  if(outcome!=="HANDED_OFF"&&outcome!=="FIRST_OPEN_HERE"&&outcome!=="ALREADY_OPEN_HERE"&&
+   outcome!=="IDEMPOTENT_REPLAY")
+   throw new ServiceUnavailableException("Invalid handoff outcome");
+  return {
+   id:String(row.id),created:Boolean(row.created),dayId:String(row.dayId),
+   status:String(row.status),branchId:String(row.branchId),
+   closedShiftId:row.closedShiftId==null?null:String(row.closedShiftId),
+   closedBranchId:row.closedBranchId==null?null:String(row.closedBranchId),
+   outcome:outcome as "HANDED_OFF"|"FIRST_OPEN_HERE"|"ALREADY_OPEN_HERE"|"IDEMPOTENT_REPLAY",
+   accountingState:"NOT_POSTED" as const,glPostState:"GATED" as const,
+   financialPostingState:"NOT_AUTHORIZED" as const,
+  };
+ }
 }

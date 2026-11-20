@@ -1,6 +1,8 @@
 'use strict';
-// Operations SQL029 + Treasury ops SQL030 disposable SQL2022 + Nest HTTP.
-// Never primary/VPS. Applies migrations 001-030 including concurrent INV/OI schemas.
+// Operations SQL029 + Treasury ops SQL030 + OPS-03 SQL039 handoff disposable SQL2022 + Nest HTTP.
+// Never primary/VPS. Applies full migration chain through SQL039.
+// MERGE AFTER: Package PR must land real 038_pos_draft_package_line_snapshots.sql first
+// (K4 consecutive numbering; this PR ships 039 only — no stub 038).
 const assert=require('node:assert/strict'),crypto=require('node:crypto');
 const {spawn}=require('node:child_process');
 const sql=require('../../apps/api/node_modules/mssql');
@@ -92,13 +94,15 @@ async function main(){
   "',CHECK_POLICY=ON,CHECK_EXPIRATION=OFF");
  admin=await connect({...base,database:db});
  await admin.query('CREATE USER ['+user+'] FOR LOGIN ['+user+'];GRANT CONNECT TO ['+user+']');
- await pass('30 migrations apply including SQL029/030 ops+treasury',async()=>{
-  const a=await applyMigrations(admin,undefined,30);
-  assert.equal(a.length,30);assert.ok(a.every(v=>v.status==='applied'));
-  const b=await applyMigrations(admin,undefined,30);
+ await pass('migrations apply through SQL039 ops handoff (requires real 038 first)',async()=>{
+  const a=await applyMigrations(admin);
+  assert.ok(a.length>=39);assert.ok(a.every(v=>v.status==='applied'));
+  const b=await applyMigrations(admin);
   assert.ok(b.every(v=>v.status==='unchanged'));
   assert.equal((await admin.query('SELECT COUNT(*) AS n FROM core.BusinessDay')).recordset[0].n,0);
   assert.equal((await admin.query('SELECT COUNT(*) AS n FROM core.TreasuryCashMovement')).recordset[0].n,0);
+  assert.ok((await admin.query(
+   "SELECT OBJECT_ID(N'core.HandoffOperationalShift',N'P') AS p")).recordset[0].p);
  });
  await grants(admin);
  await query(admin,"INSERT core.Tenant(TenantId,DisplayName) VALUES(@t,N'CI'),(@otherT,N'Other')",
@@ -110,6 +114,10 @@ async function main(){
  await account(admin,x.otherT,x.foreignOwner,'foreign.ops.tr.ci');
  await role(admin,x.t,x.b,x.role);await role(admin,x.otherT,x.foreignB,x.foreignRole);
  await member(admin,x.t,x.b,x.br,x.owner,x.role);
+ await query(admin,"INSERT core.BranchAssignment(TenantId,BusinessId,BranchId,AccountId)"+
+  " VALUES(@t,@b,@otherBr,@a);"+
+  "INSERT core.BranchRole(TenantId,BusinessId,BranchId,AccountId,RoleId)"+
+  " VALUES(@t,@b,@otherBr,@a,@r)",{t:x.t,b:x.b,otherBr:x.otherBr,a:x.owner,r:x.role});
  await member(admin,x.otherT,x.foreignB,x.foreignBr,x.foreignOwner,x.foreignRole);
  await pass('EXECUTE-only on ops/treasury procs; direct DML denied',async()=>{
   app=await connect({...base,database:db,user,password:appPass});
@@ -117,8 +125,9 @@ async function main(){
    "SELECT HAS_PERMS_BY_NAME('core.BusinessDay','OBJECT','SELECT') AS r,"+
    "HAS_PERMS_BY_NAME('core.TreasuryCashMovement','OBJECT','INSERT') AS w,"+
    "HAS_PERMS_BY_NAME('core.ReadOperationsDayShift','OBJECT','EXECUTE') AS x,"+
-   "HAS_PERMS_BY_NAME('core.CreateTreasuryCashMovement','OBJECT','EXECUTE') AS y");
-  assert.deepEqual(Object.values(r.recordset[0]).map(Number),[0,0,1,1]);
+   "HAS_PERMS_BY_NAME('core.CreateTreasuryCashMovement','OBJECT','EXECUTE') AS y,"+
+   "HAS_PERMS_BY_NAME('core.HandoffOperationalShift','OBJECT','EXECUTE') AS h");
+  assert.deepEqual(Object.values(r.recordset[0]).map(Number),[0,0,1,1,1]);
   await assert.rejects(()=>app.query('SELECT * FROM core.BusinessDay'),e=>e.number===229);
  });
  const env={...process.env,NODE_ENV:'production',API_HOST:'127.0.0.1',API_PORT:'3422',
@@ -188,9 +197,54 @@ async function main(){
   assert.equal(board.shifts.find(s=>s.shiftId===shiftId).status,'CLOSED');
   assert.equal((await post(tr(x.b,x.br)+'/movements/'+movementId+'/cancel',own,id(),{})).status,409);
  });
+ await pass('OPS-03 handoff A→B: only B open; idempotent replay; stale/concurrent fail; no GL',async()=>{
+  const movBefore=(await admin.query('SELECT COUNT(*) AS n FROM core.TreasuryCashMovement')).recordset[0].n;
+  const dayB=await post(ops(x.b,x.otherBr)+'/days',own,id(),{businessDate:today});
+  assert.equal(dayB.status,200);
+  const dayBId=(await dayB.json()).id;
+  const openA=await post(ops(x.b,x.br)+'/shifts',own,id(),{dayId});
+  assert.equal(openA.status,200);
+  const shiftA=(await openA.json()).id;
+  const handKey=id();
+  const hand=await post(ops(x.b,x.otherBr)+'/shift-handoff',own,handKey,
+   {dayId:dayBId,expectedSourceShiftId:shiftA});
+  assert.equal(hand.status,200);
+  const handBody=await hand.json();
+  assert.equal(handBody.created,true);
+  assert.equal(handBody.outcome,'HANDED_OFF');
+  assert.equal(handBody.glPostState,'GATED');
+  assert.equal(handBody.financialPostingState,'NOT_AUTHORIZED');
+  assert.equal(handBody.closedShiftId,shiftA);
+  assert.equal(handBody.closedBranchId,x.br);
+  const shiftB=handBody.id;
+  const replay=await post(ops(x.b,x.otherBr)+'/shift-handoff',own,handKey,
+   {dayId:dayBId,expectedSourceShiftId:shiftA});
+  assert.equal(replay.status,200);
+  const replayBody=await replay.json();
+  assert.equal(replayBody.created,false);
+  assert.equal(replayBody.outcome,'IDEMPOTENT_REPLAY');
+  assert.equal(replayBody.id,shiftB);
+  assert.equal(replayBody.glPostState,'GATED');
+  const boardA=await (await get(ops(x.b,x.br),own)).json();
+  const boardB=await (await get(ops(x.b,x.otherBr),own)).json();
+  assert.equal(boardA.shifts.filter(s=>s.status==='OPEN').length,0);
+  assert.equal(boardB.shifts.filter(s=>s.status==='OPEN').length,1);
+  assert.equal(boardB.shifts.find(s=>s.status==='OPEN').shiftId,shiftB);
+  assert.equal((await post(ops(x.b,x.otherBr)+'/shift-handoff',own,id(),
+   {dayId:dayBId,expectedSourceShiftId:shiftA})).status,409);
+  assert.equal((await post(ops(x.b,x.otherBr)+'/shift-handoff',own,id(),
+   {dayId:dayBId,expectedSourceShiftId:id()})).status,409);
+  assert.equal((await post(ops(x.foreignB,x.foreignBr)+'/shift-handoff',own,id(),
+   {dayId:dayBId,expectedSourceShiftId:null})).status,404);
+  assert.equal((await admin.query('SELECT COUNT(*) AS n FROM core.TreasuryCashMovement'))
+   .recordset[0].n,movBefore);
+  assert.equal((await admin.query(
+   "SELECT COUNT(*) AS n FROM core.TreasuryCashMovement WHERE GlPostState='POSTED'"))
+   .recordset[0].n|0,0);
+ });
  await pass('foreign tenant/branch denied',async()=>{
   assert.equal((await get(ops(x.foreignB,x.foreignBr),own)).status,404);
-  assert.equal((await get(tr(x.b,x.otherBr),own)).status,404);
+  assert.equal((await get(tr(x.b,x.otherBr),own)).status,200);
  });
  console.log('OPS+TREASURY SQL2022 + NEST HTTP PASS: '+checks+' independent groups');
  }finally{

@@ -28,6 +28,17 @@ export class OperationsController {
   const actor=await this.identity.actorFromToken(token);
   return this.operations.read(actor,token!,businessId,branchId);
  }
+ /** Read-only handoff plan. POST only carries the hypothetical elsewhere-branch id. */
+ @Post("shift-handoff-preview") @HttpCode(200)
+ async previewHandoff(@Headers("origin") origin:string|undefined,
+  @Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,
+  @Param("businessId") businessId:string,@Param("branchId") branchId:string,
+  @Body() body:unknown){
+  res.setHeader("Cache-Control","no-store");enabled();allowedOrigin(origin);
+  const token=extractSessionCookie(req.headers.cookie);
+  const actor=await this.identity.actorFromToken(token);
+  return this.operations.previewHandoff(actor,token!,businessId,branchId,body);
+ }
  @Post("days") @HttpCode(200)
  async openDay(@Headers("origin") origin:string|undefined,
   @Headers("idempotency-key") key:string|undefined,

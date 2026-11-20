@@ -5,6 +5,11 @@ import {createHash} from "node:crypto";
 import * as sql from "mssql";
 import {FoundationDatabaseService} from "../data/foundation-database.service";
 import type {Actor} from "../identity/identity.service";
+import {
+ TREASURY_READINESS_STATE,aggregateDaily,computeRailTotals,evaluateDayCloseReadiness,
+ filterMovements,normalizeMovementFilters,
+} from "./treasury-readiness-rules";
+import type {DayRow,ReconRow,ShiftRow} from "./treasury-readiness-rules";
 
 export type MovementView={
  movementId:string;dayId:string;shiftId:string;
@@ -73,7 +78,8 @@ export class TreasuryOpsService {
   }catch(error){
    const code=typeof error==="object"&&error!==null&&"number" in error?
     Number(error.number):undefined;
-   if(code===51501||code===51504)throw new NotFoundException();
+   // 51491/51494 come from core.ReadOperationsDayShift (day-close readiness read).
+   if(code===51501||code===51504||code===51491||code===51494)throw new NotFoundException();
    if(code===51502)throw new BadRequestException("Invalid treasury movement");
    if(code===51503||code===51505||code===2601||code===2627)
     throw new ConflictException("Treasury ops conflict or closed day/shift");
@@ -120,6 +126,91 @@ export class TreasuryOpsService {
    limit:200,mayBeTruncated:movements.length===200,
    accountingState:"NOT_POSTED",glPostState:"GATED",settlementState:"NO_SETTLEMENT",
    balanceState:"COMPUTED_FROM_MOVEMENTS_ONLY",
+  };
+ }
+ /**
+  * NON-POSTING filter + rail-total preview over the already-bounded movement read
+  * (TOP 200). POST is only a body carrier: nothing is written, no cash moves, no GL.
+  */
+ async previewMovements(actor:Actor,token:string,businessId:string,branchId:string,
+  payload:unknown){
+  this.scope(actor,token,businessId,branchId);
+  const data=body(payload,["filters"]);
+  let filters;
+  try{filters=normalizeMovementFilters(data.filters);}catch(error){
+   if(error instanceof TypeError)throw new BadRequestException("Invalid movement filters");
+   throw error;
+  }
+  const read=await this.list(actor,token,businessId,branchId);
+  const movements=filterMovements(read.movements,filters);
+  return {
+   state:TREASURY_READINESS_STATE,filters,movements,matchedCount:movements.length,
+   scannedCount:read.movements.length,mayBeTruncated:read.mayBeTruncated,
+   railTotals:computeRailTotals(movements),
+   accountingState:"NOT_POSTED" as const,glPostState:"GATED" as const,
+   settlementState:"NO_SETTLEMENT" as const,
+   balanceState:"COMPUTED_FROM_MOVEMENTS_ONLY" as const,persisted:false as const,
+  };
+ }
+ /**
+  * NON-POSTING day-close readiness + daily summary for the branch OPEN day. Combines the
+  * existing Operations day/shift read with the existing Treasury movement/recon read; it
+  * never closes a day or shift and never posts anything (ADR-031 gate preserved).
+  */
+ async dayCloseReadiness(actor:Actor,token:string,businessId:string,branchId:string){
+  if(process.env.DRVO_OPERATIONS_ENABLED!=="YES")
+   throw new ServiceUnavailableException("Operations is not enabled");
+  const scope=this.scope(actor,token,businessId,branchId);
+  const ops=await this.execute(scope,"core.ReadOperationsDayShift");
+  const opsSets=ops.recordsets as Array<Array<Record<string,unknown>>>;
+  const dayRows=Array.isArray(opsSets?.[0])?opsSets[0]:
+   (Array.isArray(ops.recordset)?ops.recordset as Array<Record<string,unknown>>:[]);
+  const shiftRows=Array.isArray(opsSets?.[1])?opsSets[1]:[];
+  const dayRaw=dayRows[0];
+  if(dayRaw&&String(dayRaw.status)!=="OPEN")
+   throw new ServiceUnavailableException("Invalid day status");
+  const day:DayRow|null=dayRaw?{dayId:String(dayRaw.dayId),
+   businessDate:String(dayRaw.businessDate).slice(0,10),status:"OPEN"}:null;
+  const shifts:ShiftRow[]=shiftRows.map(row=>{
+   const status=String(row.status);
+   if(status!=="OPEN"&&status!=="CLOSED")
+    throw new ServiceUnavailableException("Invalid shift status");
+   return {shiftId:String(row.shiftId),dayId:String(row.dayId),
+    actorAccountId:String(row.actorAccountId),status};
+  });
+  const tr=await this.execute(scope,"core.ReadTreasuryCashMovements");
+  const trSets=tr.recordsets as Array<Array<Record<string,unknown>>>;
+  const moveRows=Array.isArray(trSets?.[0])?trSets[0]:
+   (Array.isArray(tr.recordset)?tr.recordset as Array<Record<string,unknown>>:[]);
+  const reconRows=Array.isArray(trSets?.[1])?trSets[1]:[];
+  const movements=moveRows.map(row=>this.mapMove(row));
+  const recons:ReconRow[]=reconRows.map(row=>this.mapRecon(row));
+  const expectedDate=new Date().toISOString().slice(0,10);
+  const evidence={movementsMayBeTruncated:movements.length===200,
+   shiftsMayBeTruncated:shifts.length===50,reconsMayBeTruncated:recons.length===50};
+  let result;
+  try{
+   result=evaluateDayCloseReadiness({day,shifts,movements,recons,expectedDate,evidence});
+  }catch(error){
+   if(error instanceof TypeError)throw new ServiceUnavailableException("Invalid readiness evidence");
+   throw error;
+  }
+  const dayMoves=day?movements.filter(m=>m.dayId===day.dayId):[];
+  const railTotals=computeRailTotals(dayMoves);
+  let dailySummary;
+  try{
+   dailySummary=aggregateDaily([{branchId,dayStatus:day?"open":"missing",rails:railTotals}]);
+  }catch(error){
+   if(error instanceof TypeError)throw new ServiceUnavailableException("Invalid readiness evidence");
+   throw error;
+  }
+  return {
+   state:TREASURY_READINESS_STATE,expectedDate,openDay:day,
+   readiness:result.readiness,shiftSummaries:result.shiftSummaries,railTotals,
+   dailySummary,dailySummaryScope:"SINGLE_BRANCH_OPEN_DAY_ONLY" as const,evidence,
+   accountingState:"NOT_POSTED" as const,glPostState:"GATED" as const,
+   settlementState:"NO_SETTLEMENT" as const,
+   balanceState:"COMPUTED_FROM_MOVEMENTS_ONLY" as const,persisted:false as const,
   };
  }
  async createMovement(actor:Actor,token:string,businessId:string,branchId:string,

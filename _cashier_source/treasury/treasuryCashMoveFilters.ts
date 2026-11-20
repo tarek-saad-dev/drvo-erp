@@ -78,3 +78,6 @@ export function appendTreasuryCashMoveFilters(
 
   if (filters.userId != null && !Number.isNaN(filters.userId)) {
     whereConditions.push('sm.UserID = @userId');
+    params.userId = filters.userId;
+  }
+}

@@ -323,7 +323,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
     </header>
     <div className="k5-page-title"><div>
       <span className="k5-eyebrow">POS / CASHIER WORKSTATION · NONPOSTING</span>
-      <h1>نقطة البيع — محطة التشغيل</h1>
+      <h1>نقطة البيع — مسودة تشغيل</h1>
       <p className="k5-muted">تخطيط Cashier الثلاثي (عميل · حلاق/كتالوج · مسودة) على Light المضغوط مع APIs الفرع.
         التحصيل والترحيل مقفولان بـ ADR-031 — الأزرار المالية ظاهرة ومقفولة بصراحة.</p>
     </div></div>
@@ -337,8 +337,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
           apiRoot={api.replace(/\/pos-preview$/,"")} customerId={selectedCustomerId}
           onSelect={setSelectedCustomerId} onCreated={()=>setCustomerRevision(v=>v+1)}/>:
           <p className="k5-muted">تشغيل العميل الغني يحتاج أعلام المسودات + POS الغني.</p>}
-        {draftsEnabled&&richEnabled&&
-          <CashierDraftHistory
+        {draftsEnabled&&richEnabled&&<CashierDraftHistory
             apiRoot={api.replace(/\/pos-preview$/,"")} draftApi={draftApi}
             revision={richHistoryRevision} disabled={busy||draftBusy}
             printBasePath={home+"/pos-preview"}
@@ -374,7 +373,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
           });
           setPreview(null);setAdjustment(null);retryKey.current=null;
          }}/>
-        <div className="catalog-form" aria-label="معاينة خصم غير محصّل">
+        <div className="catalog-form" aria-label="معاينة خصم وإكرامية غير مدفوعة">
           <label>خصم استرشادي ({selectedCurrency})
             <input type="text" inputMode="decimal" value={discountText} maxLength={14}
               onChange={e=>{setDiscountText(e.target.value);setAdjustment(null);}} disabled={busy||draftBusy}/>
@@ -405,9 +404,13 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
           defaultExecutorEmployeeId={selectedBarberId||undefined}/>}
         {adjustment&&<section className="k5-admin-card">
           <h2>خصم وإكرامية محتملة — معاينة فقط</h2>
-          <p>بعد الخصم: <strong>{money(adjustment.afterDiscountMinor,adjustment.currency)}</strong></p>
-          <p>إكرامية محتملة: {money(adjustment.possibleTipMinor,adjustment.currency)}</p>
-          <p className="k5-muted">NOT_COLLECTED · لا تحصيل ولا قيد.</p>
+          <p>إجمالي القائمة: <strong>{money(adjustment.listPriceSubtotalMinor,adjustment.currency)}</strong></p>
+          <p>خصم استرشادي غير محفوظ: <strong>{money(adjustment.headerDiscountMinor,adjustment.currency)}</strong></p>
+          <p>بعد الخصم وقبل الضرائب: <strong>{money(adjustment.afterDiscountMinor,adjustment.currency)}</strong></p>
+          <p>المبلغ المفترض من العميل: {money(adjustment.customerPresentedMinor,adjustment.currency)}</p>
+          <p>فرق إيجابي / إكرامية محتملة: {money(adjustment.possibleTipMinor,adjustment.currency)}</p>
+          <p>المبلغ الناقص: {money(adjustment.shortfallMinor,adjustment.currency)}</p>
+          <p className="k5-muted">لا يوجد تحصيل أو إكرامية موزعة أو خصم محفوظ أو فاتورة أو قيد. حفظ المسودة يحفظ العناصر فقط؛ هذه الأرقام مؤقتة ولا تشمل ضريبة.</p>
         </section>}
         {preview&&<section className="k5-admin-card">
           <h2>نتيجة المعاينة — ليست فاتورة</h2>
@@ -415,7 +418,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
           <p className="k5-muted">NOT_POSTED · NOT_COLLECTED</p>
         </section>}
         {draftsEnabled&&draftStatus==="ready"&&savedDrafts.length>0&&<section className="k5-admin-card">
-          <h2>مسودات محفوظة</h2>
+          <h2>مسودات محفوظة — مش فواتير</h2>
           <div className="k5-table-wrap"><table className="k5-table">
             <thead><tr><th>وقت</th><th>عناصر</th><th>قالب</th></tr></thead>
             <tbody>{savedDrafts.map(d=><tr key={d.draftId}>

@@ -23,7 +23,8 @@ type Resource={resourceId:string;displayName:string;kind:string;isActive:boolean
 type Customer={customerId:string;displayName:string;phoneE164?:string|null;isActive:boolean};
 type Offering={offeringId:string;displayName:string;kind:string;durationMinutes:number|null;isActive:boolean};
 const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const LIVE:TicketStatus[]=["WAITING","CALLED","IN_SERVICE"];
+const LIVE=["WAITING","CALLED","IN_SERVICE"] as const;
+type LiveStatus=(typeof LIVE)[number];
 const label:Record<TicketStatus,string>={
  WAITING:"انتظار",CALLED:"تم النداء",IN_SERVICE:"قيد الخدمة",
  DONE:"منتهي",CANCELLED:"ملغي",NO_SHOW:"لم يحضر",
@@ -59,7 +60,7 @@ function TicketCard({t,busy,onTransition}:{
     onClick={()=>onTransition(t.ticketId,"IN_SERVICE")}>بدء الخدمة</button>}
    {t.status==="IN_SERVICE"&&<button type="button" className="k5-save" disabled={!!busy}
     onClick={()=>onTransition(t.ticketId,"DONE")}>إنهاء</button>}
-   {LIVE.includes(t.status)&&<>
+   {(LIVE as readonly string[]).includes(t.status)&&<>
     <button type="button" disabled={!!busy}
      onClick={()=>onTransition(t.ticketId,"CANCELLED")}>إلغاء</button>
     <button type="button" disabled={!!busy}
@@ -140,13 +141,14 @@ export default function QueueClient({businessId,branchId}:{
   return ()=>{cancelled=true;clearTimeout(timer);};
  },[customerQuery,api,router]);
  const columns=useMemo(()=>{
-  const live=data?.tickets.filter(t=>LIVE.includes(t.status))??[];
+  const live=data?.tickets.filter((t):t is Ticket&{status:LiveStatus}=>
+   (LIVE as readonly string[]).includes(t.status))??[];
   return {
    WAITING:live.filter(t=>t.status==="WAITING"),
    CALLED:live.filter(t=>t.status==="CALLED"),
    IN_SERVICE:live.filter(t=>t.status==="IN_SERVICE"),
    liveCount:live.length,
-  };
+  } as Record<LiveStatus,Ticket[]>&{liveCount:number};
  },[data]);
  async function createWalkIn(event:React.FormEvent<HTMLFormElement>){
   event.preventDefault();if(busy)return;

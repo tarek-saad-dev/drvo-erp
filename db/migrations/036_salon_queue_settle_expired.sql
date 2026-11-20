@@ -3,17 +3,20 @@
 -- Extends SQL026 QueueTicket with AutoClose audit; WAITING/CALLED past ExpectedEndAt+grace -> NO_SHOW.
 -- Overdue IN_SERVICE is NOT auto-closed (operator must DONE/CANCEL). No sale/Treasury/GL (ADR-031).
 -- Primary/VPS apply only after backup + 001-035 verification.
+-- After ADD column, later DDL that references new cols must be dynamic SQL (no GO batches).
+
 IF COL_LENGTH('core.QueueTicket','AutoClosedAtUtc') IS NULL
  ALTER TABLE core.QueueTicket ADD AutoClosedAtUtc DATETIME2(3) NULL;
 IF COL_LENGTH('core.QueueTicket','AutoCloseReason') IS NULL
  ALTER TABLE core.QueueTicket ADD AutoCloseReason VARCHAR(40) COLLATE Latin1_General_100_BIN2 NULL;
-IF NOT EXISTS(
- SELECT 1 FROM sys.check_constraints WHERE name=N'CK_QueueTicket_AutoClose' AND parent_object_id=OBJECT_ID(N'core.QueueTicket')
+
+EXEC(N'IF NOT EXISTS(
+ SELECT 1 FROM sys.check_constraints WHERE name=N''CK_QueueTicket_AutoClose'' AND parent_object_id=OBJECT_ID(N''core.QueueTicket'')
 ) ALTER TABLE core.QueueTicket WITH CHECK ADD CONSTRAINT CK_QueueTicket_AutoClose CHECK(
  (AutoClosedAtUtc IS NULL AND AutoCloseReason IS NULL) OR
- (AutoClosedAtUtc IS NOT NULL AND AutoCloseReason IN('SETTLED_BY_OPERATOR')));
+ (AutoClosedAtUtc IS NOT NULL AND AutoCloseReason IN(''SETTLED_BY_OPERATOR'')))');
 
-EXEC(N'CREATE PROCEDURE core.SettleExpiredQueueTickets
+EXEC(N'CREATE OR ALTER PROCEDURE core.SettleExpiredQueueTickets
  @TenantId UNIQUEIDENTIFIER,@BusinessId UNIQUEIDENTIFIER,@BranchId UNIQUEIDENTIFIER,
  @AccountId UNIQUEIDENTIFIER,@SessionVersion INT,@TokenHash CHAR(64),
  @GraceMinutes INT

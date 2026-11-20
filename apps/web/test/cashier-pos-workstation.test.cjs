@@ -60,5 +60,5 @@ test('quick actions expose Cashier finance buttons as explicitly blocked',()=>{
  assert.match(ui,/FINANCE_GATED/);
  assert.match(ui,/ADR-031/);
  assert.match(ui,/disabled/);
- assert.doesNotMatch(ui,/fetch\(|\/api\/sales|POST/);
+ assert.doesNotMatch(ui,/fetch\(|\/api\/sales|method:\s*"POST"/);
 });

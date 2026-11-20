@@ -820,21 +820,29 @@
     },
     {
       "SourceSHA": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
-      "TargetPaths": [],
+      "TargetPaths": [
+        "packages/business-modules/pos/src/return-preview.ts",
+        "apps/web/.../pos-preview/cashier-return-preview.ts",
+        "apps/web/.../pos-preview/cashier-returns-preview.tsx",
+        "_cashier_source/pos-returns/DeleteInvoiceDialog.tsx",
+        "_cashier_source/pos-returns/deleteSalesInvoice.ts",
+        "_cashier_source/pos-returns/deleteReasonGuard.ts"
+      ],
       "UIProof": "OPEN",
-      "DomainTest": "OPEN",
+      "DomainTest": "tests/pos-returns-source.test.cjs (pinned DeleteInvoiceDialog/deleteSalesInvoice blobs; reason-trim + confirm-gate characterization) + apps/web/test/pos-returns-preview.test.cjs (source guards)",
       "SQLHTTPTest": "OPEN",
       "BrowserProof": "OPEN",
       "DataProof": "OPEN",
       "PilotProof": "OPEN",
-      "Status": "BLOCKED",
-      "Blocker": "No DRVO Sales void owner; reversal cascade undefined",
-      "NextAction": "Design void/reversal after ADR-031 post",
+      "Status": "PORTING",
+      "Blocker": "ADR-031 + no DRVO Sales void owner: sale DELETE/refund RECORDING (stock reverse, Treasury cash remove, loyalty ledger delete, GL) stays BLOCKED; no Nest void/refund route; only nonposting return/void confirm-gate preview (reason.trim + sale display ref) exists; Cashier hard-deletes (no DRVO refund_documents yet); UI/Browser/Data/Pilot proof OPEN",
+      "NextAction": "Keep void/refund execution BLOCKED; after ADR-031 + Sales void owner + Inventory/Treasury/Loyalty reverse contracts exist, design flag-gated Nest void/refund with idempotency; owner browser click-path vs DeleteInvoiceDialog",
       "SalonExtension": "none",
       "ID": "POS-16",
       "SourcePaths+BlobSHA": [
         "src/components/sales/DeleteInvoiceDialog.tsx#d7af16171c1fe2a05e06ee109476b76afc244e81",
         "src/app/api/sales/[id]/route.ts#2e9746f0003587b94dc36344877bc7f61210d9e1",
+        "src/lib/deleteSalesInvoice.ts#e38b5ceab439dc5ac823375fd95352e4b3e688d6",
         "src/app/sales/today/page.tsx#fff9718bff295d492cec89d3d481d01fe9791d67"
       ],
       "OriginalScreen": "Void/delete sale invoice",
@@ -843,9 +851,9 @@
       "TenantBusinessBranchScope": "Branch; may require open day",
       "Preconditions": "existing sale; void policy",
       "Reads": "sale + payments",
-      "Writes": "void/delete + reverse cash/loyalty/stock",
-      "Effects": "financial reversal cascade",
-      "FailureAndRaceCases": "already void; day closed; partial reverse fail",
+      "Writes": "void/delete + reverse cash/loyalty/stock (NOT in DRVO preview)",
+      "Effects": "financial reversal cascade (NOT_AUTHORIZED in DRVO preview)",
+      "FailureAndRaceCases": "already void; day closed; partial reverse fail; empty reason",
       "OwnedModule": "POS/Sales + Treasury/Loyalty/Inventory"
     },
     {

@@ -7,9 +7,12 @@ on:
       - 'apps/web/src/app/workspace/**/pos-preview/**'
       - 'apps/web/test/pos-tips-preview.test.cjs'
       - 'apps/web/test/pos-product-stock-gate.test.cjs'
+      - 'apps/web/test/pos-returns-preview.test.cjs'
       - 'tests/pos-tips-source.test.cjs'
+      - 'tests/pos-returns-source.test.cjs'
       - 'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json'
       - '.github/workflows/shared-pos-tips-ci.yml'
+      - '.github/workflows/shared-pos-returns-ci.yml'
   push:
     branches: [main]
     paths:
@@ -18,8 +21,11 @@ on:
       - 'apps/web/src/app/workspace/**/pos-preview/**'
       - 'apps/web/test/pos-tips-preview.test.cjs'
       - 'apps/web/test/pos-product-stock-gate.test.cjs'
+      - 'apps/web/test/pos-returns-preview.test.cjs'
       - 'tests/pos-tips-source.test.cjs'
+      - 'tests/pos-returns-source.test.cjs'
       - '.github/workflows/shared-pos-tips-ci.yml'
+      - '.github/workflows/shared-pos-returns-ci.yml'
 permissions:
   contents: read
 jobs:
@@ -37,8 +43,8 @@ jobs:
           set -euo pipefail
           npm ci --no-audit --no-fund
           npm run build
-          node --test tests/pos-tips-source.test.cjs tests/cashier-workflow-ledger.test.cjs
+          node --test tests/pos-tips-source.test.cjs tests/pos-returns-source.test.cjs tests/cashier-workflow-ledger.test.cjs
       - name: Private UI source guards
         run: |
           set -euo pipefail
-          node --test apps/web/test/pos-tips-preview.test.cjs apps/web/test/cashier-pos-workstation.test.cjs apps/web/test/pos-adjustments-preview.test.cjs apps/web/test/pos-product-stock-gate.test.cjs
+          node --test apps/web/test/pos-tips-preview.test.cjs apps/web/test/pos-returns-preview.test.cjs apps/web/test/cashier-pos-workstation.test.cjs apps/web/test/pos-adjustments-preview.test.cjs apps/web/test/pos-product-stock-gate.test.cjs

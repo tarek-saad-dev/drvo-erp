@@ -166,7 +166,7 @@ async function main(){
     .input('br',sql.UniqueIdentifier,x.br).input('o',sql.UniqueIdentifier,x.offering)
     .query('SELECT QtyMilli AS q FROM core.BranchStockBalance WHERE TenantId=@t AND BusinessId=@b'+
      ' AND BranchId=@br AND OfferingId=@o');
-   assert.equal(bal.recordset[0].q,2000);
+   assert.equal(Number(bal.recordset[0].q),2000);
   });
   await pass('workspace returns AP preview totals and nonposting banners',async()=>{
    const response=await get(endpoint(x.b,x.br),own);assert.equal(response.status,200);
@@ -205,7 +205,7 @@ async function main(){
     .input('br',sql.UniqueIdentifier,x.br).input('o',sql.UniqueIdentifier,x.offering)
     .query('SELECT QtyMilli AS q FROM core.BranchStockBalance WHERE TenantId=@t AND BusinessId=@b'+
      ' AND BranchId=@br AND OfferingId=@o');
-   assert.equal(bal.recordset[0].q,0);
+   assert.equal(Number(bal.recordset[0].q),0);
   });
   await pass('role revocation blocks writes then reads',async()=>{
    await query(admin,"DELETE core.RolePermission WHERE TenantId=@t AND BusinessId=@b"+

@@ -4,7 +4,7 @@ import {
 } from "@nestjs/common";
 import type {IncomingMessage,ServerResponse} from "node:http";
 import {IdentityService,extractSessionCookie} from "../identity/identity.service";
-import {InventoryService,type InventoryWorkspace} from "./inventory.service";
+import {InventoryService,type InventoryWorkspace,type TransferWorkspace} from "./inventory.service";
 
 function enabled():void{
  if(process.env.DRVO_K5_AUTH_ENABLED!=="YES"||process.env.DRVO_INVENTORY_ENABLED!=="YES")
@@ -81,5 +81,36 @@ export class InventoryController {
   const token=extractSessionCookie(req.headers.cookie);
   const actor=await this.identity.actorFromToken(token);
   return this.inventory.cancelAdjust(actor,token!,businessId,branchId,adjustId,key,body);
+ }
+ @Get("transfers")
+ async listTransfers(@Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,
+  @Param("businessId") businessId:string,@Param("branchId") branchId:string
+ ):Promise<TransferWorkspace>{
+  res.setHeader("Cache-Control","no-store");enabled();
+  const token=extractSessionCookie(req.headers.cookie);
+  const actor=await this.identity.actorFromToken(token);
+  return this.inventory.listTransfers(actor,token!,businessId,branchId);
+ }
+ @Post("transfers") @HttpCode(200)
+ async createTransfer(@Headers("origin") origin:string|undefined,
+  @Headers("idempotency-key") key:string|undefined,
+  @Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,
+  @Param("businessId") businessId:string,@Param("branchId") branchId:string,
+  @Body() body:unknown){
+  res.setHeader("Cache-Control","no-store");enabled();allowedOrigin(origin);
+  const token=extractSessionCookie(req.headers.cookie);
+  const actor=await this.identity.actorFromToken(token);
+  return this.inventory.createTransfer(actor,token!,businessId,branchId,key,body);
+ }
+ @Post("transfers/:transferId/cancel") @HttpCode(200)
+ async cancelTransfer(@Headers("origin") origin:string|undefined,
+  @Headers("idempotency-key") key:string|undefined,
+  @Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,
+  @Param("businessId") businessId:string,@Param("branchId") branchId:string,
+  @Param("transferId") transferId:string,@Body() body:unknown){
+  res.setHeader("Cache-Control","no-store");enabled();allowedOrigin(origin);
+  const token=extractSessionCookie(req.headers.cookie);
+  const actor=await this.identity.actorFromToken(token);
+  return this.inventory.cancelTransfer(actor,token!,businessId,branchId,transferId,key,body);
  }
 }

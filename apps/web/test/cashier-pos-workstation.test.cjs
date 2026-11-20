@@ -36,7 +36,7 @@ test('catalog browser preserves Cashier / focus and service-product tabs without
  assert.doesNotMatch(ui,/priceMinor\s*=/);
 });
 
-test('PRODUCT tab uses Cashier-like labels and offeringId prefix search without fake barcode/stock',()=>{
+test('PRODUCT tab uses Cashier-like labels and offeringId prefix search without fake barcode',()=>{
  const ui=read('cashier-catalog-browser.tsx');
  assert.match(ui,/اختر المنتج/);
  assert.match(ui,/بيع تجزئة/);
@@ -44,8 +44,10 @@ test('PRODUCT tab uses Cashier-like labels and offeringId prefix search without 
  assert.match(ui,/idPrefix\.includes\(q\)/);
  assert.match(ui,/displayName\.toLocaleLowerCase\("en"\)/);
  assert.match(ui,/لا باركود|ليست باركود|لا باركود\/مخزون/);
- assert.doesNotMatch(ui,/Barcode|barcode\s*[:=]|qtyOnHand|stockStatus|fakeStock|مخزون:\s*\d/);
+ // SQL027 overlay may expose stockStatus/qtyMilli; forbid barcode invent + client price writes.
+ assert.doesNotMatch(ui,/Barcode|barcode\s*[:=]|fakeStock|qtyOnHand/);
  assert.doesNotMatch(ui,/priceMinor\s*=/);
+ assert.match(ui,/ProductStockHint|productStock|stockStatus/);
 });
 
 test('quick actions expose Cashier finance buttons as explicitly blocked',()=>{

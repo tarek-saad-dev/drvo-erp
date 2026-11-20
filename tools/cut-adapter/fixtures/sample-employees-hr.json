@@ -1,0 +1,36 @@
+{
+  "schema": "drvo.cut-adapter.fixture.employees-hr.v1",
+  "meta": {
+    "mode": "EXPORTED_JSON_FIXTURE_ONLY",
+    "sourceSystem": "CUT_CASHIER",
+    "datasetId": "FIX-CUT-HR-01",
+    "exportedAt": "2026-11-20T00:00:00.000Z",
+    "liveConnectionAuthorized": false,
+    "sourceTenantKey": "SYN-TENANT-CUT-01",
+    "sourceBranchKey": "SYN-BRANCH-CUT-01",
+    "notes": "Pseudonymized HR fixture only. Never bind live employee phones or salaries."
+  },
+  "employees": [
+    {
+      "sourceEmployeeId": 101,
+      "displayNameToken": "EMP-ALPHA",
+      "roleToken": "ROLE-BARBER",
+      "sourceBranchKey": "SYN-BRANCH-CUT-01",
+      "isActive": true
+    },
+    {
+      "sourceEmployeeId": 102,
+      "displayNameToken": "EMP-BETA",
+      "roleToken": "ROLE-CASHIER",
+      "sourceBranchKey": "SYN-BRANCH-CUT-01",
+      "isActive": true
+    },
+    {
+      "sourceEmployeeId": 103,
+      "displayNameToken": "EMP-GAMMA",
+      "roleToken": "ROLE-BARBER",
+      "sourceBranchKey": "SYN-BRANCH-CUT-01",
+      "isActive": false
+    }
+  ]
+}

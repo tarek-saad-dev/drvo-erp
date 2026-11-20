@@ -27,11 +27,19 @@ function assertPlanShape(plan) {
   if (!Array.isArray(plan.customers) || !Array.isArray(plan.services)) {
     throw new TypeError('Plan customers/services arrays required');
   }
+  if (
+    Object.prototype.hasOwnProperty.call(plan, 'employees') &&
+    plan.employees != null &&
+    !Array.isArray(plan.employees)
+  ) {
+    throw new TypeError('Plan employees must be an array when provided');
+  }
   // Scan entity tokens only — do not walk generated findings text (may say "VPS"/"BLOCKED").
   assertNoLiveConnectionMarkers({
     datasetId: plan.datasetId,
     customers: plan.customers,
     services: plan.services,
+    employees: plan.employees || [],
   });
   return plan;
 }
@@ -154,6 +162,11 @@ function buildIdentityMappingLedger(plan, options = {}) {
     entries.push(
       mapRow('CATALOG_SERVICE', withDefaultBranch(row), plan.datasetId, sourceTenantKey)
     );
+  }
+  if (Array.isArray(plan.employees)) {
+    for (const row of plan.employees) {
+      entries.push(mapRow('HR_EMPLOYEE', withDefaultBranch(row), plan.datasetId, sourceTenantKey));
+    }
   }
   entries.sort((a, b) => (a.sourceKey < b.sourceKey ? -1 : a.sourceKey > b.sourceKey ? 1 : 0));
 

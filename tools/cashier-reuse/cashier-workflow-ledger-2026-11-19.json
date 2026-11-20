@@ -262,17 +262,19 @@
       "OwnedModule": "Catalog + POS/Sales (nonposting)",
       "SalonExtension": "Inventory/barcode owner still absent",
       "TargetPaths": [
-        "apps/web/.../pos-preview/cashier-catalog-browser.tsx"
+        "apps/web/.../pos-preview/cashier-catalog-browser.tsx",
+        "apps/web/.../pos-preview/cashier-catalog-browser.tsx",
+        "apps/web/.../pos-preview/pos-preview-client.tsx"
       ],
-      "UIProof": "OPEN",
-      "DomainTest": "apps/web/test/cashier-pos-workstation.test.cjs PRODUCT assertions",
+      "UIProof": "SOURCE-LEVEL ONLY: apps/web/test/pos-product-stock-gate.test.cjs (SQL027 overlay; no sale decrement)",
+      "DomainTest": "apps/web/test/pos-product-stock-gate.test.cjs",
       "SQLHTTPTest": "n/a (no new Catalog columns)",
       "BrowserProof": "OPEN",
       "DataProof": "OPEN",
       "PilotProof": "OPEN",
       "Status": "PORTING",
-      "Blocker": "CatalogOffering has no barcode/stock; branch inventory + server stock gate still GAP; Owner browser OPEN",
-      "NextAction": "Keep honest prefix/name search; inventory/barcode only after owned Inventory contract"
+      "Blocker": "Barcode absent on CatalogOffering; sale-time stock decrement + COGS remain gated",
+      "NextAction": "Owner browser with inventory.read; barcode still GAP; sale stock decrement ADR-031"
     },
     {
       "ID": "POS-04",
@@ -3739,17 +3741,20 @@
       "TargetPaths": [
         "tools/cut-adapter/**",
         "tests/cut-adapter.test.cjs",
-        "docs/04-execution/TRACK-D-CUT-SALON-READINESS-2026-11-19.md"
+        "docs/04-execution/TRACK-D-CUT-SALON-READINESS-2026-11-19.md",
+        "tools/cut-adapter/preactivation-gates.cjs",
+        "tools/cut-adapter/employee-planner.cjs",
+        "tools/cut-adapter/fixtures/sample-employees-hr.json"
       ],
       "UIProof": "n/a",
-      "DomainTest": "tests/cut-adapter.test.cjs",
+      "DomainTest": "tools/cut-adapter/verify.cjs (SQL027/031 source gates + HR_EMPLOYEE identity map dry-run)",
       "SQLHTTPTest": "n/a (fixture-only; no SQL)",
       "BrowserProof": "OPEN (Owner browser gate documented, not executed)",
       "DataProof": "OPEN (synthetic fixtures only; not real Cut export)",
       "PilotProof": "OPEN",
       "Status": "SOURCE_IDENTIFIED",
       "Blocker": "Target SQL024/025 apply, isolated restore, K5 permissions, Owner browser, founder Cut scope, approved import ledger all OPEN",
-      "NextAction": "Keep real-data activation BLOCKED; use offline verify + gate board until independent operator evidence exists"
+      "NextAction": "Keep real-data activation BLOCKED until founder source scope + isolated restore + Owner browser"
     }
   ]
 }

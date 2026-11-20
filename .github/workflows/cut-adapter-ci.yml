@@ -38,6 +38,7 @@ jobs:
           node --check tools/cut-adapter/identity-mapping.cjs
           node --check tools/cut-adapter/reconciliation-report.cjs
           node --check tools/cut-adapter/preactivation-gates.cjs
+          node --check tools/cut-adapter/employee-planner.cjs
           node --check tools/cut-adapter/verify.cjs
           node --test tests/cut-adapter.test.cjs
           node tools/cut-adapter/verify.cjs

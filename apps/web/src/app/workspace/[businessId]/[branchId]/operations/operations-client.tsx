@@ -32,6 +32,7 @@ export default function OperationsClient({businessId,branchId}:{
  const openDayKey=useRef<string|null>(null);
  const closeDayKey=useRef<string|null>(null);
  const openShiftKey=useRef<string|null>(null);
+ const handoffKey=useRef<string|null>(null);
  const closeShiftKeys=useRef<Record<string,string>>({});
  const load=useCallback(async()=>{
   if(!GUID.test(businessId)||!GUID.test(branchId)){setState("denied");return;}
@@ -122,8 +123,35 @@ export default function OperationsClient({businessId,branchId}:{
   }catch{setError(true);setNotice("انقطع الاتصال؛ أعد نفس طلب الإغلاق.");}
   finally{setBusy("");}
  }
+ /** Soft custody handoff: close OPEN shift elsewhere (or first-open) onto this branch day. */
+ async function handoffShift(){
+  if(busy||!data?.openDay)return;
+  setBusy("handoff");setNotice("");setError(false);
+  if(!handoffKey.current)handoffKey.current=crypto.randomUUID();
+  try{
+   const r=await send(api+"/shift-handoff",handoffKey.current,{
+    dayId:data.openDay.dayId,expectedSourceShiftId:null});
+   if(r.status===401){router.replace("/sign-in");return;}
+   if(r.status===403||r.status===404){setError(true);setNotice("غير مصرح بنقل الوردية لهذا الفرع.");return;}
+   if(r.status===409){handoffKey.current=null;setError(true);
+    setNotice("تعارض نقل الوردية — وردية قديمة أو اليوم غير مفتوح أو طلب متزامن.");return;}
+   if(!r.ok){setError(true);setNotice("تعذر نقل الوردية؛ أعد نفس الطلب.");return;}
+   const body=await r.json() as {outcome?:string;glPostState?:string;financialPostingState?:string};
+   if(body.glPostState!=="GATED"||body.financialPostingState!=="NOT_AUTHORIZED"){
+    setError(true);setNotice("استجابة غير متوقعة — الترحيل المحاسبي يجب أن يبقى GATED.");return;
+   }
+   handoffKey.current=null;await load();
+   setNotice(body.outcome==="ALREADY_OPEN_HERE"||body.outcome==="IDEMPOTENT_REPLAY"?
+    "الوردية مفتوحة هنا بالفعل — بدون ترحيل محاسبي.":
+    body.outcome==="FIRST_OPEN_HERE"?
+     "اتفتحت وردية على هذا الفرع — حراسة تشغيلية فقط (NONPOSTING).":
+     "اتنقلت الوردية لهذا الفرع وأُغلقت أي وردية مفتوحة سابقًا — بدون خزنة أو GL.");
+  }catch{setError(true);setNotice("انقطع الاتصال؛ أعد نفس طلب نقل الوردية.");}
+  finally{setBusy("");}
+ }
  const planLabel=data?.planAction==="NO_OP"?"اليوم متوافق":
   data?.planAction==="ROLLED_OVER"?"مطلوب تدوير يوم":"مطلوب فتح يوم مفقود";
+ const openHere=data?.shifts.some(s=>s.status==="OPEN")??false;
  return <main className="k5-workspace" dir="rtl">
   <header className="k5-workspace-header">
    <div className="k5-brand"><span className="brandmark">D</span> DRVO <b>ERP</b></div>
@@ -168,10 +196,18 @@ export default function OperationsClient({businessId,branchId}:{
     <h2>الوردية</h2>
     <p className="k5-muted">الجاهزية غير المالية: {data.readiness.state==="READY_FOR_NONFINANCIAL_WORK"?
      "جاهز للعمل غير المالي":"محظور — "+data.readiness.reasons.join(", ")}</p>
-    {data.openDay&&<button type="button" className="k5-save" disabled={!!busy}
-     onClick={()=>void openShift()}>
-     {busy==="open-shift"?"جاري فتح الوردية…":"فتح ورديتي على اليوم المفتوح"}
-    </button>}
+    <div className="k5-head-actions">
+     {data.openDay&&!openHere&&<button type="button" className="k5-save" disabled={!!busy}
+      onClick={()=>void openShift()}>
+      {busy==="open-shift"?"جاري فتح الوردية…":"فتح ورديتي على اليوم المفتوح"}
+     </button>}
+     {data.openDay&&<button type="button" className="k5-save" disabled={!!busy}
+      onClick={()=>void handoffShift()}>
+      {busy==="handoff"?"جاري نقل الوردية…":
+       openHere?"تأكيد الوردية على هذا الفرع":"نقل ورديتي لهذا الفرع (إغلاق أي فرع آخر)"}
+     </button>}
+    </div>
+    <p className="k5-muted">نقل الوردية حراسة تشغيلية فقط — بدون تسوية نقدية أو ترحيل محاسبي (SQL039 · NOT_AUTHORIZED).</p>
    </section>
    <section className="k5-admin-card drvo-expenses-list">
     <div className="k5-admin-summary"><div>

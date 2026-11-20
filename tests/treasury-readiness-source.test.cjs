@@ -234,7 +234,7 @@ test('handoff preview mirrors Cashier one-OPEN-shift handoff and stays non-mutat
  assert.equal(hand.plan,'CLOSE_ELSEWHERE_AND_OPEN_HERE');
  assert.equal(hand.gate,'handoff_required');
  assert.equal(hand.requiresAtomicClose,true);
- assert.equal(hand.atomicHandoff,'NOT_IMPLEMENTED_IN_DRVO');
+ assert.equal(hand.atomicHandoff,'AVAILABLE_VIA_SQL039');
  assert.deepEqual(hand.reasons,['ACTOR_HAS_OPEN_SHIFT_ELSEWHERE','SOURCE_SHIFT_CLOSES_WITHOUT_RECON']);
  assert.equal(hand.evidence.openShiftElsewhere,'CALLER_SUPPLIED_UNVERIFIED');
  const blocked=p({targetDayOpen:false});

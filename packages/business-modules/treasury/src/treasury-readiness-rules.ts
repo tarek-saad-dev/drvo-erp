@@ -278,8 +278,8 @@ export type HandoffReason = "NO_OPEN_DAY_ON_TARGET" | "ACTOR_HAS_OPEN_SHIFT_ELSE
 export type HandoffPreview = Readonly<{
   plan: HandoffPlan; gate: ShiftWriteGateReason; reasons: HandoffReason[];
   requiresAtomicClose: boolean;
-  /** DRVO has no atomic cross-branch handoff SQL: UX_OperationalShift_OneOpenPerAccount rejects it. */
-  atomicHandoff: "NOT_IMPLEMENTED_IN_DRVO";
+  /** Preview stays non-mutating; atomic close+open is POST .../shift-handoff (SQL039). */
+  atomicHandoff: "AVAILABLE_VIA_SQL039";
   evidence: Readonly<{ openShiftHere: "TRUSTED_SQL_READ"; openShiftElsewhere: "CALLER_SUPPLIED_UNVERIFIED" | "NOT_APPLICABLE" }>;
   mutation: "NOT_PERFORMED"; financialPostingState: "NOT_AUTHORIZED";
 }>;
@@ -311,7 +311,7 @@ export function previewShiftHandoff(i: Readonly<{
   }
   return {
     plan, gate, reasons, requiresAtomicClose: elsewhere !== null && i.targetDayOpen,
-    atomicHandoff: "NOT_IMPLEMENTED_IN_DRVO",
+    atomicHandoff: "AVAILABLE_VIA_SQL039",
     evidence: { openShiftHere: "TRUSTED_SQL_READ",
       openShiftElsewhere: elsewhere === null ? "NOT_APPLICABLE" : "CALLER_SUPPLIED_UNVERIFIED" },
     mutation: "NOT_PERFORMED", financialPostingState: "NOT_AUTHORIZED",

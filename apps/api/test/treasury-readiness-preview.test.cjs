@@ -214,7 +214,7 @@ test('handoff preview plans from trusted day/shift evidence and never mutates',a
    ...handoff({actorOpenShiftElsewhereBranchId:ID(9)}));
   assert.equal(hand.plan,'CLOSE_ELSEWHERE_AND_OPEN_HERE');
   assert.equal(hand.gate,'handoff_required');
-  assert.equal(hand.atomicHandoff,'NOT_IMPLEMENTED_IN_DRVO');
+  assert.equal(hand.atomicHandoff,'AVAILABLE_VIA_SQL039');
   assert.equal(hand.evidence.openShiftElsewhere,'CALLER_SUPPLIED_UNVERIFIED');
   const here=await make(openDay(today()),[shiftRow(SHIFT,'OPEN')]).previewHandoff(
    ...handoff({actorOpenShiftElsewhereBranchId:ID(9)}));

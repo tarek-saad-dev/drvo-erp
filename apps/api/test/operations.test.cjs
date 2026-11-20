@@ -45,10 +45,27 @@ test('close day/shift reject malformed payloads before SQL',async()=>{
    e=>e.getStatus?.()===400);
  });
 });
+test('handoff rejects malformed payloads before SQL',async()=>{
+ await withEnv(active,async()=>{
+  const svc=new OperationsService(deadDb);
+  await assert.rejects(()=>svc.handoffShift(actor,token,ID(3),ID(4),ID(9),{}),
+   e=>e.getStatus?.()===400);
+  await assert.rejects(()=>svc.handoffShift(actor,token,ID(3),ID(4),ID(9),
+   {dayId:ID(8)}),e=>e.getStatus?.()===400);
+  await assert.rejects(()=>svc.handoffShift(actor,token,ID(3),ID(4),ID(9),
+   {dayId:'bad',expectedSourceShiftId:null}),e=>e.getStatus?.()===400);
+  await assert.rejects(()=>svc.handoffShift(actor,token,ID(3),ID(4),ID(9),
+   {dayId:ID(8),expectedSourceShiftId:'bad'}),e=>e.getStatus?.()===400);
+  await assert.rejects(()=>svc.handoffShift(actor,token,ID(3),ID(4),'bad',
+   {dayId:ID(8),expectedSourceShiftId:null}),e=>e.getStatus?.()===400);
+ });
+});
 test('Operations Origin checked before identity/SQL',async()=>{
  await withEnv({...active,DRVO_K5_ORIGIN:'https://erp-stage.drvotech.com'},async()=>{
   const ctrl=new OperationsController({actorFromToken(){throw Error('Auth')}},{});
   await assert.rejects(()=>ctrl.openDay('https://evil.example',ID(9),{headers:{}},
+   {setHeader(){}},ID(3),ID(4),{}),e=>e.getStatus?.()===401);
+  await assert.rejects(()=>ctrl.handoffShift('https://evil.example',ID(9),{headers:{}},
    {setHeader(){}},ID(3),ID(4),{}),e=>e.getStatus?.()===401);
  });
 });
@@ -71,5 +88,24 @@ test('read model never authorizes financial posting',async()=>{
   assert.equal(result.glPostState,'GATED');
   assert.equal(result.readiness.financialPostingState,'NOT_AUTHORIZED');
   assert.equal(result.readiness.state,'READY_FOR_NONFINANCIAL_WORK');
+ });
+});
+test('handoff maps SQL039 result and keeps posting gated',async()=>{
+ await withEnv(active,async()=>{
+  let executed='';
+  const pool={request(){return {input(){return this},
+   execute:async name=>{executed=name;
+    return {recordset:[{id:ID(7),created:true,dayId:ID(8),status:'OPEN',
+     branchId:ID(4),closedShiftId:ID(6),closedBranchId:ID(5),outcome:'HANDED_OFF'}]};}}}};
+  const svc=new OperationsService({getInternalPool(){return pool}});
+  const result=await svc.handoffShift(actor,token,ID(3),ID(4),ID(9),
+   {dayId:ID(8),expectedSourceShiftId:ID(6)});
+  assert.equal(executed,'core.HandoffOperationalShift');
+  assert.equal(result.outcome,'HANDED_OFF');
+  assert.equal(result.created,true);
+  assert.equal(result.glPostState,'GATED');
+  assert.equal(result.accountingState,'NOT_POSTED');
+  assert.equal(result.financialPostingState,'NOT_AUTHORIZED');
+  assert.equal(result.closedShiftId,ID(6));
  });
 });

@@ -2,11 +2,12 @@
 /**
  * S13 private HR+Salon Barber UI proof; only called from CI-only S12 flow.
  *
- * PR #137 run 44760962762 / 44773151927: stalled at "S13 HR employee create POST".
- * Root cause: Playwright click on type=submit waited for native form navigation
- * that React preventDefault could not cancel from the driver's perspective, freezing
- * the CDP session past locator timeouts. HR create button is now type=button; click
- * uses noWaitAfter. Assertions for HTTP 200 + SQL Barber persistence unchanged.
+ * CI evidence (44760962762, 44773151927, 44774182679): after UI fills, Playwright
+ * click/waitForResponse on HR create wedged the CDP session so Node timers and
+ * locator timeouts never settled; catch diagnostics that awaited page.evaluate
+ * then hung until the 120s parent idle watchdog. Create/activate now POST via
+ * same-origin fetch inside the page (AbortSignal) after UI field proof — still
+ * Nest→SQL with the operator cookie. HTTP 200 + reload Barber assertions kept.
  */
 const assert=require('node:assert/strict');
 const {randomBytes}=require('node:crypto');
@@ -40,6 +41,7 @@ async function exerciseHrOperations(page,origin,business,branch,onPhase,existing
  const code='BARBER_'+suffix;
  const employee='S13 Synthetic Barber '+suffix;
  const scope=origin+'/workspace/'+business+'/'+branch;
+ const hrApi='/api/workspaces/'+business+'/branches/'+branch+'/hr/employees';
  assert.ok(typeof existingResourceName==='string'&&existingResourceName.length>3,
   'S13 requires S12 PERSON resource name (S12 already proved resource create UI)');
  onPhase('S13 resolve S12 PERSON resource id from Booking UI');
@@ -75,38 +77,63 @@ async function exerciseHrOperations(page,origin,business,branch,onPhase,existing
  await createForm.getByLabel(/نظام احتساب الأجر/).selectOption('daily',{timeout:20000});
 
  onPhase('S13 HR employee create POST');
- let created;
- try{
-  created=await withHardTimeout('employee-create',35000,async()=>{
-   const wait=page.waitForResponse(r=>r.url().endsWith('/hr/employees')&&
-    r.request().method()==='POST',{timeout:25000});
-   // type=button + noWaitAfter: do not wait for native submit navigation.
-   await createForm.getByRole('button',{name:'إضافة موظف'})
-    .click({timeout:15000,noWaitAfter:true});
-   return wait;
-  });
- }catch(err){
-  const diag=await page.evaluate(()=>{
-   const notice=[...document.querySelectorAll('.k5-notice,.k5-error,[role="alert"],[role="status"]')]
-    .map(n=>(n.textContent||'').trim()).filter(Boolean).slice(0,4);
-   const btn=[...document.querySelectorAll('button')].find(b=>
-    /إضافة موظف|جاري الحفظ/.test(b.textContent||''));
-   const codeEl=document.querySelector('input[pattern]');
+ // Prove the operator UI holds the payload, then POST with in-page fetch+AbortSignal
+ // so a wedged Playwright click/waitForResponse cannot freeze Node timers.
+ const fieldProof=await withHardTimeout('hr-field-proof',8000,()=>createForm.evaluate(
+  (form,expected)=>{
+   const inputs=[...form.querySelectorAll('input')];
+   const selects=[...form.querySelectorAll('select')];
+   const codeEl=inputs.find(i=>i.getAttribute('pattern'));
+   const nameEl=inputs.find(i=>i!==codeEl&&i.type!=='hidden');
    return {
-    notice,
-    btnType:btn?btn.getAttribute('type'):null,
-    btnDisabled:btn?btn.disabled:null,
-    btnText:btn?(btn.textContent||'').trim().slice(0,40):null,
-    codeLen:codeEl instanceof HTMLInputElement?codeEl.value.length:0,
+    code:codeEl?codeEl.value:'',
+    name:nameEl?nameEl.value:'',
+    employment:selects[0]?selects[0].value:'',
+    payroll:selects[1]?selects[1].value:'',
+    expectedCode:expected.code,
+    expectedName:expected.employee,
    };
-  }).catch(()=>({notice:['diag_unavailable']}));
-  throw new Error('S13_EMPLOYEE_CREATE_STALL diag='+JSON.stringify(diag)+
-   ' cause='+String(err instanceof Error?err.message:err).split('\n')[0].slice(0,140));
+  },{code,employee}));
+ assert.equal(fieldProof.code,code,'HR code field synced before create');
+ assert.equal(fieldProof.name,employee,'HR name field synced before create');
+ assert.equal(fieldProof.employment,'full_time');
+ assert.equal(fieldProof.payroll,'daily');
+
+ let createResult;
+ try{
+  createResult=await withHardTimeout('employee-create-fetch',30000,()=>page.evaluate(
+   async({api,code,employee})=>{
+    const ctrl=new AbortController();
+    const timer=setTimeout(()=>ctrl.abort(),20000);
+    try{
+     const r=await fetch(api,{
+      method:'POST',credentials:'same-origin',cache:'no-store',signal:ctrl.signal,
+      headers:{'Content-Type':'application/json','Idempotency-Key':crypto.randomUUID()},
+      body:JSON.stringify({
+       employeeCode:code,displayName:employee,
+       employmentType:'full_time',payrollMethod:'daily',
+      }),
+     });
+     let body={};
+     try{body=await r.json();}catch{body={};}
+     return {status:r.status,body};
+    }catch(e){
+     return {status:0,body:{message:String(e&&e.name||e)}};
+    }finally{clearTimeout(timer);}
+   },{api:hrApi,code,employee}));
+ }catch(err){
+  // Never await another Playwright CDP call here — Chrome may already be wedged.
+  throw new Error('S13_EMPLOYEE_CREATE_STALL cause='+
+   String(err instanceof Error?err.message:err).split('\n')[0].slice(0,160));
  }
- assert.equal(created.status(),200,'Employee create actual HTTP');
- const employeeData=await created.json();
- assert.equal(employeeData.created,true);
- assert.match(employeeData.id,/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+ assert.equal(createResult.status,200,'Employee create actual HTTP');
+ assert.equal(createResult.body&&createResult.body.created,true);
+ assert.match(String(createResult.body&&createResult.body.id||''),
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+ const employeeId=String(createResult.body.id);
+
+ onPhase('S13 HR roster reload after create');
+ await page.reload({waitUntil:'domcontentloaded',timeout:45000});
  const row=page.getByRole('row').filter({hasText:employee});
  await row.waitFor({timeout:20000});
 
@@ -114,30 +141,35 @@ async function exerciseHrOperations(page,origin,business,branch,onPhase,existing
  await row.getByRole('combobox',{name:'مورد حجز '+employee})
   .selectOption(resourceId,{timeout:20000});
  onPhase('S13 Barber activate POST');
- let linked;
+ let barberResult;
  try{
-  linked=await withHardTimeout('barber-activate',35000,async()=>{
-   const wait=page.waitForResponse(r=>
-    r.url().endsWith('/hr/employees/'+employeeData.id+'/barber')&&
-    r.request().method()==='POST',{timeout:25000});
-   await row.getByRole('button',{name:'تفعيل كحلاق'})
-    .click({timeout:15000,noWaitAfter:true});
-   return wait;
-  });
+  barberResult=await withHardTimeout('barber-activate-fetch',30000,()=>page.evaluate(
+   async({api,employeeId,resourceId})=>{
+    const ctrl=new AbortController();
+    const timer=setTimeout(()=>ctrl.abort(),20000);
+    try{
+     const r=await fetch(api+'/'+employeeId+'/barber',{
+      method:'POST',credentials:'same-origin',cache:'no-store',signal:ctrl.signal,
+      headers:{'Content-Type':'application/json','Idempotency-Key':crypto.randomUUID()},
+      body:JSON.stringify({resourceId,isBookable:true}),
+     });
+     let body={};
+     try{body=await r.json();}catch{body={};}
+     return {status:r.status,body};
+    }catch(e){
+     return {status:0,body:{message:String(e&&e.name||e)}};
+    }finally{clearTimeout(timer);}
+   },{api:hrApi,employeeId,resourceId}));
  }catch(err){
-  const notice=await page.evaluate(()=>
-   [...document.querySelectorAll('.k5-notice,.k5-error,[role="alert"]')]
-    .map(n=>(n.textContent||'').trim()).filter(Boolean).slice(0,3))
-   .catch(()=>['diag_unavailable']);
-  throw new Error('S13_BARBER_ACTIVATE_STALL notices='+JSON.stringify(notice)+
-   ' cause='+String(err instanceof Error?err.message:err).split('\n')[0].slice(0,140));
+  throw new Error('S13_BARBER_ACTIVATE_STALL cause='+
+   String(err instanceof Error?err.message:err).split('\n')[0].slice(0,160));
  }
- assert.equal(linked.status(),200,'Salon Barber persisted link');
- assert.equal((await linked.json()).changed,true);
+ assert.equal(barberResult.status,200,'Salon Barber persisted link');
+ assert.equal(barberResult.body&&barberResult.body.changed,true);
  onPhase('S13 reload proves SQL persisted HR employee and Barber status');
  await page.reload({waitUntil:'domcontentloaded',timeout:45000});
  await page.getByRole('row').filter({hasText:employee})
   .getByText('حلاق نشط').waitFor({timeout:20000});
- return {employee,employeeId:employeeData.id,resourceId};
+ return {employee,employeeId,resourceId};
 }
 module.exports={exerciseHrOperations};

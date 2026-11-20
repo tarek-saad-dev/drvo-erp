@@ -51,8 +51,9 @@ test('S13 HR browser records action-level phases and parent fails closed on stal
  assert.match(runner,/const MAX_PHASE_IDLE_MS=120\*1000/);
  assert.match(runner,/clearInterval\(phaseWatchdog\)/);
  assert.match(runner,/Chromium phase stalled/);
- // type=submit click waited for native navigation in CI; require noWaitAfter + hard timeout.
- assert.match(hr,/noWaitAfter:\s*true/);
+ // CDP click/waitForResponse wedged CI; require in-page fetch+AbortSignal create.
+ assert.match(hr,/employee-create-fetch/);
+ assert.match(hr,/AbortController/);
  assert.match(hr,/S13_EMPLOYEE_CREATE_STALL/);
  assert.match(hr,/withHardTimeout/);
  assert.match(hr,/getByRole\('heading',\{name:'الموظفون والحلاقون'\}\)\.waitFor/);

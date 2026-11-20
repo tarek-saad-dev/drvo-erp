@@ -1,7 +1,7 @@
 -- SQL027: Inventory branch on-hand + nonposting purchase/opening receives + adjustments.
 -- Cashier pin 046bf19: branch inventory list, stock policy, purchaseInventory receive.
 -- Quantities are QtyMilli (1000 = 1 unit). No sale decrement, transfers, AP, Treasury or GL (ADR-031).
--- Primary/VPS apply only after backup + 001ΓÇô026 verification.
+-- Primary/VPS apply only after backup + 001-026 verification.
 CREATE TABLE core.InventoryStockPolicy (
  TenantId UNIQUEIDENTIFIER NOT NULL,BusinessId UNIQUEIDENTIFIER NOT NULL,
  AllowNegativeStock BIT NOT NULL CONSTRAINT DF_InvPolicy_Neg DEFAULT(1),
@@ -373,7 +373,8 @@ AS BEGIN
      AND ReceiveId=@ReceiveId ORDER BY [LineNo];
   OPEN c;FETCH NEXT FROM c INTO @Off,@Qty;
   WHILE @@FETCH_STATUS=0 BEGIN
-   EXEC core.ApplyBranchStockDelta @TenantId,@BusinessId,@BranchId,@Off,-@Qty;
+   EXEC core.ApplyBranchStockDelta @TenantId=@TenantId,@BusinessId=@BusinessId,
+    @BranchId=@BranchId,@OfferingId=@Off,@DeltaMilli=-@Qty;
    FETCH NEXT FROM c INTO @Off,@Qty;
   END
   CLOSE c;DEALLOCATE c;
@@ -452,7 +453,8 @@ AS BEGIN
   IF @Prior<>@ClientRequestId THROW 51473,''Stock adjust already cancelled'',1;
   SELECT CONVERT(VARCHAR(36),@AdjustId) AS id,CAST(0 AS BIT) AS changed;
  END ELSE BEGIN
-  EXEC core.ApplyBranchStockDelta @TenantId,@BusinessId,@BranchId,@Off,-@Delta;
+  EXEC core.ApplyBranchStockDelta @TenantId=@TenantId,@BusinessId=@BusinessId,
+   @BranchId=@BranchId,@OfferingId=@Off,@DeltaMilli=-@Delta;
   UPDATE core.StockAdjustDocument SET Status=''CANCELLED'',CancelRequestId=@ClientRequestId,
    CancelledByAccountId=@AccountId,CancelledAtUtc=SYSUTCDATETIME()
    WHERE TenantId=@TenantId AND BusinessId=@BusinessId AND BranchId=@BranchId

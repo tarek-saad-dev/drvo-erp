@@ -149,7 +149,12 @@ test('archive is honestly blocked: no archive/deactivate network call exists',()
  assert.doesNotMatch(code(client),/archive\w*\(/);
 });
 
-test('ledger and target panels are preview-only: no write keys, no payout/payroll/treasury calls',()=>{
+test('ledger and target panels are preview-only: no write keys, no payout/payroll/treasury/GL/whatsapp/cash',()=>{
+ for(const src of [code(ledger),code(target),code(client),code(modelSrc)]){
+  assert.doesNotMatch(src,/whatsapp|sendMessage|Twilio|wa\.me/i);
+  assert.doesNotMatch(src,/\/gl\/|general.?ledger|journal.?post|accounting.?post|postToCash/i);
+  assert.doesNotMatch(src,/\/treasury|CashMove|post-to-cash|payroll\/daily/i);
+ }
  for(const src of [code(ledger),code(target)]){
   assert.doesNotMatch(src,/Idempotency-Key|crypto\.randomUUID|Math\.random|Date\.now/);
   assert.doesNotMatch(src,/\/treasury|\/payout|\/payroll|\/cash|\/expenses|\/reports|\/pos-drafts/i);

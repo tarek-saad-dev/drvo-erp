@@ -98,30 +98,42 @@ AS BEGIN
    SELECT 1 FROM @Parsed WHERE OfferingId IS NULL OR Quantity NOT BETWEEN 1 AND 20
     OR (DiscountInputMinor IS NOT NULL AND DiscountInputMinor NOT BETWEEN 0 AND 9000000000000)
     OR (DiscountInputBps IS NOT NULL AND DiscountInputBps NOT BETWEEN 0 AND 10000)
-    OR ((PackageId IS NULL) <> (PackageGroupKey IS NULL))
-    OR ((PackageId IS NULL) <> (PackageRole IS NULL))
-    OR ((PackageId IS NULL) <> (CommercialPackagePriceMinor IS NULL))
+    OR (PackageId IS NULL AND (
+      PackageGroupKey IS NOT NULL OR PackageRole IS NOT NULL
+      OR CommercialPackagePriceMinor IS NOT NULL))
     OR (PackageId IS NOT NULL AND (
-      LEN(PackageGroupKey) NOT BETWEEN 1 AND 80
+      PackageGroupKey IS NULL OR PackageRole IS NULL
+      OR CommercialPackagePriceMinor IS NULL
+      OR LEN(PackageGroupKey) NOT BETWEEN 1 AND 80
       OR PackageRole NOT IN (''anchor'',''included'',''addon'')
       OR CommercialPackagePriceMinor NOT BETWEEN 0 AND 9000000000000))
   ) OR EXISTS(SELECT OfferingId FROM @Parsed GROUP BY OfferingId HAVING COUNT(*)>1)
+  BEGIN
    THROW 51422,''Invalid POS lines'',1;
+  END
   IF EXISTS(
    SELECT 1 FROM @Parsed p
    WHERE p.PackageId IS NOT NULL AND NOT EXISTS(
     SELECT 1 FROM core.CatalogPackage pkg WITH(HOLDLOCK)
     WHERE pkg.TenantId=@TenantId AND pkg.BusinessId=@BusinessId
      AND pkg.PackageId=p.PackageId AND pkg.IsActive=1))
+  BEGIN
    THROW 51424,''Unknown or inactive package'',1;
+  END
   IF EXISTS(
-   SELECT 1 FROM @Parsed p
-   WHERE p.PackageId IS NOT NULL
-   GROUP BY p.PackageGroupKey
-   HAVING COUNT(DISTINCT p.PackageId)>1
-    OR COUNT(DISTINCT p.CommercialPackagePriceMinor)>1
-    OR SUM(CASE WHEN p.PackageRole=''anchor'' THEN 1 ELSE 0 END)<>1)
+   SELECT 1 FROM (
+    SELECT p.PackageGroupKey,
+     COUNT(DISTINCT p.PackageId) AS pkgCount,
+     COUNT(DISTINCT p.CommercialPackagePriceMinor) AS priceCount,
+     SUM(CASE WHEN p.PackageRole=''anchor'' THEN 1 ELSE 0 END) AS anchorCount
+    FROM @Parsed p
+    WHERE p.PackageId IS NOT NULL
+    GROUP BY p.PackageGroupKey
+   ) g
+   WHERE g.pkgCount>1 OR g.priceCount>1 OR g.anchorCount<>1)
+  BEGIN
    THROW 51422,''Invalid POS package group'',1;
+  END
   IF EXISTS(
    SELECT 1 FROM @Parsed p LEFT JOIN core.HrEmployeeBranch eb WITH(HOLDLOCK)
     ON eb.TenantId=@TenantId AND eb.BusinessId=@BusinessId AND eb.BranchId=@BranchId

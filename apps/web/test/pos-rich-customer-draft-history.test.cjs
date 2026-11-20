@@ -30,13 +30,14 @@ test('history distinguishes limited draft evidence from paid purchase history',(
 });
 test('restored rich draft uses authorized current Catalog; never trusts saved money or state',()=>{
  const h=read('cashier-draft-history.tsx'),client=read('pos-preview-client.tsx');
- assert.match(h,/onUseDraft\(d\.lines\.map\(l=>\(\{offeringId:l\.offeringId,quantity:l\.quantity\}\)\)\)/);
+ assert.match(h,/hydratePackageMetaFromSnapshots\(d\.lines\)/);
+ assert.match(h,/onUseDraft\(hydratePackageMetaFromSnapshots\(d\.lines\)\)/);
  assert.match(client,/onUseDraft=\{savedLines=>createNewFromDraft\(\{lines:savedLines\}\)\}/);
  assert.match(client,/!offerings\.some\(o=>o\.offeringId===x\.offeringId&&o\.isActive\)/);
  assert.match(client,/setPreview\(null\);setAdjustment\(null\)/);
  assert.match(client,/setCartRevision\(v=>v\+1\)/);
  assert.match(client,/key=\{JSON\.stringify\(lines\)\+"-"\+cartRevision\+"-"\+selectedBarberId\}/);
- assert.doesNotMatch(h,/priceMinor\s*[:=]|setPaid|postInvoice|applyDiscount/);
+ assert.doesNotMatch(h,/priceMinor\s*[:=]|setPaid|postInvoice|applyDiscount|unitPriceMinor\s*[:=]/);
 });
 test('saving rich draft refreshes separately authorized history',()=>{
  const client=read('pos-preview-client.tsx');

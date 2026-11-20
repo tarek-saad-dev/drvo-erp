@@ -46,9 +46,9 @@ test('branch app launcher links remain derived from existing K5-authorized API c
   assert.match(page,/treasuryWebEnabled&&canViewTreasury/);
   assert.match(page,/setCanViewExpenses\(expenseResult\.ok\)/);
   assert.match(page,/setCanViewTreasury\(treasuryResult\.ok\)/);
-  // Inventory DRAFT tile reuses Catalog read auth; on-hand remains UNKNOWN.
+  // Inventory tile requires independently authorized Inventory API (SQL027+).
   assert.match(page,/inventoryWebEnabled&&canViewInventory/);
-  assert.match(page,/setCanViewInventory\(catalogResult\.ok\)/);
+  assert.match(page,/setCanViewInventory\(inventoryResult\.ok\)/);
   assert.doesNotMatch(page,/\/payroll\//);
 });
 test('new DRVO brand mark is served locally, no remote SVG / injected JS', () => {

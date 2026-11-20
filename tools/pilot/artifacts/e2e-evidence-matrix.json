@@ -15,7 +15,8 @@
     "CUT_LIVE_IMPORT"
   ],
   "checklistOpenOrUncoveredStepIds": [
-    "INVENTORY_VALIDATION"
+    "INVENTORY_VALIDATION",
+    "DRAFT_PRINT"
   ],
   "steps": [
     {
@@ -104,10 +105,10 @@
       "id": "DRAFT_PRINT",
       "title": "Draft Print",
       "order": 6,
-      "matrixStatus": "BLOCKED",
-      "gate": "BLOCKED",
-      "evidenceCommand": "node -e \"const m=require('./tools/pilot/workflow-matrix-builder.cjs').buildWorkflowMatrix(); if(m.steps.find(s=>s.id==='DRAFT_PRINT').status!=='BLOCKED') process.exit(1)\"",
-      "rationale": "POS-07 print/reprint remains BLOCKED in Cashier ledger; no NONPOSTING draft-print owner merged for Pilot.",
+      "matrixStatus": "READY_IN_REPO",
+      "gate": "PASS",
+      "evidenceCommand": "node -e \"const fs=require('fs'); const m=require('./tools/pilot/workflow-matrix-builder.cjs').buildWorkflowMatrix(); const s=m.steps.find(x=>x.id==='DRAFT_PRINT'); if(s.status!=='READY_IN_REPO') process.exit(1); for (const p of s.evidencePaths) fs.accessSync(p);\"",
+      "rationale": "#151 NONPOSTING DRAFT print preview in-repo (window.print only). Fiscal receipt BLOCKED; Owner Pilot browser still OPEN; no paid sale required for route existence.",
       "s12s13Coverage": [],
       "adr031Note": "ADR-031 remains PROPOSED. This workflow step must stay NONPOSTING: no paid sale, tender settlement, stock decrement-on-sale, or first mandatory GL journal. Any print surface must remain DRAFT/NONPOSTING and must not imply a fiscal receipt.",
       "ownerPilotBrowser": "OPEN",
@@ -140,12 +141,11 @@
       "BARBER",
       "POS_DRAFT",
       "INVENTORY_VALIDATION",
+      "DRAFT_PRINT",
       "RELOAD"
     ],
     "failStepIds": [],
-    "blockedStepIds": [
-      "DRAFT_PRINT"
-    ],
-    "note": "PASS = disposable/repo evidence class only. OWNER_BROWSER_E2E + TARGET_APPLY + ISOLATED_BACKUP_RESTORE + K5_PERMISSIONS remain OPEN on the readiness board. DRAFT_PRINT gate is BLOCKED until a draft-print owner merges."
+    "blockedStepIds": [],
+    "note": "PASS = disposable/repo evidence class only. OWNER_BROWSER_E2E + TARGET_APPLY + ISOLATED_BACKUP_RESTORE + K5_PERMISSIONS remain OPEN on the readiness board. DRAFT_PRINT is READY_IN_REPO after #151 (NONPOSTING window.print); fiscal receipt + Owner Pilot proof stay open/blocked separately."
   }
 }

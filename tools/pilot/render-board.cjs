@@ -74,8 +74,8 @@ function renderMarkdown(board, matrix, checklist, e2e) {
   lines.push('2. Backup first; `RESTORE VERIFYONLY`; restore into a **new** recovery DB.');
   lines.push('3. Apply SQL001–034 only on the isolated Pilot DB with restricted migrator; re-read `core.SchemaMigration` checksums.');
   lines.push('4. Bootstrap K5 Owner for the Pilot Tenant/Business/Branch; keep ADR-031 flags OFF.');
-  lines.push('5. Run Owner browser E2E for Customer → Booking → Barber → POS Draft → Inventory → Reload.');
-  lines.push('6. Draft Print remains **BLOCKED** until a NONPOSTING draft-print owner merges (POS-07 print is BLOCKED).');
+  lines.push('5. Run Owner browser E2E for Customer → Booking → Barber → POS Draft → Inventory → Draft Print (NONPOSTING window.print) → Reload.');
+  lines.push('6. Draft Print is **READY_IN_REPO** after #151 (NONPOSTING `window.print` only). Fiscal/paid receipt stays **BLOCKED**. Owner Pilot browser proof remains **OPEN**.');
   lines.push('7. Never import live Cut data from this track.');
   lines.push('');
   lines.push('## Local offline commands');

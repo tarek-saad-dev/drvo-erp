@@ -4,8 +4,19 @@ Fail-closed, machine-checkable Pilot readiness package.
 
 - **Never** applies SQL to primary/VPS.
 - **Never** opens Cut live connections.
-- **Never** enables ADR-031 posting.
-- Offline `verify.cjs` exits 0 only while activation remains **BLOCKED**.
+- **Never** enables ADR-031 posting (`postingActivation=BLOCKED` even after the ADR-031 readiness package merged).
+- Offline `verify.cjs` exits 0 only while real-data activation remains **BLOCKED** and human gates stay **OPEN**.
+
+## Post-#147–#153 reality (repo tip)
+
+| Slice | Reality |
+| --- | --- |
+| Migrations | Source tree includes **SQL001–037** (formal readiness gate still checksums **001–034**; 035 barcode, 036 queue settle-expired, 037 purchasing receive/AP preview are in-repo NONPOSTING) |
+| POS-07 Draft Print | **READY_IN_REPO** after **#151** (`window.print` DRAFT preview only; fiscal receipt **BLOCKED**) |
+| Purchasing | **SQL037** suppliers + receive + AP preview (**#152**, NONPOSTING) |
+| Queue | **SQL036** settle-expired + live board (**#153**, NONPOSTING) |
+| ADR-031 package | Merged readiness docs/board; **`postingActivation=BLOCKED`** / ADR still **PROPOSED** |
+| Owner gates | `TARGET_APPLY`, `ISOLATED_BACKUP_RESTORE`, `K5_PERMISSIONS`, `OWNER_BROWSER_E2E` remain **OPEN** — never claim Owner E2E done |
 
 ## Commands
 

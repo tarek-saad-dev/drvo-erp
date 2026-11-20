@@ -4,7 +4,7 @@
  * Private Pilot E2E evidence matrix.
  * Each workflow step gets gate = PASS | FAIL | BLOCKED with an evidence command.
  * PASS here means "repo/CI evidence class is green for this scaffold" — never Owner
- * Pilot browser proof or primary/VPS apply. Draft Print is BLOCKED (POS-07 not merged).
+ * Pilot browser proof or primary/VPS apply. Draft Print is READY_IN_REPO after #151 (Owner Pilot still OPEN).
  */
 const {assertNoLiveConnectionMarkers} = require('../cut-adapter/connection-gates.cjs');
 const {buildWorkflowMatrix} = require('./workflow-matrix-builder.cjs');
@@ -48,11 +48,11 @@ const EVIDENCE = Object.freeze({
       'SQL027 + POS OUT stock gate unit test exist in repo. Not asserted in S12/S13 Chromium phases.',
   }),
   DRAFT_PRINT: Object.freeze({
-    gate: 'BLOCKED',
+    gate: 'PASS',
     evidenceCommand:
-      'node -e "const m=require(\'./tools/pilot/workflow-matrix-builder.cjs\').buildWorkflowMatrix(); if(m.steps.find(s=>s.id===\'DRAFT_PRINT\').status!==\'BLOCKED\') process.exit(1)"',
+      'node -e "const fs=require(\'fs\'); const m=require(\'./tools/pilot/workflow-matrix-builder.cjs\').buildWorkflowMatrix(); const s=m.steps.find(x=>x.id===\'DRAFT_PRINT\'); if(s.status!==\'READY_IN_REPO\') process.exit(1); for (const p of s.evidencePaths) fs.accessSync(p);"',
     rationale:
-      'POS-07 print/reprint remains BLOCKED in Cashier ledger; no NONPOSTING draft-print owner merged for Pilot.',
+      '#151 NONPOSTING DRAFT print preview in-repo (window.print only). Fiscal receipt BLOCKED; Owner Pilot browser still OPEN; no paid sale required for route existence.',
   }),
   RELOAD: Object.freeze({
     gate: 'PASS',
@@ -80,13 +80,11 @@ function buildE2eEvidenceMatrix(operatorEvidence = {}) {
     if (!ev) {
       throw new Error('Missing E2E evidence definition for ' + step.id);
     }
-    // Align matrix status: DRAFT_PRINT must stay BLOCKED.
-    const matrixStatus = step.id === 'DRAFT_PRINT' ? 'BLOCKED' : step.status;
     return Object.freeze({
       id: step.id,
       title: step.title,
       order: step.order,
-      matrixStatus,
+      matrixStatus: step.status,
       gate: ev.gate,
       evidenceCommand: ev.evidenceCommand,
       rationale: ev.rationale,
@@ -117,7 +115,7 @@ function buildE2eEvidenceMatrix(operatorEvidence = {}) {
       failStepIds: Object.freeze(fail),
       blockedStepIds: Object.freeze(blocked),
       note:
-        'PASS = disposable/repo evidence class only. OWNER_BROWSER_E2E + TARGET_APPLY + ISOLATED_BACKUP_RESTORE + K5_PERMISSIONS remain OPEN on the readiness board. DRAFT_PRINT gate is BLOCKED until a draft-print owner merges.',
+        'PASS = disposable/repo evidence class only. OWNER_BROWSER_E2E + TARGET_APPLY + ISOLATED_BACKUP_RESTORE + K5_PERMISSIONS remain OPEN on the readiness board. DRAFT_PRINT is READY_IN_REPO after #151 (NONPOSTING window.print); fiscal receipt + Owner Pilot proof stay open/blocked separately.',
     }),
   });
 }

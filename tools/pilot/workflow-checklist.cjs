@@ -95,7 +95,7 @@ function buildPilotWorkflowChecklist(operatorEvidence = {}) {
 
     let coverageClass = 'OPEN';
     if (step.id === 'DRAFT_PRINT') {
-      coverageClass = 'BLOCKED_NO_DRAFT_PRINT_OWNER';
+      coverageClass = 'READY_IN_REPO_DRAFT_PRINT_ROUTE';
     } else if (step.id === 'INVENTORY_VALIDATION') {
       coverageClass = 'READY_IN_REPO_NO_S12_S13_PHASE';
     } else if (markersComplete) {
@@ -116,8 +116,13 @@ function buildPilotWorkflowChecklist(operatorEvidence = {}) {
       adr031Note: step.adr031Note,
       remainsOpenForPilot:
         step.status === 'OPEN' ||
-        step.id === 'INVENTORY_VALIDATION',
-      remainsBlockedForPilot: step.status === 'BLOCKED' || step.id === 'DRAFT_PRINT',
+        step.id === 'INVENTORY_VALIDATION' ||
+        step.id === 'DRAFT_PRINT',
+      remainsBlockedForPilot: step.status === 'BLOCKED',
+      disposableNote:
+        step.id === 'DRAFT_PRINT'
+          ? 'Optional disposable checklist: assert draft-print route / print-preview module paths exist (NONPOSTING window.print). Do not require a paid sale.'
+          : undefined,
     });
   });
 
@@ -142,11 +147,11 @@ function buildPilotWorkflowChecklist(operatorEvidence = {}) {
       s12s13CoveredStepIds: Object.freeze(coveredIds),
       openOrUncoveredStepIds: Object.freeze(openIds),
       blockedStepIds: Object.freeze(blockedIds),
-      draftPrintStatus: steps.find((s) => s.id === 'DRAFT_PRINT')?.matrixStatus || 'BLOCKED',
+      draftPrintStatus: steps.find((s) => s.id === 'DRAFT_PRINT')?.matrixStatus || 'OPEN',
       inventoryValidationStatus:
         steps.find((s) => s.id === 'INVENTORY_VALIDATION')?.matrixStatus || 'OPEN',
       note:
-        'S12/S13 phase markers prove disposable CI journey wiring only. Draft Print is BLOCKED (POS-07). Inventory Validation is READY_IN_REPO without S12/S13 phase markers. Owner Pilot E2E remains an OPEN readiness-board gate.',
+        'S12/S13 phase markers prove disposable CI journey wiring only. Draft Print is READY_IN_REPO after #151 (NONPOSTING window.print route existence; no paid sale). Inventory Validation is READY_IN_REPO without S12/S13 phase markers. Owner Pilot E2E remains an OPEN readiness-board gate. Fiscal receipt stays BLOCKED.',
     }),
   });
 }

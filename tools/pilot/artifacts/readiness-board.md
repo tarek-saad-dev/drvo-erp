@@ -29,12 +29,12 @@ Customer → Booking → Barber → POS Draft → Inventory Validation → Draft
 | Barber (`BARBER`) | **CI_ONLY** | S13 harness links HR Employee ↔ Booking PERSON resource as Salon Barber on disposable CI. Harness PASS is CI_ONLY, not Owner Pilot proof. |
 | POS Draft (`POS_DRAFT`) | **CI_ONLY** | S12 saves a NONPOSTING POS DRAFT (qty 2) and asserts unposted banner. Paid sale remains BLOCKED by ADR-031. |
 | Inventory Validation (`INVENTORY_VALIDATION`) | **READY_IN_REPO** | Repo has SQL027 branch stock + private POS OUT product gate unit coverage. S12/S13 Chromium journeys do not assert inventory validation → not CI_ONLY for Pilot workflow. |
-| Draft Print (`DRAFT_PRINT`) | **BLOCKED** | POS-07 print/reprint is BLOCKED in the Cashier parity ledger (no DRVO print agent / NONPOSTING draft-print owner merged). S12/S13 do not cover print. Keep BLOCKED for Pilot readiness. |
+| Draft Print (`DRAFT_PRINT`) | **READY_IN_REPO** | #151 merged NONPOSTING DRAFT print preview (window.print only). Fiscal/paid receipt remains BLOCKED (ADR-031). S12/S13 do not assert print; Owner Pilot browser proof still OPEN. |
 | Reload (`RELOAD`) | **CI_ONLY** | S12/S13 reload phases prove disposable SQL persistence for Customer/Booking/POS DRAFT/Barber. Owner Pilot reload acceptance remains OPEN. |
 
 ## S12/S13 checklist
 
-Covered: `CUSTOMER`, `BOOKING`, `BARBER`, `POS_DRAFT`, `RELOAD`. Open/uncovered: `INVENTORY_VALIDATION`.
+Covered: `CUSTOMER`, `BOOKING`, `BARBER`, `POS_DRAFT`, `RELOAD`. Open/uncovered: `INVENTORY_VALIDATION`, `DRAFT_PRINT`.
 
 ## E2E evidence matrix (PASS / FAIL / BLOCKED)
 
@@ -45,7 +45,7 @@ Covered: `CUSTOMER`, `BOOKING`, `BARBER`, `POS_DRAFT`, `RELOAD`. Open/uncovered:
 | Barber | **PASS** | `node --check tools/salon-browser/hr-operations.cjs && node tools/pilot/workflow-checklist.cjs` |
 | POS Draft | **PASS** | `node --check tools/salon-browser/operations.cjs && node tools/pilot/verify.cjs` |
 | Inventory Validation | **PASS** | `node --test apps/web/test/pos-product-stock-gate.test.cjs 2>/dev/null // node -e "require('fs').accessSync('apps/web/test/pos-product-stock-gate.test.cjs')"` |
-| Draft Print | **BLOCKED** | `node -e "const m=require('./tools/pilot/workflow-matrix-builder.cjs').buildWorkflowMatrix(); if(m.steps.find(s=>s.id==='DRAFT_PRINT').status!=='BLOCKED') process.exit(1)"` |
+| Draft Print | **PASS** | `node -e "const fs=require('fs'); const m=require('./tools/pilot/workflow-matrix-builder.cjs').buildWorkflowMatrix(); const s=m.steps.find(x=>x.id==='DRAFT_PRINT'); if(s.status!=='READY_IN_REPO') process.exit(1); for (const p of s.evidencePaths) fs.accessSync(p);"` |
 | Reload | **PASS** | `node tools/pilot/workflow-checklist.cjs && node tools/pilot/verify.cjs` |
 
 ## Operator procedure (isolated Pilot DB only)
@@ -54,8 +54,8 @@ Covered: `CUSTOMER`, `BOOKING`, `BARBER`, `POS_DRAFT`, `RELOAD`. Open/uncovered:
 2. Backup first; `RESTORE VERIFYONLY`; restore into a **new** recovery DB.
 3. Apply SQL001–034 only on the isolated Pilot DB with restricted migrator; re-read `core.SchemaMigration` checksums.
 4. Bootstrap K5 Owner for the Pilot Tenant/Business/Branch; keep ADR-031 flags OFF.
-5. Run Owner browser E2E for Customer → Booking → Barber → POS Draft → Inventory → Reload.
-6. Draft Print remains **BLOCKED** until a NONPOSTING draft-print owner merges (POS-07 print is BLOCKED).
+5. Run Owner browser E2E for Customer → Booking → Barber → POS Draft → Inventory → Draft Print (NONPOSTING window.print) → Reload.
+6. Draft Print is **READY_IN_REPO** after #151 (NONPOSTING `window.print` only). Fiscal/paid receipt stays **BLOCKED**. Owner Pilot browser proof remains **OPEN**.
 7. Never import live Cut data from this track.
 
 ## Local offline commands

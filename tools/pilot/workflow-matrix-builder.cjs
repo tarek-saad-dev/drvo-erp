@@ -121,17 +121,21 @@ const WORKFLOW_STEPS = Object.freeze([
     id: 'DRAFT_PRINT',
     title: 'Draft Print',
     order: 6,
-    status: 'BLOCKED',
+    status: 'READY_IN_REPO',
     evidencePaths: Object.freeze([
-      'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json',
-      'docs/04-execution/CASHIER-POS-PAGE-WORKFLOW-AUDIT-V1-2026-11-18.md',
+      'packages/business-modules/pos/src/draft-print.ts',
+      'apps/api/src/pos-drafts/draft-print.ts',
+      'apps/web/src/app/workspace/[businessId]/[branchId]/pos-preview/cashier-draft-print.ts',
+      'apps/web/src/app/workspace/[businessId]/[branchId]/pos-preview/cashier-draft-print-view.tsx',
+      'docs/04-execution/POS-S5-DRAFT-PRINT-PREVIEW-2026-11-20.md',
+      '.github/workflows/shared-pos-draft-print-ci.yml',
     ]),
     s12s13Coverage: Object.freeze([]),
     adr031Note:
       ADR031_NOTE +
       ' Any print surface must remain DRAFT/NONPOSTING and must not imply a fiscal receipt.',
     notes:
-      'POS-07 print/reprint is BLOCKED in the Cashier parity ledger (no DRVO print agent / NONPOSTING draft-print owner merged). S12/S13 do not cover print. Keep BLOCKED for Pilot readiness.',
+      '#151 merged NONPOSTING DRAFT print preview (window.print only). Fiscal/paid receipt remains BLOCKED (ADR-031). S12/S13 do not assert print; Owner Pilot browser proof still OPEN.',
   }),
   Object.freeze({
     id: 'RELOAD',

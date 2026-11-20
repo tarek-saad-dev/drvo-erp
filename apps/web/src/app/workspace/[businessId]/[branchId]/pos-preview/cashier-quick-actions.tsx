@@ -6,7 +6,7 @@
 const BLOCKED=[
  {id:"pay",label:"تحصيل / حفظ فاتورة",reason:"FINANCE_GATED — ADR-031"},
  {id:"split",label:"تقسيم دفع",reason:"FINANCE_GATED — NOT_COLLECTED"},
- {id:"tips",label:"إكراميات",reason:"HR/Treasury gated"},
+ {id:"tips",label:"إكراميات",reason:"HR/Treasury gated — معاينة التبس متاحة في لوحة التبس، التسجيل محظور"},
  {id:"expense",label:"مصروف سريع",reason:"Expenses draft only elsewhere"},
  {id:"income",label:"إيراد غير بيعي",reason:"Other Income owner pending"},
  {id:"transfer",label:"تحويل طريقة دفع",reason:"Treasury gated"},

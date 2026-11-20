@@ -40,3 +40,51 @@ export function rankServiceExecutorTipCandidates(
   }).sort((a,b)=>b.serviceValueMinor-a.serviceValueMinor||
     a.employeeId.localeCompare(b.employeeId));
 }
+
+export type TipEntryOutcome="NO_AMOUNT"|"TIP"|"NO_TIP"|"BELOW_INVOICE";
+export type TipEntryPreview=Readonly<{
+  state:"UNPOSTED_TIP_ENTRY_PREVIEW";persisted:false;
+  paymentState:"NOT_COLLECTED";
+  tipRecordingState:"BLOCKED_ADR_031_HR_TREASURY";
+  employeeLedgerCredit:"NOT_AUTHORIZED";treasuryCashIn:"NOT_AUTHORIZED";
+  outcome:TipEntryOutcome;possibleTipMinor:number;shortfallMinor:number;
+  recipientEmployeeId:string|null;
+  candidates:Array<{employeeId:string;serviceValueMinor:number}>;
+  /** Mirrors Cashier TipsModal `canSubmit` minus payment-method; DRVO never submits. */
+  cashierWouldEnableSubmit:boolean;
+}>;
+/**
+ * Cashier TipsModal state machine, NON-POSTING: default recipient is the highest-revenue
+ * executor (Cashier `barbers[0]`), a chosen recipient must be one of the cart executors,
+ * and only a strictly positive difference is a possible tip. Nothing is recorded.
+ */
+export function previewTipEntry(
+  totalDueMinor: number, customerPresentedMinor: number|null,
+  lines: readonly ServiceExecutorLine[], selectedEmployeeId: string|null,
+): TipEntryPreview {
+  minor(totalDueMinor);
+  const candidates=rankServiceExecutorTipCandidates(lines);
+  let recipient=candidates[0]?.employeeId??null;
+  if(selectedEmployeeId!==null){
+    if(typeof selectedEmployeeId!=="string"||!UUID.test(selectedEmployeeId))
+      throw new TypeError("Invalid employee reference");
+    const id=selectedEmployeeId.toLowerCase();
+    if(!candidates.some(c=>c.employeeId===id))
+      throw new TypeError("Tip recipient must be a cart service executor");
+    recipient=id;
+  }
+  let outcome:TipEntryOutcome="NO_AMOUNT",tip=0,shortfall=0;
+  if(customerPresentedMinor!==null){
+    const s=previewTenderSurplus(totalDueMinor,customerPresentedMinor);
+    tip=s.possibleTipMinor;shortfall=s.shortfallMinor;
+    outcome=tip>0?"TIP":shortfall>0?"BELOW_INVOICE":"NO_TIP";
+  }
+  return {
+    state:"UNPOSTED_TIP_ENTRY_PREVIEW",persisted:false,paymentState:"NOT_COLLECTED",
+    tipRecordingState:"BLOCKED_ADR_031_HR_TREASURY",
+    employeeLedgerCredit:"NOT_AUTHORIZED",treasuryCashIn:"NOT_AUTHORIZED",
+    outcome,possibleTipMinor:tip,shortfallMinor:shortfall,
+    recipientEmployeeId:recipient,candidates,
+    cashierWouldEnableSubmit:lines.length>0&&recipient!==null&&tip>0,
+  };
+}

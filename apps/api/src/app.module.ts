@@ -50,12 +50,14 @@ import { TreasuryOpsController } from "./treasury/treasury-ops.controller";
 import { TreasuryOpsService } from "./treasury/treasury-ops.service";
 import { OperationsController } from "./operations/operations.controller";
 import { OperationsService } from "./operations/operations.service";
+import { LoyaltyController } from "./loyalty/loyalty.controller";
+import { LoyaltyService } from "./loyalty/loyalty.service";
 
 @Module({
   controllers: [HealthController, DatabaseHealthController, K3ScopeProofController,
     IdentityController, AuthorizedBranchController, BranchAccessController,
-    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, ReleaseCatalogController, ActivationPreviewController, CatalogController, CustomersController, BookingController, QueueController, PosPreviewController, PosDraftsController, PosRichController, HrController, AttendanceController, ReportsController, ExpensesController, OtherIncomeController, InventoryController, TreasuryController, TreasuryOpsController, OperationsController],
+    OwnerVerificationController, BranchInvitationController, ModuleCandidatesController, ReleaseCatalogController, ActivationPreviewController, CatalogController, CustomersController, BookingController, QueueController, PosPreviewController, PosDraftsController, PosRichController, HrController, AttendanceController, ReportsController, ExpensesController, OtherIncomeController, InventoryController, TreasuryController, TreasuryOpsController, OperationsController, LoyaltyController],
   providers: [FoundationDatabaseService, K3ScopeProofRepository, IdentityService, BranchAccessService,
-    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, ReleaseCatalogService, ActivationPreviewService, CatalogService, CustomersService, BookingService, QueueService, PosPreviewService, PosDraftsService, PosRichService, HrService, AttendanceService, ReportsService, ExpensesService, OtherIncomeService, InventoryService, TreasuryService, TreasuryOpsService, OperationsService],
+    OwnerVerificationService, BranchInvitationService, ModuleCandidatesService, ReleaseCatalogService, ActivationPreviewService, CatalogService, CustomersService, BookingService, QueueService, PosPreviewService, PosDraftsService, PosRichService, HrService, AttendanceService, ReportsService, ExpensesService, OtherIncomeService, InventoryService, TreasuryService, TreasuryOpsService, OperationsService, LoyaltyService],
 })
 export class AppModule {}

@@ -1,0 +1,49 @@
+name: Shared Loyalty / Cut Club preview CI
+on:
+  pull_request:
+    paths:
+      - '_cashier_source/loyalty/**'
+      - 'packages/business-modules/loyalty/**'
+      - 'apps/api/src/loyalty/**'
+      - 'apps/api/src/app.module.ts'
+      - 'apps/api/test/loyalty-preview.test.cjs'
+      - 'apps/web/src/app/workspace/**/loyalty/**'
+      - 'apps/web/test/loyalty-preview.test.cjs'
+      - 'tests/loyalty-rules-source.test.cjs'
+      - '.github/workflows/shared-loyalty-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - '_cashier_source/loyalty/**'
+      - 'packages/business-modules/loyalty/**'
+      - 'apps/api/src/loyalty/**'
+      - 'apps/api/test/loyalty-preview.test.cjs'
+      - 'apps/web/test/loyalty-preview.test.cjs'
+      - 'tests/loyalty-rules-source.test.cjs'
+      - '.github/workflows/shared-loyalty-ci.yml'
+permissions:
+  contents: read
+jobs:
+  loyalty-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # No SQL Server: Loyalty is read/preview only (no migration, no tables, no writes).
+      - name: Package characterization against pinned Cashier loyalty source
+        run: |
+          set -euo pipefail
+          npm ci --no-audit --no-fund
+          npm run build
+          node --test tests/loyalty-rules-source.test.cjs
+      - name: Nest preview contract
+        run: |
+          set -euo pipefail
+          npm ci --prefix apps/api --no-audit --no-fund
+          npm run build --prefix apps/api
+          node --test apps/api/test/loyalty-preview.test.cjs
+      - name: Private UI source guards
+        run: node --test apps/web/test/loyalty-preview.test.cjs

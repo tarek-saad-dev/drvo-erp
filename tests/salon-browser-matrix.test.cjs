@@ -38,3 +38,19 @@ test('matrix is inert and portable; public demo and private K5 route gates are n
  assert.equal(invalid.status,1);
  assert.doesNotMatch(invalid.stderr,/token|password|private key/i);
 });
+
+
+test('S13 HR browser records action-level phases and parent fails closed on stalled phase',()=>{
+ const hr=read('tools/salon-browser/hr-operations.cjs');
+ const runner=read('tools/salon-browser/run.cjs');
+ for(const phase of [
+  'S13 HR route navigation','S13 HR heading rendered',
+  'S13 HR employee code input','S13 HR employee create POST',
+  'S13 Barber resource selection',
+ ])assert.ok(hr.includes(phase),'missing HR phase marker '+phase);
+ assert.match(runner,/const MAX_PHASE_IDLE_MS=120\*1000/);
+ assert.match(runner,/clearInterval\(phaseWatchdog\)/);
+ assert.match(runner,/Chromium phase stalled/);
+ assert.match(hr,/waitUntil:'commit',timeout:45000/);
+ assert.match(hr,/getByRole\('heading',\{name:'الموظفون والحلاقون'\}\)\.waitFor/);
+});

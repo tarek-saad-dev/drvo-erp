@@ -1,5 +1,7 @@
 # Roadmap
 
+> **2026-11-20 K0 / S13 FAILURE TRIAGE — DIAGNOSTIC PR ONLY:** [RCA and minimal test-harness hardening](CASHIER-S13-K0-FAILURE-TRIAGE-2026-11-20.md) records K0 #44751858614 CUT-03 incorrectly referencing DRVO docs as Cashier source, and S12→S13 Chromium run #44751858621 hanging at broad HR marker for 720s. Keep S13 real UI/SQL assertions; new action-level breadcrumbs + 120s phase idle limit enable next diagnosis. **No S13 PASS, primary SQL, Owner browser or Cut go-live claimed.**
+
 > **2026-11-19 PR0+PR1 IN PROGRESS:** Source lock + ledger coded; SQL024/Nest/POS server Customer search coded with unit/source tests. **NEXT:** run Shared Customers SQL2022 HTTP CI for SQL024; wire Booking to same search; PR2 Cashier POS UX transplant into private workspace; PR3 read-only historical adapter. Primary DB/SQL024 apply, Owner browser, Cut import and ADR-031 remain gated.
 
 > **2026-11-18 LIVE DEVELOPMENT PIVOT:** [Private Cut Salon pilot/data import plan](CUT-SALON-REAL-PRODUCT-LIVE-DEVELOPMENT-2026-11-18.md) makes protected DRVO workflows (not Public Demo) primary. First new private POS Customer create/select source slice coded. Next: server-wide owner-scoped Customer search, duplicate reconciliation and safe Cut read-only extraction; then source→DRVO UUID mapping/read-only last-month Sales, verified pilot DB and Owner login; financial cutover separately gated.

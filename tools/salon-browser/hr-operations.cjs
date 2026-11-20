@@ -21,13 +21,21 @@ async function exerciseHrOperations(page,origin,business,branch,onPhase,existing
  assert.match(resourceId||'',
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
   'S12 PERSON resource GUID visible in Booking UI');
- onPhase('S13 private HR view and real create through browser');
- await page.goto(scope+'/hr',{waitUntil:'domcontentloaded',timeout:45000});
+ // A previous Chromium run stalled at the broad S13 marker for 12 minutes.
+ // Each real operator action has its own PII-free phase breadcrumb.
+ onPhase('S13 HR route navigation');
+ await page.goto(scope+'/hr',{waitUntil:'commit',timeout:45000});
+ onPhase('S13 HR heading rendered');
  await page.getByRole('heading',{name:'الموظفون والحلاقون'}).waitFor({timeout:30000});
+ onPhase('S13 HR employee code input');
  await page.getByLabel(/كود الموظف/).fill(code,{timeout:20000});
+ onPhase('S13 HR employee name input');
  await page.getByLabel('اسم الموظف').fill(employee,{timeout:20000});
+ onPhase('S13 HR employment-type selection');
  await page.getByLabel('نوع التوظيف').selectOption('full_time',{timeout:20000});
+ onPhase('S13 HR pay-method selection');
  await page.getByLabel(/نظام احتساب الأجر/).selectOption('daily',{timeout:20000});
+ onPhase('S13 HR employee create POST');
  const [created]=await Promise.all([
   page.waitForResponse(r=>r.url().endsWith('/hr/employees')&&
    r.request().method()==='POST',{timeout:20000}),

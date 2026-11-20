@@ -2,6 +2,10 @@
 import {useEffect,useRef,useState} from "react";
 import {useRouter} from "next/navigation";
 import {canonicalizeEgyptPhoneE164} from "../customers/egyptian-phone.mjs";
+import CustomerProfilePanel,{
+ CustomerProfileFields,EMPTY_PROFILE_DRAFT,buildProfileBody,profileDraftHasContent,
+ type ProfileDraft,
+} from "./customer-profile-panel";
 
 type Customer={customerId:string;displayName:string;phoneE164:string|null;isActive:boolean};
 const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -27,6 +31,8 @@ export default function PosCustomerOperator({apiRoot,customerId,onSelect,onCreat
  const [name,setName]=useState("");
  const [phone,setPhone]=useState("");
  const [busy,setBusy]=useState(false);
+ const [profileDraft,setProfileDraft]=useState<ProfileDraft>(EMPTY_PROFILE_DRAFT);
+ const [profileErrors,setProfileErrors]=useState<Record<string,string>>({});
  const [message,setMessage]=useState("");
  const [mayBeTruncated,setMayBeTruncated]=useState(false);
  const retry=useRef<string|null>(null);
@@ -79,6 +85,10 @@ export default function PosCustomerOperator({apiRoot,customerId,onSelect,onCreat
   if(!displayName||displayName.length>160||!phoneE164){
    setMessage("اكتب اسم ورقم صحيحين، مثال 010 أو +20.");return;
   }
+  const wantsProfile=profileDraftHasContent(profileDraft);
+  const profile=buildProfileBody(profileDraft,profileDraft.grantConsent?"GRANT":undefined);
+  if(wantsProfile&&!profile.body){setProfileErrors(profile.errors);return;}
+  setProfileErrors({});
   if(!retry.current)retry.current=crypto.randomUUID();
   setBusy(true);setMessage("");
   try{
@@ -100,7 +110,9 @@ export default function PosCustomerOperator({apiRoot,customerId,onSelect,onCreat
       customerId:detail.existingCustomerId,displayName,phoneE164,isActive:true,
      };
      select(existing);
-     setMessage("الرقم مسجّل لنفس الـBusiness؛ تم اختيار العميل الموجود (منع تكرار).");
+     setProfileDraft(EMPTY_PROFILE_DRAFT);
+     setMessage("الرقم مسجّل لنفس الـBusiness؛ تم اختيار العميل الموجود (منع تكرار) "+
+      "ولم تُكتب بيانات CRM فوق بياناته.");
      return;
     }
     retry.current=null;setMessage("الطلب اتغير؛ راجع البيانات.");return;
@@ -111,9 +123,24 @@ export default function PosCustomerOperator({apiRoot,customerId,onSelect,onCreat
     setMessage("استجابة غير صالحة.");return;
    }
    retry.current=null;setCreating(false);setName("");setPhone("");
+   // Second, separately-idempotent step (full-replace PUT). A failure here never undoes
+   // the created Customer; the profile panel offers a retry via "complete customer".
+   let profileNote="";
+   if(wantsProfile&&profile.body&&created.created){
+    try{
+     const p=await fetch(endpoint+"/"+encodeURIComponent(created.id)+"/profile",{
+      method:"PUT",credentials:"same-origin",cache:"no-store",
+      headers:{"Content-Type":"application/json"},body:JSON.stringify(profile.body)});
+     profileNote=p.ok?" وتم حفظ بيانات العميل (CRM)."
+      :" لكن بيانات العميل (CRM) ما اتحفظتش؛ كمّلها من «تكملة بيانات العميل».";
+    }catch{
+     profileNote=" لكن بيانات العميل (CRM) ما اتحفظتش؛ كمّلها من «تكملة بيانات العميل».";
+    }
+   }
+   setProfileDraft(EMPTY_PROFILE_DRAFT);
    select({customerId:created.id,displayName,phoneE164,isActive:true});
    onCreated();
-   setMessage("اتسجل العميل في Customers Core واتحدد داخل POS DRAFT.");
+   setMessage("اتسجل العميل في Customers Core واتحدد داخل POS DRAFT."+profileNote);
   }catch{setMessage("الاتصال غير متاح. أعد المحاولة بنفس بيانات الطلب.");}
   finally{setBusy(false);}
  }
@@ -149,16 +176,24 @@ export default function PosCustomerOperator({apiRoot,customerId,onSelect,onCreat
     const phonePrefill=canonicalizeEgyptPhoneE164(query);
     setName(phonePrefill?"":query.trim());
     setPhone(phonePrefill?query:"");
+    setProfileDraft(EMPTY_PROFILE_DRAFT);setProfileErrors({});
     setCreating(true);setQuery("");retry.current=null;
    }}>＋ تسجيل عميل حقيقي من POS</button>
    {creating&&<form className="catalog-form" onSubmit={create}>
     <label>اسم العميل<input required maxLength={160} value={name}
      onChange={e=>{setName(e.target.value);retry.current=null;}}/></label>
     <label>الموبايل (01 أو +20)<input required dir="ltr" type="tel" value={phone}
-     onChange={e=>{setPhone(e.target.value);retry.current=null;}}/></label>
+     onChange={e=>{setPhone(e.target.value);retry.current=null;
+      // Consent is bound to the exact phone: changing it clears the confirmation.
+      setProfileDraft(d=>d.grantConsent?{...d,grantConsent:false}:d);}}/></label>
+    <CustomerProfileFields draft={profileDraft} errors={profileErrors}
+     onChange={setProfileDraft}
+     phone={canonicalizeEgyptPhoneE164(phone)}/>
     <button className="k5-save" type="submit" disabled={busy}>حفظ واختيار العميل</button>
     <button type="button" disabled={busy} onClick={()=>setCreating(false)}>إلغاء</button>
    </form>}
+   {selected&&<CustomerProfilePanel apiRoot={apiRoot} customerId={selected.customerId}
+    phoneE164={selected.phoneE164}/>}
    <p className="k5-muted">البحث صار سيرفر-سايد على كل عملاء الـBusiness المصرّح بهم (مش أول 200 فقط). تكرار نفس الموبايل بيرجع العميل الموجود بدل إنشاء مزدوج. ده Private POS، مش Demo. مفيش دفع/ترحيل مالي.</p>
   </>}
   {message&&<p role="status" className="k5-notice">{message}</p>}

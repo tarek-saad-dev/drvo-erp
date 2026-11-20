@@ -3625,8 +3625,7 @@
         "tools/cut-adapter/reconciliation-report.cjs",
         "tools/cut-adapter/preactivation-gates.cjs",
         "tools/cut-adapter/verify.cjs",
-        "tools/cut-adapter/fixtures/sample-sales-history-summary.json",
-        "docs/04-execution/TRACK-D-CUT-SALON-READINESS-2026-11-19.md"
+        "tools/cut-adapter/fixtures/sample-sales-history-summary.json"
       ],
       "OriginalScreen": "n/a (Track D Cut readiness scaffolds)",
       "UserAction": "Build unassigned identity map + redacted recon report + preactivation checklist from fixtures",

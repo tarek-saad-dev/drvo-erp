@@ -39,6 +39,8 @@ async function childCheck(env){
  // Hard ceiling covers S12 operator journey + S13 HR/Barber UI. Fail closed
  // well under the 45m workflow budget so SQL diagnostics still run.
  const MAX_MS=12*60*1000;
+ // A stalled Chromium action must not consume the full 12-minute CI budget.
+ const MAX_PHASE_IDLE_MS=120*1000;
  const fs=require('node:fs');
  const path=require('node:path');
  const heartbeat=path.join(process.env.RUNNER_TEMP||require('node:os').tmpdir(),
@@ -50,12 +52,23 @@ async function childCheck(env){
    stdio:['ignore','pipe','pipe'],
   });
   let stdout='',stderr='',settled=false;
+  let lastPhase='boot',lastPhaseChangedAt=Date.now();
   const finish=(fn,arg)=>{
    if(settled)return;
-   settled=true;clearTimeout(timer);
+   settled=true;clearTimeout(timer);clearInterval(phaseWatchdog);
    try{child.kill('SIGKILL');}catch{}
    fn(arg);
   };
+  const phaseWatchdog=setInterval(()=>{
+   if(settled)return;
+   let observed=lastPhase;
+   try{observed=fs.readFileSync(heartbeat,'utf8').trim().slice(0,120)||observed;}catch{}
+   if(observed!==lastPhase){lastPhase=observed;lastPhaseChangedAt=Date.now();}
+   if(Date.now()-lastPhaseChangedAt>MAX_PHASE_IDLE_MS){
+    finish(reject,new Error('Chromium phase stalled > '+MAX_PHASE_IDLE_MS+
+     'ms lastPhase='+lastPhase));
+   }
+  },5000);
   const timer=setTimeout(()=>{
    let last='unread';
    try{last=fs.readFileSync(heartbeat,'utf8').trim().slice(0,120);}catch{}

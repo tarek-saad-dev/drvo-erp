@@ -43,9 +43,10 @@ test('POS create form carries Cashier CRM fields and uses the profile API after 
 
 test('profile panel: consent only via explicit action, never inferred, no messaging',()=>{
  const ui=read('pos-preview/customer-profile-panel.tsx');
+ const source=read('customers/customer-source.mjs');
  assert.match(ui,/credentials:"same-origin"/);
  assert.match(ui,/cache:"no-store"/);
- assert.match(ui,/offersConsentAction/);
+ assert.match(source,/offersConsentAction/);
  assert.match(ui,/"GRANT"/);
  assert.match(ui,/"REVOKE"/);
  assert.match(ui,/disabled=\{!phone\}/);
@@ -54,6 +55,7 @@ test('profile panel: consent only via explicit action, never inferred, no messag
  assert.match(ui,/grantConsent:false/);
  assert.doesNotMatch(ui,/grantConsent:true/);
  assert.doesNotMatch(ui,/\/api\/messaging|whatsapp\.send|wa\.me|localStorage|sessionStorage|\/demo\/salon/i);
+ assert.doesNotMatch(source,/\/api\/messaging|whatsapp\.send|wa\.me/i);
  assert.match(ui,/isCustomerProfileIncomplete/);
  assert.match(ui,/data-customer-incomplete/);
 });

@@ -1,5 +1,7 @@
 # Project changelog
 
+- **2026-11-20 — OPERATIONAL READINESS MATRIX (#147–#153 ON MAIN):** Documented [OPERATIONAL-READINESS-MATRIX-2026-11-20](OPERATIONAL-READINESS-MATRIX-2026-11-20.md) against tip `d0a5d06`. Merged Track A Pilot tools (#150), Track B barcode/print/Queue/Purchasing (#148/#151/#153/#152), Track C ADR-031 package (#147 still PROPOSED). START-HERE / CURRENT-STATE / ROADMAP banners refreshed. **Owner Pilot E2E, primary VPS, ADR-031 H1–H4, Cut import remain OPEN/BLOCKED.**
+
 - **2026-11-20 — PURCHASING SQL037 SUPPLIERS + RECEIVE + AP PREVIEW (NOT PARITY-VERIFIED):** Additive `037_purchasing_suppliers_receive_ap_preview.sql` (Business-shared Supplier + PurchaseReceive with stock via SQL027 ApplyBranchStockDelta + informational AP preview). Nest `/purchasing` EXECUTE-only APIs (flags OFF), private Arabic Light UI, pinned Cashier purchase blobs, `shared-purchasing-ci.yml`. **SQL035 remains Catalog barcode (#148); SQL036 is Queue-owned and must land separately for consecutive K4 numbering (not in this PR). No paid AP/Treasury/GL, no primary DB, no ADR-031 activation.** Ledger: PUR-01/PUR-02 PORTING. [Slice note](PUR-S1-SUPPLIERS-RECEIVE-AP-PREVIEW-2026-11-20.md).
 
 ## Unreleased

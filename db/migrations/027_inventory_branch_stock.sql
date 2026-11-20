@@ -366,15 +366,15 @@ AS BEGIN
   IF @Prior<>@ClientRequestId THROW 51473,''Stock receive already cancelled'',1;
   SELECT CONVERT(VARCHAR(36),@ReceiveId) AS id,CAST(0 AS BIT) AS changed;
  END ELSE BEGIN
-  DECLARE @Off UNIQUEIDENTIFIER,@Qty BIGINT;
+  DECLARE @Off UNIQUEIDENTIFIER,@Qty BIGINT,@ReverseQty BIGINT;
   DECLARE c CURSOR LOCAL FAST_FORWARD FOR
    SELECT OfferingId,QtyMilli FROM core.StockReceiveLine
     WHERE TenantId=@TenantId AND BusinessId=@BusinessId AND BranchId=@BranchId
      AND ReceiveId=@ReceiveId ORDER BY [LineNo];
   OPEN c;FETCH NEXT FROM c INTO @Off,@Qty;
   WHILE @@FETCH_STATUS=0 BEGIN
-   EXEC core.ApplyBranchStockDelta @TenantId=@TenantId,@BusinessId=@BusinessId,
-    @BranchId=@BranchId,@OfferingId=@Off,@DeltaMilli=-@Qty;
+   SET @ReverseQty=-@Qty;
+   EXEC core.ApplyBranchStockDelta @TenantId,@BusinessId,@BranchId,@Off,@ReverseQty;
    FETCH NEXT FROM c INTO @Off,@Qty;
   END
   CLOSE c;DEALLOCATE c;
@@ -443,7 +443,8 @@ AS BEGIN
  EXEC core.AssertInventoryBranchAction @TenantId,@BusinessId,@BranchId,@AccountId,
   @SessionVersion,@TokenHash,''inventory.manage'';
  IF @AdjustId IS NULL OR @ClientRequestId IS NULL THROW 51472,''Invalid stock adjust cancel'',1;
- DECLARE @Status VARCHAR(10),@Prior UNIQUEIDENTIFIER,@Off UNIQUEIDENTIFIER,@Delta BIGINT;
+ DECLARE @Status VARCHAR(10),@Prior UNIQUEIDENTIFIER,@Off UNIQUEIDENTIFIER,@Delta BIGINT,
+  @ReverseDelta BIGINT;
  SELECT @Status=Status,@Prior=CancelRequestId,@Off=OfferingId,@Delta=DeltaMilli
   FROM core.StockAdjustDocument WITH(UPDLOCK,HOLDLOCK)
   WHERE TenantId=@TenantId AND BusinessId=@BusinessId AND BranchId=@BranchId
@@ -453,8 +454,8 @@ AS BEGIN
   IF @Prior<>@ClientRequestId THROW 51473,''Stock adjust already cancelled'',1;
   SELECT CONVERT(VARCHAR(36),@AdjustId) AS id,CAST(0 AS BIT) AS changed;
  END ELSE BEGIN
-  EXEC core.ApplyBranchStockDelta @TenantId=@TenantId,@BusinessId=@BusinessId,
-   @BranchId=@BranchId,@OfferingId=@Off,@DeltaMilli=-@Delta;
+  SET @ReverseDelta=-@Delta;
+  EXEC core.ApplyBranchStockDelta @TenantId,@BusinessId,@BranchId,@Off,@ReverseDelta;
   UPDATE core.StockAdjustDocument SET Status=''CANCELLED'',CancelRequestId=@ClientRequestId,
    CancelledByAccountId=@AccountId,CancelledAtUtc=SYSUTCDATETIME()
    WHERE TenantId=@TenantId AND BusinessId=@BusinessId AND BranchId=@BranchId

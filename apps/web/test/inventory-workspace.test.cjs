@@ -23,7 +23,8 @@ test('Inventory Client uses owned inventory API with nonposting receive/adjust',
  assert.match(client,/\/adjusts/);
  assert.match(client,/purchasingPosts/);
  assert.doesNotMatch(client,/localStorage|sessionStorage|IndexedDB/);
- assert.doesNotMatch(client,/\/inventory\/transfers/);
+ // INV-03 transfer UI lives in inventory-transfers.test.cjs
+ assert.match(client,/home\+"\/inventory\/transfers"/);
 });
 
 test('Branch launcher reveals Inventory after inventory API auth, Other Income independently',()=>{

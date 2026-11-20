@@ -18,6 +18,11 @@ export type BookingWindow={windowId:string;resourceId:string;startsAtUtc:string;
 export type Created={id:string;created:boolean};
 export type StatusChange={id:string;status:"CANCELLED"|"COMPLETED";changed:boolean};
 export type WindowClosure={id:string;state:"CLOSED";changed:boolean};
+/** BK-06 (SQL033): a move keeps the original duration; `validateOnly` writes nothing. */
+export type RescheduleResult={
+ id:string;resourceId:string;startsAtUtc:string;endsAtUtc:string;
+ changed:boolean;validateOnly:boolean;
+};
 const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const TOKEN=/^[A-Za-z0-9_-]{43}$/;
 const ISO=/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00\.000Z$/;
@@ -73,6 +78,7 @@ export class BookingService {
    if(code===51155)throw new ConflictException("Appointment is final or cannot be completed yet");
    if(code===51156)throw new NotFoundException();
    if(code===51157)throw new ConflictException("Resource is outside published availability");
+   if(code===51158)throw new ConflictException("Booking has an active queue ticket");
    throw new ServiceUnavailableException("Booking unavailable");
   }
  }
@@ -154,6 +160,51 @@ export class BookingService {
    throw new ServiceUnavailableException("Booking transition unavailable");
   return {id:String(row.id),status:row.status as StatusChange["status"],
    changed:Boolean(row.changed)};
+ }
+ private moveInput(bookingId:unknown,body:unknown){
+  const id=validId(bookingId);
+  const d=data(body,["resourceId","startsAtUtc"]);
+  const resourceId=validId(d.resourceId);
+  if(typeof d.startsAtUtc!=="string"||!ISO.test(d.startsAtUtc)||
+     !Number.isFinite(Date.parse(d.startsAtUtc))||
+     new Date(d.startsAtUtc).toISOString()!==d.startsAtUtc)
+   throw new BadRequestException("Start must be exact UTC minute with Z");
+  return {id,resourceId,startsAtUtc:new Date(d.startsAtUtc)};
+ }
+ private moveResult(row:Record<string,unknown>|undefined):RescheduleResult{
+  if(!row)throw new ServiceUnavailableException("Booking move unavailable");
+  return {
+   id:String(row.id),resourceId:String(row.resourceId),
+   startsAtUtc:new Date(row.startsAtUtc as string|number|Date).toISOString(),
+   endsAtUtc:new Date(row.endsAtUtc as string|number|Date).toISOString(),
+   changed:Boolean(row.changed),validateOnly:Boolean(row.validateOnly),
+  };
+ }
+ /** Cashier validate-move equivalent: runs every SQL conflict check, persists nothing. */
+ async validateMove(actor:Actor,token:string,businessId:string,branchId:string,
+  bookingId:unknown,body:unknown):Promise<RescheduleResult>{
+  const scope=this.scope(actor,token,businessId,branchId);
+  const move=this.moveInput(bookingId,body);
+  const result=await this.execute(scope,"core.RescheduleBookingAppointment",r=>r
+   .input("ClientRequestId",sql.UniqueIdentifier,null)
+   .input("BookingId",sql.UniqueIdentifier,move.id)
+   .input("ResourceId",sql.UniqueIdentifier,move.resourceId)
+   .input("StartsAtUtc",sql.DateTime2(0),move.startsAtUtc)
+   .input("Validate",sql.Bit,true));
+  return this.moveResult(result.recordset?.[0]);
+ }
+ async reschedule(actor:Actor,token:string,businessId:string,branchId:string,
+  requestId:unknown,bookingId:unknown,body:unknown):Promise<RescheduleResult>{
+  const scope=this.scope(actor,token,businessId,branchId);
+  const key=validId(requestId);
+  const move=this.moveInput(bookingId,body);
+  const result=await this.execute(scope,"core.RescheduleBookingAppointment",r=>r
+   .input("ClientRequestId",sql.UniqueIdentifier,key)
+   .input("BookingId",sql.UniqueIdentifier,move.id)
+   .input("ResourceId",sql.UniqueIdentifier,move.resourceId)
+   .input("StartsAtUtc",sql.DateTime2(0),move.startsAtUtc)
+   .input("Validate",sql.Bit,false));
+  return this.moveResult(result.recordset?.[0]);
  }
  async listWindows(actor:Actor,token:string,businessId:string,branchId:string):
   Promise<{windows:BookingWindow[]}>{

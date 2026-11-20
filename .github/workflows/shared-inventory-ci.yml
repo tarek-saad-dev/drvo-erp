@@ -1,4 +1,4 @@
-name: Shared Inventory SQL027 + Web CI
+name: Shared Inventory SQL027/SQL032 + Web CI
 on:
   pull_request:
     paths:
@@ -8,8 +8,11 @@ on:
       - 'apps/api/test/inventory.test.cjs'
       - 'apps/web/src/app/workspace/**'
       - 'apps/web/test/inventory-workspace.test.cjs'
+      - 'apps/web/test/inventory-transfers.test.cjs'
       - 'packages/business-modules/inventory/**'
       - 'tests/inventory-stock-preview.test.cjs'
+      - 'tests/inventory-transfer-source.test.cjs'
+      - '_cashier_source/inventory/**'
       - 'tools/inventory/**'
       - 'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json'
       - '.github/workflows/shared-inventory-ci.yml'
@@ -22,8 +25,11 @@ on:
       - 'apps/api/test/inventory.test.cjs'
       - 'apps/web/src/app/workspace/**'
       - 'apps/web/test/inventory-workspace.test.cjs'
+      - 'apps/web/test/inventory-transfers.test.cjs'
       - 'packages/business-modules/inventory/**'
       - 'tests/inventory-stock-preview.test.cjs'
+      - 'tests/inventory-transfer-source.test.cjs'
+      - '_cashier_source/inventory/**'
       - 'tools/inventory/**'
       - 'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json'
       - '.github/workflows/shared-inventory-ci.yml'
@@ -43,9 +49,9 @@ jobs:
           set -euo pipefail
           npm ci --no-audit --no-fund
           npm run build
-          node --test tests/inventory-stock-preview.test.cjs
+          node --test tests/inventory-stock-preview.test.cjs tests/inventory-transfer-source.test.cjs
           npm ci --prefix apps/web --no-audit --no-fund
-          node --test apps/web/test/inventory-workspace.test.cjs
+          node --test apps/web/test/inventory-workspace.test.cjs apps/web/test/inventory-transfers.test.cjs
           env -u DRVO_K5_WEB_ENABLED -u DRVO_INVENTORY_WEB_ENABLED -u DRVO_OTHER_INCOME_WEB_ENABLED \
             npm run build --prefix apps/web
           npm run typecheck --prefix apps/web
@@ -75,7 +81,7 @@ jobs:
             -e MSSQL_SA_PASSWORD="$pass" \
             -p 127.0.0.1:14347:1433 -p 127.0.0.1:1433:1433 \
             mcr.microsoft.com/mssql/server:2022-latest
-      - name: Verify SQL027 balances + purchase receive through Nest HTTP
+      - name: Verify SQL027 balances/receive + SQL032 branch transfers through Nest HTTP
         env:
           INVENTORY_SQL_DISPOSABLE: 'YES'
           INVENTORY_TEST_PORT: '14347'

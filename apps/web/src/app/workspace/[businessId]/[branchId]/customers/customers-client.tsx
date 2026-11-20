@@ -54,11 +54,15 @@ export default function CustomersClient({businessId,branchId}:{businessId:string
  return <main className="k5-workspace">
   <header className="k5-workspace-header">
    <div className="k5-brand"><span className="brandmark">D</span> DRVO <b>ERP</b></div>
-   <nav className="k5-head-actions"><Link href={home}>مساحة الفرع</Link></nav>
+   <nav className="k5-head-actions">
+    <Link href={home}>مساحة الفرع</Link>
+    <Link href={home+"/customers/follow-up"}>مكتب المتابعة</Link>
+   </nav>
   </header>
   <div className="k5-page-title"><div>
    <span className="k5-eyebrow">CUSTOMERS / CRM</span><h1>العملاء</h1>
-   <p className="k5-muted">بيانات العملاء مشتركة داخل نفس الـBusiness فقط. مفيش تسويق أو رسائل تلقائية.</p>
+   <p className="k5-muted">بيانات العملاء مشتركة داخل نفس الـBusiness فقط. مفيش تسويق أو رسائل تلقائية.
+    {" "}<Link href={home+"/customers/follow-up"}>مكتب متابعة العملاء</Link> لتسجيل نتائج التواصل بدون إرسال رسائل.</p>
   </div></div>
   {state==="loading"&&<p role="status" className="k5-table-state">جاري تحميل العملاء…</p>}
   {state==="denied"&&<p role="alert" className="k5-error">مش مصرح لك بعرض العملاء.</p>}

@@ -165,3 +165,128 @@ test("window close endpoint rejects forged Origin before identity lookup",async(
    GUID(3),GUID(4),GUID(6),{}),e=>e.getStatus?.()===401);
  }finally{restore();}
 });
+
+// ---- BK-06 / SQL033 reschedule + validate-move ----
+const move={resourceId:GUID(7),startsAtUtc:"2027-03-01T12:00:00.000Z"};
+function fakePool(handler){
+ const calls=[];
+ return {calls,getInternalPool(){return {request(){
+  const inputs={};
+  const req={input(name,_type,value){inputs[name]=value;return req;},
+   async execute(procedure){calls.push({procedure,inputs});return handler(procedure,inputs);}};
+  return req;
+ }};}};
+}
+test("reschedule/validate-move reject forged fields, ids, token and bad starts before SQL",async()=>{
+ const restore=on({DRVO_BOOKING_ENABLED:"YES",DRVO_K5_AUTH_ENABLED:"YES"});
+ try{
+  const svc=new BookingService({getInternalPool(){throw Error("no SQL");}});
+  const bad=[
+   {...move,tenantId:GUID(1)},{...move,businessId:GUID(3)},{...move,branchId:GUID(4)},
+   {...move,status:"CANCELLED"},{resourceId:GUID(7)},{startsAtUtc:move.startsAtUtc},
+   {...move,resourceId:"invalid"},{...move,startsAtUtc:"2027-03-01T12:00:30.000Z"},
+   {...move,startsAtUtc:"2027-03-01T12:00:00+00:00"},
+   {...move,startsAtUtc:"2027-02-30T12:00:00.000Z"},null,[],"x",
+  ];
+  for(const body of bad){
+   await assert.rejects(()=>svc.reschedule(actor,token,GUID(3),GUID(4),GUID(8),GUID(9),body),
+    e=>e.getStatus?.()===400,JSON.stringify(body));
+   await assert.rejects(()=>svc.validateMove(actor,token,GUID(3),GUID(4),GUID(9),body),
+    e=>e.getStatus?.()===400,JSON.stringify(body));
+  }
+  await assert.rejects(()=>svc.reschedule(actor,token,GUID(3),GUID(4),"no-guid",GUID(9),move),
+   e=>e.getStatus?.()===400);
+  await assert.rejects(()=>svc.reschedule(actor,token,GUID(3),GUID(4),undefined,GUID(9),move),
+   e=>e.getStatus?.()===400);
+  await assert.rejects(()=>svc.reschedule(actor,token,GUID(3),GUID(4),GUID(8),"bad",move),
+   e=>e.getStatus?.()===400);
+  await assert.rejects(()=>svc.validateMove(actor,token,GUID(3),GUID(4),"bad",move),
+   e=>e.getStatus?.()===400);
+  for(const a of [{...actor,tenantId:"spoof"},{...actor,mustChangePassword:true},
+   {...actor,sessionVersion:0}]){
+   await assert.rejects(()=>svc.reschedule(a,token,GUID(3),GUID(4),GUID(8),GUID(9),move),
+    e=>e.getStatus?.()===404);
+   await assert.rejects(()=>svc.validateMove(a,token,GUID(3),GUID(4),GUID(9),move),
+    e=>e.getStatus?.()===404);
+  }
+  await assert.rejects(()=>svc.reschedule(actor,"bad",GUID(3),GUID(4),GUID(8),GUID(9),move),
+   e=>e.getStatus?.()===404);
+  await assert.rejects(()=>svc.reschedule(actor,token,"spoof",GUID(4),GUID(8),GUID(9),move),
+   e=>e.getStatus?.()===404);
+ }finally{restore();}
+});
+
+test("reschedule disabled by default and never touches the database",async()=>{
+ const old=process.env.DRVO_BOOKING_ENABLED;
+ try{
+  delete process.env.DRVO_BOOKING_ENABLED;
+  const svc=new BookingService({getInternalPool(){throw Error("no SQL");}});
+  await assert.rejects(()=>svc.reschedule(actor,token,GUID(3),GUID(4),GUID(8),GUID(9),move),
+   e=>e.getStatus?.()===503);
+  await assert.rejects(()=>svc.validateMove(actor,token,GUID(3),GUID(4),GUID(9),move),
+   e=>e.getStatus?.()===503);
+ }finally{if(old===undefined)delete process.env.DRVO_BOOKING_ENABLED;
+ else process.env.DRVO_BOOKING_ENABLED=old;}
+});
+
+test("reschedule binds Tenant/Business/Branch/Account from session+path only and calls SQL033 proc",async()=>{
+ const restore=on({DRVO_BOOKING_ENABLED:"YES",DRVO_K5_AUTH_ENABLED:"YES"});
+ try{
+  const row={id:GUID(9),resourceId:GUID(7),startsAtUtc:new Date(move.startsAtUtc),
+   endsAtUtc:new Date("2027-03-01T12:30:00.000Z"),changed:true,validateOnly:false};
+  const pool=fakePool(()=>({recordset:[row]}));
+  const svc=new BookingService(pool);
+  const done=await svc.reschedule(actor,token,GUID(3),GUID(4),GUID(8),GUID(9),move);
+  assert.deepEqual(done,{id:GUID(9),resourceId:GUID(7),startsAtUtc:move.startsAtUtc,
+   endsAtUtc:"2027-03-01T12:30:00.000Z",changed:true,validateOnly:false});
+  const c=pool.calls[0];
+  assert.equal(c.procedure,"core.RescheduleBookingAppointment");
+  assert.equal(c.inputs.TenantId,actor.tenantId);
+  assert.equal(c.inputs.BusinessId,GUID(3));
+  assert.equal(c.inputs.BranchId,GUID(4));
+  assert.equal(c.inputs.AccountId,actor.accountId);
+  assert.equal(c.inputs.ClientRequestId,GUID(8));
+  assert.equal(c.inputs.BookingId,GUID(9));
+  assert.equal(c.inputs.Validate,false);
+  assert.match(c.inputs.TokenHash,/^[0-9a-f]{64}$/);
+  const v=await new BookingService(fakePool(()=>({recordset:[{...row,changed:false,validateOnly:true}]})))
+   .validateMove(actor,token,GUID(3),GUID(4),GUID(9),move);
+  assert.equal(v.validateOnly,true);assert.equal(v.changed,false);
+  const vpool=fakePool(()=>({recordset:[{...row,changed:false,validateOnly:true}]}));
+  await new BookingService(vpool).validateMove(actor,token,GUID(3),GUID(4),GUID(9),move);
+  assert.equal(vpool.calls[0].inputs.Validate,true);
+  assert.equal(vpool.calls[0].inputs.ClientRequestId,null);
+  // An empty recordset is a failure, never a fabricated success.
+  await assert.rejects(()=>new BookingService(fakePool(()=>({recordset:[]})))
+   .reschedule(actor,token,GUID(3),GUID(4),GUID(8),GUID(9),move),e=>e.getStatus?.()===503);
+ }finally{restore();}
+});
+
+test("reschedule maps SQL guard errors: conflict/availability/queue=409, not found/denied=404",async()=>{
+ const restore=on({DRVO_BOOKING_ENABLED:"YES",DRVO_K5_AUTH_ENABLED:"YES"});
+ try{
+  const expected={51151:404,51152:409,51153:409,51154:400,51155:409,51156:404,51157:409,51158:409,1205:503};
+  for(const [number,status] of Object.entries(expected)){
+   const svc=new BookingService(fakePool(()=>{throw Object.assign(Error("sql"),{number:Number(number)});}));
+   await assert.rejects(()=>svc.reschedule(actor,token,GUID(3),GUID(4),GUID(8),GUID(9),move),
+    e=>e.getStatus?.()===status,"reschedule "+number);
+   await assert.rejects(()=>svc.validateMove(actor,token,GUID(3),GUID(4),GUID(9),move),
+    e=>e.getStatus?.()===status,"validate "+number);
+  }
+ }finally{restore();}
+});
+
+test("reschedule and validate-move endpoints reject foreign Origin before identity lookup",async()=>{
+ const restore=on({DRVO_BOOKING_ENABLED:"YES",DRVO_K5_AUTH_ENABLED:"YES",
+  DRVO_K5_ORIGIN:"https://erp-stage.drvotech.com"});
+ try{
+  const controller=new BookingController(
+   {actorFromToken(){throw Error("must not authenticate");}},
+   {reschedule(){throw Error("must not write");},validateMove(){throw Error("must not read");}},
+  );
+  await assert.rejects(()=>controller.reschedule("https://attacker.invalid",GUID(8),
+   {headers:{}},{setHeader(){}},GUID(3),GUID(4),GUID(9),move),e=>e.getStatus?.()===401);
+  await assert.rejects(()=>controller.validateMove("https://attacker.invalid",
+   {headers:{}},{setHeader(){}},GUID(3),GUID(4),GUID(9),move),e=>e.getStatus?.()===401);
+ }finally{restore();}
+});

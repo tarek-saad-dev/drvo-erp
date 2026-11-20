@@ -6,8 +6,11 @@ on:
       - 'apps/api/src/app.module.ts'
       - 'apps/api/test/customers.test.cjs'
       - 'apps/api/test/customer-source.test.cjs'
+      - 'apps/api/test/customer-follow-up.test.cjs'
       - 'apps/web/test/customer-profile-crm.test.cjs'
+      - 'apps/web/test/customer-follow-up.test.cjs'
       - 'tests/customer-profile-source.test.cjs'
+      - 'tests/customer-follow-up-source.test.cjs'
       - '_cashier_source/crm/**'
       - 'apps/web/src/app/workspace/**'
       - 'db/migrations/**'
@@ -20,8 +23,11 @@ on:
       - 'apps/api/src/app.module.ts'
       - 'apps/api/test/customers.test.cjs'
       - 'apps/api/test/customer-source.test.cjs'
+      - 'apps/api/test/customer-follow-up.test.cjs'
       - 'apps/web/test/customer-profile-crm.test.cjs'
+      - 'apps/web/test/customer-follow-up.test.cjs'
       - 'tests/customer-profile-source.test.cjs'
+      - 'tests/customer-follow-up-source.test.cjs'
       - '_cashier_source/crm/**'
       - 'apps/web/src/app/workspace/**'
       - 'db/migrations/**'
@@ -45,7 +51,9 @@ jobs:
           npm test --prefix apps/api
           node --check tools/customers/verify.cjs
           node --test tests/customer-profile-source.test.cjs
+          node --test tests/customer-follow-up-source.test.cjs
           node --test apps/web/test/customer-profile-crm.test.cjs
+          node --test apps/web/test/customer-follow-up.test.cjs
       - name: Start local disposable SQL Server
         shell: bash
         run: |

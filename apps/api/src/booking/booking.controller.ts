@@ -4,7 +4,7 @@ import {
 } from "@nestjs/common";
 import type {IncomingMessage,ServerResponse} from "node:http";
 import {IdentityService,extractSessionCookie} from "../identity/identity.service";
-import {BookingService,type BookingRead,type Created,type StatusChange,type BookingWindow,type WindowClosure} from "./booking.service";
+import {BookingService,type BookingRead,type Created,type StatusChange,type BookingWindow,type WindowClosure,type RescheduleResult} from "./booking.service";
 
 function enabled():void{
  if(process.env.DRVO_K5_AUTH_ENABLED!=="YES"||
@@ -61,6 +61,30 @@ export class BookingController {
   const token=extractSessionCookie(req.headers.cookie);
   const actor=await this.identity.actorFromToken(token);
   return this.booking.changeAppointmentStatus(
+   actor,token!,businessId,branchId,key,bookingId,body);
+ }
+ @Post("appointments/:bookingId/validate-move") @HttpCode(200)
+ async validateMove(@Headers("origin") origin:string|undefined,
+  @Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,
+  @Param("businessId") businessId:string,@Param("branchId") branchId:string,
+  @Param("bookingId") bookingId:string,
+  @Body() body:unknown):Promise<RescheduleResult>{
+  res.setHeader("Cache-Control","no-store");enabled();allowedOrigin(origin);
+  const token=extractSessionCookie(req.headers.cookie);
+  const actor=await this.identity.actorFromToken(token);
+  return this.booking.validateMove(actor,token!,businessId,branchId,bookingId,body);
+ }
+ @Post("appointments/:bookingId/reschedule") @HttpCode(200)
+ async reschedule(@Headers("origin") origin:string|undefined,
+  @Headers("idempotency-key") key:string|undefined,
+  @Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,
+  @Param("businessId") businessId:string,@Param("branchId") branchId:string,
+  @Param("bookingId") bookingId:string,
+  @Body() body:unknown):Promise<RescheduleResult>{
+  res.setHeader("Cache-Control","no-store");enabled();allowedOrigin(origin);
+  const token=extractSessionCookie(req.headers.cookie);
+  const actor=await this.identity.actorFromToken(token);
+  return this.booking.reschedule(
    actor,token!,businessId,branchId,key,bookingId,body);
  }
  @Get("windows")

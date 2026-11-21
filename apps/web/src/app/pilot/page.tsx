@@ -36,7 +36,7 @@ export default async function PrivatePilotPage() {
         <h1>Private Pilot<br /><span>محطة Cashier الحقيقية</span></h1>
         <p>
           هذه بوابة الدخول للمنتج الخاص — عميل وحجز ومسودة POS محفوظة في SQL Server
-          المعزول (`DRVO_ERP_STAGING`). ليست Demo العامة، وليست تحصيلًا ماليًا.
+          المعزول (`DRVO_ERP_PILOT` — بيانات اصطناعية). ليست Demo العامة، وليست تحصيلًا ماليًا.
         </p>
 
         {sliceReady ? (
@@ -54,8 +54,8 @@ export default async function PrivatePilotPage() {
               Private Pilot غير مفعّل على هذا النشر بعد
             </span>
             <span className="demo-hero-description">
-              يحتاج موافقة المؤسس + تطبيق SQL001–040 على `DRVO_ERP_STAGING` + drop-ins في
-              `ops/staging/pilot/` ثم إعادة تشغيل الخدمات.
+              يحتاج أمر الجذر مرة واحدة: `activate-isolated-pilot-once.sh` لإنشاء `DRVO_ERP_PILOT`
+              + SQL001–040 + Owner اصطناعي + أعلام الواجهة.
             </span>
           </div>
         )}

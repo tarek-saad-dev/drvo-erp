@@ -10,6 +10,8 @@
 
 ## Unreleased
 
+- **2026-11-21 — PRIVATE PILOT ONE-COMMAND LIVE ACTIVATOR (STILL NEEDS ROOT):** Isolates synthetic `DRVO_ERP_PILOT`, migrates SQL001–040, backup/restore witness, seeds Owner, wires systemd SQL+flags via `ops/staging/pilot/activate-isolated-pilot-once.sh`. Live orchestrator + GitHub workflow probe HTTPS without claiming verified. [One-command note](PRIVATE-PILOT-LIVE-ACTIVATION-ONE-COMMAND-2026-11-21.md).
+
 - **2026-11-21 — PRIVATE PILOT P0 ACTIVATION PACKAGE (NOT OWNER-VERIFIED):** Founder `/pilot` entry + home prioritizes Private Pilot over synthetic `/demo/salon`. SQL040 grants Owner Pilot module actions (`customers`/`catalog`/`booking`/`hr`/`pos.draft`/`inventory.read`) via `EnsureOwnerPilotModulePermissions` + expanded `ClaimApprovedOwner`. Systemd flag templates + `apply-pilot-flags-once.sh`, K5D grant tool, Owner journey plan/tests. **Still OPEN:** staging SQL001–040 apply, backup/restore witness, flag drop-ins, Owner claim, Owner browser E2E. ADR-031 posting BLOCKED. [Activation note](PRIVATE-PILOT-P0-ACTIVATION-2026-11-21.md).
 
 - **2026-11-21 — CASHIER POS WORKSTATION UX LIVE ON STAGING (VISIBLE PRODUCT, NOT FINANCIAL PARITY):** [#158](https://github.com/tarek-saad-dev/drvo-erp/pull/158) MERGED; Staging Deploy [SUCCESS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44935626730) exact SHA `d617ee2`; External smoke [PASS](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44935802244) for `data-demo-revision="cashier-workstation-shell-v1"`. Founder URL: https://erp-stage.drvotech.com/demo/salon — shared Light RTL 3-column shell (demo synthetic + private DRAFT). BEFORE/AFTER screenshots in [evidence](evidence/cashier-pos-ux-2026-11-20/). **No fake paid success; ADR-031 still BLOCKED.**

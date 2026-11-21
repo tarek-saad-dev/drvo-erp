@@ -1,0 +1,75 @@
+name: Private Pilot Live Bootstrap
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_database:
+        description: 'Type DRVO_ERP_PILOT to authorize live probe/orchestration'
+        type: string
+        required: true
+      probe_live:
+        description: 'Probe https://erp-stage.drvotech.com (YES/NO)'
+        type: choice
+        options: ['YES', 'NO']
+        default: 'YES'
+permissions:
+  contents: read
+concurrency:
+  group: drvo-erp-pilot-live-bootstrap
+  cancel-in-progress: false
+jobs:
+  orchestrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Confirm isolated Pilot database identity
+        env:
+          REQUESTED: ${{ inputs.confirm_database }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$REQUESTED" == "DRVO_ERP_PILOT" ]] || {
+            echo "::error::Type DRVO_ERP_PILOT exactly. Refusing DRVO_ERP_STAGING/production."
+            exit 1
+          }
+          echo "PASS: orchestration authorized for isolated DRVO_ERP_PILOT only"
+      - name: Verify activator package + offline orchestrator
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check ops/staging/pilot/activate-pilot-sql.cjs
+          node --check tools/pilot/live-orchestrator.cjs
+          node --test tests/pilot-live-orchestrator.test.cjs
+          node tools/pilot/live-orchestrator.cjs
+      - name: Probe public HTTPS Pilot entry (does not claim verified)
+        if: inputs.probe_live == 'YES'
+        env:
+          DRVO_PILOT_PROBE_LIVE: 'YES'
+          DRVO_PILOT_ORIGIN: 'https://erp-stage.drvotech.com'
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/pilot/live-orchestrator.cjs | tee "$RUNNER_TEMP/pilot-live.json"
+          python3 - <<'PY'
+          import json,os,sys
+          p=json.load(open(os.environ['RUNNER_TEMP']+'/pilot-live.json'))
+          live=p.get('live') or {}
+          print('pilotHttp', live.get('pilotHttp'))
+          print('signInHttp', live.get('signInHttp'))
+          print('flagsAllOff', live.get('flagsAllOff'))
+          print('flagsLikelyOn', live.get('flagsLikelyOn'))
+          if live.get('pilotHttp') != 200:
+            print('::error:: /pilot is not HTTP 200 on staging')
+            sys.exit(1)
+          print('NOTE: flags OFF means one-time root activator still required.')
+          print('ONE-TIME:', ' && '.join(p['oneTimeOperatorAction']['commands']))
+          PY
+      - name: Honesty banner
+        run: |
+          echo "This workflow never claims PILOT_VERIFIED or enables ADR-031 posting."
+          echo "Isolated DB activation requires VPS root: ops/staging/pilot/activate-isolated-pilot-once.sh"

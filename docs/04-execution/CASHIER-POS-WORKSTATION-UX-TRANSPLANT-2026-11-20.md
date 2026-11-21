@@ -43,15 +43,15 @@ Visible product experience is the milestone — not another commit table. Stagin
 3. Browser screenshots: demo POS 3-pane desktop + private POS 3-pane (or CI Chromium capture).
 4. This checklist checked against the live URL.
 
-## Current delivery snapshot (this branch)
+## Current delivery snapshot (LIVE)
 
 | Item | Status |
 |---|---|
-| PR | https://github.com/tarek-saad-dev/drvo-erp/pull/158 |
-| App SHA (UX) | `a967dc24` (+ evidence docs `c39886c`) |
+| PR | [#158 MERGED](https://github.com/tarek-saad-dev/drvo-erp/pull/158) |
+| Deployed SHA | `d617ee2a470bae55707e676e899a915671b38299` |
+| Staging Deploy | [SUCCESS #44935626730](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44935626730) |
+| External smoke | [PASS #44935802244](https://github.com/tarek-saad-dev/drvo-erp/actions/runs/44935802244) (`cashier-workstation-shell-v1`) |
 | BEFORE staging POS | stacked single-column — `evidence/.../BEFORE-staging-pos-tab` |
-| AFTER local 1440 | 3-pane shell + cart — `evidence/.../AFTER-local-1440-*` |
-| Staging URL live with new marker | **PENDING merge + Staging Deploy** |
+| AFTER staging 1440 | 3-pane + cart — `evidence/.../AFTER-staging-pos-tab-*` |
+| Staging URL | **https://erp-stage.drvotech.com/demo/salon** |
 | ADR-031 collect/pay | **BLOCKED** (honest banners; no fake success) |
-
-Inspect after deploy: `https://erp-stage.drvotech.com/demo/salon`

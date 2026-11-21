@@ -1,0 +1,24 @@
+# Copy to /etc/systemd/system/drvoerp-api.service.d/40-k5-pilot-api.conf
+# ONLY after founder approval + SQL001–040 on DRVO_ERP_STAGING + backup/restore evidence.
+# NEVER commit real HMAC/mail secrets into git. Fill secrets on the VPS only.
+# ADR-031 posting / Cut live import must stay OFF.
+[Service]
+Environment=DRVO_K5_AUTH_ENABLED=YES
+Environment=DRVO_K5_ORIGIN=https://erp-stage.drvotech.com
+Environment=DRVO_K5_TRUST_NGINX_REAL_IP=YES
+# Bootstrap window (disable after first Owner claim if desired):
+Environment=DRVO_K5_OWNER_BOOTSTRAP_ENABLED=YES
+Environment=DRVO_K5_VERIFY_API_ENABLED=YES
+# Private Pilot vertical slice (NONPOSTING):
+Environment=DRVO_CATALOG_ENABLED=YES
+Environment=DRVO_CUSTOMERS_ENABLED=YES
+Environment=DRVO_BOOKING_ENABLED=YES
+Environment=DRVO_POS_PREVIEW_ENABLED=YES
+Environment=DRVO_POS_DRAFTS_ENABLED=YES
+Environment=DRVO_POS_RICH_ENABLED=YES
+Environment=DRVO_HR_ENABLED=YES
+Environment=DRVO_INVENTORY_ENABLED=YES
+# Also required on API (usually from a separate protected drop-in / EnvironmentFile):
+#   DRVO_K5_VERIFICATION_HMAC_KEY (64 hex, must match /etc/drvo-erp/k5d-operator.env)
+#   DRVO_K5_MAIL_ENABLED=YES, DRVO_K5_MAIL_PROVIDER=resend, DRVO_K5_RESEND_API_KEY, DRVO_K5_FROM_EMAIL
+# Do NOT enable paid sale / ADR-031 posting paths.

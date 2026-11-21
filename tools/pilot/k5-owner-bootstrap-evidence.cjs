@@ -9,22 +9,9 @@
 const assert = require('node:assert/strict');
 const {randomUUID} = require('node:crypto');
 const {assertNoLiveConnectionMarkers} = require('../cut-adapter/connection-gates.cjs');
+const {PILOT_OWNER_MODULE_ACTIONS} = require('./owner-module-permissions.cjs');
 
-const PILOT_OWNER_ACTIONS = Object.freeze([
-  'branch.read',
-  'customers.read',
-  'customers.manage',
-  'catalog.read',
-  'catalog.manage',
-  'booking.read',
-  'booking.manage',
-  'hr.read',
-  'hr.manage',
-  'salon.barber.manage',
-  'pos.draft.read',
-  'pos.draft.manage',
-  'inventory.read',
-]);
+const PILOT_OWNER_ACTIONS = PILOT_OWNER_MODULE_ACTIONS;
 
 function buildPilotOwnerBootstrapPlan(operatorEvidence = {}) {
   assertNoLiveConnectionMarkers(operatorEvidence);

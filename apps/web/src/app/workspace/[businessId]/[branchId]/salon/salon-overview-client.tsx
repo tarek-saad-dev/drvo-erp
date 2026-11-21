@@ -3,8 +3,8 @@ import Link from "next/link";
 import {useCallback,useEffect,useState} from "react";
 import {useRouter} from "next/navigation";
 
-type Booking={bookingId:string;offeringId:string;resourceId:string;customerName:string;offeringName:string;
- resourceName:string;startsAtUtc:string;status:"BOOKED"|"CANCELLED"|"COMPLETED"};
+type Booking={bookingId:string;customerId:string;offeringId:string;resourceId:string;customerName:string;
+ offeringName:string;resourceName:string;startsAtUtc:string;status:"BOOKED"|"CANCELLED"|"COMPLETED"};
 type Overview={branchName:string;businessName:string;bookings:Booking[];
  customersCount:number;offeringsCount:number;draftCount:number|null;posPreviewAllowed:boolean};
 type Status="loading"|"ready"|"denied"|"unavailable";
@@ -201,8 +201,9 @@ export default function SalonOverview({businessId,branchId,draftsAvailable}:{
         <td>{b.customerName}</td><td>{b.offeringName}</td><td>{b.resourceName}</td>
         <td dir="ltr">{new Date(b.startsAtUtc).toLocaleString("ar-EG")}</td>
         <td>{b.status==="BOOKED"?"محجوز":b.status==="COMPLETED"?"مكتمل":"ملغي"}</td>
-        <td>{overview.posPreviewAllowed&&b.status==="COMPLETED"&&GUID.test(b.offeringId)?
-         <Link href={home+"/pos-preview?offeringId="+encodeURIComponent(b.offeringId)}>
+        <td>{overview.posPreviewAllowed&&b.status==="COMPLETED"&&GUID.test(b.offeringId)&&GUID.test(b.customerId)?
+         <Link href={home+"/pos-preview?customerId="+encodeURIComponent(b.customerId)+
+           "&offeringId="+encodeURIComponent(b.offeringId)}>
            جهّز مسودة من الخدمة
          </Link>:
          b.status==="BOOKED"?<Link href={home+"/booking"}>إدارة الحجز</Link>:<span>—</span>}</td>

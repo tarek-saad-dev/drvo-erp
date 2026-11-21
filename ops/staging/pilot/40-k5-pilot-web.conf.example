@@ -1,0 +1,14 @@
+# Copy to /etc/systemd/system/drvoerp-web.service.d/40-k5-pilot-web.conf
+# ONLY after founder approval. No secrets belong here — Web flags only.
+# Public /demo/salon stays synthetic; Private Pilot is /sign-in → /workspaces → POS.
+[Service]
+Environment=DRVO_K5_WEB_ENABLED=YES
+Environment=DRVO_K5_VERIFY_UI_ENABLED=YES
+Environment=DRVO_CATALOG_WEB_ENABLED=YES
+Environment=DRVO_CUSTOMERS_WEB_ENABLED=YES
+Environment=DRVO_BOOKING_WEB_ENABLED=YES
+Environment=DRVO_POS_PREVIEW_WEB_ENABLED=YES
+Environment=DRVO_POS_DRAFTS_WEB_ENABLED=YES
+Environment=DRVO_POS_RICH_WEB_ENABLED=YES
+Environment=DRVO_HR_WEB_ENABLED=YES
+Environment=DRVO_INVENTORY_WEB_ENABLED=YES

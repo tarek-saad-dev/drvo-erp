@@ -5,6 +5,8 @@ on:
       - 'apps/web/src/app/demo/salon/**'
       - 'apps/web/src/components/cashier-pos/**'
       - 'apps/web/src/app/page.tsx'
+      - 'apps/web/src/app/pilot/**'
+      - 'apps/web/test/private-pilot-entry.test.cjs'
       - 'apps/web/src/app/globals.css'
       - 'apps/web/src/app/drvo-light.css'
       - 'apps/web/src/app/layout.tsx'
@@ -22,6 +24,8 @@ on:
       - 'apps/web/src/app/demo/salon/**'
       - 'apps/web/src/components/cashier-pos/**'
       - 'apps/web/src/app/page.tsx'
+      - 'apps/web/src/app/pilot/**'
+      - 'apps/web/test/private-pilot-entry.test.cjs'
       - 'apps/web/src/app/globals.css'
       - 'apps/web/src/app/drvo-light.css'
       - 'apps/web/src/app/layout.tsx'
@@ -53,6 +57,7 @@ jobs:
           node --test apps/web/test/cashier-pos-workstation.test.cjs
           node --test apps/web/test/drvo-light-ui.test.cjs
           node --test apps/web/test/private-salon-overview.test.cjs
+          node --test apps/web/test/private-pilot-entry.test.cjs
           env -u DRVO_K5_WEB_ENABLED npm run build --prefix apps/web
           npm run typecheck --prefix apps/web
       - name: Public route renders; private auth and real workspace remain CLOSED

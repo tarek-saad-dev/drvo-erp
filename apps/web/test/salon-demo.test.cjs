@@ -203,7 +203,7 @@ test('compact Light V1.1 increases visible viewport rather than applying browser
  const css=fs.readFileSync(path.join(root,'demo/salon/salon-pos-workspace.css'),'utf8');
  const base=fs.readFileSync(path.join(root,'demo/salon/salon-demo.css'),'utf8');
  const light=fs.readFileSync(path.join(root,'demo/salon/salon-demo-light.css'),'utf8');
- assert.match(client,/data-demo-revision="salon-pos-customer-v1-2"/);
+ assert.match(client,/data-demo-revision="cashier-workstation-shell-v1"/);
  assert.doesNotMatch(client,/GUIDED TOUR|className="sd-tour"|tourActive/);
  assert.doesNotMatch(base,/\.sd-tour/);
  assert.doesNotMatch(light,/\.sd-tour/);

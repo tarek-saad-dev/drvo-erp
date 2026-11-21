@@ -21,7 +21,7 @@ const {
   compareSchemaMigrationRows,
   readMigrationManifestOffline,
 } = require('./backup-restore-evidence.cjs');
-const {seedDisposablePilotOwner} = require('./k5-owner-bootstrap-evidence.cjs');
+const {seedDisposablePilotOwner, PILOT_OWNER_ACTIONS} = require('./k5-owner-bootstrap-evidence.cjs');
 const {buildPilotReadinessBoard} = require('./readiness-board.cjs');
 
 const SOURCE_DB = 'DrvoPilotDisposable';
@@ -134,7 +134,7 @@ async function runHarness() {
     console.log('PASS: SQL001–034 applied on disposable Pilot DB with matching checksums');
 
     const owner = await seedDisposablePilotOwner(source, sql);
-    assert.equal(owner.permissionCount, 13);
+    assert.equal(owner.permissionCount, PILOT_OWNER_ACTIONS.length);
     console.log('PASS: synthetic K5 Owner Tenant/Business/Branch seeded (ADR-031 still BLOCKED)');
 
     const stamp = Date.now();

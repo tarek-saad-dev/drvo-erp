@@ -4,24 +4,38 @@ on:
     paths:
       - 'tools/pilot/**'
       - 'tests/pilot-readiness.test.cjs'
+      - 'tests/pilot-owner-journey.test.cjs'
+      - 'apps/web/src/app/pilot/**'
+      - 'apps/web/src/app/page.tsx'
+      - 'apps/web/test/private-pilot-entry.test.cjs'
+      - 'ops/staging/pilot/**'
+      - 'tools/k5d/operator-grant-pilot-owner-permissions.cjs'
       - 'db/migrations/**'
       - 'tools/cut-adapter/connection-gates.cjs'
       - 'tools/k4-db/migrate.cjs'
       - 'tools/salon-browser/**'
       - 'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json'
       - 'docs/04-execution/PILOT-OPERATIONAL-READINESS-2026-11-20.md'
+      - 'docs/04-execution/PRIVATE-PILOT-P0-ACTIVATION-2026-11-21.md'
       - '.github/workflows/pilot-readiness-ci.yml'
   push:
     branches: [main]
     paths:
       - 'tools/pilot/**'
       - 'tests/pilot-readiness.test.cjs'
+      - 'tests/pilot-owner-journey.test.cjs'
+      - 'apps/web/src/app/pilot/**'
+      - 'apps/web/src/app/page.tsx'
+      - 'apps/web/test/private-pilot-entry.test.cjs'
+      - 'ops/staging/pilot/**'
+      - 'tools/k5d/operator-grant-pilot-owner-permissions.cjs'
       - 'db/migrations/**'
       - 'tools/cut-adapter/connection-gates.cjs'
       - 'tools/k4-db/migrate.cjs'
       - 'tools/salon-browser/**'
       - 'tools/cashier-reuse/cashier-workflow-ledger-2026-11-19.json'
       - 'docs/04-execution/PILOT-OPERATIONAL-READINESS-2026-11-20.md'
+      - 'docs/04-execution/PRIVATE-PILOT-P0-ACTIVATION-2026-11-21.md'
       - '.github/workflows/pilot-readiness-ci.yml'
 permissions:
   contents: read
@@ -46,8 +60,14 @@ jobs:
           node --check tools/pilot/isolated-db-harness.cjs
           node --check tools/pilot/render-board.cjs
           node --check tools/pilot/verify.cjs
+          node --check tools/pilot/owner-module-permissions.cjs
+          node --check tools/pilot/owner-journey-plan.cjs
+          node --check tools/k5d/operator-grant-pilot-owner-permissions.cjs
           node --test tests/pilot-readiness.test.cjs
+          node --test tests/pilot-owner-journey.test.cjs
+          node --test apps/web/test/private-pilot-entry.test.cjs
           node tools/pilot/verify.cjs
+          node tools/pilot/owner-journey-plan.cjs
           node tools/pilot/render-board.cjs
           test -f tools/pilot/artifacts/readiness-board.json
           test -f tools/pilot/artifacts/readiness-board.md

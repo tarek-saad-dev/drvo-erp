@@ -18,11 +18,22 @@ Fail-closed, machine-checkable Pilot readiness package.
 | ADR-031 package | Merged readiness docs/board; **`postingActivation=BLOCKED`** / ADR still **PROPOSED** |
 | Owner gates | `TARGET_APPLY`, `ISOLATED_BACKUP_RESTORE`, `K5_PERMISSIONS`, `OWNER_BROWSER_E2E` remain **OPEN** — never claim Owner E2E done |
 
+## Private Pilot P0 (2026-11-21)
+
+- Owner journey plan: `node tools/pilot/owner-journey-plan.cjs`
+- Module permissions contract: `tools/pilot/owner-module-permissions.cjs` ↔ SQL040
+- Staging flag templates: `ops/staging/pilot/`
+- Founder entry (Web): `/pilot`
+- Activation doc: `docs/04-execution/PRIVATE-PILOT-P0-ACTIVATION-2026-11-21.md`
+
 ## Commands
 
 ```bash
 node --test tests/pilot-readiness.test.cjs
+node --test tests/pilot-owner-journey.test.cjs
+node --test apps/web/test/private-pilot-entry.test.cjs
 node tools/pilot/verify.cjs
+node tools/pilot/owner-journey-plan.cjs
 node tools/pilot/render-board.cjs
 node tools/pilot/workflow-checklist.cjs
 node tools/pilot/e2e-matrix.cjs

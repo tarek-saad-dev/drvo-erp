@@ -1,19 +1,19 @@
 # Operational Readiness Matrix — 2026-11-20
 
-Baseline: `main` tip **`d0a5d06`** (Purchasing #152). Migrations **SQL001–037** in-repo. Cashier pin **`046bf19`**. ADR-031 **PROPOSED**; `postingActivation=BLOCKED`.
+Baseline updates with Private Pilot P0 activation package (SQL040, `/pilot`, flag templates). Migrations **SQL001–040** in-repo. Cashier pin **`046bf19`**. ADR-031 **PROPOSED**; `postingActivation=BLOCKED`. Activation: [PRIVATE-PILOT-P0-ACTIVATION-2026-11-21](PRIVATE-PILOT-P0-ACTIVATION-2026-11-21.md).
 
-This matrix separates **merged disposable/CI evidence** from **Owner Pilot / primary VPS / paid posting** gates. Nonposting ≠ operational pilot.
+This matrix separates **merged disposable/CI evidence** from **Owner Pilot / primary VPS / paid posting** gates. Nonposting ≠ operational pilot. **Do not claim PILOT_VERIFIED from CI.**
 
 ## Track A — Private Pilot
 
 | Gate | Status | Evidence | Next human action |
 |---|---|---|---|
-| Repo Pilot package (`tools/pilot/**`) | MERGED #150 | Fail-closed board, workflow matrix, disposable harness | Keep board honest as modules land |
-| Workflow matrix DRAFT_PRINT | STALE until sync PR | #151 POS-07 print is in-repo; matrix may still say BLOCKED | Sync matrix → READY_IN_REPO; do not claim Owner print |
-| TARGET_APPLY (isolated Pilot DB 001–037) | OPEN | Harness ≠ witnessed Pilot apply | Founder/DBA: isolated DB only; never primary/VPS without recovery gates |
+| Repo Pilot package (`tools/pilot/**`) | MERGED #150 + P0 package | Fail-closed board, Owner journey plan, `/pilot` entry | Keep board honest; activate on staging |
+| Workflow matrix DRAFT_PRINT | READY_IN_REPO | #151 POS-07 print | Owner print proof still OPEN |
+| TARGET_APPLY (isolated Pilot DB 001–040) | OPEN | Harness ≠ witnessed Pilot apply | Founder/DBA: `DRVO_ERP_STAGING` only through SQL040 |
 | ISOLATED_BACKUP_RESTORE | OPEN | CI disposable restore ≠ Pilot witness | Operator witness encrypted/off-host Pilot restore |
-| K5_PERMISSIONS (real Owner) | OPEN | Synthetic seed ≠ Owner session | Issue scoped Owner on Pilot target |
-| OWNER_BROWSER_E2E | OPEN | S12/S13 disposable Chromium ≠ Pilot Owner | Customer→Booking→Barber→POS Draft→Inventory→Draft Print→Reload on Pilot |
+| K5_PERMISSIONS (real Owner) | OPEN | SQL040 + grant tool in-repo; synthetic seed ≠ Owner session | Flag drop-ins + approve/claim + Ensure if pre-040 |
+| OWNER_BROWSER_E2E | OPEN | S12/S13 disposable Chromium ≠ Pilot Owner | `/pilot` → Customer→Booking→Barber→POS Draft→Inventory→Draft Print→Reload |
 | Live Cut import / primary SQL apply | BLOCKED | Track D fixtures only | Explicit Founder+Security+DBA approvals |
 
 ## Track B — Cashier functional parity (nonposting)

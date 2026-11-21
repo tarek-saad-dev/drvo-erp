@@ -8,7 +8,7 @@ Related: [TRACK-D-CUT-SALON-READINESS-2026-11-19](TRACK-D-CUT-SALON-READINESS-20
 
 | Item | In-repo reality |
 | --- | --- |
-| Migrations | Git has **SQL001–037**. Formal Track A gate still reports **PASS_SOURCE_ONLY** for **001–034** checksums; **035** (barcode), **036** (queue settle-expired), **037** (purchasing suppliers/receive/AP preview) are additional NONPOSTING slices. |
+| Migrations | Git has **SQL001–040**. Formal Track A gate still reports **PASS_SOURCE_ONLY** for **001–034** checksums; **035–039** NONPOSTING slices + **040** Owner Pilot module permissions (`EnsureOwnerPilotModulePermissions` + expanded `ClaimApprovedOwner`). Activation: [PRIVATE-PILOT-P0-ACTIVATION-2026-11-21](PRIVATE-PILOT-P0-ACTIVATION-2026-11-21.md). |
 | POS-07 / Draft Print | **#151** merged NONPOSTING DRAFT print preview (`window.print` only). Matrix step `DRAFT_PRINT` = **READY_IN_REPO**. Fiscal/paid receipt remains **BLOCKED**. |
 | Purchasing | **#152** / **SQL037** suppliers + receive + AP preview (NONPOSTING). |
 | Queue | **#153** / **SQL036** settle-expired + grouped live board (NONPOSTING). |
@@ -43,10 +43,10 @@ Disposable GitHub CI PASS (migrations + backup/restore on `DrvoPilotDisposable*`
 
 | Gate | Status |
 | --- | --- |
-| SOURCE_MIGRATIONS_001_034 | **PASS_SOURCE_ONLY** (git checksums; tree also has 035–037) |
-| TARGET_APPLY (isolated Pilot DB) | **OPEN** (operator) |
+| SOURCE_MIGRATIONS_001_034 | **PASS_SOURCE_ONLY** (git checksums; tree also has 035–040) |
+| TARGET_APPLY (isolated Pilot DB) | **OPEN** (operator — apply through **040** on `DRVO_ERP_STAGING`) |
 | ISOLATED_BACKUP_RESTORE | **OPEN** (operator; disposable harness is CI rehearsal only) |
-| K5_PERMISSIONS | **OPEN** (operator; disposable seed ≠ Pilot Owner session) |
+| K5_PERMISSIONS | **OPEN** (operator; SQL040 + flag drop-ins in-repo; disposable seed ≠ Pilot Owner session) |
 | OWNER_BROWSER_E2E | **OPEN** |
 | ADR031_POSTING | **BLOCKED** (`postingActivation=BLOCKED`) |
 | CUT_LIVE_IMPORT | **BLOCKED** |
@@ -70,9 +70,9 @@ Path: `tools/pilot/workflow-matrix.json`
 
 1. **Confirm destination identity** — dedicated DRVO Pilot database name, Owner principal, Tenant/Business/Branch UUIDs. Never reuse Cut/Cashier/AutoResponse/primary live SQL.
 2. **Backup first** — COPY_ONLY (or approved) → `RESTORE VERIFYONLY` → restore into a **new** recovery DB; compare `core.SchemaMigration` checksums to git.
-3. **Apply migrations** only on the isolated Pilot DB with a restricted migrator (formal gate still centers 001–034; include 035–037 when the Pilot target is meant to exercise barcode/queue/purchasing NONPOSTING slices). Re-read checksums. Do **not** apply from chat to primary/VPS.
-4. **K5 Owner bootstrap** — grant Pilot scopes (`customers.*`, `booking.*`, `hr.*`, `pos.draft.*`, `inventory.read`, …); keep ADR-031 posting flags **OFF**.
-5. **Owner browser E2E** — Customer → Booking → Barber → POS NONPOSTING Draft → Inventory validation → Draft Print (`window.print` only) → Reload. Treat disposable Chromium as preparatory only. **Never claim Owner E2E done from CI.**
+3. **Apply migrations** only on the isolated Pilot DB with a restricted migrator through **SQL040** (`DRVO_ERP_STAGING`). Re-read checksums. Do **not** apply from chat to primary/VPS.
+4. **K5 Owner bootstrap** — apply Pilot flag drop-ins (`ops/staging/pilot/`), approve/claim Owner, run `EnsureOwnerPilotModulePermissions` / grant tool if Owner predated SQL040; keep ADR-031 posting flags **OFF**.
+5. **Owner browser E2E** — start at `/pilot` → Customer → Booking → Barber → POS NONPOSTING Draft → Inventory validation → Draft Print (`window.print` only) → Reload. Treat disposable Chromium as preparatory only. **Never claim Owner E2E done from CI.**
 6. **Draft Print** — in-repo after #151 as NONPOSTING DRAFT preview. Fiscal/paid receipt stays **BLOCKED**. Owner Pilot print proof remains **OPEN**.
 7. **No Cut live import** — use Track D fixtures only until founder-approved export + identity ledger exist off-chat.
 

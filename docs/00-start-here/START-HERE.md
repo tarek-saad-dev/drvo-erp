@@ -1,6 +1,6 @@
 # Start here — project handoff
 
-> **2026-11-21 P0 — REAL PRIVATE PILOT (HIGHEST PRIORITY):** Public `/demo/salon` is **synthetic only** and is **not** the product. Deliver database-connected Private Pilot on isolated `DRVO_ERP_STAGING`: K5 Owner → Customer → Booking → Barber → Cashier 3-pane POS Draft → Inventory gate → Draft Print → Reload. Activation package: [PRIVATE-PILOT-P0-ACTIVATION-2026-11-21](../04-execution/PRIVATE-PILOT-P0-ACTIVATION-2026-11-21.md) · entry `/pilot`. **External gates still OPEN:** SQL001–040 apply + backup/restore witness + systemd Pilot flags + Owner approve/claim. **ADR-031 posting BLOCKED. Never claim PILOT_VERIFIED from CI alone.**
+> **2026-11-21 FAST TRACK — ISOLATED LIVE PILOT:** `/pilot` is deployed on staging (flags OFF until activator). **One root command** creates synthetic `DRVO_ERP_PILOT` (does not rewrite `DRVO_ERP_STAGING` data): [ONE-COMMAND activation](../04-execution/PRIVATE-PILOT-LIVE-ACTIVATION-ONE-COMMAND-2026-11-21.md). Public `/demo/salon` stays synthetic. **ADR-031 BLOCKED. Never claim PILOT_VERIFIED without Owner acceptance.**
 
 > **2026-11-21 FOUNDER VISIBLE WORKSTATION LIVE:** [#158](https://github.com/tarek-saad-dev/drvo-erp/pull/158) MERGED · Staging Deploy SHA `d617ee2` · External smoke PASS for `cashier-workstation-shell-v1`. Demo URL still synthetic: https://erp-stage.drvotech.com/demo/salon. Evidence: [transplant note](../04-execution/CASHIER-POS-WORKSTATION-UX-TRANSPLANT-2026-11-20.md). **ADR-031 still BLOCKED.**
 

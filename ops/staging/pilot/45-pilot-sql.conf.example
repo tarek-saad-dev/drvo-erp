@@ -1,0 +1,5 @@
+# Copy to /etc/systemd/system/drvoerp-api.service.d/45-pilot-sql.conf
+# Points the staging API at isolated DRVO_ERP_PILOT (synthetic) without altering
+# DRVO_ERP_STAGING database contents. Installed by activate-isolated-pilot-once.sh.
+[Service]
+EnvironmentFile=/etc/drvo-erp/pilot-sql.env

@@ -333,9 +333,10 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
     {status==="ready"&&<CashierWorkstationShell
       mode="private"
       customerPane={<>
-        {draftsEnabled&&richEnabled?<PosCustomerOperator
+        {draftsEnabled&&richEnabled&&<PosCustomerOperator
           apiRoot={api.replace(/\/pos-preview$/,"")} customerId={selectedCustomerId}
-          onSelect={setSelectedCustomerId} onCreated={()=>setCustomerRevision(v=>v+1)}/>:
+          onSelect={setSelectedCustomerId} onCreated={()=>setCustomerRevision(v=>v+1)}/>}
+        {!(draftsEnabled&&richEnabled)&&
           <p className="k5-muted">تشغيل العميل الغني يحتاج أعلام المسودات + POS الغني.</p>}
         {draftsEnabled&&richEnabled&&<CashierDraftHistory
             apiRoot={api.replace(/\/pos-preview$/,"")} draftApi={draftApi}
@@ -417,17 +418,19 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
           <p><strong>{money(preview.listPriceSubtotalMinor,preview.currency)}</strong></p>
           <p className="k5-muted">NOT_POSTED · NOT_COLLECTED</p>
         </section>}
-        {draftsEnabled&&draftStatus==="ready"&&savedDrafts.length>0&&<section className="k5-admin-card">
+        {draftsEnabled&&draftStatus==="ready"&&<section className="k5-admin-card">
           <h2>مسودات محفوظة — مش فواتير</h2>
-          <div className="k5-table-wrap"><table className="k5-table">
-            <thead><tr><th>وقت</th><th>عناصر</th><th>قالب</th></tr></thead>
-            <tbody>{savedDrafts.map(d=><tr key={d.draftId}>
-              <td>{new Date(d.createdAtUtc).toLocaleString("ar-EG")}</td>
-              <td>{d.lines.length}</td>
-              <td><button className="k5-salon-refresh" type="button" disabled={busy||draftBusy}
-                onClick={()=>createNewFromDraft(d)}>جهّز سلة</button></td>
-            </tr>)}</tbody>
-          </table></div>
+          {savedDrafts.length===0?<p className="k5-muted">مفيش مسودات محفوظة للفرع.</p>:
+            <div className="k5-table-wrap"><table className="k5-table">
+              <thead><tr><th>تاريخ الحفظ</th><th>العناصر</th><th>إجمالي القائمة وقت الحفظ</th><th>الحالة</th><th>استخدام كقالب</th></tr></thead>
+              <tbody>{savedDrafts.map(d=><tr key={d.draftId}>
+                <td>{new Date(d.createdAtUtc).toLocaleString("ar-EG")}</td>
+                <td>{d.lines.map(l=>l.displayName+" × "+l.quantity).join("، ")}</td>
+                <td dir="ltr">{money(d.subtotalMinor,d.currency)}</td><td>مسودة فقط</td>
+                <td><button className="k5-salon-refresh" type="button" disabled={busy||draftBusy}
+                  onClick={()=>createNewFromDraft(d)}>جهّز سلة جديدة</button></td>
+              </tr>)}</tbody>
+            </table></div>}
         </section>}
       </>}
       footer={<>

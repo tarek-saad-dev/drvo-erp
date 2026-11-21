@@ -32,6 +32,7 @@ test('SQL040 and ClaimApprovedOwner grant Pilot module actions', () => {
   for (const action of PILOT_OWNER_MODULE_ACTIONS) {
     assert.ok(sql.includes(action), action);
   }
+  assert.doesNotMatch(sql, /INSERT INTO core\.SchemaMigration/i);
   assert.doesNotMatch(sql, /pos\.sale|treasury\.settle|accounting\.post/i);
   const plan = buildOwnerPilotPermissionPlan();
   assert.equal(plan.adr031Posting, 'BLOCKED');

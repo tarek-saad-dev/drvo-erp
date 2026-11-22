@@ -1,5 +1,8 @@
 # BK-POS2 — trusted completed-booking handoff to nonposting POS Draft (2026-11-22)
 
+**Merged evidence:** [PR #170](https://github.com/tarek-saad-dev/drvo-erp/pull/170), `main@9523dacf`, exact PR-head `1fd07586` **32/32 GitHub Actions PASS**. Code is merged; no confirmed fresh Pilot activation, production SQL apply or Owner browser acceptance.
+
+
 **Source comparison:** Cashier `tarek-saad-dev/casher@f8fa67d` `src/apps/booking/application/convertBooking.ts`: original performs shift-guarded paid invoice creation. **DRVO explicitly does not copy the posting side effect** while ADR-031 is proposed/blocked. Existing Booking → POS link used `customerId` / `offeringId` query parameters, which could be forged and did not prove Booking COMPLETED.
 
 **New API:** GET `/api/workspaces/{businessId}/branches/{branchId}/booking/appointments/{bookingId}/pos-handoff` is protected by normal private K5 cookie, `DRVO_BOOKING_ENABLED`, `booking.read`, and SQL042 `core.ReadCompletedBookingForPosDraft`. The transaction returns only an exact scoped `COMPLETED` appointment's `bookingId/customerId/offeringId`, otherwise 404 (except malformed GUID 400). EXECUTE-only runtime grant; no direct table SELECT. No Customer phone/private profile, no price, token or invoice is returned.

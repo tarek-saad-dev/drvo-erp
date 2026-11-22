@@ -1,4 +1,11 @@
 # Project changelog
+
+## 2026-11-22 — Founder-approved interim DRVO Salon launch direction (docs only)
+
+- Adopt Cashier as the near-term Salon UI/runtime fast track while preserving DRVO ERP as modular shared multi-industry destination; [ADR-042](../05-decisions/ADR-042-CASHIER-INTERIM-SALON-LAUNCH-BRIDGE.md), [delivery plan](CASHIER-SALON-FAST-TRACK-2026-11-22.md), [Cashier #333](https://github.com/tarek-saad-dev/casher/issues/333).
+- Closed Cashier baseline issues #48/#52 are reusable foundations, **not** proof of first-customer readiness. Cashier #61 tenant runtime isolation remains OPEN, and DRVO #106/#166 and ADR-031 remain operational gates.
+- Docs update only; no app/SQL/flags/VPS/deploy/billing/production change.
+
 - **2026-11-22 BK-WEB1 PRIVATE WEBSITE BOOKING SQL043 (MERGED #173, NOT LIVE):** Source-backed first Website flow reads full scoped SQL availability via K5-only EXECUTE procedure, private /workspace website stepper invokes Catalog+Customers+Booking SQL013 create with idempotency. Explicit UTC, 24-slot bounded preview, NO public endpoint, no notifications, financial mutations or Customer migration. Both preview flags default OFF. Exact PR-head `63c70756` **29/29 Actions PASS** including disposable SQL2022 HTTP, K0/K1 and Private Browser. Staging/Cut SQL apply and Owner browser acceptance remain OPEN. [Details](BOOKING-BK-WEB1-PRIVATE-WEBSITE-SQL043-2026-11-22.md).
 
 - **2026-11-22 — BK-POS2 SQL042 VERIFIED PRIVATE BOOKING→POS DRAFT HANDOFF (MERGED #170):** `main@9523dacf`. Replaces fragile Booking link `customerId/offeringId` with `bookingId` lookup in scoped Booking SQL042 (EXECUTE-only, completed-only, K5 booking.read), verified private Nest GET, explicit one-time POS/DRAFT prefill after independent Catalog/POS read, current Catalog pricing and strict response parsing. **32/32 PR-head CI PASS** on `1fd07586`, including disposable SQL2022 HTTP, K0/K1, Private Browser, K5C, Purchasing and Pilot Readiness. **NOT** completed Website Booking/financial conversion or source-DB migration; no owner live browser, Cut data or VPS apply. [Implementation](BOOKING-BK-POS2-VERIFIED-HANDOFF-SQL042-2026-11-22.md), [#171 Website follow-up](https://github.com/tarek-saad-dev/drvo-erp/issues/171).

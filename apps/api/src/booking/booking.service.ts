@@ -16,6 +16,9 @@ export type AppointmentView={
 export type BookingRead={resources:BookingResourceView[];appointments:AppointmentView[]};
 export type VerifiedPosHandoff={bookingId:string;customerId:string;offeringId:string;status:"COMPLETED"};
 export type BookingWindow={windowId:string;resourceId:string;startsAtUtc:string;endsAtUtc:string;state:"OPEN"|"CLOSED"};
+export type WebsiteSlot={startsAtUtc:string;endsAtUtc:string};
+export type WebsiteSlotsRead={utcDay:string;resourceId:string;offeringId:string;
+ advisory:true;confirmed:false;timezone:"UTC";slots:WebsiteSlot[]};
 export type Created={id:string;created:boolean};
 export type StatusChange={id:string;status:"CANCELLED"|"COMPLETED"|"NO_SHOW";changed:boolean};
 export type WindowClosure={id:string;state:"CLOSED";changed:boolean};
@@ -118,6 +121,31 @@ export class BookingService {
    throw new NotFoundException();
   return {bookingId:String(row.bookingId),customerId:String(row.customerId),
    offeringId:String(row.offeringId),status:"COMPLETED"};
+ }
+ /** BK-WEB1: Private preview of website availability. No public auth or customer PII.
+  * SQL reads ALL conflict/window rows; only final CreateBookingAppointment confirms. */
+ async websiteSlots(actor:Actor,token:string,businessId:string,branchId:string,
+  resourceId:unknown,offeringId:unknown,dayUtc:unknown):Promise<WebsiteSlotsRead>{
+  if(process.env.DRVO_WEBSITE_BOOKING_PREVIEW_ENABLED!=="YES")
+   throw new NotFoundException();
+  const scope=this.scope(actor,token,businessId,branchId);
+  const resource=validId(resourceId),offering=validId(offeringId);
+  if(typeof dayUtc!=="string"||!/^\\d{4}-\\d{2}-\\d{2}$/.test(dayUtc)||
+     !Number.isFinite(Date.parse(dayUtc+"T00:00:00.000Z"))||
+     new Date(dayUtc+"T00:00:00.000Z").toISOString().slice(0,10)!==dayUtc)
+   throw new BadRequestException("Invalid UTC day");
+  const result=await this.execute(scope,"core.ReadWebsiteBookingSlots",
+   r=>r.input("ResourceId",sql.UniqueIdentifier,resource)
+    .input("OfferingId",sql.UniqueIdentifier,offering)
+    .input("UtcDayStart",sql.DateTime2(0),new Date(dayUtc+"T00:00:00.000Z")));
+  const rows=result.recordset??[];
+  if(rows.length>24)throw new ServiceUnavailableException("Unexpected website availability response");
+  const slots=rows.map(row=>({
+    startsAtUtc:new Date(row.startsAtUtc as string|number|Date).toISOString(),
+    endsAtUtc:new Date(row.endsAtUtc as string|number|Date).toISOString(),
+  }));
+  return {utcDay:dayUtc,resourceId:resource,offeringId:offering,
+   advisory:true,confirmed:false,timezone:"UTC",slots};
  }
  async addResource(actor:Actor,token:string,businessId:string,branchId:string,
   requestId:unknown,body:unknown):Promise<Created>{

@@ -313,3 +313,47 @@ test("Booking NO_SHOW calls existing scoped idempotent stored procedure",async()
   assert.equal(calls[0].data.BranchId,GUID(4));
  }finally{restore();}
 });
+
+test("Booking -> POS read handoff enforces K5 scope, requested ID and COMPLETE status",async()=>{
+ const restore=on({DRVO_BOOKING_ENABLED:"YES",DRVO_K5_AUTH_ENABLED:"YES"});
+ try{
+  const booking=GUID(51),customer=GUID(52),offering=GUID(53);
+  const fake=fakePool((procedure,inputs)=>{
+   assert.equal(procedure,"core.ReadCompletedBookingForPosDraft");
+   assert.equal(inputs.TenantId,actor.tenantId);
+   assert.equal(inputs.BusinessId,GUID(3));
+   assert.equal(inputs.BranchId,GUID(4));
+   assert.equal(inputs.BookingId,booking);
+   return {recordset:[{bookingId:booking,customerId:customer,offeringId:offering,status:"COMPLETED"}]};
+  });
+  const svc=new BookingService(fake);
+  assert.deepEqual(await svc.verifiedPosHandoff(actor,token,GUID(3),GUID(4),booking),
+   {bookingId:booking,customerId:customer,offeringId:offering,status:"COMPLETED"});
+  assert.equal(fake.calls.length,1);
+  for(const id of ["bad-id",undefined,null])
+   await assert.rejects(()=>svc.verifiedPosHandoff(actor,token,GUID(3),GUID(4),id),
+    e=>e.getStatus?.()===400);
+  await assert.rejects(()=>svc.verifiedPosHandoff(actor,"bad",GUID(3),GUID(4),booking),
+   e=>e.getStatus?.()===404);
+  for(const row of [
+   {bookingId:booking,customerId:customer,offeringId:offering,status:"BOOKED"},
+   {bookingId:booking,customerId:customer,offeringId:offering,status:"NO_SHOW"},
+   {bookingId:GUID(89),customerId:customer,offeringId:offering,status:"COMPLETED"},
+   {bookingId:booking,customerId:"bad",offeringId:offering,status:"COMPLETED"},
+  ]){
+   const bad=new BookingService(fakePool(()=>({recordset:[row]})));
+   await assert.rejects(()=>bad.verifiedPosHandoff(actor,token,GUID(3),GUID(4),booking),
+    e=>e.getStatus?.()===404);
+  }
+ }finally{restore();}
+});
+test("Booking handoff GET disabled by default and lacks public/unsafe Origin bypass",async()=>{
+ const original=process.env.DRVO_BOOKING_ENABLED;
+ try{
+  delete process.env.DRVO_BOOKING_ENABLED;
+  const svc=new BookingService({getInternalPool(){throw Error("not allowed");}});
+  await assert.rejects(()=>svc.verifiedPosHandoff(actor,token,GUID(3),GUID(4),GUID(9)),
+   e=>e.getStatus?.()===503);
+ }finally{if(original===undefined)delete process.env.DRVO_BOOKING_ENABLED;
+  else process.env.DRVO_BOOKING_ENABLED=original;}
+});

@@ -55,6 +55,7 @@ jobs:
         env:
           BOOKING_SQL_DISPOSABLE: 'YES'
           BOOKING_SQL_041: 'YES'
+          BOOKING_SQL_042: 'YES'
           BOOKING_TEST_PORT: '14342'
         run: node tools/booking/verify.cjs
       - name: Show disposable SQL diagnostics on failure

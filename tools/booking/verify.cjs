@@ -153,7 +153,8 @@ async function main(){
    // Browser path needs SQL018 HR + SQL024 Customer search for Cashier-parity Booking UX.
    // Non-browser Booking HTTP CI stays at SQL017 Booking foundation tip.
    // Browser path: SQL018 HR + SQL024 SearchCustomers (required for Booking Business search UX).
-   const migrations=process.env.BOOKING_SQL_042==='YES'?42:
+   const migrations=process.env.BOOKING_SQL_043==='YES'?43:
+    process.env.BOOKING_SQL_042==='YES'?42:
     process.env.BOOKING_SQL_041==='YES'?41:
     process.env.BOOKING_BROWSER_DISPOSABLE==='YES'?24:17;
    if(process.env.BOOKING_BROWSER_DISPOSABLE==='YES'){
@@ -297,6 +298,7 @@ async function main(){
    DRVO_SQL_HOST:'127.0.0.1',DRVO_SQL_PORT:'1433',
    DRVO_SQL_DATABASE:db,DRVO_SQL_USER:user,DRVO_SQL_PASSWORD:appPass,
    DRVO_K5_AUTH_ENABLED:'YES',DRVO_BOOKING_ENABLED:'YES',
+   DRVO_WEBSITE_BOOKING_PREVIEW_ENABLED:process.env.BOOKING_SQL_043==='YES'?'YES':'NO',
    DRVO_CUSTOMERS_ENABLED:'YES',DRVO_CATALOG_ENABLED:'YES',
    DRVO_POS_DRAFTS_ENABLED:'YES',
    DRVO_POS_PREVIEW_ENABLED:process.env.BOOKING_BROWSER_DISPOSABLE==='YES'?'YES':'NO',
@@ -606,7 +608,7 @@ async function main(){
    assert.equal((await post(changePath(g.business,g.branch,bookingId),cookie,guid(),
     {status:'COMPLETED'})).status,409);
   });
-  if(process.env.BOOKING_SQL_041==='YES'||process.env.BOOKING_SQL_042==='YES'){
+  if(process.env.BOOKING_SQL_041==='YES'||process.env.BOOKING_SQL_042==='YES'||process.env.BOOKING_SQL_043==='YES'){
   await pass('SQL041 NO_SHOW: scoped, after start, queue guard, idempotent audit',async()=>{
    const endpoint=path(g.business,g.branch),start=future(850);
    const res=await post(endpoint+'/appointments',cookie,guid(),{
@@ -676,7 +678,7 @@ async function main(){
    assert.equal(String(changes.recordset[0].ActorAccountId).toLowerCase(),g.account);
   });
   }
-  if(process.env.BOOKING_SQL_042==='YES'){
+  if(process.env.BOOKING_SQL_042==='YES'||process.env.BOOKING_SQL_043==='YES'){
    await pass('SQL042: GET handoff returns only scoped completed booking with no financial write',async()=>{
     const endpoint=path(g.business,g.branch);
     const at=future(620);
@@ -722,6 +724,70 @@ async function main(){
       " HAS_PERMS_BY_NAME('core.BookingAppointment','OBJECT','SELECT') AS s,"+
       " HAS_PERMS_BY_NAME('core.ReadCompletedBookingForPosDraft','OBJECT','EXECUTE') AS e");
     assert.deepEqual(Object.values(perms.recordset[0]).map(Number),[0,1]);
+   });
+  }
+  if(process.env.BOOKING_SQL_043==='YES'){
+   await pass('SQL043: K5 Website preview slots, scoped SQL evidence, conflict and actual create',async()=>{
+    const endpoint=path(g.business,g.branch);
+    const resourceResponse=await post(endpoint+'/resources',cookie,guid(),{
+      displayName:'Website Private CI Resource',kind:'PERSON',
+    });
+    assert.equal(resourceResponse.status,200);
+    const resource=(await resourceResponse.json()).id;
+    const utcDay=new Date(Date.now()+2*86400000).toISOString().slice(0,10);
+    const begins=utcDay+'T09:00:00.000Z',ends=utcDay+'T11:00:00.000Z';
+    const slots=(b=g.business,br=g.branch,r=resource,o=g.service,day=utcDay)=>
+     path(b,br)+'/website-preview/slots?'+new URLSearchParams({
+      resourceId:r,offeringId:o,dayUtc:day,
+     }).toString();
+    assert.equal((await get(slots())).status,401);
+    assert.equal((await get(slots(g.otherBusiness,g.otherBranch),cookie)).status,404);
+    assert.equal((await get(slots(g.foreignBusiness,g.foreignBranch),cookie)).status,404);
+    assert.equal((await get(slots(g.business,g.branch,guid()),cookie)).status,404);
+    assert.equal((await get(slots(g.business,g.branch,resource,guid()),cookie)).status,404);
+    assert.equal((await get(slots(g.business,g.branch,resource,g.service,'2027-02-29'),cookie)).status,400);
+    assert.equal((await get(slots(g.business,g.branch,resource,g.service,'2020-01-01'),cookie)).status,400);
+    const missing=await get(slots(),cookie);
+    assert.equal(missing.status,200);
+    assert.deepEqual((await missing.json()).slots,[],
+     'unpublished resources must never appear open to Website consumers');
+    assert.equal((await post(endpoint+'/windows',cookie,guid(),{
+      resourceId:resource,startsAtUtc:begins,endsAtUtc:ends,
+    })).status,200);
+    const preview=await get(slots(),cookie);
+    assert.equal(preview.status,200);
+    assert.equal(preview.headers.get('cache-control'),'no-store');
+    const body=await preview.json();
+    assert.deepEqual({
+     utcDay:body.utcDay,
+     resourceId:String(body.resourceId).toLowerCase(),
+     offeringId:String(body.offeringId).toLowerCase(),
+     advisory:body.advisory,confirmed:body.confirmed,timezone:body.timezone,
+    },{
+     utcDay,resourceId:resource.toLowerCase(),offeringId:g.service.toLowerCase(),
+     advisory:true,confirmed:false,timezone:'UTC',
+    });
+    assert.ok(body.slots.length>=4);
+    assert.ok(body.slots.every(s=>
+      s.startsAtUtc.startsWith(utcDay)&&s.startsAtUtc>=begins&&s.endsAtUtc<=ends));
+    assert.ok(!JSON.stringify(body).includes('customerName'));
+    const booked=await post(endpoint+'/appointments',cookie,guid(),{
+      customerId:g.customer,offeringId:g.service,resourceId:resource,
+      startsAtUtc:utcDay+'T09:30:00.000Z',
+    });
+    assert.equal(booked.status,200,'private website selection persists via the SAME Booking Core write');
+    const following=(await (await get(slots(),cookie)).json()).slots;
+    assert.ok(!following.some(s=>s.startsAtUtc===utcDay+'T09:30:00.000Z'));
+    assert.ok(following.some(s=>s.startsAtUtc===utcDay+'T10:00:00.000Z'));
+    assert.equal((await post(endpoint+'/appointments',cookie,guid(),{
+      customerId:g.customer,offeringId:g.service,resourceId:resource,
+      startsAtUtc:utcDay+'T09:30:00.000Z',
+    })).status,409);
+    const perms=await app.query("SELECT "+
+     "HAS_PERMS_BY_NAME('core.BookingAppointment','OBJECT','SELECT') AS a,"+
+     "HAS_PERMS_BY_NAME('core.BookingResourceWindow','OBJECT','SELECT') AS b,"+
+     "HAS_PERMS_BY_NAME('core.ReadWebsiteBookingSlots','OBJECT','EXECUTE') AS c");
+    assert.deepEqual(Object.values(perms.recordset[0]).map(Number),[0,0,1]);
    });
   }
   await pass('Lifecycle: completion requires booking already started, preserves history',async()=>{

@@ -4,7 +4,7 @@
 
 **2026-11-22 migration-note:** SQL041 No-show and SQL042 verified Booking→POS handoff are applied only to future authorized isolated synthetic Pilot activation after reviewed main is pulled. Never re-run the one-time activator after a partial failure; SQL041 on any live Cut database requires separate approvals.
 
-**Not claimed:** `PILOT_VERIFIED`, ADR-031 posting, Cut live import, production readiness.
+**SQL043 scope:** Site/Website **private K5 preview only**; both `DRVO_WEBSITE_BOOKING_PREVIEW_ENABLED` and `DRVO_WEBSITE_BOOKING_PREVIEW_WEB_ENABLED` remain OFF by default in Pilot activation. No public booking issuance, public auth, customer import, notifications or financial posting.\n\n**Not claimed:** `PILOT_VERIFIED`, ADR-031 posting, Cut live import, production readiness.
 
 ## Already done in GitHub
 
@@ -26,7 +26,7 @@ The script will:
 
 1. Create `DRVO_ERP_PILOT` (leaves `DRVO_ERP_STAGING` data untouched)
 2. Map existing app/migrator logins into Pilot DB
-3. Apply SQL001–042 + COPY_ONLY backup + restore witness
+3. Apply SQL001–043 + COPY_ONLY backup + restore witness
 4. Seed synthetic Owner `pilot.owner` (password only in `/root/drvo-erp-pilot-owner.once`)
 5. Install systemd SQL + K5/module flag drop-ins
 6. Restart API/Web

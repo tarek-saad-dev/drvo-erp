@@ -1,10 +1,10 @@
 import {
- Body,Controller,Get,Headers,HttpCode,Param,Post,Req,Res,
+ Body,Controller,Get,Headers,HttpCode,Param,Post,Query,Req,Res,
  ServiceUnavailableException,UnauthorizedException,
 } from "@nestjs/common";
 import type {IncomingMessage,ServerResponse} from "node:http";
 import {IdentityService,extractSessionCookie} from "../identity/identity.service";
-import {BookingService,type BookingRead,type Created,type StatusChange,type BookingWindow,type WindowClosure,type RescheduleResult,type VerifiedPosHandoff} from "./booking.service";
+import {BookingService,type BookingRead,type Created,type StatusChange,type BookingWindow,type WindowClosure,type RescheduleResult,type VerifiedPosHandoff,type WebsiteSlotsRead} from "./booking.service";
 
 function enabled():void{
  if(process.env.DRVO_K5_AUTH_ENABLED!=="YES"||
@@ -27,6 +27,20 @@ export class BookingController {
   const token=extractSessionCookie(req.headers.cookie);
   const actor=await this.identity.actorFromToken(token);
   return this.booking.list(actor,token!,businessId,branchId);
+ }
+ @Get("website-preview/slots")
+ async websiteSlots(@Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,
+  @Param("businessId") businessId:string,@Param("branchId") branchId:string,
+  @Query("resourceId") resourceId:string|undefined,
+  @Query("offeringId") offeringId:string|undefined,
+  @Query("dayUtc") dayUtc:string|undefined):Promise<WebsiteSlotsRead>{
+  res.setHeader("Cache-Control","no-store");enabled();
+  if(process.env.DRVO_WEBSITE_BOOKING_PREVIEW_ENABLED!=="YES")
+   throw new ServiceUnavailableException("Website preview disabled");
+  const token=extractSessionCookie(req.headers.cookie);
+  const actor=await this.identity.actorFromToken(token);
+  return this.booking.websiteSlots(actor,token!,businessId,branchId,
+   resourceId,offeringId,dayUtc);
  }
  @Get("appointments/:bookingId/pos-handoff")
  async posHandoff(@Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,

@@ -1,7 +1,7 @@
 'use strict';
 /**
  * Root-invoked SQL activator for isolated DRVO_ERP_PILOT only.
- * Migrates SQL001–042, backup+restore witness, seeds synthetic Owner.
+ * Migrates SQL001–043, backup+restore witness, seeds synthetic Owner.
  * Never targets DRVO_ERP_STAGING / production / Cut.
  */
 const assert = require('node:assert/strict');
@@ -53,8 +53,8 @@ async function main() {
   assert.equal(who.recordset[0].db, DB);
 
   const applied = await applyMigrations(pool);
-  assert.ok(applied.length >= 42, 'expected migrations through SQL042');
-  assert.equal(applied[applied.length - 1].filename, '042_booking_completed_pos_handoff.sql');
+  assert.ok(applied.length >= 43, 'expected migrations through SQL043');
+  assert.equal(applied[applied.length - 1].filename, '043_booking_website_preview_slots.sql');
 
   const stamp = Date.now();
   const bak = `/var/opt/mssql/data/${DB}_pilot_${stamp}.bak`;
@@ -78,7 +78,7 @@ async function main() {
   const restorePool = new sql.ConnectionPool({...base, database: restoreDb});
   await restorePool.connect();
   const hist = await restorePool.request().query('SELECT COUNT(*) AS n FROM core.SchemaMigration');
-  assert.ok(Number(hist.recordset[0].n) >= 42);
+  assert.ok(Number(hist.recordset[0].n) >= 43);
   await restorePool.close();
   await master.request().batch(`DROP DATABASE [${restoreDb}]`);
   await master.close();
@@ -158,7 +158,7 @@ async function main() {
     JSON.stringify({
       ok: true,
       database: DB,
-      migrationsTip: '042_booking_completed_pos_handoff.sql',
+      migrationsTip: '043_booking_website_preview_slots.sql',
       migrationRows: applied.length,
       ownerUsername: username,
       ownerOnceFile: ownerOnce,

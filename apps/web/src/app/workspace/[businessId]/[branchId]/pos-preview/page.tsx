@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 
 export default async function PosPreviewPage({ params,searchParams }: {
   params: Promise<{businessId:string;branchId:string}>;
-  searchParams:Promise<{offeringId?:string|string[];customerId?:string|string[];packageId?:string|string[]}>;
+  searchParams:Promise<{offeringId?:string|string[];customerId?:string|string[];packageId?:string|string[];bookingId?:string|string[]}>;
 }) {
   if (process.env.DRVO_K5_WEB_ENABLED !== "YES" ||
       process.env.DRVO_CATALOG_WEB_ENABLED !== "YES" ||
@@ -14,10 +14,11 @@ export default async function PosPreviewPage({ params,searchParams }: {
   const requestedOfferingId=typeof query.offeringId==="string"?query.offeringId:null;
   const requestedCustomerId=typeof query.customerId==="string"?query.customerId:null;
   const requestedPackageId=typeof query.packageId==="string"?query.packageId:null;
+  const requestedBookingId=typeof query.bookingId==="string"?query.bookingId:null;
   return <PosPreviewClient businessId={businessId} branchId={branchId}
     draftsEnabled={process.env.DRVO_POS_DRAFTS_WEB_ENABLED==="YES"}
     richEnabled={process.env.DRVO_POS_RICH_WEB_ENABLED==="YES"}
     initialOfferingId={requestedOfferingId}
     initialCustomerId={requestedCustomerId}
-    initialPackageId={requestedPackageId}/>;
+    initialPackageId={requestedPackageId} initialBookingId={requestedBookingId}/>;
 }

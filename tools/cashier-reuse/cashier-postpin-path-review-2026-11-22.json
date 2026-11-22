@@ -1,0 +1,288 @@
+{
+  "schema": "drvo.cashier.postpin-path-review.v1",
+  "repository": "tarek-saad-dev/casher",
+  "fromRevision": "046bf19b0d5833a07fe4b2891cbf3032d03b7cef",
+  "toRevision": "f8fa67d2b1c8254e638cf89d95dcee75edc88598",
+  "comparison": "GitHub compare main (read only)",
+  "capturedAt": "2026-11-22",
+  "commits": [
+    {
+      "sha": "4592d49af0a9eedf722ea450b47c5602e48fb823",
+      "subject": "feat(cut-club): deploy DRVO OTP and wallet backend behind explicit tenant/auth flags"
+    },
+    {
+      "sha": "9b7953b13e8bce27010a0b0bbcd1ca1b881395da",
+      "subject": "feat(cut-club): production migration 026 for secure OTP/member wallet tables (reconcile applied 025) (#323)"
+    },
+    {
+      "sha": "da6e8b3dfc2b395e3d097b1894906ec68d7a4c4a",
+      "subject": "feat(cut-club): pick legacy client from phone-matched candidates in member review (#324)"
+    },
+    {
+      "sha": "d014d6d77d5ba2c48adeabee7e6b10f08f24448c",
+      "subject": "feat(cut-club): revalidate linked phone per session + staff unlink/revoke tools (#325)"
+    },
+    {
+      "sha": "8910084586227f35e17cc009175d0860655cd336",
+      "subject": "feat(cut-club): upcoming booking in wallet + paginated coins history BFF (#326)"
+    },
+    {
+      "sha": "f8fa67d2b1c8254e638cf89d95dcee75edc88598",
+      "subject": "fix(cut-club): correct OTP verification for SQL Server uppercase challenge UUIDs (#328)"
+    }
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/cut-club-member-real-sql.yml",
+      "status": "added",
+      "blob": "502252f8820a1e62a7f820bc1756d2df5eeccb01",
+      "review": "OPEN"
+    },
+    {
+      "path": ".github/workflows/cut-club-member-staging-readonly.yml",
+      "status": "added",
+      "blob": "a1ad2e928c4ca56adc795f7cb2035a4f4f8f3370",
+      "review": "OPEN"
+    },
+    {
+      "path": ".github/workflows/cut-club-member-wallet.yml",
+      "status": "added",
+      "blob": "262c5a6de6a76c1ff389c1236dee85e3f53b3cc9",
+      "review": "OPEN"
+    },
+    {
+      "path": "db/drvo-migrations/025-customer-education-occupation-profile/schema.sql",
+      "status": "added",
+      "blob": "3a7fb2bfb158e059c3f1941a01b9f06a54cbd8d1",
+      "review": "OPEN"
+    },
+    {
+      "path": "db/drvo-migrations/026-cut-club-member-wallet/schema.sql",
+      "status": "added",
+      "blob": "33726c873f81f9d87bf558f638a5e24312605d28",
+      "review": "OPEN"
+    },
+    {
+      "path": "docs/cut-club/drvo-whatsapp-otp-wallet-release.md",
+      "status": "added",
+      "blob": "804f83fa2792f5966882a7058a32e947528dcbab",
+      "review": "OPEN"
+    },
+    {
+      "path": "docs/cut-club/production-activation-operator-runbook.md",
+      "status": "added",
+      "blob": "581bcb558106683903b87ce996924f5da28ad261",
+      "review": "OPEN"
+    },
+    {
+      "path": "scripts/cut-club/ci/inspect-member-staging-schema.cjs",
+      "status": "added",
+      "blob": "7b2241b39a8d3ef902d20db1eadb1325551c15e7",
+      "review": "OPEN"
+    },
+    {
+      "path": "scripts/cut-club/ci/seed-member-ephemeral-sql.cjs",
+      "status": "added",
+      "blob": "7a9fca02301a0bd70d6b571dca17c897499f75c3",
+      "review": "OPEN"
+    },
+    {
+      "path": "scripts/cut-club/sql/member-wallet-staging-schema.sql",
+      "status": "added",
+      "blob": "40e84cce689d4adb32a8b9dbd2c639604fd2f4d7",
+      "review": "OPEN"
+    },
+    {
+      "path": "scripts/drvo/__tests__/migrationManifest.test.ts",
+      "status": "modified",
+      "blob": "cc02abcecf19b776c913018df3f22de627e7e12c",
+      "review": "OPEN"
+    },
+    {
+      "path": "scripts/drvo/migrations/025-customer-education-occupation-profile.ts",
+      "status": "added",
+      "blob": "044c104131e81fc9bd0433387fbc2ff5059d9eab",
+      "review": "OPEN"
+    },
+    {
+      "path": "scripts/drvo/migrations/026-cut-club-member-wallet.ts",
+      "status": "added",
+      "blob": "34072594eb71edade1a0f18d3a2f05d26c3aaca7",
+      "review": "OPEN"
+    },
+    {
+      "path": "scripts/drvo/migrations/index.ts",
+      "status": "modified",
+      "blob": "b49acfbf12711d6350022a12b22aff43e23afe19",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/admin/cut-club/member-review/page.tsx",
+      "status": "added",
+      "blob": "b85a91b85d091cb53da3cb3ed80f8ed0d2db8d27",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/admin/cut-club/member-support/page.tsx",
+      "status": "added",
+      "blob": "52d906a198651634d70b9bcf5ae5b9592d347944",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/admin/loyalty/page.tsx",
+      "status": "modified",
+      "blob": "f61b666008593558f0dd23a0c4fe68c1b07dfead",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/api/admin/cut-club/member-account/route.ts",
+      "status": "added",
+      "blob": "8ec59f2cdca59d3e082831c78b53c64e6d1300d8",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/api/admin/cut-club/member-link/candidates/route.ts",
+      "status": "added",
+      "blob": "2ad89fa926f40178d8f9702a64b7e3246621ae2b",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/api/admin/cut-club/member-link/route.ts",
+      "status": "added",
+      "blob": "1fd97ce34d8b5004903404ecbd460debc2e7c016",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/api/public/client/inventory/route.ts",
+      "status": "modified",
+      "blob": "68fbab43458779b9e208f42088b19835ea4234cb",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/api/public/client/loyalty/activity/route.ts",
+      "status": "modified",
+      "blob": "120eb931c45cbeb24a1a08226f48be72e0b8f783",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/api/public/client/loyalty/me/route.ts",
+      "status": "modified",
+      "blob": "b53d25bfffd7570afd2f9947b09573192f4d4ee4",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/api/public/client/loyalty/rewards/route.ts",
+      "status": "modified",
+      "blob": "77aa7fde30a724be8e21a96409588795d3e8bfbe",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/api/public/client/profile/route.ts",
+      "status": "modified",
+      "blob": "351508c57484b5bf32aca04629846f311a963baf",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/api/public/client/referral/route.ts",
+      "status": "modified",
+      "blob": "042efa048c97d82a952dca7f009d16b593fb85da",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/api/public/client/store/buy/route.ts",
+      "status": "modified",
+      "blob": "f474e45ed7957734544396dfef32b2e218887c66",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/api/public/client/store/open-box/route.ts",
+      "status": "modified",
+      "blob": "f474e45ed7957734544396dfef32b2e218887c66",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/api/public/client/store/route.ts",
+      "status": "modified",
+      "blob": "1f0eadfbe73fbcbf3c157fb0ab724789f938f511",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/api/public/cut-club/auth/logout/route.ts",
+      "status": "added",
+      "blob": "29b674b3b4fbb51323f259042918cd749a9ce145",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/api/public/cut-club/auth/start/route.ts",
+      "status": "added",
+      "blob": "16d21ff5df77f155d4a2477a6563c40162811a5c",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/api/public/cut-club/auth/verify/route.ts",
+      "status": "added",
+      "blob": "d4ae162d42a08a864f903ece429ec5f9d861647f",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/api/public/cut-club/wallet/activity/route.ts",
+      "status": "added",
+      "blob": "ec21df808c71c48ac73edab296215ba3a3cadf5d",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/app/api/public/cut-club/wallet/route.ts",
+      "status": "added",
+      "blob": "fd2fe0e1320683419febfe00d769f204709c3796",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/lib/__tests__/cutClubLegacyPublicQuarantine.test.ts",
+      "status": "added",
+      "blob": "6c67e8271bd1771a0711cc2e554499b6a3f6aa9a",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/lib/__tests__/cutClubMemberFlowIsolated.test.ts",
+      "status": "added",
+      "blob": "d6f942af9b1eabf394ec0ed10cbfbc434c467515",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/lib/__tests__/cutClubMemberOtp.test.ts",
+      "status": "added",
+      "blob": "2804585374ffebc81f0a92512931811b27a981cc",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/lib/__tests__/cutClubMemberRealSql.test.ts",
+      "status": "added",
+      "blob": "93588196d7636e7afea93ff46cb9ed7730ffaff2",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/lib/cut-club/legacyPublicQuarantine.ts",
+      "status": "added",
+      "blob": "b443d72ed086a162e10e51bfe2166d002df84642",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/lib/cut-club/memberOtp.ts",
+      "status": "added",
+      "blob": "e3d4f457ec9b6931cc917f3024350a2113a9d4a0",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/lib/cut-club/memberWalletRead.ts",
+      "status": "added",
+      "blob": "171cec1d94f2ef929b574fd3b6da4671f2bcbfd4",
+      "review": "OPEN"
+    },
+    {
+      "path": "src/lib/integrations/drvowaClient.ts",
+      "status": "modified",
+      "blob": "5fcdd43a3f7c664782b291989b71e274de0d4eff",
+      "review": "OPEN"
+    }
+  ]
+}

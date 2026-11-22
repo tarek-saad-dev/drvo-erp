@@ -4,7 +4,7 @@ import {
 } from "@nestjs/common";
 import type {IncomingMessage,ServerResponse} from "node:http";
 import {IdentityService,extractSessionCookie} from "../identity/identity.service";
-import {BookingService,type BookingRead,type Created,type StatusChange,type BookingWindow,type WindowClosure,type RescheduleResult} from "./booking.service";
+import {BookingService,type BookingRead,type Created,type StatusChange,type BookingWindow,type WindowClosure,type RescheduleResult,type VerifiedPosHandoff} from "./booking.service";
 
 function enabled():void{
  if(process.env.DRVO_K5_AUTH_ENABLED!=="YES"||
@@ -27,6 +27,15 @@ export class BookingController {
   const token=extractSessionCookie(req.headers.cookie);
   const actor=await this.identity.actorFromToken(token);
   return this.booking.list(actor,token!,businessId,branchId);
+ }
+ @Get("appointments/:bookingId/pos-handoff")
+ async posHandoff(@Req() req:IncomingMessage,@Res({passthrough:true}) res:ServerResponse,
+  @Param("businessId") businessId:string,@Param("branchId") branchId:string,
+  @Param("bookingId") bookingId:string):Promise<VerifiedPosHandoff>{
+  res.setHeader("Cache-Control","no-store");enabled();
+  const token=extractSessionCookie(req.headers.cookie);
+  const actor=await this.identity.actorFromToken(token);
+  return this.booking.verifiedPosHandoff(actor,token!,businessId,branchId,bookingId);
  }
  @Post("resources") @HttpCode(200)
  async addResource(@Headers("origin") origin:string|undefined,

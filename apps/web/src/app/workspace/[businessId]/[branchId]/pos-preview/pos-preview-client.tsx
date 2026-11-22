@@ -13,6 +13,7 @@ import CashierReturnsPreview from "./cashier-returns-preview";
 import CashierPackagesSection,{expandPackageToDraftLines,type CatalogPackage} from "./cashier-packages-section";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import {parseVerifiedBookingHandoff} from "./booking-pos-handoff.mjs";
 
 type Offering = {offeringId:string;kind:"SERVICE"|"PRODUCT";displayName:string;
   priceMinor:number;currency:string;isActive:boolean};
@@ -43,9 +44,10 @@ function readMoneyMinor(value:string):number|null {
   return Number.isSafeInteger(minor)&&minor<=9_000_000_000_000?minor:null;
 }
 export default function PosPreviewClient({businessId,branchId,draftsEnabled,richEnabled,
-  initialOfferingId,initialCustomerId,initialPackageId}:{
+  initialOfferingId,initialCustomerId,initialPackageId,initialBookingId}:{
   businessId:string;branchId:string;draftsEnabled:boolean;richEnabled:boolean;
   initialOfferingId:string|null;initialCustomerId:string|null;initialPackageId:string|null;
+  initialBookingId:string|null;
 }) {
   const router=useRouter();
   const [status,setStatus]=useState<"loading"|"ready"|"denied"|"error">("loading");
@@ -128,25 +130,53 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
       }catch{
         setProductStock({});
       }
-      // The query is NEVER an authority, price, sale or booked-status proof.
-      // Only the independently permitted POS/Catalog response can validate it.
-      // Customer GUID is a draft selection hint; operator/rich save revalidates.
+      // bookingId from a URL is just a lookup hint; Booking Core verifies COMPLETED.
+      // POS/Catalog is authorized separately above, and the cart is still unposted.
       if(!handoffApplied.current&&(initialOfferingId!==null||initialCustomerId!==null||
-         initialPackageId!==null)){
+         initialPackageId!==null||initialBookingId!==null)){
         handoffApplied.current=true;
-        if(initialCustomerId!==null&&GUID.test(initialCustomerId)){
-          setSelectedCustomerId(initialCustomerId);
+        let customerHint=initialBookingId===null?initialCustomerId:null;
+        let offeringHint=initialBookingId===null?initialOfferingId:null;
+        let packageHint=initialBookingId===null?initialPackageId:null;
+        if(initialBookingId!==null){
+          if(!GUID.test(initialBookingId)){
+            setMessage("معرّف الحجز غير صالح؛ لم تُجهَّز مسودة من الحجز.");
+            setStatus("ready");return;
+          }
+          try{
+            const bookingApi=api.replace(/\/pos-preview$/,"")+
+              "/booking/appointments/"+encodeURIComponent(initialBookingId)+"/pos-handoff";
+            const bookingRes=await fetch(bookingApi,{credentials:"same-origin",cache:"no-store"});
+            if(bookingRes.status===401){router.replace("/sign-in");return;}
+            if(!bookingRes.ok){
+              setMessage("الحجز مش مكتمل أو مش متاح في الفرع. لم تُجهَّز مسودة.");
+              setStatus("ready");return;
+            }
+            const verified=parseVerifiedBookingHandoff(await bookingRes.json(),initialBookingId);
+            if(!verified){
+              setMessage("نتيجة التحقق من الحجز غير صحيحة. لم تُجهَّز مسودة.");
+              setStatus("ready");return;
+            }
+            customerHint=verified.customerId;
+            offeringHint=verified.offeringId;
+          }catch{
+            setMessage("تعذر الاتصال للتحقق من الحجز. لم تُجهَّز مسودة.");
+            setStatus("ready");return;
+          }
+        }
+        if(customerHint!==null&&GUID.test(customerHint)){
+          setSelectedCustomerId(customerHint);
           setCustomerRevision(v=>v+1);
         }
         let packageLines:Line[]|null=null;
-        if(initialPackageId!==null&&GUID.test(initialPackageId)){
+        if(packageHint!==null&&GUID.test(packageHint)){
           try{
             const packagesApi=api.replace(/\/pos-preview$/,"")+"/catalog/packages";
             const pkgRes=await fetch(packagesApi,{credentials:"same-origin",cache:"no-store"});
             if(pkgRes.ok){
               const pkgBody=await pkgRes.json() as {packages?:CatalogPackage[]};
               const pkg=Array.isArray(pkgBody.packages)?
-                pkgBody.packages.find(p=>p.packageId===initialPackageId):undefined;
+                pkgBody.packages.find(p=>p.packageId===packageHint):undefined;
               if(pkg){
                 const expanded=expandPackageToDraftLines({
                   pkg,offerings:data.offerings,lines:[],
@@ -156,8 +186,8 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
             }
           }catch{/* fall back to offeringId */}
         }
-        const offering=initialOfferingId!==null?data.offerings.find(o=>
-          o.offeringId===initialOfferingId&&GUID.test(o.offeringId)&&
+        const offering=offeringHint!==null?data.offerings.find(o=>
+          GUID.test(o.offeringId)&&o.offeringId.toLowerCase()===offeringHint.toLowerCase()&&
           o.isActive&&o.kind==="SERVICE"):undefined;
         // Package expand only when cart empty; otherwise (or on expand miss) offeringId.
         // Compute seed outside setState so TypeScript sees the branch result.
@@ -173,13 +203,13 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
           setMessage("اتوسّعت باقة الحجز لمسودة خدمات. راجع الأسعار، ولا يوجد بيع أو تحصيل.");
         }else if(seeded==="offering"){
           setMessage("اتجهزت سلة مسودة جديدة من خدمة الحجز. راجع الأسعار، ولا يوجد بيع أو تحصيل.");
-        }else if(initialOfferingId!==null||initialPackageId!==null){
+        }else if(offeringHint!==null||packageHint!==null){
           setMessage("الخدمة مش متاحة في الكتالوج الحالي. اختار خدمة من القائمة.");
         }
       }
       setStatus("ready");
     } catch {setStatus("error");}
-  },[api,businessId,branchId,router,initialOfferingId,initialCustomerId,initialPackageId]);
+  },[api,businessId,branchId,router,initialOfferingId,initialCustomerId,initialPackageId,initialBookingId]);
   useEffect(()=>{void load();},[load]);
 
   const loadDrafts=useCallback(async()=>{

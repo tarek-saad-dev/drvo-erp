@@ -153,7 +153,8 @@ async function main(){
    // Browser path needs SQL018 HR + SQL024 Customer search for Cashier-parity Booking UX.
    // Non-browser Booking HTTP CI stays at SQL017 Booking foundation tip.
    // Browser path: SQL018 HR + SQL024 SearchCustomers (required for Booking Business search UX).
-   const migrations=process.env.BOOKING_SQL_041==='YES'?41:
+   const migrations=process.env.BOOKING_SQL_042==='YES'?42:
+    process.env.BOOKING_SQL_041==='YES'?41:
     process.env.BOOKING_BROWSER_DISPOSABLE==='YES'?24:17;
    if(process.env.BOOKING_BROWSER_DISPOSABLE==='YES'){
     assert.ok(migrations>=24,'disposable browser SQL must include SearchCustomers');
@@ -605,7 +606,7 @@ async function main(){
    assert.equal((await post(changePath(g.business,g.branch,bookingId),cookie,guid(),
     {status:'COMPLETED'})).status,409);
   });
-  if(process.env.BOOKING_SQL_041==='YES'){
+  if(process.env.BOOKING_SQL_041==='YES'||process.env.BOOKING_SQL_042==='YES'){
   await pass('SQL041 NO_SHOW: scoped, after start, queue guard, idempotent audit',async()=>{
    const endpoint=path(g.business,g.branch),start=future(850);
    const res=await post(endpoint+'/appointments',cookie,guid(),{
@@ -674,6 +675,54 @@ async function main(){
    assert.equal(changes.recordset[0].TargetStatus,'NO_SHOW');
    assert.equal(String(changes.recordset[0].ActorAccountId).toLowerCase(),g.account);
   });
+  }
+  if(process.env.BOOKING_SQL_042==='YES'){
+   await pass('SQL042: GET handoff returns only scoped completed booking with no financial write',async()=>{
+    const endpoint=path(g.business,g.branch);
+    const at=future(620);
+    const created=await post(endpoint+'/appointments',cookie,guid(),{
+     customerId:g.customer,offeringId:g.service,resourceId:secondResource,startsAtUtc:at,
+    });
+    assert.equal(created.status,200);
+    const bookingId=(await created.json()).id;
+    const handoff=endpoint+'/appointments/'+bookingId+'/pos-handoff';
+    assert.equal((await get(handoff)).status,401);
+    assert.equal((await get(handoff,cookie)).status,404,
+     'booked appointment must not expose POS handoff');
+    assert.equal((await get(path(g.otherBusiness,g.otherBranch)+
+      '/appointments/'+bookingId+'/pos-handoff',cookie)).status,404);
+    assert.equal((await get(path(g.foreignBusiness,g.foreignBranch)+
+      '/appointments/'+bookingId+'/pos-handoff',cookie)).status,404);
+    assert.equal((await get(endpoint+'/appointments/not-a-guid/pos-handoff',cookie)).status,400);
+    await admin.request().input('t',sql.UniqueIdentifier,g.t)
+     .input('b',sql.UniqueIdentifier,g.business)
+     .input('br',sql.UniqueIdentifier,g.branch)
+     .input('id',sql.UniqueIdentifier,bookingId)
+     .query("UPDATE core.BookingAppointment SET StartsAtUtc=DATEADD(MINUTE,-40,SYSUTCDATETIME()),"+
+       "EndsAtUtc=DATEADD(MINUTE,-10,SYSUTCDATETIME()) WHERE"+
+       " TenantId=@t AND BusinessId=@b AND BranchId=@br AND BookingId=@id");
+    const changed=await post(endpoint+'/appointments/'+bookingId+'/status',
+      cookie,guid(),{status:'COMPLETED'});
+    assert.equal(changed.status,200);
+    const ok=await get(handoff,cookie);
+    assert.equal(ok.status,200);
+    assert.equal(ok.headers.get('cache-control'),'no-store');
+    const verified=await ok.json();
+    assert.deepEqual({
+      bookingId:String(verified.bookingId).toLowerCase(),
+      customerId:String(verified.customerId).toLowerCase(),
+      offeringId:String(verified.offeringId).toLowerCase(),
+      status:verified.status,
+    },{
+      bookingId:bookingId.toLowerCase(),customerId:g.customer.toLowerCase(),
+      offeringId:g.service.toLowerCase(),status:'COMPLETED',
+    });
+    assert.equal((await get(endpoint+'/appointments/'+guid()+'/pos-handoff',cookie)).status,404);
+    const perms=await app.query("SELECT"+
+      " HAS_PERMS_BY_NAME('core.BookingAppointment','OBJECT','SELECT') AS s,"+
+      " HAS_PERMS_BY_NAME('core.ReadCompletedBookingForPosDraft','OBJECT','EXECUTE') AS e");
+    assert.deepEqual(Object.values(perms.recordset[0]).map(Number),[0,1]);
+   });
   }
   await pass('Lifecycle: completion requires booking already started, preserves history',async()=>{
    const at=future(780),req={customerId:g.customer,offeringId:g.service,

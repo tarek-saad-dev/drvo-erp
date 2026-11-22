@@ -1,5 +1,7 @@
 # Current state
 
+> **2026-11-22 BK-POS2 / SQL042 REVIEW:** Trustworthy COMPLETED Booking→POS DRAFT handoff via Booking-owned scoped SQL read, K5 private GET, and POS one-time catalog-priced seed from bookingId only. No public Website Booking or financial invoice conversion, no SQL applied to real VPS, no Pilot verified. CI and Owner acceptance remain open. [Execution note](../04-execution/BOOKING-BK-POS2-VERIFIED-HANDOFF-SQL042-2026-11-22.md).
+
 > **2026-11-22 BK-NOSHOW / SQL041 (REVIEW):** New real private Booking terminal NO_SHOW from Cashier uses K5 scoped, idempotent SQL status + actor audit; disallows future absence and active Queue ticket. New SQL041, Nest, UI and disposable SQL/HTTP tests await CI and authorized Pilot Owner browser. No Cashier/primary VPS migrations, posting, HR/finance or Cut data changed.
 
 > **2026-11-22 BK-QC1 REVIEW BRANCH — BOOKING CUSTOMER QUICK REGISTER:** In-place protected Booking form now invokes the Customers-owned idempotent create API with source-consistent Egyptian phone normalization, verified Business-scoped duplicate ID reread, and no legacy SQL or extra Customer table. [Implementation note](../04-execution/BOOKING-BK-QC1-INPLACE-CUSTOMER-2026-11-22.md). **Source code/tests submitted on branch; exact SHA CI and Owner Pilot browser remain OPEN; not full Booking/Cashier parity.** No migrations/flags/Cut data/financial posting.

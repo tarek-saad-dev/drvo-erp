@@ -32,8 +32,9 @@ test('Booking completed-to-POS route requires draft AND preview grants, never po
  assert.match(booking,/if\(preview\.ok&&draftsWebEnabled\)/);
  assert.match(booking,/fetch\(scope\+"\/pos-drafts"/);
  assert.match(booking,/setCanPrepareDraft\(drafts\.ok\)/);
- assert.match(booking,/b\.status==="COMPLETED"&&canPrepareDraft&&GUID\.test\(b\.offeringId\)&&GUID\.test\(b\.customerId\)/);
- assert.match(booking,/encodeURIComponent\(b\.customerId\)/);
- assert.match(booking,/encodeURIComponent\(b\.offeringId\)/);
+ assert.match(booking,/b\.status==="COMPLETED"&&canPrepareDraft&&GUID\.test\(b\.bookingId\)/);
+ assert.doesNotMatch(booking,/encodeURIComponent\(b\.customerId\)/);
+ assert.match(booking,/encodeURIComponent\(b\.bookingId\)/);
+ assert.doesNotMatch(booking,/encodeURIComponent\(b\.offeringId\)/);
  assert.doesNotMatch(booking,/\/sales\/posted|localStorage|sessionStorage/);
 });

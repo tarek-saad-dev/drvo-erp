@@ -14,6 +14,7 @@ export type AppointmentView={
  startsAtUtc:string;endsAtUtc:string;status:"BOOKED"|"CANCELLED"|"COMPLETED"|"NO_SHOW";
 };
 export type BookingRead={resources:BookingResourceView[];appointments:AppointmentView[]};
+export type VerifiedPosHandoff={bookingId:string;customerId:string;offeringId:string;status:"COMPLETED"};
 export type BookingWindow={windowId:string;resourceId:string;startsAtUtc:string;endsAtUtc:string;state:"OPEN"|"CLOSED"};
 export type Created={id:string;created:boolean};
 export type StatusChange={id:string;status:"CANCELLED"|"COMPLETED"|"NO_SHOW";changed:boolean};
@@ -102,6 +103,21 @@ export class BookingService {
    status:(row.status==="CANCELLED"?"CANCELLED":row.status==="COMPLETED"?"COMPLETED":row.status==="NO_SHOW"?"NO_SHOW":"BOOKED") as AppointmentView["status"],
   }));
   return {resources,appointments};
+ }
+ /** Booking owns only the completed appointment reference, not POS prices or invoices.
+  * A GUID from URL is a lookup hint; this stored procedure proves trusted scoped status. */
+ async verifiedPosHandoff(actor:Actor,token:string,businessId:string,branchId:string,
+  bookingId:unknown):Promise<VerifiedPosHandoff>{
+  const scope=this.scope(actor,token,businessId,branchId),id=validId(bookingId);
+  const result=await this.execute(scope,"core.ReadCompletedBookingForPosDraft",
+   r=>r.input("BookingId",sql.UniqueIdentifier,id));
+  const row=result.recordset?.[0];
+  if(!row||row.status!=="COMPLETED"||
+     !GUID.test(String(row.bookingId))||String(row.bookingId).toLowerCase()!==id.toLowerCase()||
+     !GUID.test(String(row.customerId))||!GUID.test(String(row.offeringId)))
+   throw new NotFoundException();
+  return {bookingId:String(row.bookingId),customerId:String(row.customerId),
+   offeringId:String(row.offeringId),status:"COMPLETED"};
  }
  async addResource(actor:Actor,token:string,businessId:string,branchId:string,
   requestId:unknown,body:unknown):Promise<Created>{

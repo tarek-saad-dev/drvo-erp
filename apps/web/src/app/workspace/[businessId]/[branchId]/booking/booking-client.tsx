@@ -9,6 +9,7 @@ import {
   describeMoveFailure,moveRequestKeyId,suggestMoveStarts,
 } from "./booking-reschedule.mjs";
 import {useRouter} from "next/navigation";
+import BookingQuickCustomer from "./booking-quick-customer";
 
 type Resource={resourceId:string;displayName:string;kind:"PERSON"|"CHAIR"|"ROOM"|"EQUIPMENT";isActive:boolean};
 type Appointment={
@@ -565,6 +566,12 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
                 bookingRequest.current=null;
               }}>{c.displayName} — {c.phoneE164??""}</button>)}
           </div>
+          <BookingQuickCustomer apiRoot={scope} disabled={busy||!customersReady}
+            onSelected={c=>{
+              setCustomerId(c.customerId);setSelectedCustomer(c);
+              setCustomerQuery("");setCustomerResults([]);
+              bookingRequest.current=null;
+            }}/>
           <input type="hidden" value={customerId} readOnly required/>
           <label>الخدمة<select required value={offeringId} onChange={e=>{
             setOfferingId(e.target.value);bookingRequest.current=null;

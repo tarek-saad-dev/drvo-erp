@@ -78,7 +78,7 @@ async function main() {
   const restorePool = new sql.ConnectionPool({...base, database: restoreDb});
   await restorePool.connect();
   const hist = await restorePool.request().query('SELECT COUNT(*) AS n FROM core.SchemaMigration');
-  assert.ok(Number(hist.recordset[0].n) >= 40);
+  assert.ok(Number(hist.recordset[0].n) >= 42);
   await restorePool.close();
   await master.request().batch(`DROP DATABASE [${restoreDb}]`);
   await master.close();

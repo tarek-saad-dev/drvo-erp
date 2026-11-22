@@ -14,7 +14,7 @@ test('private website preview denies public access and never fakes payments or b
  assert.match(page,/notFound\(\)/);
  assert.match(controller,/DRVO_WEBSITE_BOOKING_PREVIEW_ENABLED!=="YES"/);
  assert.match(client,/credentials:"same-origin"/);
- assert.match(client,/booking+"\/appointments"/);
+ assert.ok(client.includes('booking+"/appointments"'));
  assert.match(client,/BookingQuickCustomer/);
  assert.match(client,/Idempotency-Key/);
  assert.match(client,/URLSearchParams/);

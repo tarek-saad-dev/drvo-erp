@@ -357,3 +357,43 @@ test("Booking handoff GET disabled by default and lacks public/unsafe Origin byp
  }finally{if(original===undefined)delete process.env.DRVO_BOOKING_ENABLED;
   else process.env.DRVO_BOOKING_ENABLED=original;}
 });
+
+test("Website Booking preview is opt-in, scoped K5 and UTC strict",async()=>{
+ const before=process.env.DRVO_WEBSITE_BOOKING_PREVIEW_ENABLED;
+ try{
+  delete process.env.DRVO_WEBSITE_BOOKING_PREVIEW_ENABLED;
+  const svc=new BookingService({getInternalPool(){throw Error("DB must stay off");}});
+  await assert.rejects(()=>svc.websiteSlots(actor,token,GUID(3),GUID(4),GUID(7),
+    GUID(6),"2027-01-02"),e=>e.getStatus?.()===404);
+ }finally{if(before===undefined)delete process.env.DRVO_WEBSITE_BOOKING_PREVIEW_ENABLED;
+  else process.env.DRVO_WEBSITE_BOOKING_PREVIEW_ENABLED=before;}
+ const restore=on({DRVO_K5_AUTH_ENABLED:"YES",DRVO_BOOKING_ENABLED:"YES",
+  DRVO_WEBSITE_BOOKING_PREVIEW_ENABLED:"YES"});
+ try{
+  const db=fakePool((procedure,args)=>{
+   assert.equal(procedure,"core.ReadWebsiteBookingSlots");
+   assert.equal(args.TenantId,actor.tenantId);
+   assert.equal(args.BusinessId,GUID(3));assert.equal(args.BranchId,GUID(4));
+   assert.equal(args.OfferingId,GUID(6));assert.equal(args.ResourceId,GUID(7));
+   assert.equal(args.UtcDayStart.toISOString(),"2027-01-02T00:00:00.000Z");
+   return {recordset:[{startsAtUtc:new Date("2027-01-02T09:00:00.000Z"),
+    endsAtUtc:new Date("2027-01-02T09:30:00.000Z")}]};
+  });
+  const svc=new BookingService(db);
+  assert.deepEqual(await svc.websiteSlots(actor,token,GUID(3),GUID(4),GUID(7),GUID(6),"2027-01-02"),{
+   utcDay:"2027-01-02",resourceId:GUID(7),offeringId:GUID(6),
+   advisory:true,confirmed:false,timezone:"UTC",
+   slots:[{startsAtUtc:"2027-01-02T09:00:00.000Z",endsAtUtc:"2027-01-02T09:30:00.000Z"}]});
+  assert.equal(db.calls.length,1);
+  for(const day of ["2027-02-29","2027-01-02T00:00:00.000Z","2027-2-2","9999-12-99",
+    "2027-01-02+03:00","bad",null]){
+   await assert.rejects(()=>svc.websiteSlots(actor,token,GUID(3),GUID(4),GUID(7),GUID(6),day),
+    e=>e.getStatus?.()===400);
+  }
+  for(const id of ["bad",null,undefined])
+   await assert.rejects(()=>svc.websiteSlots(actor,token,GUID(3),GUID(4),id,GUID(6),"2027-01-02"),
+    e=>e.getStatus?.()===400);
+  await assert.rejects(()=>svc.websiteSlots(actor,"bad",GUID(3),GUID(4),GUID(7),GUID(6),"2027-01-02"),
+   e=>e.getStatus?.()===404);
+ }finally{restore();}
+});

@@ -130,7 +130,7 @@ export class BookingService {
    throw new NotFoundException();
   const scope=this.scope(actor,token,businessId,branchId);
   const resource=validId(resourceId),offering=validId(offeringId);
-  if(typeof dayUtc!=="string"||!/^\\d{4}-\\d{2}-\\d{2}$/.test(dayUtc)||
+  if(typeof dayUtc!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(dayUtc)||
      !Number.isFinite(Date.parse(dayUtc+"T00:00:00.000Z"))||
      new Date(dayUtc+"T00:00:00.000Z").toISOString().slice(0,10)!==dayUtc)
    throw new BadRequestException("Invalid UTC day");

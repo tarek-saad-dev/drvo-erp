@@ -26,7 +26,7 @@ The script will:
 
 1. Create `DRVO_ERP_PILOT` (leaves `DRVO_ERP_STAGING` data untouched)
 2. Map existing app/migrator logins into Pilot DB
-3. Apply SQL001–042 + COPY_ONLY backup + restore witness
+3. Apply SQL001–043 + COPY_ONLY backup + restore witness
 4. Seed synthetic Owner `pilot.owner` (password only in `/root/drvo-erp-pilot-owner.once`)
 5. Install systemd SQL + K5/module flag drop-ins
 6. Restart API/Web

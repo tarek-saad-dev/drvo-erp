@@ -1,5 +1,8 @@
 # Start here — project handoff
 
+> **2026-11-22 LATEST MERGED:** [#170](https://github.com/tarek-saad-dev/drvo-erp/pull/170) (`main@9523dacf`, 32/32 PR-head CI PASS) gives private, scoped `COMPLETED` Booking→POS DRAFT handoff on SQL042, with Booking ID alone and independently authorized Catalog/POS read. [#169](https://github.com/tarek-saad-dev/drvo-erp/pull/169) added Booking NO_SHOW SQL041; [#167](https://github.com/tarek-saad-dev/drvo-erp/pull/167) added in-place Booking Customer registration. **Current authorized operator blocker:** [VPS queue #166](https://github.com/tarek-saad-dev/drvo-erp/issues/166), synthetic isolated `DRVO_ERP_PILOT`, SQL001–042; there is **no verified VPS pilot or Cut import, paid posting/public Booking remains OFF, ADR-031 still BLOCKED.** Next engineering [Website Booking #171](https://github.com/tarek-saad-dev/drvo-erp/issues/171).
+
+
 > **2026-11-21 FAST TRACK — ISOLATED LIVE PILOT:** `/pilot` is deployed on staging (flags OFF until activator). **One root command** creates synthetic `DRVO_ERP_PILOT` (does not rewrite `DRVO_ERP_STAGING` data): [ONE-COMMAND activation](../04-execution/PRIVATE-PILOT-LIVE-ACTIVATION-ONE-COMMAND-2026-11-21.md). Public `/demo/salon` stays synthetic. **ADR-031 BLOCKED. Never claim PILOT_VERIFIED without Owner acceptance.**
 
 > **2026-11-21 FOUNDER VISIBLE WORKSTATION LIVE:** [#158](https://github.com/tarek-saad-dev/drvo-erp/pull/158) MERGED · Staging Deploy SHA `d617ee2` · External smoke PASS for `cashier-workstation-shell-v1`. Demo URL still synthetic: https://erp-stage.drvotech.com/demo/salon. Evidence: [transplant note](../04-execution/CASHIER-POS-WORKSTATION-UX-TRANSPLANT-2026-11-20.md). **ADR-031 still BLOCKED.**

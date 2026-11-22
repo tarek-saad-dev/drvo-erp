@@ -1,6 +1,6 @@
 # Roadmap
 
-> **2026-11-22 BK-POS2 handoff (review):** Complete Cashier-like Booking→POS DRAFT trust seam via scoped SQL042, only completed Booking ID and independently authorized POS/Catalog price. Next phase: Website Booking consent, identity/public eligibility, availability and anti-abuse contracts before any public intake. No paid conversion until ADR-031. 
+> **2026-11-22 BK-POS2 handoff MERGED [#170](https://github.com/tarek-saad-dev/drvo-erp/pull/170), 32/32 PR-head CI PASS:** Complete Cashier-like Booking→POS DRAFT trust seam via scoped SQL042, only completed Booking ID and independently authorized POS/Catalog price. Next source-backed implementation [#171](https://github.com/tarek-saad-dev/drvo-erp/issues/171): Website Booking consent, identity/public eligibility, availability, plan/hold and anti-abuse contracts before any public intake. No paid conversion until ADR-031. 
 
 > **2026-11-22 BK-NOSHOW P0 source slice:** Port Cashier's absent/no-show state into Shared Booking with SQL041, protected REST status lifecycle and real UI button, concurrency/idempotency and Queue guard. Next: disposable SQL CI + independent Owner Pilot, then full Website Booking and POS conversion. ADR-031 remains BLOCKED.
 

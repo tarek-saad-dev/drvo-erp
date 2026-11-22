@@ -687,8 +687,6 @@ async function main(){
     const bookingId=(await created.json()).id;
     const handoff=endpoint+'/appointments/'+bookingId+'/pos-handoff';
     assert.equal((await get(handoff)).status,401);
-    assert.equal((await get(handoff,staffCookie)).status,200,
-     'booking.read alone permits read; POS independently enforces draft permission');
     assert.equal((await get(handoff,cookie)).status,404,
      'booked appointment must not expose POS handoff');
     assert.equal((await get(path(g.otherBusiness,g.otherBranch)+

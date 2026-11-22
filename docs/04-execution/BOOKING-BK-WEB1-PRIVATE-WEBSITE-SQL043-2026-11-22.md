@@ -1,6 +1,6 @@
 # BK-WEB1 — Cashier Website Booking → DRVO Booking Core, private source-backed P0 (2026-11-22)
 
-**Status:** Review PR; public capability NOT implemented or approved, no public customer endpoint. Exact Cashier pinned source `tarek-saad-dev/casher@f8fa67d2b1c8254e638cf89d95dcee75edc88598`. [#171](https://github.com/tarek-saad-dev/drvo-erp/issues/171).
+**Status:** Stage 1 MERGED [PR #173](https://github.com/tarek-saad-dev/drvo-erp/pull/173), `main@40175c59` (29/29 PR-head CI PASS); public capability NOT implemented or approved, no public customer endpoint. Exact Cashier pinned source `tarek-saad-dev/casher@f8fa67d2b1c8254e638cf89d95dcee75edc88598`. [#171](https://github.com/tarek-saad-dev/drvo-erp/issues/171).
 
 ## Cashier source review and ownership
 - `src/app/book/[branchCode]/page.tsx` and `src/lib/booking/hostedBookingPage.ts`: tenant/branch public eligibility must be explicit (unknown, disabled, inactive => non-disclosing denial). Not ported into a public DRVO route.
@@ -16,7 +16,7 @@
 
 ## Testing / evidence
 - Source and pure parser validation `apps/web/test/bk-web1-website-preview.test.cjs`; Nest unit in `apps/api/test/booking.test.cjs`.
-- Disposable SQL2022 `tools/booking/verify.cjs` with `BOOKING_SQL_043=YES` (runs SQL001–043) tests no window, OPEN window, foreign Business/Tenant/Branch, no cookie, invalid day/resource/service, complete SQL conflict visibility, existing appointment POST collision (409), EXECUTE-only SQL principal; fixture contains only synthetic generated GUIDs. K0/K1, private Browser, Purchasing, Pilot automation CI also required. **No test result/merge/deployment claimed until exact SHA CI verifies.**
+- Disposable SQL2022 `tools/booking/verify.cjs` with `BOOKING_SQL_043=YES` (runs SQL001–043) tests no window, OPEN window, foreign Business/Tenant/Branch, no cookie, invalid day/resource/service, complete SQL conflict visibility, existing appointment POST collision (409), EXECUTE-only SQL principal; fixture contains only synthetic generated GUIDs. K0/K1, private Browser, Purchasing, Pilot automation CI also required. **Verified PR-head `63c70756` 29/29 CI PASS**; no live deployment or VPS Owner Pilot evidence.
 
 ## Operator, deployment and limits
 - `DRVO_ERP_PILOT` isolated once-only activation now expects SQL001–043 on a **fresh** verified preflight; update #166 only after merge. Never re-run activator on partial failure, and never touch `DRVO_ERP_STAGING` or Cut production without separate authorization.

@@ -4,7 +4,7 @@
 
 **2026-11-22 migration-note:** SQL041 No-show and SQL042 verified Booking→POS handoff are applied only to future authorized isolated synthetic Pilot activation after reviewed main is pulled. Never re-run the one-time activator after a partial failure; SQL041 on any live Cut database requires separate approvals.
 
-**Not claimed:** `PILOT_VERIFIED`, ADR-031 posting, Cut live import, production readiness.
+**SQL043 scope:** Site/Website **private K5 preview only**; both `DRVO_WEBSITE_BOOKING_PREVIEW_ENABLED` and `DRVO_WEBSITE_BOOKING_PREVIEW_WEB_ENABLED` remain OFF by default in Pilot activation. No public booking issuance, public auth, customer import, notifications or financial posting.\n\n**Not claimed:** `PILOT_VERIFIED`, ADR-031 posting, Cut live import, production readiness.
 
 ## Already done in GitHub
 

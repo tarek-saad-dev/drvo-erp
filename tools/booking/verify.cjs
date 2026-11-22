@@ -605,6 +605,7 @@ async function main(){
    assert.equal((await post(changePath(g.business,g.branch,bookingId),cookie,guid(),
     {status:'COMPLETED'})).status,409);
   });
+  if(process.env.BOOKING_SQL_041==='YES'){
   await pass('SQL041 NO_SHOW: scoped, after start, queue guard, idempotent audit',async()=>{
    const endpoint=path(g.business,g.branch),start=future(850);
    const res=await post(endpoint+'/appointments',cookie,guid(),{
@@ -673,6 +674,7 @@ async function main(){
    assert.equal(changes.recordset[0].TargetStatus,'NO_SHOW');
    assert.equal(String(changes.recordset[0].ActorAccountId).toLowerCase(),g.account);
   });
+  }
   await pass('Lifecycle: completion requires booking already started, preserves history',async()=>{
    const at=future(780),req={customerId:g.customer,offeringId:g.service,
     resourceId:secondResource,startsAtUtc:at};

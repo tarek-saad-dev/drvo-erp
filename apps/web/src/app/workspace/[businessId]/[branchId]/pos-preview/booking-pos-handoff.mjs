@@ -1,5 +1,5 @@
 'use strict';
-const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const GUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export function parseVerifiedBookingHandoff(data,bookingId){
  if(typeof bookingId!=='string'||!GUID.test(bookingId)||
     !data||typeof data!=='object'||Array.isArray(data))return null;

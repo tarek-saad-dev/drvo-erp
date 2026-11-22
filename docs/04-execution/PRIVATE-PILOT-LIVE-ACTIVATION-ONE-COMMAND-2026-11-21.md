@@ -2,7 +2,9 @@
 
 **Goal:** Founder-accessible HTTPS Private Pilot on a **new isolated** SQL database `DRVO_ERP_PILOT` (synthetic data only), shared Cashier 3-pane UI, persistence after refresh/re-login.
 
-**2026-11-22 migration-note:** New SQL041 Booking NO_SHOW is applied only to future authorized isolated synthetic Pilot activation after the reviewed main is pulled. Never re-run the one-time activator after a partial failure; SQL041 on any live Cut database requires separate approvals.\n\n**Not claimed:** `PILOT_VERIFIED`, ADR-031 posting, Cut live import, production readiness.
+**2026-11-22 migration-note:** New SQL041 Booking NO_SHOW is applied only to future authorized isolated synthetic Pilot activation after the reviewed main is pulled. Never re-run the one-time activator after a partial failure; SQL041 on any live Cut database requires separate approvals.
+
+**Not claimed:** `PILOT_VERIFIED`, ADR-031 posting, Cut live import, production readiness.
 
 ## Already done in GitHub
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ONE interactive root session for isolated Private Pilot (synthetic DB only).
-# Creates DRVO_ERP_PILOT, migrates SQL001–040, seeds Owner, wires systemd SQL+flags.
+# Creates DRVO_ERP_PILOT, migrates SQL001–041, seeds Owner, wires systemd SQL+flags.
 # Does NOT modify rows inside DRVO_ERP_STAGING. ADR-031 posting stays OFF.
 set -Eeuo pipefail
 umask 077

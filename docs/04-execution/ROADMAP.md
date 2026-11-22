@@ -1,5 +1,7 @@
 # Roadmap
 
+> **2026-11-22 BK-NOSHOW P0 source slice:** Port Cashier's absent/no-show state into Shared Booking with SQL041, protected REST status lifecycle and real UI button, concurrency/idempotency and Queue guard. Next: disposable SQL CI + independent Owner Pilot, then full Website Booking and POS conversion. ADR-031 remains BLOCKED.
+
 > **2026-11-22 BOOKING BK-QC1 (SOURCE REVIEW):** Next incremental Cashier-preserving operator journey: Booking quick-register Customer in-place via protected Customers Core with independent K5 scopes; duplicate phone resolved only after Business server reread, preserved create idempotency and tests. [BK-QC1](BOOKING-BK-QC1-INPLACE-CUSTOMER-2026-11-22.md). Still needs exact source CI and isolated Owner browser, and does NOT address full website booking or finance. #163/#166 retain all Cut go-live blockers.
 
 

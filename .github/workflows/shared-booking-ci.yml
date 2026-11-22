@@ -36,7 +36,7 @@ jobs:
           npm ci --prefix apps/api --no-audit --no-fund
           npm test --prefix apps/api
           node --check tools/booking/verify.cjs
-          node --test apps/web/test/booking-reschedule.test.cjs apps/web/test/booking-customer-finder.test.cjs apps/web/test/booking-pos-handoff.test.cjs apps/web/test/booking-quick-customer.test.cjs
+          node --test apps/web/test/booking-no-show.test.cjs apps/web/test/booking-reschedule.test.cjs apps/web/test/booking-customer-finder.test.cjs apps/web/test/booking-pos-handoff.test.cjs apps/web/test/booking-quick-customer.test.cjs
       - name: Start disposable localhost SQL Server 2022
         shell: bash
         run: |
@@ -54,6 +54,7 @@ jobs:
       - name: Prove scoped Booking SQL, real HTTP, overlap and concurrent inserts
         env:
           BOOKING_SQL_DISPOSABLE: 'YES'
+          BOOKING_SQL_041: 'YES'
           BOOKING_TEST_PORT: '14342'
         run: node tools/booking/verify.cjs
       - name: Show disposable SQL diagnostics on failure

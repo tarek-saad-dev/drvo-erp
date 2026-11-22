@@ -153,7 +153,8 @@ async function main(){
    // Browser path needs SQL018 HR + SQL024 Customer search for Cashier-parity Booking UX.
    // Non-browser Booking HTTP CI stays at SQL017 Booking foundation tip.
    // Browser path: SQL018 HR + SQL024 SearchCustomers (required for Booking Business search UX).
-   const migrations=process.env.BOOKING_BROWSER_DISPOSABLE==='YES'?24:17;
+   const migrations=process.env.BOOKING_SQL_041==='YES'?41:
+    process.env.BOOKING_BROWSER_DISPOSABLE==='YES'?24:17;
    if(process.env.BOOKING_BROWSER_DISPOSABLE==='YES'){
     assert.ok(migrations>=24,'disposable browser SQL must include SearchCustomers');
    }
@@ -604,6 +605,76 @@ async function main(){
    assert.equal((await post(changePath(g.business,g.branch,bookingId),cookie,guid(),
     {status:'COMPLETED'})).status,409);
   });
+  if(process.env.BOOKING_SQL_041==='YES'){
+  await pass('SQL041 NO_SHOW: scoped, after start, queue guard, idempotent audit',async()=>{
+   const endpoint=path(g.business,g.branch),start=future(850);
+   const res=await post(endpoint+'/appointments',cookie,guid(),{
+    customerId:g.customer,offeringId:g.service,
+    resourceId:secondResource,startsAtUtc:start,
+   });
+   assert.equal(res.status,200);
+   const bookingId=(await res.json()).id;
+   const target=changePath(g.business,g.branch,bookingId);
+   assert.equal((await post(target,cookie,guid(),{status:'NO_SHOW'})).status,409,
+    'must not record future booking as no-show');
+   assert.equal((await post(target,cookie,guid(),{status:'no_show'})).status,400);
+   assert.equal((await post(target,cookie,guid(),{status:'NO_SHOW',tenantId:g.t})).status,400);
+   assert.equal((await post(changePath(g.otherBusiness,g.otherBranch,bookingId),
+     cookie,guid(),{status:'NO_SHOW'})).status,404);
+   const db=admin.request().input('t',sql.UniqueIdentifier,g.t)
+    .input('b',sql.UniqueIdentifier,g.business)
+    .input('br',sql.UniqueIdentifier,g.branch)
+    .input('booking',sql.UniqueIdentifier,bookingId);
+   await db.query("UPDATE core.BookingAppointment SET"+
+    " StartsAtUtc=DATEADD(MINUTE,-40,SYSUTCDATETIME()),"+
+    " EndsAtUtc=DATEADD(MINUTE,-10,SYSUTCDATETIME())"+
+    " WHERE TenantId=@t AND BusinessId=@b AND BranchId=@br AND BookingId=@booking");
+   const ticketId=guid();
+   await admin.request().input('t',sql.UniqueIdentifier,g.t)
+    .input('b',sql.UniqueIdentifier,g.business)
+    .input('br',sql.UniqueIdentifier,g.branch)
+    .input('ticket',sql.UniqueIdentifier,ticketId)
+    .input('req',sql.UniqueIdentifier,guid())
+    .input('booking',sql.UniqueIdentifier,bookingId)
+    .input('customer',sql.UniqueIdentifier,g.customer)
+    .input('resource',sql.UniqueIdentifier,secondResource)
+    .input('service',sql.UniqueIdentifier,g.service)
+    .input('actor',sql.UniqueIdentifier,g.account)
+    .query("INSERT core.QueueTicket(TenantId,BusinessId,BranchId,TicketId,ClientRequestId,"+
+      "TicketCode,CustomerId,ResourceId,OfferingId,BookingId,DurationMinutes,"+
+      "ExpectedStartAtUtc,ExpectedEndAtUtc,Status,Source,CreatedByAccountId)"+
+      " VALUES(@t,@b,@br,@ticket,@req,'NS-041',@customer,@resource,@service,@booking,30,"+
+      "DATEADD(MINUTE,-40,SYSUTCDATETIME()),DATEADD(MINUTE,-10,SYSUTCDATETIME()),"+
+      "'WAITING','BOOKING_HANDOFF',@actor)");
+   assert.equal((await post(target,cookie,guid(),{status:'NO_SHOW'})).status,409,
+    'active Queue ticket must be reconciled before absence');
+   await admin.request().input('t',sql.UniqueIdentifier,g.t)
+    .input('b',sql.UniqueIdentifier,g.business)
+    .input('br',sql.UniqueIdentifier,g.branch)
+    .input('ticket',sql.UniqueIdentifier,ticketId)
+    .query("UPDATE core.QueueTicket SET Status='CANCELLED'"+
+      " WHERE TenantId=@t AND BusinessId=@b AND BranchId=@br AND TicketId=@ticket");
+   const idempotency=guid();
+   const marked=await post(target,cookie,idempotency,{status:'NO_SHOW'});
+   assert.equal(marked.status,200);
+   assert.deepEqual(await marked.json(),{id:bookingId,status:'NO_SHOW',changed:true});
+   const replay=await post(target,cookie,idempotency,{status:'NO_SHOW'});
+   assert.equal(replay.status,200);
+   assert.deepEqual(await replay.json(),{id:bookingId,status:'NO_SHOW',changed:false});
+   assert.equal((await post(target,cookie,guid(),{status:'COMPLETED'})).status,409);
+   const list=(await (await get(endpoint,cookie)).json()).appointments;
+   assert.equal(list.find(x=>x.bookingId===bookingId)?.status,'NO_SHOW');
+   const changes=await admin.request().input('t',sql.UniqueIdentifier,g.t)
+    .input('b',sql.UniqueIdentifier,g.business)
+    .input('br',sql.UniqueIdentifier,g.branch)
+    .input('booking',sql.UniqueIdentifier,bookingId)
+    .query("SELECT TargetStatus,ActorAccountId FROM core.BookingStatusChange"+
+     " WHERE TenantId=@t AND BusinessId=@b AND BranchId=@br AND BookingId=@booking");
+   assert.equal(changes.recordset.length,1);
+   assert.equal(changes.recordset[0].TargetStatus,'NO_SHOW');
+   assert.equal(String(changes.recordset[0].ActorAccountId).toLowerCase(),g.account);
+  });
+  }
   await pass('Lifecycle: completion requires booking already started, preserves history',async()=>{
    const at=future(780),req={customerId:g.customer,offeringId:g.service,
     resourceId:secondResource,startsAtUtc:at};

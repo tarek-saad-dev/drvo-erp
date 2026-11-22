@@ -31,7 +31,7 @@ test('activator scripts refuse staging DB identity and secrets in git', () => {
   assert.match(sh, /45-pilot-sql\.conf/);
   assert.doesNotMatch(sh, /sa_password\s*=|Password=.*Drvo!/i);
   assert.match(sql, /DRVO_ERP_PILOT/);
-  assert.match(sql, /040_owner_pilot_module_permissions\.sql/);
+  assert.match(sql, /041_booking_no_show_terminal\.sql/);
   assert.match(sql, /assert\.notEqual\(DB, 'DRVO_ERP_STAGING'\)/);
   assert.match(sql, /productionVerificationClaimed: false/);
 });

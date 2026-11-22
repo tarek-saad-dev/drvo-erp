@@ -11,12 +11,12 @@ export type BookingResourceView={resourceId:string;displayName:string;kind:strin
 export type AppointmentView={
  bookingId:string;customerId:string;offeringId:string;resourceId:string;
  customerName:string;offeringName:string;resourceName:string;
- startsAtUtc:string;endsAtUtc:string;status:"BOOKED"|"CANCELLED"|"COMPLETED";
+ startsAtUtc:string;endsAtUtc:string;status:"BOOKED"|"CANCELLED"|"COMPLETED"|"NO_SHOW";
 };
 export type BookingRead={resources:BookingResourceView[];appointments:AppointmentView[]};
 export type BookingWindow={windowId:string;resourceId:string;startsAtUtc:string;endsAtUtc:string;state:"OPEN"|"CLOSED"};
 export type Created={id:string;created:boolean};
-export type StatusChange={id:string;status:"CANCELLED"|"COMPLETED";changed:boolean};
+export type StatusChange={id:string;status:"CANCELLED"|"COMPLETED"|"NO_SHOW";changed:boolean};
 export type WindowClosure={id:string;state:"CLOSED";changed:boolean};
 /** BK-06 (SQL033): a move keeps the original duration; `validateOnly` writes nothing. */
 export type RescheduleResult={
@@ -99,7 +99,7 @@ export class BookingService {
    resourceName:String(row.resourceName),
    startsAtUtc:new Date(row.startsAtUtc as string|number|Date).toISOString(),
    endsAtUtc:new Date(row.endsAtUtc as string|number|Date).toISOString(),
-   status:(row.status==="CANCELLED"?"CANCELLED":row.status==="COMPLETED"?"COMPLETED":"BOOKED") as AppointmentView["status"],
+   status:(row.status==="CANCELLED"?"CANCELLED":row.status==="COMPLETED"?"COMPLETED":row.status==="NO_SHOW"?"NO_SHOW":"BOOKED") as AppointmentView["status"],
   }));
   return {resources,appointments};
  }
@@ -149,14 +149,14 @@ export class BookingService {
   const scope=this.scope(actor,token,businessId,branchId);
   const key=validId(requestId),id=validId(bookingId);
   const d=data(body,["status"]);
-  if(d.status!=="CANCELLED"&&d.status!=="COMPLETED")
+  if(d.status!=="CANCELLED"&&d.status!=="COMPLETED"&&d.status!=="NO_SHOW")
    throw new BadRequestException("Invalid status transition");
   const result=await this.execute(scope,"core.ChangeBookingAppointmentStatus",r=>r
    .input("ClientRequestId",sql.UniqueIdentifier,key)
    .input("BookingId",sql.UniqueIdentifier,id)
    .input("TargetStatus",sql.VarChar(12),d.status));
   const row=result.recordset?.[0];
-  if(!row||!["CANCELLED","COMPLETED"].includes(String(row.status)))
+  if(!row||!["CANCELLED","COMPLETED","NO_SHOW"].includes(String(row.status)))
    throw new ServiceUnavailableException("Booking transition unavailable");
   return {id:String(row.id),status:row.status as StatusChange["status"],
    changed:Boolean(row.changed)};

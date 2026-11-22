@@ -74,7 +74,7 @@ test("status lifecycle rejects forged scope/fields before SQL",async()=>{
   const svc=new BookingService({getInternalPool(){throw Error("DB must not be used");}});
   const book=GUID(13),id=GUID(14);
   for(const body of [
-   {status:"POSTED"},{status:"BOOKED"},{status:"CANCELLED",tenantId:GUID(1)},
+   {status:"POSTED"},{status:"BOOKED"},{status:"no_show"},{status:"CANCELLED",tenantId:GUID(1)},
    {status:"COMPLETED",posted:true},{},{status:null},
   ])await assert.rejects(()=>svc.changeAppointmentStatus(
    actor,token,GUID(3),GUID(4),id,book,body),e=>e.getStatus?.()===400);
@@ -288,5 +288,28 @@ test("reschedule and validate-move endpoints reject foreign Origin before identi
    {headers:{}},{setHeader(){}},GUID(3),GUID(4),GUID(9),move),e=>e.getStatus?.()===401);
   await assert.rejects(()=>controller.validateMove("https://attacker.invalid",
    {headers:{}},{setHeader(){}},GUID(3),GUID(4),GUID(9),move),e=>e.getStatus?.()===401);
+ }finally{restore();}
+});
+
+// SQL041: no-show is authorized by Booking, never written by frontend SQL.
+test("Booking NO_SHOW calls existing scoped idempotent stored procedure",async()=>{
+ const restore=on({DRVO_BOOKING_ENABLED:"YES",DRVO_K5_AUTH_ENABLED:"YES"});
+ try{
+  const calls=[];
+  const db={getInternalPool(){return {request(){
+   const data={};const req={input(key,_type,value){data[key]=value;return req;},
+    async execute(procedure){calls.push({procedure,data});return {recordset:[{
+      id:GUID(21),status:"NO_SHOW",changed:true}]};}};
+   return req;
+  }};}};
+  const svc=new BookingService(db);
+  assert.deepEqual(await svc.changeAppointmentStatus(actor,token,GUID(3),GUID(4),GUID(20),
+    GUID(21),{status:"NO_SHOW"}),{id:GUID(21),status:"NO_SHOW",changed:true});
+  assert.equal(calls.length,1);
+  assert.equal(calls[0].procedure,"core.ChangeBookingAppointmentStatus");
+  assert.equal(calls[0].data.TargetStatus,"NO_SHOW");
+  assert.equal(calls[0].data.TenantId,actor.tenantId);
+  assert.equal(calls[0].data.BusinessId,GUID(3));
+  assert.equal(calls[0].data.BranchId,GUID(4));
  }finally{restore();}
 });

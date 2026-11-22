@@ -1,7 +1,7 @@
 'use strict';
 /**
  * Root-invoked SQL activator for isolated DRVO_ERP_PILOT only.
- * Migrates SQL001–040, backup+restore witness, seeds synthetic Owner.
+ * Migrates SQL001–041, backup+restore witness, seeds synthetic Owner.
  * Never targets DRVO_ERP_STAGING / production / Cut.
  */
 const assert = require('node:assert/strict');
@@ -53,8 +53,8 @@ async function main() {
   assert.equal(who.recordset[0].db, DB);
 
   const applied = await applyMigrations(pool);
-  assert.ok(applied.length >= 40, 'expected migrations through SQL040');
-  assert.equal(applied[applied.length - 1].filename, '040_owner_pilot_module_permissions.sql');
+  assert.ok(applied.length >= 41, 'expected migrations through SQL041');
+  assert.equal(applied[applied.length - 1].filename, '041_booking_no_show_terminal.sql');
 
   const stamp = Date.now();
   const bak = `/var/opt/mssql/data/${DB}_pilot_${stamp}.bak`;
@@ -158,7 +158,7 @@ async function main() {
     JSON.stringify({
       ok: true,
       database: DB,
-      migrationsTip: '040_owner_pilot_module_permissions.sql',
+      migrationsTip: '041_booking_no_show_terminal.sql',
       migrationRows: applied.length,
       ownerUsername: username,
       ownerOnceFile: ownerOnce,

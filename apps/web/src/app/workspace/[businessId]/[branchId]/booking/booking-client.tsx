@@ -15,7 +15,7 @@ type Resource={resourceId:string;displayName:string;kind:"PERSON"|"CHAIR"|"ROOM"
 type Appointment={
   bookingId:string;customerId:string;offeringId:string;resourceId:string;
   customerName:string;offeringName:string;resourceName:string;
-  startsAtUtc:string;endsAtUtc:string;status:"BOOKED"|"CANCELLED"|"COMPLETED";
+  startsAtUtc:string;endsAtUtc:string;status:"BOOKED"|"CANCELLED"|"COMPLETED"|"NO_SHOW";
 };
 type BookingRead={resources:Resource[];appointments:Appointment[]};
 type BookingWindow={windowId:string;resourceId:string;startsAtUtc:string;endsAtUtc:string;state:"OPEN"|"CLOSED"};
@@ -308,7 +308,8 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
     },bookingRequest);
     if(created)setLocalStart("");
   }
-  async function changeStatus(bookingId:string,next:"CANCELLED"|"COMPLETED"){
+  async function changeStatus(bookingId:string,next:"CANCELLED"|"COMPLETED"|"NO_SHOW"){
+    if(next==="NO_SHOW"&&!window.confirm("تأكيد تسجيل عدم الحضور؟ الحالة نهائية ولا تنشئ بيعًا أو تحصيلًا."))return;
     if(busy||!GUID.test(bookingId))return;
     setBusy(true);setNotice("");
     const retryId=bookingId+":"+next;
@@ -334,7 +335,7 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
         setNotice("استجابة تحديث غير صحيحة.");return;
       }
       statusKeys.current.delete(retryId);
-      setNotice(next==="CANCELLED"?"تم إلغاء الحجز وتحرير الموعد.":"تم إتمام الموعد. لا يوجد بيع أو تحصيل تلقائي.");
+      setNotice(next==="CANCELLED"?"تم إلغاء الحجز وتحرير الموعد.":next==="NO_SHOW"?"تم تسجيل عدم الحضور. لا يوجد بيع أو تحصيل تلقائي.":"تم إتمام الموعد. لا يوجد بيع أو تحصيل تلقائي.");
       await load();
     }catch{setNotice("تعذر الاتصال. أعد المحاولة بنفس الطلب لتفادي التكرار.");}
     finally{setBusy(false);}
@@ -629,7 +630,7 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
                 col.items.map(a=><article key={a.bookingId}>
                   <span dir="ltr">{new Date(a.startsAtUtc).toLocaleTimeString("ar-EG",{hour:"2-digit",minute:"2-digit"})}</span>
                   <span>{a.customerName}</span>
-                  <span className="k5-muted">{a.offeringName} · {a.status==="BOOKED"?"محجوز":"مكتمل"}</span>
+                  <span className="k5-muted">{a.offeringName} · {a.status==="BOOKED"?"محجوز":a.status==="NO_SHOW"?"لم يحضر":"مكتمل"}</span>
                 </article>)}
             </div>)}
         </div>
@@ -688,7 +689,7 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
               <td>{b.customerName}</td><td>{b.offeringName}</td><td>{b.resourceName}</td>
               <td dir="ltr">{new Date(b.startsAtUtc).toLocaleString("ar-EG")}</td>
               <td dir="ltr">{new Date(b.endsAtUtc).toLocaleString("ar-EG")}</td>
-              <td>{b.status==="BOOKED"?"محجوز":b.status==="CANCELLED"?"ملغي":"مكتمل"}</td>
+              <td>{b.status==="BOOKED"?"محجوز":b.status==="CANCELLED"?"ملغي":b.status==="NO_SHOW"?"لم يحضر":"مكتمل"}</td>
               <td>{b.status==="COMPLETED"&&canPrepareDraft&&GUID.test(b.offeringId)&&GUID.test(b.customerId)?
                 <Link href={home+"/pos-preview?customerId="+encodeURIComponent(b.customerId)+
                   "&offeringId="+encodeURIComponent(b.offeringId)}
@@ -702,6 +703,11 @@ export default function BookingClient({businessId,branchId,posWebEnabled,draftsW
                     onClick={()=>openMove(b)}>نقل الموعد</a>}
                 <button type="button" disabled={busy} onClick={()=>void changeStatus(b.bookingId,"CANCELLED")}>
                   إلغاء الحجز
+                </button>
+                <button type="button" disabled={busy||Date.parse(b.startsAtUtc)>Date.now()}
+                  title="الغياب متاح بعد بداية الموعد فقط"
+                  onClick={()=>void changeStatus(b.bookingId,"NO_SHOW")}>
+                  لم يحضر
                 </button>
                 <button type="button" disabled={busy||Date.parse(b.startsAtUtc)>Date.now()}
                   title="الإتمام متاح بعد بداية الموعد فقط"

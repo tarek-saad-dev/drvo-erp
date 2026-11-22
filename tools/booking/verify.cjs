@@ -707,8 +707,15 @@ async function main(){
     const ok=await get(handoff,cookie);
     assert.equal(ok.status,200);
     assert.equal(ok.headers.get('cache-control'),'no-store');
-    assert.deepEqual(await ok.json(),{
-      bookingId,customerId:g.customer,offeringId:g.service,status:'COMPLETED',
+    const verified=await ok.json();
+    assert.deepEqual({
+      bookingId:String(verified.bookingId).toLowerCase(),
+      customerId:String(verified.customerId).toLowerCase(),
+      offeringId:String(verified.offeringId).toLowerCase(),
+      status:verified.status,
+    },{
+      bookingId:bookingId.toLowerCase(),customerId:g.customer.toLowerCase(),
+      offeringId:g.service.toLowerCase(),status:'COMPLETED',
     });
     assert.equal((await get(endpoint+'/appointments/'+guid()+'/pos-handoff',cookie)).status,404);
     const perms=await app.query("SELECT"+

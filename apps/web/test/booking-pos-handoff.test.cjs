@@ -49,7 +49,7 @@ test('untrusted link ID only pre-fills after independently authorized POS/Catalo
  assert.match(client,/setCustomerRevision\(v=>v\+1\)/);
  assert.match(client,/expandPackageToDraftLines/);
  assert.match(client,/\/catalog\/packages/);
- assert.match(client,/o\.offeringId===offeringHint&&GUID\.test/);
+ assert.match(client,/o\.offeringId\.toLowerCase\(\)===offeringHint\.toLowerCase\(\)/);
  assert.match(client,/o\.isActive&&o\.kind==="SERVICE"/);
  assert.match(client,/setLines\(current=>current\.length!==0\|\|!handoffLines\?current:handoffLines\)/);
  assert.match(client,/credentials:"same-origin",cache:"no-store"/);

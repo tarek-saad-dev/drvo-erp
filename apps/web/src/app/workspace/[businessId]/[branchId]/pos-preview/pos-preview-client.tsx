@@ -187,7 +187,7 @@ export default function PosPreviewClient({businessId,branchId,draftsEnabled,rich
           }catch{/* fall back to offeringId */}
         }
         const offering=offeringHint!==null?data.offerings.find(o=>
-          o.offeringId===offeringHint&&GUID.test(o.offeringId)&&
+          GUID.test(o.offeringId)&&o.offeringId.toLowerCase()===offeringHint.toLowerCase()&&
           o.isActive&&o.kind==="SERVICE"):undefined;
         // Package expand only when cart empty; otherwise (or on expand miss) offeringId.
         // Compute seed outside setState so TypeScript sees the branch result.
